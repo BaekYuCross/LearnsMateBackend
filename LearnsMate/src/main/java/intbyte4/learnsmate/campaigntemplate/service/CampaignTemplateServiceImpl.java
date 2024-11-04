@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
-public class CampaignServiceImpl implements CampaignService {
+public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     private final CampaignTemplateRepository campaignTemplateRepository;
 }
