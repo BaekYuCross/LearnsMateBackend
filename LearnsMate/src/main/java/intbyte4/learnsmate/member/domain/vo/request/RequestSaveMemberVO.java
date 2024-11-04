@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @ToString
-public class RequestInsertMemberVO {
+public class RequestSaveMemberVO {
     private Long memberCode;
     private MemberType memberType;
     private String memberEmail;
