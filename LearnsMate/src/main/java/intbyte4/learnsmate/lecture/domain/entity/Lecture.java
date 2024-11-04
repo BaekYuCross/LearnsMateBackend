@@ -1,10 +1,9 @@
 package intbyte4.learnsmate.lecture.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -17,13 +16,14 @@ import java.time.LocalDateTime;
 @Builder
 public class Lecture {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lecture_code")
     private Long lectureCode;
 
-    @Column(name = "lecture_title")
+    @Column(name = "lecture_title", nullable = false)
     private String lectureTitle;
 
-    @Column(name = "lecture_category")
+    @Column(name = "lecture_category", nullable = false)
     private Integer lectureCategory;
 
     @Column(name = "lecture_confirm_status")
@@ -35,14 +35,16 @@ public class Lecture {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "lecture_image")
+    @Column(name = "lecture_image", length = 3000)
     private String lectureImage;
 
     @Column(name = "lecture_price")
     private Integer lecturePrice;
 
-    @Column(name = "tutor_code")
-    private Long tutorCode;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tutor_code")
+    @Where(clause = "member_type = 'TUTOR'")
+    private Member tutor;
 
     @Column(name = "lecture_status")
     private Boolean lectureStatus;
