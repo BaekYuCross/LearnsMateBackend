@@ -2,7 +2,7 @@ package intbyte4.learnsmate.member.domain.dto;
 
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.domain.vo.request.RequestInsertMemberVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public class MemberDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public MemberDTO insertMemberRequest(RequestInsertMemberVO request) {
+    public MemberDTO insertMemberRequest(RequestSaveMemberVO request) {
         this.memberType = request.getMemberType();
         this.memberEmail = request.getMemberEmail();
         this.memberPassword = request.getMemberPassword();
