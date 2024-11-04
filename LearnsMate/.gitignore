@@ -1,5 +1,12 @@
 HELP.md
 .gradle
+gradlew.bat
+gradlew
+.gradle
+settings.gradle
+.gitattributes
+.gradle/
+gradle/
 .idea/
 build/
 .idea/
