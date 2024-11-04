@@ -19,7 +19,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestInsertMemberVO request) {
 
         MemberDTO memberDTO = new MemberDTO().insertMemberRequest(request);
