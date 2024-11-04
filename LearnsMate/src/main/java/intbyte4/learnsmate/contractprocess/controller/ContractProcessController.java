@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.contractprocess.Controller;
+package intbyte4.learnsmate.contractprocess.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
