@@ -17,41 +17,41 @@ import java.time.LocalDateTime;
 public class Lecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lecture_code")
+    @Column(name = "lecture_code", nullable = false)
     private Long lectureCode;
 
-    @Column(name = "lecture_title")
+    @Column(name = "lecture_title", nullable = false)
     private String lectureTitle;
 
-    @Column(name = "lecture_category")
+    @Column(name = "lecture_category", nullable = false)
     private Integer lectureCategory;
 
-    @Column(name = "lecture_confirm_status")
+    @Column(name = "lecture_confirm_status", nullable = false)
     private Boolean lectureConfirmStatus;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "lecture_image", length = 3000)
+    @Column(name = "lecture_image", nullable = false , length = 3000)
     private String lectureImage;
 
-    @Column(name = "lecture_price")
+    @Column(name = "lecture_price", nullable = false)
     private Integer lecturePrice;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "tutor_code")
+    @ManyToOne
+    @JoinColumn(name = "tutor_code", nullable = false)
     @Where(clause = "member_type = 'TUTOR'")
     private Member tutor;
 
-    @Column(name = "lecture_status")
+    @Column(name = "lecture_status", nullable = false)
     private Boolean lectureStatus;
 
-    @Column(name = "lecture_click_count")
+    @Column(name = "lecture_click_count", nullable = false)
     private Integer lectureClickCount;
 
-    @Column(name = "lecture_level")
+    @Column(name = "lecture_level", nullable = false)
     private Integer lectureLevel;
 }
