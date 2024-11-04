@@ -20,10 +20,10 @@ public class Lecture {
     @Column(name = "lecture_code")
     private Long lectureCode;
 
-    @Column(name = "lecture_title", nullable = false)
+    @Column(name = "lecture_title")
     private String lectureTitle;
 
-    @Column(name = "lecture_category", nullable = false)
+    @Column(name = "lecture_category")
     private Integer lectureCategory;
 
     @Column(name = "lecture_confirm_status")
