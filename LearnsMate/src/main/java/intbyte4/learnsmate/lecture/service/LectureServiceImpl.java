@@ -29,6 +29,13 @@ public class LectureServiceImpl implements LectureService {
     }
 
     // 강의 단건 조회
+    public LectureDTO getLectureById(Long lectureId) {
+        Lecture lecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
+        return lecture.convertToDTO();
+    }
+
+
     // 카테고리별 강의 조회
 
 
