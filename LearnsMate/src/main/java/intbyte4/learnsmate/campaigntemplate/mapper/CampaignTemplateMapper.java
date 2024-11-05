@@ -6,6 +6,7 @@ import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestEditTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestRegisterTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseEditTemplateVO;
+import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseFindTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseRegisterTemplateVO;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +63,18 @@ public class CampaignTemplateMapper {
                 .campaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle())
                 .campaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents())
                 .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public ResponseFindTemplateVO fromDtoToFindResponseVO(CampaignTemplateDTO campaignTemplateDTO) {
+        return ResponseFindTemplateVO.builder()
+                .campaignTemplateCode(campaignTemplateDTO.getCampaignTemplateCode())
+                .campaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle())
+                .campaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents())
+                .campaignTemplateFlag(campaignTemplateDTO.getCampaignTemplateFlag())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .adminCode(campaignTemplateDTO.getAdminCode())
                 .build();
     }
 
