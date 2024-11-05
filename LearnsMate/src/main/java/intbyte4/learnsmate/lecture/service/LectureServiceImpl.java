@@ -65,4 +65,14 @@ public class LectureServiceImpl implements LectureService {
         return lecture.convertToDTO();
     }
 
+    @Transactional
+    public LectureDTO deleteLecture(LectureDTO lectureDTO) {
+        Lecture lecture = lectureRepository.findById(lectureDTO.getLectureCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
+        lecture.toDelete(lectureDTO);
+        lectureRepository.save(lecture);
+        return lecture.convertToDTO();
+    }
+
+
 }
