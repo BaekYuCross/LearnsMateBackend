@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("campaignTemplateController")
-@RequestMapping("campaigntemplate")
+@RequestMapping("campaign-template")
 @Slf4j
 @RequiredArgsConstructor
 public class CampaignTemplateController {
@@ -46,7 +46,7 @@ public class CampaignTemplateController {
         }
     }
 
-    @PatchMapping("/{campaignTemplateCode}")
+    @PatchMapping("/edit/{campaignTemplateCode}")
     public ResponseEntity<?> editTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode, @RequestBody RequestEditTemplateVO request) {
         log.info("템플릿 수정 요청 : {}", request);
         try {
@@ -61,6 +61,25 @@ public class CampaignTemplateController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {
             log.error("캠페인 템플릿 수정 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
+        }
+    }
+
+    @PatchMapping("/delete/{campaignTemplateCode}")
+    public ResponseEntity<?> deleteTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
+        log.info("템플릿 삭제 요청된 템플릿 코드 : {}", campaignTemplateCode);
+        try {
+            CampaignTemplateDTO campaignTemplateDTO = new CampaignTemplateDTO();
+            campaignTemplateDTO.setCampaignTemplateCode(campaignTemplateCode);
+
+            campaignTemplateService.deleteTemplate(campaignTemplateDTO);
+
+            return ResponseEntity.status(HttpStatus.OK).body("성공적으로 삭제되었습니다.");
+        } catch (CommonException e) {
+            log.error("캠페인 템플릿 삭제 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("예상치 못한 오류", e);
