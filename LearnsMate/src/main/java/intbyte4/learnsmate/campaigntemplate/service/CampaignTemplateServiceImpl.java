@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service("campaignTemplateService")
@@ -67,7 +69,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     @Override
     @Transactional
-    public CampaignTemplateDTO deleteTemplate(CampaignTemplateDTO campaignTemplateDTO) {
+    public void deleteTemplate(CampaignTemplateDTO campaignTemplateDTO) {
         log.info("템플릿 삭제 중: {}", campaignTemplateDTO);
 
         CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
@@ -76,7 +78,17 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         log.info("데이터베이스에 해당 템플릿 삭제 처리 중: {}", campaignTemplate);
         CampaignTemplate deletedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
         log.info("삭제 처리된 템플릿 객체: {}", deletedCampaignTemplate);
+    }
 
-        return campaignTemplateMapper.fromEntityToDto(deletedCampaignTemplate);
+    @Override
+    public List<CampaignTemplateDTO> findAllByTemplate() {
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
+        List<CampaignTemplateDTO> campaignTemplateDTOList = new ArrayList<>();
+
+        for (CampaignTemplate campaignTemplate : campaignTemplateList) {
+            campaignTemplateDTOList.add(campaignTemplateMapper.fromEntityToDto(campaignTemplate));
+        }
+
+        return campaignTemplateDTOList;
     }
 }
