@@ -1,5 +1,7 @@
 package intbyte4.learnsmate.report.domain.entity;
 
+import intbyte4.learnsmate.comment.domain.entity.Comment;
+import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,18 +27,15 @@ public class Report {
     @Column(name = "report_date", nullable = false)
     private LocalDateTime reportDate;
 
-    //    @ManyToOne
-    //    @JoinColumn
-    @Column(name = "comment_code", nullable = false)
-    private Long commentCode;
+    @ManyToOne
+    @JoinColumn(name = "comment_code", nullable = false)
+    private Comment comment;
 
-    //    @ManyToOne
-    //    @JoinColumn
-    @Column(name = "report_member_code", nullable = false)
-    private Long reportMemberCode;
+    @ManyToOne
+    @JoinColumn(name = "report_member_code", nullable = false)
+    private Member reportMember;
 
-    //    @ManyToOne
-    //    @JoinColumn
-    @Column(name = "reported_member_code", nullable = false)
-    private Long reportedMemberCode;
+    @ManyToOne
+    @JoinColumn(name = "reported_member_code", nullable = false)
+    private Member reportedMember;
 }
