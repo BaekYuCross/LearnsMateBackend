@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.common.mapper;
+package intbyte4.learnsmate.member.mapper;
 
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
