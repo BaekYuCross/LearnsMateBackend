@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @ToString
 @Getter
 @Setter
+@Builder
 public class CampaignDTO {
     @JsonProperty("campaign_code")
     private Long campaignCode;
@@ -26,9 +27,13 @@ public class CampaignDTO {
     @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;
 
-    @JsonProperty("campaign_template_code")
-    private Long campaignTemplateCode;
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 
     @JsonProperty("admin_code")
     private Long adminCode;
+
 }
