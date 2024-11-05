@@ -58,7 +58,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
 
-        MemberDTO memberDTO = memberMapper.fromRequestSaveMemberVOtoDTO(request);
+        MemberDTO memberDTO = memberMapper.fromRequestSaveMemberVOtoMemberDTO(request);
 
         memberService.saveMember(memberDTO);
 

@@ -30,7 +30,7 @@ public class MemberMapper{
     }
 
     // VO -> DTO 변환 메서드
-    public MemberDTO fromRequestSaveMemberVOtoDTO(RequestSaveMemberVO request) {
+    public MemberDTO fromRequestSaveMemberVOtoMemberDTO(RequestSaveMemberVO request) {
         return MemberDTO.builder()
                 .memberType(request.getMemberType())
                 .memberEmail(request.getMemberEmail())
