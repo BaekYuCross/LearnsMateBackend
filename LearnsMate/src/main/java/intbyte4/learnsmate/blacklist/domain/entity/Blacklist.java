@@ -6,7 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "Blacklist")
+@Entity(name = "blacklist")
 @Table(name = "blacklist")
 @Getter
 @AllArgsConstructor
