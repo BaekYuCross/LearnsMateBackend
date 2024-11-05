@@ -1,13 +1,13 @@
-package intbyte4.learnsmate.campaigntemplate.controller;
+package intbyte4.learnsmate.campaign_template.controller;
 
-import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestEditTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestRegisterTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseEditTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseFindTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseRegisterTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.mapper.CampaignTemplateMapper;
-import intbyte4.learnsmate.campaigntemplate.service.CampaignTemplateService;
+import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestRegisterTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseRegisterTemplateVO;
+import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
+import intbyte4.learnsmate.campaign_template.service.CampaignTemplateService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
