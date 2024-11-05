@@ -35,7 +35,7 @@ public class CampaignController {
     public ResponseEntity<ResponseEditCampaignVO> updateCampaign(@RequestBody RequestEditCampaignVO request
             , @PathVariable("campaignCode") Long campaignCode) {
         CampaignDTO campaignDTO = campaignService.updateCampaign(campaignMapper.fromEditRequestVOtoDTO(request)
-                ,campaignCode);
+                , campaignCode);
         return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToEditResponseVO(campaignDTO));
     }
 }
