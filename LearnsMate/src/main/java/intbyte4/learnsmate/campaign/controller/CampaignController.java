@@ -31,11 +31,21 @@ public class CampaignController {
     }
 
     @Operation(summary = "직원 - 예약된 캠페인 수정")
-    @PutMapping("/{campaignCode}")
+    @PutMapping("/edit/{campaignCode}")
     public ResponseEntity<ResponseEditCampaignVO> updateCampaign(@RequestBody RequestEditCampaignVO request
             , @PathVariable("campaignCode") Long campaignCode) {
         CampaignDTO campaignDTO = campaignService.editCampaign(campaignMapper.fromEditRequestVOtoDTO(request)
                 , campaignCode);
         return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToEditResponseVO(campaignDTO));
+    }
+
+    @Operation(summary = "직원 - 예약된 캠페인 취소")
+    @DeleteMapping("/delete/{campaignCode}")
+    public ResponseEntity<Void> deleteCampaign(@PathVariable("campaignCode") Long campaignCode) {
+        CampaignDTO getCampaignCode = new CampaignDTO();
+        getCampaignCode.setCampaignCode(campaignCode);
+        campaignService.removeCampaign(getCampaignCode);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
