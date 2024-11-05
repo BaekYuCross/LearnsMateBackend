@@ -72,4 +72,15 @@ public class CampaignServiceImpl implements CampaignService {
 
         return campaignMapper.toDTO(updatedCampaign);
     }
+
+    @Override
+    public void removeCampaign(CampaignDTO request){
+        Campaign campaign = campaignRepository.findById(request.getCampaignCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
+        if(Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
+            throw new CommonException(StatusEnum.DELETE_NOT_ALLOWED);
+        }
+
+        campaignRepository.delete(campaign);
+    }
 }
