@@ -106,4 +106,27 @@ public class CampaignTemplateController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @Operation(summary = "직원 - 캠페인 템플릿 단 건 조회")
+    @GetMapping("/{campaignTemplateCode}")
+    public ResponseEntity<?> getTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
+        log.info("템플릿 조회 요청된 템플릿 코드 : {}", campaignTemplateCode);
+        try {
+            CampaignTemplateDTO campaignTemplateDTO = new CampaignTemplateDTO();
+            campaignTemplateDTO.setCampaignTemplateCode(campaignTemplateCode);
+
+            CampaignTemplateDTO findTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateDTO);
+
+            ResponseFindTemplateVO response = campaignTemplateMapper.fromDtoToFindResponseVO(findTemplateDTO);
+
+            log.info("캠페인 템플릿 조회 성공: {}", response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (CommonException e) {
+            log.error("캠페인 템플릿 조회 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
+        }
+    }
 }
