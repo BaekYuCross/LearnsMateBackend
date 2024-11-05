@@ -1,11 +1,11 @@
 package intbyte4.learnsmate.member.controller;
 
+import intbyte4.learnsmate.common.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.service.MemberService;
-import org.hibernate.usertype.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +15,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("member")
+@RequestMapping("/member")
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
     @Autowired
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, MemberMapper memberMapper) {
         this.memberService = memberService;
+        this.memberMapper = memberMapper;
     }
 
     // 1. 모든 학생 조회(member_flag가 true인 사람 + member_type이 STUDENT)
@@ -33,7 +35,7 @@ public class MemberController {
 
         // DTO 리스트를 VO 리스트로 변환
         List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(ResponseFindMemberVO::new)  // 생성자를 사용하여 변환
+                .map(memberMapper::toResponseFindMemberVO)  // 생성자를 사용하여 변환
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
@@ -47,7 +49,7 @@ public class MemberController {
 
         // DTO 리스트를 VO 리스트로 변환
         List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(ResponseFindMemberVO::new)
+                .map(memberMapper::toResponseFindMemberVO)  // 생성자를 사용하여 변환
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
@@ -56,7 +58,8 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
 
-        MemberDTO memberDTO = request.toDTO();
+        MemberDTO memberDTO = memberMapper.toDTO(request);
+
         memberService.saveMember(memberDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");
