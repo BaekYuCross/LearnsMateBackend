@@ -42,16 +42,4 @@ public class Campaign {
     @JoinColumn(name = "admin_code", nullable = false)
     private Admin admin;
 
-    public CampaignDTO toDTO() {
-        CampaignDTO campaignDTO = new CampaignDTO();
-        campaignDTO.setCampaignCode(this.getCampaignCode());
-        campaignDTO.setCampaignTitle(this.getCampaignTitle());
-        campaignDTO.setCampaignContents(this.getCampaignContents());
-        campaignDTO.setCampaignType(String.valueOf(this.campaignType));
-        campaignDTO.setCampaignSendDate(this.getCampaignSendDate());
-        campaignDTO.setCreatedAt(this.getCreatedAt());
-        campaignDTO.setUpdatedAt(this.getUpdatedAt());
-        campaignDTO.setAdminCode(this.admin.getAdminCode());
-        return campaignDTO;
-    }
 }
