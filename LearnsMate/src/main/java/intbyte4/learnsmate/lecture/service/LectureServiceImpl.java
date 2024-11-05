@@ -50,8 +50,6 @@ public class LectureServiceImpl implements LectureService {
     // 강의 등록
 //    @Transactional
 //    public LectureDTO createLecture(LectureDTO lectureDTO) {
-//        Lecture lecture = lectureDTO.toLecture();
-//        Lecture savedLecture = lectureRepository.save(lecture);
 //        return savedLecture.convertToDTO();
 //    }
 
@@ -65,6 +63,7 @@ public class LectureServiceImpl implements LectureService {
         return lecture.convertToDTO();
     }
 
+    // 강의 삭제
     @Transactional
     public LectureDTO deleteLecture(LectureDTO lectureDTO) {
         Lecture lecture = lectureRepository.findById(lectureDTO.getLectureCode())
