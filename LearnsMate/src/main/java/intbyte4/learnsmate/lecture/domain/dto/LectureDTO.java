@@ -3,6 +3,8 @@ package intbyte4.learnsmate.lecture.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.enums.LectureCategory;
+import intbyte4.learnsmate.lecture.enums.LectureLevel;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,7 +22,7 @@ public class LectureDTO {
     private String lectureTitle;
 
     @JsonProperty("lecture_category")
-    private Integer lectureCategory;
+    private LectureCategory lectureCategory;
 
     @JsonProperty("lecture_confirm_status")
     private Boolean lectureConfirmStatus;
@@ -47,7 +49,7 @@ public class LectureDTO {
     private Integer lectureClickCount;
 
     @JsonProperty("lecture_level")
-    private Integer lectureLevel;
+    private LectureLevel lectureLevel;
 
     public Lecture toLecture() {
         return Lecture.builder()
