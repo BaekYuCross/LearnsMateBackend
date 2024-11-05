@@ -4,6 +4,7 @@ import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestEditTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestRegisterTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseEditTemplateVO;
+import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseFindTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseRegisterTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.mapper.CampaignTemplateMapper;
 import intbyte4.learnsmate.campaigntemplate.service.CampaignTemplateService;
@@ -14,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController("campaignTemplateController")
 @RequestMapping("campaign-template")
@@ -46,6 +50,7 @@ public class CampaignTemplateController {
         }
     }
 
+    @Operation(summary = "직원 - 캠페인 템플릿 수정")
     @PatchMapping("/edit/{campaignTemplateCode}")
     public ResponseEntity<?> editTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode, @RequestBody RequestEditTemplateVO request) {
         log.info("템플릿 수정 요청 : {}", request);
@@ -68,6 +73,7 @@ public class CampaignTemplateController {
         }
     }
 
+    @Operation(summary = "직원 - 캠페인 템플릿 삭제처리")
     @PatchMapping("/delete/{campaignTemplateCode}")
     public ResponseEntity<?> deleteTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
         log.info("템플릿 삭제 요청된 템플릿 코드 : {}", campaignTemplateCode);
@@ -85,5 +91,19 @@ public class CampaignTemplateController {
             log.error("예상치 못한 오류", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
         }
+    }
+
+    @Operation(summary = "직원 - 캠페인 템플릿 전체 조회")
+    @GetMapping("/list")
+    public ResponseEntity<List<ResponseFindTemplateVO>> listTemplates() {
+        List<CampaignTemplateDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
+        List<ResponseFindTemplateVO> responseList = new ArrayList<>();
+
+        for (CampaignTemplateDTO campaignTemplateDTO : campaignTemplateDTOList) {
+            ResponseFindTemplateVO responseFindTemplateVO = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
+            responseList.add(responseFindTemplateVO);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
