@@ -12,13 +12,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class RequestEditCampaignVO {
-    private Long campaignCode;
     private String campaignTitle;
     private String campaignContents;
-    private String campaignType;
     private LocalDateTime campaignSendDate;
-    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long adminCode;
 
 }
