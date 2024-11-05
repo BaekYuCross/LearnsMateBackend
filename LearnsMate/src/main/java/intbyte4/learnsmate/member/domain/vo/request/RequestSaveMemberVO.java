@@ -1,19 +1,17 @@
-package intbyte4.learnsmate.member.domain.dto;
+package intbyte4.learnsmate.member.domain.vo.request;
 
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-
-@Getter @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString
-public class MemberDTO {
+public class RequestSaveMemberVO {
     private Long memberCode;
     private MemberType memberType;
     private String memberEmail;
@@ -28,9 +26,10 @@ public class MemberDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Member toEntity(LocalDateTime createdAt, LocalDateTime updatedAt) {
-        return Member.builder()
-                .memberType(this.memberType)
+    public MemberDTO toDTO() {
+        return MemberDTO.builder()
+                .memberCode(null) // 새로 생성되는 회원이므로 null로 설정
+                .memberType(this.memberType) // 인스턴스의 필드를 사용
                 .memberEmail(this.memberEmail)
                 .memberPassword(this.memberPassword)
                 .memberName(this.memberName)
@@ -38,10 +37,10 @@ public class MemberDTO {
                 .memberPhone(this.memberPhone)
                 .memberAddress(this.memberAddress)
                 .memberBirth(this.memberBirth)
-                .memberFlag(this.memberFlag)
-                .memberDormantStatus(this.memberDormantStatus)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
+                .memberFlag(true) // 기본값 설정
+                .memberDormantStatus(false) // 기본값 설정
+                .createdAt(LocalDateTime.now()) // 생성 시점 설정
+                .updatedAt(LocalDateTime.now()) // 생성 시점 설정
                 .build();
     }
 }

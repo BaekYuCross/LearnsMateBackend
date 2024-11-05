@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum MemberType {
 
-    STUEDENT("STUDENT"),
+    STUDENT("STUDENT"),
     TUTOR("TUTOR");
 
     private final String userType;
