@@ -1,13 +1,13 @@
-package intbyte4.learnsmate.campaigntemplate.mapper;
+package intbyte4.learnsmate.campaign_template.mapper;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.campaigntemplate.domain.CampaignTemplate;
-import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestEditTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestRegisterTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseEditTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseFindTemplateVO;
-import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseRegisterTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
+import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestRegisterTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseRegisterTemplateVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

@@ -1,6 +1,5 @@
-package intbyte4.learnsmate.campaigntemplate.domain.dto;
+package intbyte4.learnsmate.campaign_template.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
