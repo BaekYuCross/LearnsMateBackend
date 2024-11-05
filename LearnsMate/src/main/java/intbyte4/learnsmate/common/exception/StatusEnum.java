@@ -19,6 +19,7 @@ public enum StatusEnum {
     USER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     ADMIN_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 직원입니다."),
     EMAIL_NOT_FOUND(404, HttpStatus.NOT_FOUND, "회원가입 되지않은 아이디 입니다."),
+    LECTURE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "강의가 존재하지 않습니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 
