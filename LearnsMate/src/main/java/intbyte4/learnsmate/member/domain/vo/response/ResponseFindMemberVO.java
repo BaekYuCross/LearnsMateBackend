@@ -25,15 +25,4 @@ public class ResponseFindMemberVO {
     private Boolean memberDormantStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    // MemberDTO를 받아서 VO 필드를 초기화하는 생성자
-    public ResponseFindMemberVO(MemberDTO dto) {
-        this.memberCode = dto.getMemberCode();
-        this.memberType = dto.getMemberType();
-        this.memberEmail = dto.getMemberEmail();
-        this.memberName = dto.getMemberName();
-        this.memberAge = dto.getMemberAge();
-        this.memberPhone = dto.getMemberPhone();
-        this.memberAddress = dto.getMemberAddress();
-    }
 }
