@@ -3,11 +3,12 @@ package intbyte4.learnsmate.campaigntemplate.controller;
 import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestRegisterTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseRegisterTemplateVO;
+import intbyte4.learnsmate.campaigntemplate.mapper.CampaignTemplateMapper;
 import intbyte4.learnsmate.campaigntemplate.service.CampaignTemplateService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,31 +19,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("campaignTemplateController")
 @RequestMapping("campaigntemplate")
 @Slf4j
+@RequiredArgsConstructor
 public class CampaignTemplateController {
 
     private final CampaignTemplateService campaignTemplateService;
-
-    @Autowired
-    public CampaignTemplateController(final CampaignTemplateService campaignTemplateService) {
-        this.campaignTemplateService = campaignTemplateService;
-    }
+    private final CampaignTemplateMapper campaignTemplateMapper;
 
     @Operation(summary = "직원 - 캠페인 템플릿 등록")
     @PostMapping("/register")
     public ResponseEntity<?> registerTemplate(@RequestBody final RequestRegisterTemplateVO request) {
         log.info("템플릿 등록 요청 : {}", request);
         try {
-            CampaignTemplateDTO campaignTemplateDTO = new CampaignTemplateDTO();
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateMapper.fromRequestVOToDto(request);
 
             CampaignTemplateDTO registerCampaignTemplate = campaignTemplateService.registerTemplate(campaignTemplateDTO);
 
-            ResponseRegisterTemplateVO response = new ResponseRegisterTemplateVO(
-                    registerCampaignTemplate.getCampaignTemplateCode(),
-                    registerCampaignTemplate.getCampaignTemplateTitle(),
-                    registerCampaignTemplate.getCampaignTemplateContents(),
-                    registerCampaignTemplate.getCampaignTemplateFlag(),
-                    registerCampaignTemplate.getAdminCode()
-            );
+            ResponseRegisterTemplateVO response = campaignTemplateMapper.fromDtoToResponseVO(registerCampaignTemplate);
 
             log.info("캠페인 템플릿 등록 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
