@@ -3,7 +3,9 @@ package intbyte4.learnsmate.campaigntemplate.mapper;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaigntemplate.domain.CampaignTemplate;
 import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestEditTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.request.RequestRegisterTemplateVO;
+import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseEditTemplateVO;
 import intbyte4.learnsmate.campaigntemplate.domain.vo.response.ResponseRegisterTemplateVO;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +26,7 @@ public class CampaignTemplateMapper {
                 .build();
     }
 
-    public CampaignTemplateDTO fromRequestVOToDto(RequestRegisterTemplateVO requestRegisterTemplateVO) {
+    public CampaignTemplateDTO fromRegisterRequestVOToDto(RequestRegisterTemplateVO requestRegisterTemplateVO) {
         return CampaignTemplateDTO.builder()
                 .campaignTemplateCode(requestRegisterTemplateVO.getCampaignTemplateCode())
                 .campaignTemplateTitle(requestRegisterTemplateVO.getCampaignTemplateTitle())
@@ -36,7 +38,14 @@ public class CampaignTemplateMapper {
                 .build();
     }
 
-    public ResponseRegisterTemplateVO fromDtoToResponseVO(CampaignTemplateDTO campaignTemplateDTO) {
+    public CampaignTemplateDTO fromEditRequestVOToDto(RequestEditTemplateVO requestEditTemplateVO) {
+        return CampaignTemplateDTO.builder()
+                .campaignTemplateTitle(requestEditTemplateVO.getCampaignTemplateTitle())
+                .campaignTemplateContents(requestEditTemplateVO.getCampaignTemplateContents())
+                .build();
+    }
+
+    public ResponseRegisterTemplateVO fromDtoToRegisterResponseVO(CampaignTemplateDTO campaignTemplateDTO) {
         return ResponseRegisterTemplateVO.builder()
                 .campaignTemplateCode(campaignTemplateDTO.getCampaignTemplateCode())
                 .campaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle())
@@ -45,6 +54,14 @@ public class CampaignTemplateMapper {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .adminCode(campaignTemplateDTO.getAdminCode())
+                .build();
+    }
+
+    public ResponseEditTemplateVO fromDtoToEditResponseVO(CampaignTemplateDTO campaignTemplateDTO) {
+        return ResponseEditTemplateVO.builder()
+                .campaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle())
+                .campaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 
