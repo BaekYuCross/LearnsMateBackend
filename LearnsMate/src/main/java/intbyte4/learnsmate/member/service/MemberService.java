@@ -27,7 +27,7 @@ public class MemberService {
     public void saveMember(MemberDTO memberDTO) {
         LocalDateTime now = LocalDateTime.now();
 
-        Member member = memberMapper.toEntity(memberDTO);
+        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
         memberRepository.save(member);
     }
 
@@ -37,7 +37,7 @@ public class MemberService {
 
         List<MemberDTO> memberDTOList = new ArrayList<>();
         for (Member member : allMember) {
-            memberDTOList.add(memberMapper.toDTO(member));
+            memberDTOList.add(memberMapper.fromMembertoMemberDTO(member));
         }
 
         return memberDTOList;

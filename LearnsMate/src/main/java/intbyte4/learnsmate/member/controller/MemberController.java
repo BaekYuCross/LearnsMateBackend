@@ -35,7 +35,7 @@ public class MemberController {
 
         // DTO 리스트를 VO 리스트로 변환
         List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(memberMapper::toResponseFindMemberVO)  // 생성자를 사용하여 변환
+                .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
@@ -49,7 +49,7 @@ public class MemberController {
 
         // DTO 리스트를 VO 리스트로 변환
         List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(memberMapper::toResponseFindMemberVO)  // 생성자를 사용하여 변환
+                .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
@@ -58,7 +58,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
 
-        MemberDTO memberDTO = memberMapper.toDTO(request);
+        MemberDTO memberDTO = memberMapper.fromRequestSaveMemberVOtoDTO(request);
 
         memberService.saveMember(memberDTO);
 

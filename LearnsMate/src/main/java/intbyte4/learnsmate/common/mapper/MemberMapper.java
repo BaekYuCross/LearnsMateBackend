@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Component
 public class MemberMapper{
 
-    public MemberDTO toDTO(Member entity) {
+    public MemberDTO fromMembertoMemberDTO(Member entity) {
         return MemberDTO.builder()
                 .memberCode(entity.getMemberCode())
                 .memberType(entity.getMemberType())
@@ -30,7 +30,7 @@ public class MemberMapper{
     }
 
     // VO -> DTO 변환 메서드
-    public MemberDTO toDTO(RequestSaveMemberVO request) {
+    public MemberDTO fromRequestSaveMemberVOtoDTO(RequestSaveMemberVO request) {
         return MemberDTO.builder()
                 .memberType(request.getMemberType())
                 .memberEmail(request.getMemberEmail())
@@ -47,7 +47,7 @@ public class MemberMapper{
                 .build();
     }
 
-    public Member toEntity(MemberDTO dto) {
+    public Member fromMemberDTOtoMember(MemberDTO dto) {
         return Member.builder()
                 .memberCode(dto.getMemberCode())
                 .memberType(dto.getMemberType())
@@ -66,7 +66,7 @@ public class MemberMapper{
     }
 
     // MemberDTO -> ResponseFindMemberVO 변환
-    public ResponseFindMemberVO toResponseFindMemberVO(MemberDTO dto) {
+    public ResponseFindMemberVO fromMemberDTOtoResponseFindMemberVO(MemberDTO dto) {
         return ResponseFindMemberVO.builder()
                 .memberCode(dto.getMemberCode())
                 .memberType(dto.getMemberType())
