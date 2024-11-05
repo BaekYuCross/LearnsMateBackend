@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service("campaignTemplateService")
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
         AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
         if (adminDTO == null) {
-            log.warn("존재하지 않는 사용자 : {}", campaignTemplateDTO.getAdminCode());
+            log.warn("존재하지 않는 직원 : {}", campaignTemplateDTO.getAdminCode());
             throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         }
         log.info(adminDTO.toString());
@@ -46,4 +48,27 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         return campaignTemplateMapper.fromEntityToDto(savedCampaignTemplate);
     }
 
+    @Override
+    @Transactional
+    public CampaignTemplateDTO editTemplate(CampaignTemplateDTO campaignTemplateDTO) {
+        log.info("템플릿 수정 중: {}", campaignTemplateDTO);
+        campaignTemplateDTO.setAdminCode(campaignTemplateDTO.getAdminCode());
+
+        AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
+        if (adminDTO == null) {
+            log.warn("존재하지 않는 직원 : {}", campaignTemplateDTO.getAdminCode());
+            throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
+        }
+
+        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+        campaignTemplate.setCampaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle());
+        campaignTemplate.setCampaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents());
+        campaignTemplate.setUpdatedAt(LocalDateTime.now());
+
+        log.info("데이터베이스에 템플릿 저장 중: {}", campaignTemplate);
+        CampaignTemplate updatedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
+        log.info("수정된 템플릿 객체: {}", updatedCampaignTemplate);
+
+        return campaignTemplateMapper.fromEntityToDto(updatedCampaignTemplate);
+    }
 }
