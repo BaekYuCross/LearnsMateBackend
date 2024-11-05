@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.service;
 
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.repository.MemberRepository;
@@ -26,9 +27,9 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public List<MemberDTO> findAllMember() {
+    public List<MemberDTO> findAllMemberByMemberType(MemberType memberType) {
 
-        List<Member> allMember = memberRepository.findAll();
+        List<Member> allMember = memberRepository.findByMemberFlagTureAndMemberType(memberType);
 
         List<MemberDTO> memberDTOList = new ArrayList<>();
         for (Member member : allMember) {
