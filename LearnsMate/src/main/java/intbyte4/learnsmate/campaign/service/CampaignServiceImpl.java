@@ -8,6 +8,9 @@ import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.common.mapper.CampaignMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +22,12 @@ import java.util.Objects;
 public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
     private final AdminService adminService;
+    private final CampaignMapper campaignMapper;
 
     @Override
     public CampaignDTO registerCampaign(CampaignDTO request) {
         LocalDateTime sendTime;
+
 
         AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
         Admin admin = adminDTO.convertToEntity();
@@ -46,7 +51,27 @@ public class CampaignServiceImpl implements CampaignService {
 
         campaignRepository.save(campaign);
 
-        return campaign.toDTO();
+        return campaignMapper.toDTO(campaign);
     }
+
+    @Override
+    public CampaignDTO updateCampaign(CampaignDTO request, Long campaignCode) {
+        if (campaignCode == null) {
+            throw new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND);
+        }
+        if (Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
+            throw new CommonException(StatusEnum.DELETE_NOT_ALLOWED);
+        }
+
+        AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
+        Admin admin = adminDTO.convertToEntity();
+
+        Campaign updatedCampaign = campaignMapper.toEntity(request, admin);
+
+        campaignRepository.save(updatedCampaign);
+
+        return campaignMapper.toDTO(updatedCampaign);
+    }
+
 
 }
