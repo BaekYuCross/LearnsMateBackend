@@ -21,8 +21,7 @@ public class CampaignServiceImpl implements CampaignService {
     private final AdminService adminService;
 
     @Override
-    public CampaignDTO registCampaign(CampaignDTO request) {
-
+    public CampaignDTO registerCampaign(CampaignDTO request) {
         LocalDateTime sendTime;
 
         AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
