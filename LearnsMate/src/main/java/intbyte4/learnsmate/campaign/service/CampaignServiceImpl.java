@@ -55,12 +55,12 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public CampaignDTO updateCampaign(CampaignDTO request, Long campaignCode) {
+    public CampaignDTO editCampaign(CampaignDTO request, Long campaignCode) {
         if (campaignCode == null) {
             throw new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND);
         }
         if (Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
-            throw new CommonException(StatusEnum.DELETE_NOT_ALLOWED);
+            throw new CommonException(StatusEnum.UPDATE_NOT_ALLOWED);
         }
 
         AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
@@ -72,6 +72,4 @@ public class CampaignServiceImpl implements CampaignService {
 
         return campaignMapper.toDTO(updatedCampaign);
     }
-
-
 }
