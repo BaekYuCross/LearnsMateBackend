@@ -5,6 +5,7 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaigntemplate.domain.CampaignTemplate;
 import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaigntemplate.mapper.CampaignTemplateMapper;
 import intbyte4.learnsmate.campaigntemplate.repository.CampaignTemplateRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
@@ -15,12 +16,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-@RequiredArgsConstructor
 @Slf4j
 @Service("campaignTemplateService")
+@RequiredArgsConstructor
 public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     private final CampaignTemplateRepository campaignTemplateRepository;
+    private final CampaignTemplateMapper campaignTemplateMapper;
     private final AdminService adminService;
 
     @Override
@@ -31,26 +33,50 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
         AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
         if (adminDTO == null) {
-            log.warn("존재하지 않는 사용자 : {}", campaignTemplateDTO.getAdminCode());
-            throw new CommonException(StatusEnum.USER_NOT_FOUND);
+            log.warn("존재하지 않는 직원 : {}", campaignTemplateDTO.getAdminCode());
+            throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         }
         log.info(adminDTO.toString());
 
         Admin user = adminDTO.convertToEntity();
-
-        CampaignTemplate campaignTemplate = new CampaignTemplate();
-        campaignTemplate.setCampaignTemplateCode(campaignTemplateDTO.getCampaignTemplateCode());
-        campaignTemplate.setCampaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle());
-        campaignTemplate.setCampaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents());
-        campaignTemplate.setCampaignTemplateFlag(campaignTemplateDTO.getCampaignTemplateFlag());
-        campaignTemplate.setCreatedAt(LocalDateTime.now());
-        campaignTemplate.setUpdatedAt(LocalDateTime.now());
-        campaignTemplate.setAdmin(user);
+        CampaignTemplate campaignTemplate = campaignTemplateMapper.toEntity(campaignTemplateDTO, user);
 
         log.info("데이터베이스에 템플릿 저장 중: {}", campaignTemplate);
-        CampaignTemplate saveCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
-        log.info("저장된 템플릿 객체: {}", saveCampaignTemplate);
+        CampaignTemplate savedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
+        log.info("저장된 템플릿 객체: {}", savedCampaignTemplate);
 
-        return saveCampaignTemplate.convertToCampaignDTO();
+        return campaignTemplateMapper.fromEntityToDto(savedCampaignTemplate);
+    }
+
+    @Override
+    @Transactional
+    public CampaignTemplateDTO editTemplate(CampaignTemplateDTO campaignTemplateDTO) {
+        log.info("템플릿 수정 중: {}", campaignTemplateDTO);
+
+        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+        campaignTemplate.setCampaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle());
+        campaignTemplate.setCampaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents());
+        campaignTemplate.setUpdatedAt(LocalDateTime.now());
+
+        log.info("데이터베이스에 수정된 템플릿 저장 중: {}", campaignTemplate);
+        CampaignTemplate updatedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
+        log.info("수정된 템플릿 객체: {}", updatedCampaignTemplate);
+
+        return campaignTemplateMapper.fromEntityToDto(updatedCampaignTemplate);
+    }
+
+    @Override
+    @Transactional
+    public CampaignTemplateDTO deleteTemplate(CampaignTemplateDTO campaignTemplateDTO) {
+        log.info("템플릿 삭제 중: {}", campaignTemplateDTO);
+
+        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+        campaignTemplate.setCampaignTemplateFlag(false);
+
+        log.info("데이터베이스에 해당 템플릿 삭제 처리 중: {}", campaignTemplate);
+        CampaignTemplate deletedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
+        log.info("삭제 처리된 템플릿 객체: {}", deletedCampaignTemplate);
+
+        return campaignTemplateMapper.fromEntityToDto(deletedCampaignTemplate);
     }
 }

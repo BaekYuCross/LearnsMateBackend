@@ -1,13 +1,14 @@
 package intbyte4.learnsmate.member.domain.entity;
 
 import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "UserEntity")
-@Table(name = "users")
+@Entity(name = "Member")
+@Table(name = "member")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

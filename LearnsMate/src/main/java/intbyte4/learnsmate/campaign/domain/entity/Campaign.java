@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,15 +27,19 @@ public class Campaign {
     private String campaignContents;
 
     @Column(name = "campaign_type")
-    private String campaignType;
+    private CampaignTypeEnum campaignType;
 
     @Column(name = "campaign_send_date")
     private LocalDateTime campaignSendDate;
 
-    @Column(name = "campaign_template_code")
-    private Long campaignTemplateCode;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column(name = "admin_code")
-    private Long adminCode;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_code", nullable = false)
+    private Admin admin;
 
 }

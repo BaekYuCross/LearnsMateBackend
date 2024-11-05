@@ -1,19 +1,17 @@
-package intbyte4.learnsmate.member.domain.dto;
+package intbyte4.learnsmate.member.domain.vo.request;
 
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-
-@Getter @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString
-public class MemberDTO {
+public class RequestSaveMemberVO {
     private Long memberCode;
     private MemberType memberType;
     private String memberEmail;
@@ -27,5 +25,4 @@ public class MemberDTO {
     private Boolean memberDormantStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }
