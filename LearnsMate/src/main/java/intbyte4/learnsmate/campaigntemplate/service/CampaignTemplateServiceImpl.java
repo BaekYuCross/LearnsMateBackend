@@ -37,7 +37,16 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         log.info(adminDTO.toString());
 
         Admin user = adminDTO.convertToEntity();
+        CampaignTemplate campaignTemplate = convertToTemplate(campaignTemplateDTO, user);
 
+        log.info("데이터베이스에 템플릿 저장 중: {}", campaignTemplate);
+        CampaignTemplate saveCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
+        log.info("저장된 템플릿 객체: {}", saveCampaignTemplate);
+
+        return saveCampaignTemplate.convertToCampaignDTO();
+    }
+
+    private CampaignTemplate convertToTemplate(CampaignTemplateDTO campaignTemplateDTO, Admin admin) {
         CampaignTemplate campaignTemplate = new CampaignTemplate();
         campaignTemplate.setCampaignTemplateCode(campaignTemplateDTO.getCampaignTemplateCode());
         campaignTemplate.setCampaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle());
@@ -45,12 +54,8 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         campaignTemplate.setCampaignTemplateFlag(campaignTemplateDTO.getCampaignTemplateFlag());
         campaignTemplate.setCreatedAt(LocalDateTime.now());
         campaignTemplate.setUpdatedAt(LocalDateTime.now());
-        campaignTemplate.setAdmin(user);
+        campaignTemplate.setAdmin(admin);
 
-        log.info("데이터베이스에 템플릿 저장 중: {}", campaignTemplate);
-        CampaignTemplate saveCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
-        log.info("저장된 템플릿 객체: {}", saveCampaignTemplate);
-
-        return saveCampaignTemplate.convertToCampaignDTO();
+        return campaignTemplate;
     }
 }
