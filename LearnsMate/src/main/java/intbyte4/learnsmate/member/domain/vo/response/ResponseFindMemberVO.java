@@ -26,16 +26,14 @@ public class ResponseFindMemberVO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // DTO -> VO 변환을 위한 정적 메서드
-    public static ResponseFindMemberVO fromDTO(MemberDTO dto) {
-        return ResponseFindMemberVO.builder()
-                .memberCode(dto.getMemberCode())
-                .memberType(dto.getMemberType())
-                .memberEmail(dto.getMemberEmail())
-                .memberName(dto.getMemberName())
-                .memberAge(dto.getMemberAge())
-                .memberPhone(dto.getMemberPhone())
-                .memberAddress(dto.getMemberAddress())
-                .build();
+    // MemberDTO를 받아서 VO 필드를 초기화하는 생성자
+    public ResponseFindMemberVO(MemberDTO dto) {
+        this.memberCode = dto.getMemberCode();
+        this.memberType = dto.getMemberType();
+        this.memberEmail = dto.getMemberEmail();
+        this.memberName = dto.getMemberName();
+        this.memberAge = dto.getMemberAge();
+        this.memberPhone = dto.getMemberPhone();
+        this.memberAddress = dto.getMemberAddress();
     }
 }

@@ -23,13 +23,13 @@ public class MemberService {
 
     public void saveMember(MemberDTO memberDTO) {
         LocalDateTime now = LocalDateTime.now();
-        Member member = MemberDTO.toEntity(memberDTO, now, now);
+        Member member = memberDTO.toEntity(now, now);
         memberRepository.save(member);
     }
 
     public List<MemberDTO> findAllMemberByMemberType(MemberType memberType) {
 
-        List<Member> allMember = memberRepository.findByMemberFlagTureAndMemberType(memberType);
+        List<Member> allMember = memberRepository.findByMemberFlagTrueAndMemberType(memberType);
 
         List<MemberDTO> memberDTOList = new ArrayList<>();
         for (Member member : allMember) {

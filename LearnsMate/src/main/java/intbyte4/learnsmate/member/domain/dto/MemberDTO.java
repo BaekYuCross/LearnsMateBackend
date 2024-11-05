@@ -28,18 +28,18 @@ public class MemberDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static Member toEntity(MemberDTO dto, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Member toEntity(LocalDateTime createdAt, LocalDateTime updatedAt) {
         return Member.builder()
-                .memberType(dto.getMemberType())
-                .memberEmail(dto.getMemberEmail())
-                .memberPassword(dto.getMemberPassword())
-                .memberName(dto.getMemberName())
-                .memberAge(dto.getMemberAge())
-                .memberPhone(dto.getMemberPhone())
-                .memberAddress(dto.getMemberAddress())
-                .memberBirth(dto.getMemberBirth())
-                .memberFlag(dto.getMemberFlag())
-                .memberDormantStatus(dto.getMemberDormantStatus())
+                .memberType(this.memberType)
+                .memberEmail(this.memberEmail)
+                .memberPassword(this.memberPassword)
+                .memberName(this.memberName)
+                .memberAge(this.memberAge)
+                .memberPhone(this.memberPhone)
+                .memberAddress(this.memberAddress)
+                .memberBirth(this.memberBirth)
+                .memberFlag(this.memberFlag)
+                .memberDormantStatus(this.memberDormantStatus)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();

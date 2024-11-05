@@ -29,11 +29,11 @@ public class MemberController {
     @GetMapping("/students")
     public ResponseEntity<List<ResponseFindMemberVO>> findAllStudent() {
 
-        List<MemberDTO> memberDTOList = memberService.findAllMemberByMemberType(MemberType.STUEDENT);
+        List<MemberDTO> memberDTOList = memberService.findAllMemberByMemberType(MemberType.STUDENT);
 
         // DTO 리스트를 VO 리스트로 변환
         List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(ResponseFindMemberVO::fromDTO)
+                .map(ResponseFindMemberVO::new)  // 생성자를 사용하여 변환
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
@@ -47,7 +47,7 @@ public class MemberController {
 
         // DTO 리스트를 VO 리스트로 변환
         List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(ResponseFindMemberVO::fromDTO)
+                .map(ResponseFindMemberVO::new)
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
@@ -56,7 +56,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
 
-        MemberDTO memberDTO = RequestSaveMemberVO.toDTO(request);
+        MemberDTO memberDTO = request.toDTO();
         memberService.saveMember(memberDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");
