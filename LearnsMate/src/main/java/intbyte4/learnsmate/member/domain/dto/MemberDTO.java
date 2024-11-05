@@ -28,34 +28,18 @@ public class MemberDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public MemberDTO insertMemberRequest(RequestSaveMemberVO request) {
-        this.memberType = request.getMemberType();
-        this.memberEmail = request.getMemberEmail();
-        this.memberPassword = request.getMemberPassword();
-        this.memberName = request.getMemberName();
-        this.memberAge = request.getMemberAge();
-        this.memberPhone = request.getMemberPhone();
-        this.memberAddress = request.getMemberAddress();
-        this.memberBirth = request.getMemberBirth();
-        this.memberFlag = request.getMemberFlag();
-        this.memberDormantStatus = request.getMemberDormantStatus();
-        this.createdAt = request.getCreatedAt();
-        this.updatedAt = request.getUpdatedAt();
-        return this;
-    }
-
-    public Member toEntity(LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Member toEntity(MemberDTO dto, LocalDateTime createdAt, LocalDateTime updatedAt) {
         return Member.builder()
-                .memberType(this.memberType)
-                .memberEmail(this.memberEmail)
-                .memberPassword(this.memberPassword)
-                .memberName(this.memberName)
-                .memberAge(this.memberAge)
-                .memberPhone(this.memberPhone)
-                .memberAddress(this.memberAddress)
-                .memberBirth(this.memberBirth)
-                .memberFlag(this.memberFlag)
-                .memberDormantStatus(this.memberDormantStatus)
+                .memberType(dto.getMemberType())
+                .memberEmail(dto.getMemberEmail())
+                .memberPassword(dto.getMemberPassword())
+                .memberName(dto.getMemberName())
+                .memberAge(dto.getMemberAge())
+                .memberPhone(dto.getMemberPhone())
+                .memberAddress(dto.getMemberAddress())
+                .memberBirth(dto.getMemberBirth())
+                .memberFlag(dto.getMemberFlag())
+                .memberDormantStatus(dto.getMemberDormantStatus())
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
