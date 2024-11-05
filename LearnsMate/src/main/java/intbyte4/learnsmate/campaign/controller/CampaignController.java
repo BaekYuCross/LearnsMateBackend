@@ -34,7 +34,7 @@ public class CampaignController {
     @PutMapping("/{campaignCode}")
     public ResponseEntity<ResponseEditCampaignVO> updateCampaign(@RequestBody RequestEditCampaignVO request
             , @PathVariable("campaignCode") Long campaignCode) {
-        CampaignDTO campaignDTO = campaignService.updateCampaign(campaignMapper.fromEditRequestVOtoDTO(request)
+        CampaignDTO campaignDTO = campaignService.editCampaign(campaignMapper.fromEditRequestVOtoDTO(request)
                 , campaignCode);
         return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToEditResponseVO(campaignDTO));
     }
