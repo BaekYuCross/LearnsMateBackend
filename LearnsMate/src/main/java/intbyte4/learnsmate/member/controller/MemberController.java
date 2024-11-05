@@ -39,8 +39,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
 
-        MemberDTO memberDTO = new MemberDTO().insertMemberRequest(request);
-
+        MemberDTO memberDTO = RequestSaveMemberVO.toDTO(request);
         memberService.saveMember(memberDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");

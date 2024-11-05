@@ -22,7 +22,8 @@ public class MemberService {
 
     public void saveMember(MemberDTO memberDTO) {
         LocalDateTime now = LocalDateTime.now();
-        memberRepository.save(memberDTO.toEntity(now, now));
+        Member member = MemberDTO.toEntity(memberDTO, now, now);
+        memberRepository.save(member);
     }
 
     public List<MemberDTO> findAllMember() {
