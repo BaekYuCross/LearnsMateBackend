@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    List<Member> findByMemberFlagTureAndMemberType(MemberType memberType);
+    List<Member> findByMemberFlagTrueAndMemberType(MemberType memberType);
 }
