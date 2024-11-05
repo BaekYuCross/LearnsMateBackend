@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -15,5 +17,7 @@ public class RequestRegisterTemplateVO {
     private final String campaignTemplateTitle;
     private final String campaignTemplateContents;
     private final Boolean campaignTemplateFlag;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
     private final Long adminCode;
 }
