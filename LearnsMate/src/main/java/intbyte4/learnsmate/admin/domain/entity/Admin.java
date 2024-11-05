@@ -1,6 +1,6 @@
 package intbyte4.learnsmate.admin.domain.entity;
 
-
+import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -61,4 +61,23 @@ public class Admin {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public AdminDTO convertToDTO() {
+        return AdminDTO.builder()
+                .adminCode(this.adminCode)
+                .adminEmail(this.adminEmail)
+                .adminPassword(this.adminPassword)
+                .adminDepartment(this.adminDepartment)
+                .adminPosition(this.adminPosition)
+                .adminName(this.adminName)
+                .adminPhone(this.adminPhone)
+                .adminAddress(this.adminAddress)
+                .adminBirthday(this.adminBirthday)
+                .adminJobType(this.adminJobType)
+                .adminLevel(this.adminLevel)
+                .adminStatus(this.adminStatus)
+                .adminLastLoginDate(this.adminLastLoginDate)
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
+                .build();
+    }
 }
