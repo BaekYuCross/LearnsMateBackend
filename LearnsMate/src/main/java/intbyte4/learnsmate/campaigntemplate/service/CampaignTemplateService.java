@@ -12,4 +12,6 @@ public interface CampaignTemplateService {
     void deleteTemplate(CampaignTemplateDTO campaignTemplateDTO);
 
     List<CampaignTemplateDTO> findAllByTemplate();
+
+    CampaignTemplateDTO findByTemplateCode(CampaignTemplateDTO campaignTemplateDTO);
 }

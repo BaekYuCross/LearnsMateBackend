@@ -82,6 +82,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     @Override
     public List<CampaignTemplateDTO> findAllByTemplate() {
+        log.info("템플릿 전체 조회 중");
         List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
         List<CampaignTemplateDTO> campaignTemplateDTOList = new ArrayList<>();
 
@@ -90,5 +91,14 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         }
 
         return campaignTemplateDTOList;
+    }
+
+    @Override
+    public CampaignTemplateDTO findByTemplateCode(CampaignTemplateDTO campaignTemplateDTO) {
+        log.info("템플릿 단 건 조회 중: {}", campaignTemplateDTO);
+        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+
+        return campaignTemplateMapper.fromEntityToDto(campaignTemplate);
     }
 }
