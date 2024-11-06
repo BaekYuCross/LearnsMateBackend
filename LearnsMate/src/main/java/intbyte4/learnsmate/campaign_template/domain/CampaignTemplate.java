@@ -1,7 +1,6 @@
-package intbyte4.learnsmate.campaigntemplate.domain;
+package intbyte4.learnsmate.campaign_template.domain;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;

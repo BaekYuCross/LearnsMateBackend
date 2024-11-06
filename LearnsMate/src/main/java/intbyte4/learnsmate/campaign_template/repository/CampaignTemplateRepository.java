@@ -1,6 +1,6 @@
-package intbyte4.learnsmate.campaigntemplate.repository;
+package intbyte4.learnsmate.campaign_template.repository;
 
-import intbyte4.learnsmate.campaigntemplate.domain.CampaignTemplate;
+import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

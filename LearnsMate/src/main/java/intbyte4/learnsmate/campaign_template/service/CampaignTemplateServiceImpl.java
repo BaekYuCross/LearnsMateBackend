@@ -1,12 +1,12 @@
-package intbyte4.learnsmate.campaigntemplate.service;
+package intbyte4.learnsmate.campaign_template.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.service.AdminService;
-import intbyte4.learnsmate.campaigntemplate.domain.CampaignTemplate;
-import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
-import intbyte4.learnsmate.campaigntemplate.mapper.CampaignTemplateMapper;
-import intbyte4.learnsmate.campaigntemplate.repository.CampaignTemplateRepository;
+import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
+import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
+import intbyte4.learnsmate.campaign_template.repository.CampaignTemplateRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import jakarta.transaction.Transactional;
@@ -82,6 +82,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     @Override
     public List<CampaignTemplateDTO> findAllByTemplate() {
+        log.info("템플릿 전체 조회 중");
         List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
         List<CampaignTemplateDTO> campaignTemplateDTOList = new ArrayList<>();
 
@@ -90,5 +91,14 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         }
 
         return campaignTemplateDTOList;
+    }
+
+    @Override
+    public CampaignTemplateDTO findByTemplateCode(CampaignTemplateDTO campaignTemplateDTO) {
+        log.info("템플릿 단 건 조회 중: {}", campaignTemplateDTO);
+        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+
+        return campaignTemplateMapper.fromEntityToDto(campaignTemplate);
     }
 }
