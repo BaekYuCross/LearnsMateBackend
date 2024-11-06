@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.common.mapper;
+package intbyte4.learnsmate.campaign.mapper;
 
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
@@ -8,15 +8,18 @@ import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class CampaignMapper{
+public class CampaignMapper {
 
     public CampaignDTO toDTO(Campaign entity) {
         return CampaignDTO.builder()
@@ -92,4 +95,16 @@ public class CampaignMapper{
                 .build();
     }
 
+    public List<ResponseFindCampaignVO> fromDtoListToFindCampaignVO(List<CampaignDTO> dtoList) {
+        return dtoList.stream().map(dto -> ResponseFindCampaignVO.builder()
+                .campaignCode(dto.getCampaignCode())
+                .campaignTitle(dto.getCampaignTitle())
+                .campaignContents(dto.getCampaignContents())
+                .campaignType(dto.getCampaignType())
+                .campaignSendDate(dto.getCampaignSendDate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .adminCode(dto.getAdminCode())
+                .build()).collect(Collectors.toList());
+    }
 }
