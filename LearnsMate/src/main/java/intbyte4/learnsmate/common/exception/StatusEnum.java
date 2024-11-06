@@ -16,10 +16,12 @@ public enum StatusEnum {
 
     RESTRICTED(403, HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     DELETE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "삭제할 수 없습니다."),
+    UPDATE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "수정할 수 없습니다."),
 
 
     USER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     ADMIN_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 직원입니다."),
+    LECTURE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 강의입니다."),
     EMAIL_NOT_FOUND(404, HttpStatus.NOT_FOUND, "회원가입 되지 않은 아이디입니다."),
     TEMPLATE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 템플릿입니다."),
     CAMPAIGN_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 캠페인입니다."),
