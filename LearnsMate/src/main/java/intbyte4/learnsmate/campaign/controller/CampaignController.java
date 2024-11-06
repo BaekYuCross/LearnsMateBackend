@@ -4,15 +4,18 @@ import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
+import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.service.CampaignService;
-import intbyte4.learnsmate.common.mapper.CampaignMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController("campaignController")
 @RequestMapping("campaign")
@@ -47,5 +50,15 @@ public class CampaignController {
         campaignService.removeCampaign(getCampaignCode);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "직원 - 캠페인 전체 조회")
+    @GetMapping("/campaigns")
+    public ResponseEntity<List<ResponseFindCampaignVO>> getAllCampaigns() {
+        List<CampaignDTO> campaignDTOList = campaignService.findAllCampaigns();
+        List<ResponseFindCampaignVO> responseFindCampaignVOList = campaignMapper
+                .fromDtoListToFindCampaignVO(campaignDTOList);
+
+        return new ResponseEntity<>(responseFindCampaignVOList, HttpStatus.OK);
     }
 }
