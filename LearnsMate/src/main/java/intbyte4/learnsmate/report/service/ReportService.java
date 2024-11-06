@@ -34,4 +34,12 @@ public class ReportService {
 
         return reportDTOList;
     }
+
+    // 어떠한 인원이 얼마나 신고당했는지 확인하는 메서드 -> 블랙리스트에서 추가하는 메서드임.
+    public void findCountReportedByMemberCode(ReportDTO reportDTO) {
+
+        long count = reportRepository.countByReportedMember_MemberCode(reportDTO.getReportedMemberCode());
+
+        ReportDTO responseDTO = new ReportDTO();
+    }
 }
