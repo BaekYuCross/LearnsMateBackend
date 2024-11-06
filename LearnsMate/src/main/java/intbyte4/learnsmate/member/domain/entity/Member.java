@@ -7,7 +7,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "Member")
+@Entity(name = "member")
 @Table(name = "member")
 @Getter
 @AllArgsConstructor

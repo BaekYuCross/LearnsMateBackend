@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.campaign.domain.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,13 +13,16 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class RequestEditCampaignVO {
-    private Long campaignCode;
+    @JsonProperty("campaign_title")
     private String campaignTitle;
+
+    @JsonProperty("campaign_contents")
     private String campaignContents;
-    private String campaignType;
+
+    @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;
-    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
-    private Long adminCode;
 
 }

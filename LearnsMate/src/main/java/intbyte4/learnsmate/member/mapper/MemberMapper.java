@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.common.mapper;
+package intbyte4.learnsmate.member.mapper;
 
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -30,7 +30,7 @@ public class MemberMapper{
     }
 
     // VO -> DTO 변환 메서드
-    public MemberDTO fromRequestSaveMemberVOtoDTO(RequestSaveMemberVO request) {
+    public MemberDTO fromRequestSaveMemberVOtoMemberDTO(RequestSaveMemberVO request) {
         return MemberDTO.builder()
                 .memberType(request.getMemberType())
                 .memberEmail(request.getMemberEmail())

@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.campaigntemplate.domain.vo.response;
+package intbyte4.learnsmate.campaign_template.domain.vo.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

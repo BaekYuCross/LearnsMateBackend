@@ -1,12 +1,14 @@
 package intbyte4.learnsmate.blacklist.domain.entity;
 
-import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.report.domain.entity.Report;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "Blacklist")
+@Entity(name = "blacklist")
 @Table(name = "blacklist")
 @Getter
 @AllArgsConstructor
@@ -29,18 +31,15 @@ public class Blacklist {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    //    @ManyToOne
-    //    @JoinColumn
-    @Column(name = "member_code", nullable = false)
-    private Long memberCode;
+    @ManyToOne
+    @JoinColumn(name = "member_code", nullable = false)
+    private Member member;
 
-    //    @ManyToOne
-    //    @JoinColumn
-    @Column(name = "report_code", nullable = false)
-    private Long reportCode;
+    @ManyToOne
+    @JoinColumn(name = "report_code", nullable = false)
+    private Report report;
 
-    //    @ManyToOne
-    //    @JoinColumn
-    @Column(name = "admin_code", nullable = false)
-    private Long adminCode;
+    @ManyToOne
+    @JoinColumn(name = "admin_code", nullable = false)
+    private Admin admin;
 }

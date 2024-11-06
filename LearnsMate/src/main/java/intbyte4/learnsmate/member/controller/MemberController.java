@@ -1,6 +1,6 @@
 package intbyte4.learnsmate.member.controller;
 
-import intbyte4.learnsmate.common.mapper.MemberMapper;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
@@ -58,7 +58,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
 
-        MemberDTO memberDTO = memberMapper.fromRequestSaveMemberVOtoDTO(request);
+        MemberDTO memberDTO = memberMapper.fromRequestSaveMemberVOtoMemberDTO(request);
 
         memberService.saveMember(memberDTO);
 
