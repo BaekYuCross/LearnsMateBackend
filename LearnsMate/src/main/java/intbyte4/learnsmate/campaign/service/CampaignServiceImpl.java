@@ -94,4 +94,11 @@ public class CampaignServiceImpl implements CampaignService {
 
         return campaignDTOList;
     }
+
+    @Override
+    public CampaignDTO findCampaign(CampaignDTO request){
+        Campaign campaign = campaignRepository.findById(request.getCampaignCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
+        return campaignMapper.toDTO(campaign);
+    }
 }
