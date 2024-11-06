@@ -2,6 +2,7 @@ package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignByCampaignCodeVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
@@ -60,5 +61,15 @@ public class CampaignController {
                 .fromDtoListToFindCampaignVO(campaignDTOList);
 
         return new ResponseEntity<>(responseFindCampaignVOList, HttpStatus.OK);
+    }
+
+    @Operation(summary = "직원 - 캠페인 단건 조회")
+    @GetMapping("/campaign")
+    public ResponseEntity<ResponseFindCampaignVO> getCampaign
+            (@RequestBody RequestFindCampaignByCampaignCodeVO requestFindCampaignByCampaignCodeVO) {
+        CampaignDTO getCampaignCode = campaignMapper.fromFindRequestVOtoDTO(requestFindCampaignByCampaignCodeVO);
+        CampaignDTO campaignDTO = campaignService.findCampaign(getCampaignCode);
+
+        return ResponseEntity.status(HttpStatus.OK).body(campaignMapper.fromDtoToFindResponseVO(campaignDTO));
     }
 }
