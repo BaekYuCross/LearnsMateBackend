@@ -64,10 +64,11 @@ public class CampaignController {
     }
 
     @Operation(summary = "직원 - 캠페인 단건 조회")
-    @GetMapping("/campaign")
+    @GetMapping("/{campaignCode}")
     public ResponseEntity<ResponseFindCampaignVO> getCampaign
-            (@RequestBody RequestFindCampaignByCampaignCodeVO requestFindCampaignByCampaignCodeVO) {
-        CampaignDTO getCampaignCode = campaignMapper.fromFindRequestVOtoDTO(requestFindCampaignByCampaignCodeVO);
+            (@PathVariable Long campaignCode) {
+        CampaignDTO getCampaignCode = new CampaignDTO();
+        getCampaignCode.setCampaignCode(campaignCode);
         CampaignDTO campaignDTO = campaignService.findCampaign(getCampaignCode);
 
         return ResponseEntity.status(HttpStatus.OK).body(campaignMapper.fromDtoToFindResponseVO(campaignDTO));
