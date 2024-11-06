@@ -1,7 +1,6 @@
-package intbyte4.learnsmate.campaigntemplate.domain;
+package intbyte4.learnsmate.campaign_template.domain;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.campaigntemplate.domain.dto.CampaignTemplateDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -42,16 +41,4 @@ public class CampaignTemplate {
     @ManyToOne
     @JoinColumn(name = "admin_code", nullable = false)
     private Admin admin;
-
-    public CampaignTemplateDTO convertToCampaignDTO() {
-        return CampaignTemplateDTO.builder()
-                .campaignTemplateCode(this.campaignTemplateCode)
-                .campaignTemplateTitle(this.campaignTemplateTitle)
-                .campaignTemplateContents(this.campaignTemplateContents)
-                .campaignTemplateFlag(this.campaignTemplateFlag)
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
-                .adminCode(this.admin.getAdminCode())
-                .build();
-    }
 }

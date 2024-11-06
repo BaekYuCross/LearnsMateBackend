@@ -1,5 +1,6 @@
-package intbyte4.learnsmate.campaigntemplate.domain.vo.response;
+package intbyte4.learnsmate.campaign_template.domain.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +10,11 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class ResponseRegisterTemplateVO {
+public class RequestEditTemplateVO {
 
-    private final Long campaignTemplateCode;
+    @JsonProperty("campaign_template_title")
     private final String campaignTemplateTitle;
+
+    @JsonProperty("campaign_template_contents")
     private final String campaignTemplateContents;
-    private final Boolean campaignTemplateFlag;
-    private final Long adminCode;
 }

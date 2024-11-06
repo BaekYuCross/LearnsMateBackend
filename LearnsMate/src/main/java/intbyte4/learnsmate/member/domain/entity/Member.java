@@ -7,7 +7,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "Member")
+@Entity(name = "member")
 @Table(name = "member")
 @Getter
 @AllArgsConstructor
@@ -57,23 +57,4 @@ public class Member {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    // Entity -> DTO 변환 메서드
-    public MemberDTO toDTO() {
-        return MemberDTO.builder()
-                .memberCode(this.memberCode)
-                .memberType(this.memberType)
-                .memberEmail(this.memberEmail)
-                .memberPassword(this.memberPassword)
-                .memberName(this.memberName)
-                .memberAge(this.memberAge)
-                .memberPhone(this.memberPhone)
-                .memberAddress(this.memberAddress)
-                .memberBirth(this.memberBirth)
-                .memberFlag(this.memberFlag)
-                .memberDormantStatus(this.memberDormantStatus)
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
-                .build();
-    }
 }
