@@ -1,7 +1,8 @@
 package intbyte4.learnsmate.member.domain.vo.response;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @ToString
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseFindMemberVO {
     private Long memberCode;
     private MemberType memberType;
