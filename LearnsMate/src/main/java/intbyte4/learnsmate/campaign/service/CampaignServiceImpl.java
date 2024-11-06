@@ -6,15 +6,17 @@ import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
+import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.common.mapper.CampaignMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -82,5 +84,14 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         campaignRepository.delete(campaign);
+    }
+
+    @Override
+    public List<CampaignDTO> findAllCampaigns(){
+        List<Campaign> campaign = campaignRepository.findAll();
+        List<CampaignDTO> campaignDTOList = new ArrayList<>();
+        campaign.forEach(dto -> campaignDTOList.add(campaignMapper.toDTO(dto)));
+
+        return campaignDTOList;
     }
 }
