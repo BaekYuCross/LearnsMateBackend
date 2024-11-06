@@ -9,4 +9,6 @@ public interface CampaignService {
     CampaignDTO editCampaign(CampaignDTO request, Long campaignCode);
     void removeCampaign(CampaignDTO request);
     List<CampaignDTO> findAllCampaigns();
+
+    CampaignDTO findCampaign(CampaignDTO request);
 }
