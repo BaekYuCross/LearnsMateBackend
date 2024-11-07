@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface VocService {
     List<VocDTO> findAllByVoc();
+
+    VocDTO findByVocCode(VocDTO vocDTO);
 }

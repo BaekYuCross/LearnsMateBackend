@@ -1,5 +1,7 @@
 package intbyte4.learnsmate.voc.service;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.voc.domain.Voc;
 import intbyte4.learnsmate.voc.domain.dto.VocDTO;
 import intbyte4.learnsmate.voc.mapper.VocMapper;
@@ -30,5 +32,14 @@ public class VocServiceImpl implements VocService {
         }
 
         return vocDTOList;
+    }
+
+    @Override
+    public VocDTO findByVocCode(VocDTO vocDTO) {
+        log.info("템플릿 단 건 조회 중: {}", vocDTO);
+        Voc voc = vocRepository.findById(vocDTO.getVocCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
+
+        return vocMapper.fromEntityToDto(voc);
     }
 }
