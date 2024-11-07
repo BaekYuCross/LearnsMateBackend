@@ -2,17 +2,14 @@ package intbyte4.learnsmate.lecture.domain.vo.request;
 
 import intbyte4.learnsmate.lecture.enums.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
+@Builder
 public class RequestEditLectureInfoVO {
     private String lectureTitle;
     private LectureCategoryEnum lectureCategoryEnum;
