@@ -1,7 +1,11 @@
 package intbyte4.learnsmate.lecture.controller;
 
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,17 +32,24 @@ public class LectureController {
     public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
         List<LectureDTO> lectureDTOs = lectureService.getAllLecture();
         List<ResponseFindLectureVO> lectureVOs = lectureDTOs.stream()
-                .map(lectureMapper::fromDtoToResponseVO)  // DTO -> VO로 변환
+                .map(lectureMapper::fromDtoToResponseVO)
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(lectureVOs);
     }
 
-    // 강의 단건 조회
     @Operation(summary = "강의 단건 조회")
     @GetMapping("/{lectureCode}")
-    public ResponseEntity<ResponseFindLectureVO> getLecture(@PathVariable Long lectureCode) {
+    public ResponseEntity<ResponseFindLectureVO> getLecture(@PathVariable("lectureCode") Long lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
+    }
+
+    @Operation(summary = "강의 등록")
+    @PutMapping("/{lectureCode}")
+    public ResponseEntity<ResponseEditLectureInfoVO> registerLecture(
+            @PathVariable("lectureCode")  Long lectureCode) {
+        LectureDTO updatedLecture = lectureService.registerLecture(lectureCode);
+        return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToEditResponseVO(updatedLecture));
     }
 
 
