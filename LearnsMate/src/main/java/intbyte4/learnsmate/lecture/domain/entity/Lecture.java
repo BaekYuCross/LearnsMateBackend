@@ -75,7 +75,7 @@ public class Lecture {
          this.lectureLevel = requestEditLectureInfoVO.getLectureLevel();
     }
 
-    public void toDelete(LectureDTO lectureDTO){
+    public void toDelete(){
         this.lectureStatus = false;
         this.updatedAt = LocalDateTime.now();
     }
