@@ -3,6 +3,9 @@ package intbyte4.learnsmate.blacklist.mapper;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReportVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTutorBlacklistVO;
+import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,6 +33,22 @@ public class BlacklistMapper {
                 .memberCode(blacklistDTO.getMemberCode())
                 .reportCode(blacklistDTO.getReportCode())
                 .adminCode(blacklistDTO.getAdminCode())
+                .build();
+    }
+
+    public ResponseFindReservedStudentBlacklistVO fromReportedMemberDTOToResponseFindReservedStudentBlacklistVO(ReportedMemberDTO dto) {
+        return ResponseFindReservedStudentBlacklistVO.builder()
+                .memberCode(dto.getReportedMember().getMemberCode())
+                .memberName(dto.getReportedMember().getMemberName())
+                .reportCount(dto.getReportCount())
+                .build();
+    }
+
+    public ResponseFindReservedTutorBlacklistVO fromReportedMemberDTOToResponseFindReservedTutorBlacklistVO(ReportedMemberDTO dto) {
+        return ResponseFindReservedTutorBlacklistVO.builder()
+                .memberCode(dto.getReportedMember().getMemberCode())
+                .memberName(dto.getReportedMember().getMemberName())
+                .reportCount(dto.getReportCount())
                 .build();
     }
 }
