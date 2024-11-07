@@ -61,6 +61,11 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToEditResponseVO(updatedLecture));
     }
 
-
+    @Operation(summary = "강의 삭제")
+    @PatchMapping("/{lectureCode}/status")
+    public ResponseEntity<ResponseRemoveLectureVO> removeLecture(@PathVariable("lectureCode")  Long lectureCode) {
+        LectureDTO removedLecture = lectureService.removeLecture(lectureCode);
+        return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToRemoveResponseVO(removedLecture));
+    }
 
 }
