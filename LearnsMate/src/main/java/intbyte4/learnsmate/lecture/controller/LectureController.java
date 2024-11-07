@@ -52,5 +52,15 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToEditResponseVO(updatedLecture));
     }
 
+    @Operation(summary = "강의 수정")
+    @PatchMapping("/{lectureCode}/info")
+    public ResponseEntity<ResponseEditLectureInfoVO> updateLecture(
+            @PathVariable("lectureCode")  Long lectureCode,
+            @RequestBody RequestEditLectureInfoVO requestEditLectureInfoVO) {
+        LectureDTO updatedLecture = lectureService.updateLecture(lectureCode, requestEditLectureInfoVO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToEditResponseVO(updatedLecture));
+    }
+
+
 
 }
