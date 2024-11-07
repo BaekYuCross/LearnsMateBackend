@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.lecture.controller;
 
+import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lecture")
@@ -26,8 +28,23 @@ public class LectureController {
     @Operation(summary = "강의 정보 전체 조회")
     @GetMapping
     public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
-        List<ResponseFindLectureVO> lectures = lectureService.getAllLecture();
-        return new ResponseEntity<>(lectures, HttpStatus.OK);
+        List<LectureDTO> lectureDTOs = lectureService.getAllLecture();
+        List<ResponseFindLectureVO> lectureVOs = lectureDTOs.stream()
+                .map(lectureMapper::fromDtoToResponseVO)  // DTO -> VO로 변환
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(lectureVOs);
     }
+
+    @Operation(summary = "강의 단건 조회")
+    @GetMapping
+    public ResponseEntity<ResponseFindLectureVO> getLectureById(Long lectureId) {
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureId);
+        return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
+
+    }
+
+
+
+
 
 }
