@@ -8,4 +8,6 @@ public interface VOCService {
     List<VOCDTO> findAllByVOC();
 
     VOCDTO findByVOCCode(Long vocDTO);
+
+    void updateVOCAnswerStatus(Long vocCode, boolean vocAnswerStatus);
 }

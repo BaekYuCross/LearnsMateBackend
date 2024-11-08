@@ -41,4 +41,13 @@ public class VOCServiceImpl implements VOCService {
 
         return vocMapper.fromEntityToDTO(voc);
     }
+
+    @Override
+    public void updateVOCAnswerStatus(Long vocCode, boolean vocAnswerStatus) {
+        VOC voc = vocRepository.findById(vocCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
+        voc.setVocAnswerStatus(vocAnswerStatus);
+        vocRepository.save(voc);
+        log.info("VOC 답변 상태가 {}로 업데이트됐습니다.: {}", vocAnswerStatus, voc);
+    }
 }

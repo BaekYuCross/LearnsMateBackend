@@ -53,6 +53,8 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         VOCAnswer savedVOCAnswer = vocAnswerRepository.save(vocAnswer);
         log.info("저장된 VOC 답변 객체: {}", savedVOCAnswer);
 
+        vocService.updateVOCAnswerStatus(voc.getVocCode(), true);
+
         return vocAnswerMapper.fromEntityToDTO(savedVOCAnswer);
     }
 
@@ -101,4 +103,6 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
 
         return adminDTO.convertToEntity();
     }
+
+
 }
