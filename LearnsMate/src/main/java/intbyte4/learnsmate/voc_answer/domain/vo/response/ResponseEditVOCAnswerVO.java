@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class ResponseEditVOCAnswerVO {
-    @JsonProperty("vos_answer_content")
+    @JsonProperty("voc_answer_content")
     private String vocAnswerContent;
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;

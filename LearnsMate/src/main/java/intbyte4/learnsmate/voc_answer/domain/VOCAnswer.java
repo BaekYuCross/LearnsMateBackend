@@ -19,10 +19,10 @@ public class VOCAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vos_answer_code", nullable = false, unique = true)
+    @Column(name = "voc_answer_code", nullable = false, unique = true)
     private Long vocAnswerCode;
 
-    @Column(name = "vos_answer_content", nullable = false)
+    @Column(name = "voc_answer_content", nullable = false)
     private String vocAnswerContent;
 
     @Column(name = "created_at", nullable = false)
