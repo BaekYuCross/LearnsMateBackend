@@ -25,6 +25,7 @@ public enum StatusEnum {
     EMAIL_NOT_FOUND(404, HttpStatus.NOT_FOUND, "회원가입 되지 않은 아이디입니다."),
     TEMPLATE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 템플릿입니다."),
     CAMPAIGN_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 캠페인입니다."),
+    VOC_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 VOC 입니다."),
     COUPON_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
