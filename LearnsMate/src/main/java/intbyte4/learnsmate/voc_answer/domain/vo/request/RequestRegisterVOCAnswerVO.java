@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class RequestRegisterVocAnswerVO {
+public class RequestRegisterVOCAnswerVO {
     @JsonProperty("voc_answer_code")
     private Long vocAnswerCode;
     @JsonProperty("vos_answer_content")

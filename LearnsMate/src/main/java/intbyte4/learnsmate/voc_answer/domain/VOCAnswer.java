@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @Builder
-public class VocAnswer {
+public class VOCAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

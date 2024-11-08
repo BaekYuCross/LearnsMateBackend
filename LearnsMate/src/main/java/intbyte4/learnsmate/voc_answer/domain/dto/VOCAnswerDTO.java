@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Builder
-public class VocAnswerDTO {
+public class VOCAnswerDTO {
     private Long vocAnswerCode;
     private String vocAnswerContent;
     private LocalDateTime createdAt;
