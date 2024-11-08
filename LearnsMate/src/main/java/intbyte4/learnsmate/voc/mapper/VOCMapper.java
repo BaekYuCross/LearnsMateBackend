@@ -1,16 +1,16 @@
 package intbyte4.learnsmate.voc.mapper;
 
 import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.voc.domain.Voc;
-import intbyte4.learnsmate.voc.domain.dto.VocDTO;
-import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVocVO;
+import intbyte4.learnsmate.voc.domain.VOC;
+import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc_category.domain.VocCategory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class VocMapper {
-    public VocDTO fromEntityToDto(Voc voc) {
-        return VocDTO.builder()
+public class VOCMapper {
+    public VOCDTO fromEntityToDto(VOC voc) {
+        return VOCDTO.builder()
                 .vocCode(voc.getVocCode())
                 .vocContent(voc.getVocContent())
                 .vocAnswerStatus(voc.getVocAnswerStatus())
@@ -21,8 +21,8 @@ public class VocMapper {
                 .build();
     }
 
-    public ResponseFindVocVO fromDtoToFindResponseVO(VocDTO vocDTO) {
-        return ResponseFindVocVO.builder()
+    public ResponseFindVOCVO fromDtoToFindResponseVO(VOCDTO vocDTO) {
+        return ResponseFindVOCVO.builder()
                 .vocCode(vocDTO.getVocCode())
                 .vocContent(vocDTO.getVocContent())
                 .vocAnswerStatus(vocDTO.getVocAnswerStatus())
@@ -33,8 +33,8 @@ public class VocMapper {
                 .build();
     }
 
-    public Voc toEntity(VocDTO vocDTO, VocCategory vocCategory, Member member) {
-        return Voc.builder()
+    public VOC toEntity(VOCDTO vocDTO, VocCategory vocCategory, Member member) {
+        return VOC.builder()
                 .vocCode(vocDTO.getVocCode())
                 .vocContent(vocDTO.getVocContent())
                 .vocAnswerStatus(vocDTO.getVocAnswerStatus())

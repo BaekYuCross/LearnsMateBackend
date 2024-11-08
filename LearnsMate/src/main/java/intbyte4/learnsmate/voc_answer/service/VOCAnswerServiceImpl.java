@@ -7,10 +7,10 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.service.MemberService;
-import intbyte4.learnsmate.voc.domain.Voc;
-import intbyte4.learnsmate.voc.domain.dto.VocDTO;
-import intbyte4.learnsmate.voc.mapper.VocMapper;
-import intbyte4.learnsmate.voc.service.VocService;
+import intbyte4.learnsmate.voc.domain.VOC;
+import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.mapper.VOCMapper;
+import intbyte4.learnsmate.voc.service.VOCService;
 import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.mapper.VOCAnswerMapper;
@@ -33,8 +33,8 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     private final VOCAnswerRepository vocAnswerRepository;
     private final VOCAnswerMapper vocAnswerMapper;
     private final AdminService adminService;
-    private final VocService vocService;
-    private final VocMapper vocMapper;
+    private final VOCService vocService;
+    private final VOCMapper vocMapper;
     private final VocCategoryService vocCategoryService;
     private final MemberService memberService;
 
@@ -43,7 +43,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     public VOCAnswerDTO registerVOCAnswer(VOCAnswerDTO vocAnswerDTO) {
         log.info("VOC 답변 등록 중: {}", vocAnswerDTO);
         Admin user = validAdmin(adminService, vocAnswerDTO.getAdminCode(), log);
-        Voc voc = getVOC(vocAnswerDTO);
+        VOC voc = getVOC(vocAnswerDTO);
 
         VOCAnswer vocAnswer = vocAnswerMapper.toEntity(vocAnswerDTO, user, voc);
         vocAnswer.setCreatedAt(LocalDateTime.now());
@@ -72,8 +72,8 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         return vocAnswerMapper.fromEntityToDTO(updatedCampaignTemplate);
     }
 
-    private Voc getVOC(VOCAnswerDTO vocAnswerDTO) {
-        VocDTO vocDTO = vocService.findByVocCode(vocAnswerDTO.getVocCode());
+    private VOC getVOC(VOCAnswerDTO vocAnswerDTO) {
+        VOCDTO vocDTO = vocService.findByVOCCode(vocAnswerDTO.getVocCode());
         if (vocDTO == null) {
             log.warn("존재하지 않는 VOC : {}", vocAnswerDTO.getVocCode());
             throw new CommonException(StatusEnum.VOC_NOT_FOUND);
