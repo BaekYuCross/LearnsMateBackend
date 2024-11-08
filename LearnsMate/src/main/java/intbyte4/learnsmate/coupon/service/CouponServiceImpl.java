@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -22,13 +24,24 @@ public class CouponServiceImpl implements CouponService {
     private final CouponMapper couponMapper;
 
     // 쿠폰 전체 조회
+    @Override
+    public List<CouponDTO> findAllCoupons() {
+
+        List<CouponEntity> couponEntities = couponRepository.findAll();
+        List<CouponDTO> couponDTOList = new ArrayList<>();
+        couponEntities.forEach(dto -> couponDTOList.add(couponMapper.toDTO(dto)));
+
+        return couponDTOList;
+    }
     // 쿠폰 단 건 조회 (쿠폰코드로)
+
     // 쿠폰 필터링해서 조회
 
     // 쿠폰 등록
     @Override
     public CouponDTO registerCoupon(CouponRegisterRequestVO request, Admin admin, Member tutor) {
 
+        /* todo. 따로 Mapper에 메소드 빼서 변환하기 */
         CouponEntity newCoupon = CouponEntity.builder()
                 .couponCode(request.getCouponCode())
                 .couponName(request.getCouponName())
