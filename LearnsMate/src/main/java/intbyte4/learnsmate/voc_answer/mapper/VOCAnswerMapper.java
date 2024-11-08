@@ -41,7 +41,7 @@ public class VOCAnswerMapper {
                 .build();
     }
 
-    public ResponseRegisterVOCAnswerVO fromDtoToRegisterResponseVO(VOCAnswerDTO registerVocAnswer) {
+    public ResponseRegisterVOCAnswerVO fromDTOToRegisterResponseVO(VOCAnswerDTO registerVocAnswer) {
         return ResponseRegisterVOCAnswerVO.builder()
                 .vocAnswerCode(registerVocAnswer.getVocAnswerCode())
                 .vocAnswerContent(registerVocAnswer.getVocAnswerContent())
@@ -52,7 +52,7 @@ public class VOCAnswerMapper {
                 .build();
     }
 
-    public ResponseEditVOCAnswerVO fromDtoToEditResponseVO(VOCAnswerDTO updatedTemplateDTO) {
+    public ResponseEditVOCAnswerVO fromDTOToEditResponseVO(VOCAnswerDTO updatedTemplateDTO) {
         return ResponseEditVOCAnswerVO.builder()
                 .vocAnswerContent(updatedTemplateDTO.getVocAnswerContent())
                 .updatedAt(updatedTemplateDTO.getUpdatedAt())
@@ -68,14 +68,14 @@ public class VOCAnswerMapper {
                 .build();
     }
 
-    public ResponseFindVOCAnswerVO fromEntityToResponseVO(VOCAnswer vocAnswer) {
+    public ResponseFindVOCAnswerVO fromDTOToFindResponseVO(VOCAnswerDTO vocAnswerDTO) {
         return ResponseFindVOCAnswerVO.builder()
-                .vocAnswerCode(vocAnswer.getVocAnswerCode())
-                .vocAnswerContent(vocAnswer.getVocAnswerContent())
-                .vocCode(vocAnswer.getVoc().getVocCode())
-                .adminCode(vocAnswer.getAdmin().getAdminCode())
-                .createdAt(vocAnswer.getCreatedAt())
-                .updatedAt(vocAnswer.getUpdatedAt())
+                .vocAnswerCode(vocAnswerDTO.getVocAnswerCode())
+                .vocAnswerContent(vocAnswerDTO.getVocAnswerContent())
+                .vocCode(vocAnswerDTO.getVocCode())
+                .adminCode(vocAnswerDTO.getAdminCode())
+                .createdAt(vocAnswerDTO.getCreatedAt())
+                .updatedAt(vocAnswerDTO.getUpdatedAt())
                 .build();
     }
 }
