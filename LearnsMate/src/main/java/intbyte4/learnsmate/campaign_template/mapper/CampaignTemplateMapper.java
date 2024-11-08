@@ -27,18 +27,6 @@ public class CampaignTemplateMapper {
                 .build();
     }
 
-    public ResponseFindTemplateVO fromEntityToVO(CampaignTemplate campaignTemplate) {
-        return ResponseFindTemplateVO.builder()
-                .campaignTemplateCode(campaignTemplate.getCampaignTemplateCode())
-                .campaignTemplateTitle(campaignTemplate.getCampaignTemplateTitle())
-                .campaignTemplateContents(campaignTemplate.getCampaignTemplateContents())
-                .campaignTemplateFlag(campaignTemplate.getCampaignTemplateFlag())
-                .createdAt(campaignTemplate.getCreatedAt())
-                .updatedAt(campaignTemplate.getUpdatedAt())
-                .adminCode(campaignTemplate.getAdmin().getAdminCode())
-                .build();
-    }
-
     public CampaignTemplateDTO fromRegisterRequestVOToDto(RequestRegisterTemplateVO requestRegisterTemplateVO) {
         return CampaignTemplateDTO.builder()
                 .campaignTemplateCode(requestRegisterTemplateVO.getCampaignTemplateCode())

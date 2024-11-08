@@ -1,8 +1,6 @@
 package intbyte4.learnsmate.voc_answer.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
-import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
-import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestEditVOCAnswerVO;
 import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestRegisterVOCAnswerVO;
@@ -34,7 +32,7 @@ public class VOCAnswerController {
         try {
             VOCAnswerDTO vocAnswerDTO = vocAnswerMapper.fromRegisterRequestVOToDTO(request);
             VOCAnswerDTO registerVocAnswer = vocAnswerService.registerVOCAnswer(vocAnswerDTO);
-            ResponseRegisterVOCAnswerVO response = vocAnswerMapper.fromDtoToRegisterResponseVO(registerVocAnswer);
+            ResponseRegisterVOCAnswerVO response = vocAnswerMapper.fromDTOToRegisterResponseVO(registerVocAnswer);
 
             log.info("VOC 답변 등록 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -57,7 +55,7 @@ public class VOCAnswerController {
 
             VOCAnswerDTO updatedTemplateDTO = vocAnswerService.editVOCAnswer(vocAnswerDTO);
 
-            ResponseEditVOCAnswerVO response = vocAnswerMapper.fromDtoToEditResponseVO(updatedTemplateDTO);
+            ResponseEditVOCAnswerVO response = vocAnswerMapper.fromDTOToEditResponseVO(updatedTemplateDTO);
 
             log.info("VOC 답변 수정 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -75,7 +73,8 @@ public class VOCAnswerController {
     public ResponseEntity<?> getVOC(@PathVariable("vocAnswerCode") Long vocAnswerCode) {
         log.info("조회 요청된 VOC 답변 코드 : {}", vocAnswerCode);
         try {
-            ResponseFindVOCAnswerVO response = vocAnswerService.findById(vocAnswerCode);
+            VOCAnswerDTO vocAnswerDTO = vocAnswerService.findById(vocAnswerCode);
+            ResponseFindVOCAnswerVO response = vocAnswerMapper.fromDTOToFindResponseVO(vocAnswerDTO);
 
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);

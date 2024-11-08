@@ -3,7 +3,7 @@ package intbyte4.learnsmate.voc.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.voc.domain.VOC;
-import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
+import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.repository.VOCRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,24 +22,23 @@ public class VOCServiceImpl implements VOCService {
     private final VOCMapper vocMapper;
 
     @Override
-    public List<ResponseFindVOCVO> findAllByVOC() {
+    public List<VOCDTO> findAllByVOC() {
         log.info("VOC 전체 조회 중");
         List<VOC> vocList = vocRepository.findAll();
-        List<ResponseFindVOCVO> VOCDTOList = new ArrayList<>();
+        List<VOCDTO> VOCDTOList = new ArrayList<>();
 
         for (VOC voc : vocList) {
-            VOCDTOList.add(vocMapper.fromEntityToVO(voc));
+            VOCDTOList.add(vocMapper.fromEntityToDTO(voc));
         }
-
         return VOCDTOList;
     }
 
     @Override
-    public ResponseFindVOCVO findByVOCCode(Long vocCode) {
+    public VOCDTO findByVOCCode(Long vocCode) {
         log.info("VOC 단 건 조회 중: {}", vocCode);
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
 
-        return vocMapper.fromEntityToVO(voc);
+        return vocMapper.fromEntityToDTO(voc);
     }
 }
