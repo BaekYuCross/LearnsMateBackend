@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class VOCMapper {
-    public VOCDTO fromEntityToDto(VOC voc) {
-        return VOCDTO.builder()
+    public ResponseFindVOCVO fromEntityToVO(VOC voc) {
+        return ResponseFindVOCVO.builder()
                 .vocCode(voc.getVocCode())
                 .vocContent(voc.getVocContent())
                 .vocAnswerStatus(voc.getVocAnswerStatus())
@@ -21,7 +21,7 @@ public class VOCMapper {
                 .build();
     }
 
-    public ResponseFindVOCVO fromDtoToFindResponseVO(VOCDTO vocDTO) {
+    public ResponseFindVOCVO fromDTOToFindResponseVO(VOCDTO vocDTO) {
         return ResponseFindVOCVO.builder()
                 .vocCode(vocDTO.getVocCode())
                 .vocContent(vocDTO.getVocContent())
