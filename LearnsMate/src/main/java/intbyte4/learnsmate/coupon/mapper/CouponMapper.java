@@ -3,9 +3,13 @@ package intbyte4.learnsmate.coupon.mapper;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class CouponMapper {
                 .build();
     }
 
-    public CouponDTO fromCouponRegisterRequestVOtoDTO (CouponRegisterRequestVO vo) {
+    public CouponDTO fromCouponRegisterRequestVOToDTO(CouponRegisterRequestVO vo) {
         return CouponDTO.builder()
                 .couponCode(vo.getCouponCode())
                 .couponName(vo.getCouponName())
@@ -44,8 +48,40 @@ public class CouponMapper {
                 .build();
     }
 
-    public CouponRegisterResponseVO fromDtoToRegisterResponseVO (CouponDTO couponDTO) {
+    public CouponRegisterResponseVO fromDTOToRegisterResponseVO(CouponDTO couponDTO) {
         return CouponRegisterResponseVO.builder()
+                .couponCode(couponDTO.getCouponCode())
+                .couponName(couponDTO.getCouponName())
+                .couponContents(couponDTO.getCouponContents())
+                .couponDiscountRate(couponDTO.getCouponDiscountRate())
+                .createdAt(couponDTO.getCreatedAt())
+                .updatedAt(couponDTO.getUpdatedAt())
+                .couponStartDate(couponDTO.getCouponStartDate())
+                .couponExpireDate(couponDTO.getCouponExpireDate())
+                .couponCategoryCode(couponDTO.getCouponCategoryCode())
+                .adminCode(couponDTO.getAdminCode())
+                .tutorCode(couponDTO.getTutorCode())
+                .build();
+    }
+
+    public List<CouponFindResponseVO> fromDTOListToCouponFindVO(List<CouponDTO> couponDTOList) {
+        return couponDTOList.stream().map(dto -> CouponFindResponseVO.builder()
+                .couponCode(dto.getCouponCode())
+                .couponName(dto.getCouponName())
+                .couponContents(dto.getCouponContents())
+                .couponDiscountRate(dto.getCouponDiscountRate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .couponStartDate(dto.getCouponStartDate())
+                .couponExpireDate(dto.getCouponExpireDate())
+                .couponCategoryCode(dto.getCouponCategoryCode())
+                .adminCode(dto.getAdminCode())
+                .tutorCode(dto.getTutorCode())
+                .build()).collect(Collectors.toList());
+    }
+
+    public CouponFindResponseVO fromDTOToFindResponseVO(CouponDTO couponDTO) {
+        return CouponFindResponseVO.builder()
                 .couponCode(couponDTO.getCouponCode())
                 .couponName(couponDTO.getCouponName())
                 .couponContents(couponDTO.getCouponContents())

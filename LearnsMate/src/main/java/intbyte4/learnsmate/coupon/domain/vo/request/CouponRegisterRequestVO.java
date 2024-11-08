@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Builder
 public class CouponRegisterRequestVO {
     @JsonProperty("coupon_code")
