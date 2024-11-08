@@ -35,9 +35,9 @@ public class VocServiceImpl implements VocService {
     }
 
     @Override
-    public VocDTO findByVocCode(VocDTO vocDTO) {
-        log.info("템플릿 단 건 조회 중: {}", vocDTO);
-        Voc voc = vocRepository.findById(vocDTO.getVocCode())
+    public VocDTO findByVocCode(Long vocCode) {
+        log.info("템플릿 단 건 조회 중: {}", vocCode);
+        Voc voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
 
         return vocMapper.fromEntityToDto(voc);
