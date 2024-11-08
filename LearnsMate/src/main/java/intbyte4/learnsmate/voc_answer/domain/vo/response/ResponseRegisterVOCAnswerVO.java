@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ResponseRegisterVOCAnswerVO {
     @JsonProperty("voc_answer_code")
