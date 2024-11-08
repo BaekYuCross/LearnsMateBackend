@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.voc_answer.mapper;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.voc.domain.Voc;
+import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestEditVOCAnswerVO;
@@ -58,7 +58,7 @@ public class VOCAnswerMapper {
                 .build();
     }
 
-    public VOCAnswer toEntity(VOCAnswerDTO vocAnswerDTO, Admin user, Voc voc) {
+    public VOCAnswer toEntity(VOCAnswerDTO vocAnswerDTO, Admin user, VOC voc) {
         return VOCAnswer.builder()
                 .vocAnswerCode(vocAnswerDTO.getVocAnswerCode())
                 .vocAnswerContent(vocAnswerDTO.getVocAnswerContent())

@@ -1,10 +1,10 @@
 package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
-import intbyte4.learnsmate.voc.domain.dto.VocDTO;
-import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVocVO;
-import intbyte4.learnsmate.voc.mapper.VocMapper;
-import intbyte4.learnsmate.voc.service.VocService;
+import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
+import intbyte4.learnsmate.voc.mapper.VOCMapper;
+import intbyte4.learnsmate.voc.service.VOCService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,19 +22,19 @@ import java.util.List;
 @RequestMapping("voc")
 @Slf4j
 @RequiredArgsConstructor
-public class VocController {
+public class VOCController {
 
-    private final VocService vocService;
-    private final VocMapper vocMapper;
+    private final VOCService vocService;
+    private final VOCMapper vocMapper;
 
     @Operation(summary = "직원 - VOC 전체 조회")
     @GetMapping("/list")
-    public ResponseEntity<List<ResponseFindVocVO>> listTemplates() {
-        List<VocDTO> vocDTOList = vocService.findAllByVoc();
-        List<ResponseFindVocVO> responseList = new ArrayList<>();
+    public ResponseEntity<List<ResponseFindVOCVO>> listVOC() {
+        List<VOCDTO> VOCDTOList = vocService.findAllByVOC();
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
 
-        for (VocDTO vocDTO : vocDTOList) {
-            ResponseFindVocVO responseFindTemplateVO = vocMapper.fromDtoToFindResponseVO(vocDTO);
+        for (VOCDTO vocDTO : VOCDTOList) {
+            ResponseFindVOCVO responseFindTemplateVO = vocMapper.fromDtoToFindResponseVO(vocDTO);
             responseList.add(responseFindTemplateVO);
         }
 
@@ -43,11 +43,11 @@ public class VocController {
 
     @Operation(summary = "직원 - VOC 단 건 조회")
     @GetMapping("/{vocCode}")
-    public ResponseEntity<?> getTemplate(@PathVariable("vocCode") Long vocCode) {
+    public ResponseEntity<?> getVOC(@PathVariable("vocCode") Long vocCode) {
         log.info("조회 요청된 VOC 코드 : {}", vocCode);
         try {
-            VocDTO findVocDTO = vocService.findByVocCode(vocCode);
-            ResponseFindVocVO response = vocMapper.fromDtoToFindResponseVO(findVocDTO);
+            VOCDTO findVOCDTO = vocService.findByVOCCode(vocCode);
+            ResponseFindVOCVO response = vocMapper.fromDtoToFindResponseVO(findVOCDTO);
 
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);

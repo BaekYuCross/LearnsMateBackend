@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseFindVocVO {
+public class ResponseFindVOCVO {
     @JsonProperty("voc_code")
     private Long vocCode;
     @JsonProperty("voc_content")
