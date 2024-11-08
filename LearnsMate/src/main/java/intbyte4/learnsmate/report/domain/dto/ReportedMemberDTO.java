@@ -10,5 +10,5 @@ import lombok.*;
 @Builder
 public class ReportedMemberDTO {
     private Member reportedMember;
-    private Integer reportCount;
+    private Long reportCount;
 }
