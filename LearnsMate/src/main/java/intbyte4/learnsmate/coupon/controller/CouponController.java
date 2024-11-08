@@ -35,6 +35,14 @@ public class CouponController {
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
+    @Operation(summary = "쿠폰 단 건 조회")
+    @GetMapping("/coupon/{couponCode}")
+    public ResponseEntity<CouponFindResponseVO> getCouponByCode(@PathVariable("couponCode") String couponCode) {
+        CouponDTO couponDTO = couponService.findCouponByCouponCode(couponCode);
+
+        return new ResponseEntity(couponDTO, HttpStatus.OK);
+    }
+
     @Operation(summary = "쿠폰 등록")
     @PostMapping("/register")
     public ResponseEntity<CouponRegisterResponseVO> createCoupon (@RequestBody CouponRegisterRequestVO request

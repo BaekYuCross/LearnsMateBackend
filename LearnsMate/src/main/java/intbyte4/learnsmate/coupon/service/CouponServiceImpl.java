@@ -1,6 +1,8 @@
 package intbyte4.learnsmate.coupon.service;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
@@ -34,6 +36,12 @@ public class CouponServiceImpl implements CouponService {
         return couponDTOList;
     }
     // 쿠폰 단 건 조회 (쿠폰코드로)
+    @Override
+    public CouponDTO findCouponByCouponCode(String couponCode) {
+        CouponEntity couponEntity = couponRepository.findById(couponCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        return couponMapper.toDTO(couponEntity);
+    }
 
     // 쿠폰 필터링해서 조회
 
