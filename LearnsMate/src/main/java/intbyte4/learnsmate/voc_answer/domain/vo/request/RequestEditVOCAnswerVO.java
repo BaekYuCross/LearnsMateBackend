@@ -11,6 +11,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class RequestEditVOCAnswerVO {
-    @JsonProperty("vos_answer_content")
+    @JsonProperty("voc_answer_content")
     private String vocAnswerContent;
 }
