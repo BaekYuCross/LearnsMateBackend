@@ -4,7 +4,9 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.voc.domain.Voc;
 import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
+import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestEditVOCAnswerVO;
 import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestRegisterVOCAnswerVO;
+import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseEditVOCAnswerVO;
 import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseRegisterVOCAnswerVO;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +34,12 @@ public class VOCAnswerMapper {
                 .build();
     }
 
+    public VOCAnswerDTO fromEditRequestVOToDto(RequestEditVOCAnswerVO request) {
+        return  VOCAnswerDTO.builder()
+                .vocAnswerContent(request.getVocAnswerContent())
+                .build();
+    }
+
     public ResponseRegisterVOCAnswerVO fromDtoToRegisterResponseVO(VOCAnswerDTO registerVocAnswer) {
         return ResponseRegisterVOCAnswerVO.builder()
                 .vocAnswerCode(registerVocAnswer.getVocAnswerCode())
@@ -40,6 +48,13 @@ public class VOCAnswerMapper {
                 .updatedAt(LocalDateTime.now())
                 .vocCode(registerVocAnswer.getVocCode())
                 .adminCode(registerVocAnswer.getAdminCode())
+                .build();
+    }
+
+    public ResponseEditVOCAnswerVO fromDtoToEditResponseVO(VOCAnswerDTO updatedTemplateDTO) {
+        return ResponseEditVOCAnswerVO.builder()
+                .vocAnswerContent(updatedTemplateDTO.getVocAnswerContent())
+                .updatedAt(updatedTemplateDTO.getUpdatedAt())
                 .build();
     }
 
