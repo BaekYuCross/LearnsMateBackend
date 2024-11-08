@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @Builder
-public class Voc {
+public class VOC {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +26,7 @@ public class Voc {
     private String vocContent;
 
     @Column(name = "voc_answer_status", nullable = false)
-    private int vocAnswerStatus;
+    private Boolean vocAnswerStatus;
 
     @Column(name = "voc_answer_satisfaction")
     private String vocAnswerSatisfaction;
