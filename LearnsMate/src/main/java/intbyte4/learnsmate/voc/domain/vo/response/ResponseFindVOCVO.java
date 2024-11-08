@@ -8,15 +8,16 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class ResponseFindVocVO {
+public class ResponseFindVOCVO {
     @JsonProperty("voc_code")
     private Long vocCode;
     @JsonProperty("voc_content")
     private String vocContent;
     @JsonProperty("voc_answer_status")
-    private int vocAnswerStatus;
+    private Boolean vocAnswerStatus;
     @JsonProperty("voc_answer_satisfaction")
     private String vocAnswerSatisfaction;
     @JsonProperty("voc_analysis")

@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController("campaignTemplateController")
@@ -96,15 +95,7 @@ public class CampaignTemplateController {
     @Operation(summary = "직원 - 캠페인 템플릿 전체 조회")
     @GetMapping("/list")
     public ResponseEntity<List<ResponseFindTemplateVO>> listTemplates() {
-        List<CampaignTemplateDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
-        List<ResponseFindTemplateVO> responseList = new ArrayList<>();
-
-        for (CampaignTemplateDTO campaignTemplateDTO : campaignTemplateDTOList) {
-            ResponseFindTemplateVO responseFindTemplateVO = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
-            responseList.add(responseFindTemplateVO);
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(campaignTemplateService.findAllByTemplate());
     }
 
     @Operation(summary = "직원 - 캠페인 템플릿 단 건 조회")
@@ -112,13 +103,7 @@ public class CampaignTemplateController {
     public ResponseEntity<?> getTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
         log.info("템플릿 조회 요청된 템플릿 코드 : {}", campaignTemplateCode);
         try {
-            CampaignTemplateDTO campaignTemplateDTO = new CampaignTemplateDTO();
-            campaignTemplateDTO.setCampaignTemplateCode(campaignTemplateCode);
-
-            CampaignTemplateDTO findTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateDTO);
-
-            ResponseFindTemplateVO response = campaignTemplateMapper.fromDtoToFindResponseVO(findTemplateDTO);
-
+            ResponseFindTemplateVO response = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {

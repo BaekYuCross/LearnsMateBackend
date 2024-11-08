@@ -1,9 +1,5 @@
 package intbyte4.learnsmate.voc.domain.dto;
 
-import intbyte4.learnsmate.member.domain.entity.Member;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,11 +10,10 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Builder
-public class VocDTO {
-
+public class VOCDTO {
     private Long vocCode;
     private String vocContent;
-    private int vocAnswerStatus;
+    private Boolean vocAnswerStatus;
     private String vocAnswerSatisfaction;
     private String vocAnalysis;
     private LocalDateTime createdAt;
