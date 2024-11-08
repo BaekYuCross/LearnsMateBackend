@@ -2,29 +2,29 @@ package intbyte4.learnsmate.voc_answer.mapper;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.voc.domain.Voc;
-import intbyte4.learnsmate.voc_answer.domain.VocAnswer;
-import intbyte4.learnsmate.voc_answer.domain.dto.VocAnswerDTO;
-import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestRegisterVocAnswerVO;
-import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseRegisterVocAnswerVO;
+import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
+import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
+import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestRegisterVOCAnswerVO;
+import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseRegisterVOCAnswerVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
-public class VocAnswerMapper {
-    public VocAnswerDTO fromEntityToDto(VocAnswer savedVocAnswer) {
-        return VocAnswerDTO.builder()
-                .vocAnswerCode(savedVocAnswer.getVocAnswerCode())
-                .vocAnswerContent(savedVocAnswer.getVocAnswerContent())
+public class VOCAnswerMapper {
+    public VOCAnswerDTO fromEntityToDTO(VOCAnswer savedVOCAnswer) {
+        return VOCAnswerDTO.builder()
+                .vocAnswerCode(savedVOCAnswer.getVocAnswerCode())
+                .vocAnswerContent(savedVOCAnswer.getVocAnswerContent())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .vocCode(savedVocAnswer.getVoc().getVocCode())
-                .adminCode(savedVocAnswer.getAdmin().getAdminCode())
+                .vocCode(savedVOCAnswer.getVoc().getVocCode())
+                .adminCode(savedVOCAnswer.getAdmin().getAdminCode())
                 .build();
     }
 
-    public VocAnswerDTO fromRegisterRequestVOToDto(RequestRegisterVocAnswerVO request) {
-        return VocAnswerDTO.builder()
+    public VOCAnswerDTO fromRegisterRequestVOToDTO(RequestRegisterVOCAnswerVO request) {
+        return VOCAnswerDTO.builder()
                 .vocAnswerCode(request.getVocAnswerCode())
                 .vocAnswerContent(request.getVocAnswerContent())
                 .vocCode(request.getVocCode())
@@ -32,8 +32,8 @@ public class VocAnswerMapper {
                 .build();
     }
 
-    public ResponseRegisterVocAnswerVO fromDtoToRegisterResponseVO(VocAnswerDTO registerVocAnswer) {
-        return ResponseRegisterVocAnswerVO.builder()
+    public ResponseRegisterVOCAnswerVO fromDtoToRegisterResponseVO(VOCAnswerDTO registerVocAnswer) {
+        return ResponseRegisterVOCAnswerVO.builder()
                 .vocAnswerCode(registerVocAnswer.getVocAnswerCode())
                 .vocAnswerContent(registerVocAnswer.getVocAnswerContent())
                 .createdAt(LocalDateTime.now())
@@ -43,8 +43,8 @@ public class VocAnswerMapper {
                 .build();
     }
 
-    public VocAnswer toEntity(VocAnswerDTO vocAnswerDTO, Admin user, Voc voc) {
-        return VocAnswer.builder()
+    public VOCAnswer toEntity(VOCAnswerDTO vocAnswerDTO, Admin user, Voc voc) {
+        return VOCAnswer.builder()
                 .vocAnswerCode(vocAnswerDTO.getVocAnswerCode())
                 .vocAnswerContent(vocAnswerDTO.getVocAnswerContent())
                 .voc(voc)

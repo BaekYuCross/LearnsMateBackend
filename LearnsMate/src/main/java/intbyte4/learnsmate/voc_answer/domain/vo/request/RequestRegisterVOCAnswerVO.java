@@ -1,24 +1,20 @@
-package intbyte4.learnsmate.voc_answer.domain.vo.response;
+package intbyte4.learnsmate.voc_answer.domain.vo.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-@Builder
-public class ResponseRegisterVocAnswerVO {
+public class RequestRegisterVOCAnswerVO {
     @JsonProperty("voc_answer_code")
     private Long vocAnswerCode;
     @JsonProperty("vos_answer_content")
     private String vocAnswerContent;
-    @JsonProperty("created_at")
-    private LocalDateTime createdAt;
-    @JsonProperty("updated_at")
-    private LocalDateTime updatedAt;
     @JsonProperty("voc_code")
     private Long vocCode;
     @JsonProperty("admin_code")
