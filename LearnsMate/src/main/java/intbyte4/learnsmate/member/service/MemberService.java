@@ -51,4 +51,11 @@ public class MemberService {
 
         return tutorName;
     }
+
+    public List<MemberDTO> findMemberListByStudentCode(Long memberCode) {
+        List<Member> member = memberRepository.finByMemberFlagTrueAndMemberCode(memberCode);
+        return member.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .toList();
+    }
 }
