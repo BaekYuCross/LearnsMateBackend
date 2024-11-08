@@ -13,6 +13,7 @@ import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.service.VOCService;
 import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
+import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseFindVOCAnswerVO;
 import intbyte4.learnsmate.voc_answer.mapper.VOCAnswerMapper;
 import intbyte4.learnsmate.voc_answer.repository.VOCAnswerRepository;
 import intbyte4.learnsmate.voc_category.domain.VocCategory;
@@ -70,6 +71,12 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         log.info("수정된 VOC 답변 객체: {}", updatedCampaignTemplate);
 
         return vocAnswerMapper.fromEntityToDTO(updatedCampaignTemplate);
+    }
+
+    @Override
+    public ResponseFindVOCAnswerVO findById(Long vocAnswerCode) {
+        VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerCode).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+        return vocAnswerMapper.fromEntityToResponseVO(vocAnswer);
     }
 
     private VOC getVOC(VOCAnswerDTO vocAnswerDTO) {
