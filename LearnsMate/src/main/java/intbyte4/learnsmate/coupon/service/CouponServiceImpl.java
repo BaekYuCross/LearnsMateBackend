@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("couponService")
 @Slf4j
 @RequiredArgsConstructor
 public class CouponServiceImpl implements CouponService {

@@ -79,4 +79,20 @@ public class CouponMapper {
                 .tutorCode(dto.getTutorCode())
                 .build()).collect(Collectors.toList());
     }
+
+    public CouponFindResponseVO fromDTOToFindResponseVO(CouponDTO couponDTO) {
+        return CouponFindResponseVO.builder()
+                .couponCode(couponDTO.getCouponCode())
+                .couponName(couponDTO.getCouponName())
+                .couponContents(couponDTO.getCouponContents())
+                .couponDiscountRate(couponDTO.getCouponDiscountRate())
+                .createdAt(couponDTO.getCreatedAt())
+                .updatedAt(couponDTO.getUpdatedAt())
+                .couponStartDate(couponDTO.getCouponStartDate())
+                .couponExpireDate(couponDTO.getCouponExpireDate())
+                .couponCategoryCode(couponDTO.getCouponCategoryCode())
+                .adminCode(couponDTO.getAdminCode())
+                .tutorCode(couponDTO.getTutorCode())
+                .build();
+    }
 }

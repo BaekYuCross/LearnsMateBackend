@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController("couponController")
 @RequestMapping("coupon")
 @RequiredArgsConstructor
 @Slf4j
@@ -39,8 +39,9 @@ public class CouponController {
     @GetMapping("/coupon/{couponCode}")
     public ResponseEntity<CouponFindResponseVO> getCouponByCode(@PathVariable("couponCode") String couponCode) {
         CouponDTO couponDTO = couponService.findCouponByCouponCode(couponCode);
+        CouponFindResponseVO response = couponMapper.fromDTOToFindResponseVO(couponDTO);
 
-        return new ResponseEntity(couponDTO, HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @Operation(summary = "쿠폰 등록")
