@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.coupon.domain.entity;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -46,15 +47,16 @@ public class CouponEntity {
     @Column(name = "coupon_flag", nullable = false)
     private Boolean couponFlag;
 
-    @Column(name = "coupon_category_code", nullable = false)
-    private int couponCategoryCode;
+    @ManyToOne
+    @JoinColumn (name = "coupon_category_code", nullable = false)
+    private CouponCategory couponCategoryCode;
 
     @ManyToOne
     @JoinColumn (name = "admin_code")
     private Admin admin;
 
     @ManyToOne
-    @JoinColumn(name = " tutor_code")
+    @JoinColumn(name = "tutor_code")
     @Where(clause = "member_type = 'TUTOR'")
     private Member tutor;
 }
