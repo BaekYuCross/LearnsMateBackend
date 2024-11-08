@@ -5,6 +5,7 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindTemplateVO;
 import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
 import intbyte4.learnsmate.campaign_template.repository.CampaignTemplateRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
@@ -47,7 +48,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate savedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
         log.info("저장된 템플릿 객체: {}", savedCampaignTemplate);
 
-        return campaignTemplateMapper.fromEntityToDto(savedCampaignTemplate);
+        return campaignTemplateMapper.fromEntityToDTO(savedCampaignTemplate);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate updatedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
         log.info("수정된 템플릿 객체: {}", updatedCampaignTemplate);
 
-        return campaignTemplateMapper.fromEntityToDto(updatedCampaignTemplate);
+        return campaignTemplateMapper.fromEntityToDTO(updatedCampaignTemplate);
     }
 
     @Override
@@ -81,24 +82,24 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     }
 
     @Override
-    public List<CampaignTemplateDTO> findAllByTemplate() {
+    public List<ResponseFindTemplateVO> findAllByTemplate() {
         log.info("템플릿 전체 조회 중");
         List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
-        List<CampaignTemplateDTO> campaignTemplateDTOList = new ArrayList<>();
+        List<ResponseFindTemplateVO> campaignTemplateVOList = new ArrayList<>();
 
         for (CampaignTemplate campaignTemplate : campaignTemplateList) {
-            campaignTemplateDTOList.add(campaignTemplateMapper.fromEntityToDto(campaignTemplate));
+            campaignTemplateVOList.add(campaignTemplateMapper.fromEntityToVO(campaignTemplate));
         }
 
-        return campaignTemplateDTOList;
+        return campaignTemplateVOList;
     }
 
     @Override
-    public CampaignTemplateDTO findByTemplateCode(CampaignTemplateDTO campaignTemplateDTO) {
-        log.info("템플릿 단 건 조회 중: {}", campaignTemplateDTO);
-        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode())
+    public ResponseFindTemplateVO findByTemplateCode(Long campaignTemplateCode) {
+        log.info("템플릿 단 건 조회 중: {}", campaignTemplateCode);
+        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
 
-        return campaignTemplateMapper.fromEntityToDto(campaignTemplate);
+        return campaignTemplateMapper.fromEntityToVO(campaignTemplate);
     }
 }
