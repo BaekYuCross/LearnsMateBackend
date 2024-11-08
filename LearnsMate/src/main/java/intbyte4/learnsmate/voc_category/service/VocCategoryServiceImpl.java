@@ -1,7 +1,5 @@
 package intbyte4.learnsmate.voc_category.service;
 
-import intbyte4.learnsmate.common.exception.CommonException;
-import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.voc_category.domain.VocCategory;
 import intbyte4.learnsmate.voc_category.repository.VocCategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +16,6 @@ public class VocCategoryServiceImpl implements VocCategoryService {
     @Override
     public VocCategory findByVocCategoryCode(Integer vocCategoryCode) {
         log.info("vocCategory 조회 중: {}", vocCategoryCode);
-        return vocCategoryRepository.findById(vocCategoryCode).orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
+        return vocCategoryRepository.findById(vocCategoryCode).orElseThrow(() -> new RuntimeException("vocCategoryCode not found"));
     }
 }
