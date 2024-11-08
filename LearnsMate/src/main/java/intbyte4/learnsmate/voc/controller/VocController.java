@@ -46,10 +46,7 @@ public class VocController {
     public ResponseEntity<?> getTemplate(@PathVariable("vocCode") Long vocCode) {
         log.info("조회 요청된 VOC 코드 : {}", vocCode);
         try {
-            VocDTO vocDTO = new VocDTO();
-            vocDTO.setVocCode(vocCode);
-
-            VocDTO findVocDTO = vocService.findByVocCode(vocDTO);
+            VocDTO findVocDTO = vocService.findByVocCode(vocCode);
             ResponseFindVocVO response = vocMapper.fromDtoToFindResponseVO(findVocDTO);
 
             log.info("캠페인 템플릿 조회 성공: {}", response);
