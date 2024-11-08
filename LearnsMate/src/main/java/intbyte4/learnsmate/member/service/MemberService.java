@@ -1,5 +1,7 @@
 package intbyte4.learnsmate.member.service;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -57,5 +59,11 @@ public class MemberService {
         return member.stream()
                 .map(memberMapper::fromMembertoMemberDTO)
                 .toList();
+    }
+
+    public Member findByStudentCode(Long memberCode) {
+        Member student = memberRepository.findById(memberCode).orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
+        if (!student.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.RESTRICTED);
+        return student;
     }
 }

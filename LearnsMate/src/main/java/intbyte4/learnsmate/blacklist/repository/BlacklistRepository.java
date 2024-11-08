@@ -12,7 +12,7 @@ import java.util.List;
 public interface BlacklistRepository extends JpaRepository<Blacklist, Long> {
 
     @Query("SELECT b FROM blacklist b " +
-            "JOIN Member m ON b.member.memberCode = m.memberCode " +
+            "JOIN member m ON b.member.memberCode = m.memberCode " +
             "WHERE m.memberType = :memberType")
     List<Blacklist> findAllBlacklistByMemberType(MemberType memberType);
 }

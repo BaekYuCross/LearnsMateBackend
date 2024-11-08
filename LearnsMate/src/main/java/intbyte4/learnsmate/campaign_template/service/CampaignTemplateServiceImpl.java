@@ -47,7 +47,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate savedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
         log.info("저장된 템플릿 객체: {}", savedCampaignTemplate);
 
-        return campaignTemplateMapper.fromEntityToDto(savedCampaignTemplate);
+        return campaignTemplateMapper.fromEntityToDTO(savedCampaignTemplate);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate updatedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
         log.info("수정된 템플릿 객체: {}", updatedCampaignTemplate);
 
-        return campaignTemplateMapper.fromEntityToDto(updatedCampaignTemplate);
+        return campaignTemplateMapper.fromEntityToDTO(updatedCampaignTemplate);
     }
 
     @Override
@@ -84,21 +84,21 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     public List<CampaignTemplateDTO> findAllByTemplate() {
         log.info("템플릿 전체 조회 중");
         List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
-        List<CampaignTemplateDTO> campaignTemplateDTOList = new ArrayList<>();
+        List<CampaignTemplateDTO> campaignTemplateVOList = new ArrayList<>();
 
         for (CampaignTemplate campaignTemplate : campaignTemplateList) {
-            campaignTemplateDTOList.add(campaignTemplateMapper.fromEntityToDto(campaignTemplate));
+            campaignTemplateVOList.add(campaignTemplateMapper.fromEntityToDTO(campaignTemplate));
         }
 
-        return campaignTemplateDTOList;
+        return campaignTemplateVOList;
     }
 
     @Override
-    public CampaignTemplateDTO findByTemplateCode(CampaignTemplateDTO campaignTemplateDTO) {
-        log.info("템플릿 단 건 조회 중: {}", campaignTemplateDTO);
-        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode())
+    public CampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode) {
+        log.info("템플릿 단 건 조회 중: {}", campaignTemplateCode);
+        CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
 
-        return campaignTemplateMapper.fromEntityToDto(campaignTemplate);
+        return campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
     }
 }

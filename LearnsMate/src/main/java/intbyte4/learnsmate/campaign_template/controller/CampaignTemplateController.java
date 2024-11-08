@@ -97,14 +97,12 @@ public class CampaignTemplateController {
     @GetMapping("/list")
     public ResponseEntity<List<ResponseFindTemplateVO>> listTemplates() {
         List<CampaignTemplateDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
-        List<ResponseFindTemplateVO> responseList = new ArrayList<>();
-
+        List<ResponseFindTemplateVO> response = new ArrayList<>();
         for (CampaignTemplateDTO campaignTemplateDTO : campaignTemplateDTOList) {
-            ResponseFindTemplateVO responseFindTemplateVO = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
-            responseList.add(responseFindTemplateVO);
+            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
+            response.add(vocVO);
         }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "직원 - 캠페인 템플릿 단 건 조회")
@@ -112,13 +110,8 @@ public class CampaignTemplateController {
     public ResponseEntity<?> getTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
         log.info("템플릿 조회 요청된 템플릿 코드 : {}", campaignTemplateCode);
         try {
-            CampaignTemplateDTO campaignTemplateDTO = new CampaignTemplateDTO();
-            campaignTemplateDTO.setCampaignTemplateCode(campaignTemplateCode);
-
-            CampaignTemplateDTO findTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateDTO);
-
-            ResponseFindTemplateVO response = campaignTemplateMapper.fromDtoToFindResponseVO(findTemplateDTO);
-
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
+            ResponseFindTemplateVO response = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {

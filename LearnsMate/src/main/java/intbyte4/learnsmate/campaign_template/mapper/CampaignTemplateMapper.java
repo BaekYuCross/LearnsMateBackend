@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Component
 public class CampaignTemplateMapper {
 
-    public CampaignTemplateDTO fromEntityToDto(CampaignTemplate campaignTemplate) {
+    public CampaignTemplateDTO fromEntityToDTO(CampaignTemplate campaignTemplate) {
         return CampaignTemplateDTO.builder()
                 .campaignTemplateCode(campaignTemplate.getCampaignTemplateCode())
                 .campaignTemplateTitle(campaignTemplate.getCampaignTemplateTitle())
