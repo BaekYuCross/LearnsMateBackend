@@ -11,10 +11,10 @@ import intbyte4.learnsmate.voc.domain.Voc;
 import intbyte4.learnsmate.voc.domain.dto.VocDTO;
 import intbyte4.learnsmate.voc.mapper.VocMapper;
 import intbyte4.learnsmate.voc.service.VocService;
-import intbyte4.learnsmate.voc_answer.domain.VocAnswer;
-import intbyte4.learnsmate.voc_answer.domain.dto.VocAnswerDTO;
-import intbyte4.learnsmate.voc_answer.mapper.VocAnswerMapper;
-import intbyte4.learnsmate.voc_answer.repository.VocAnswerRepository;
+import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
+import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
+import intbyte4.learnsmate.voc_answer.mapper.VOCAnswerMapper;
+import intbyte4.learnsmate.voc_answer.repository.VOCAnswerRepository;
 import intbyte4.learnsmate.voc_category.domain.VocCategory;
 import intbyte4.learnsmate.voc_category.service.VocCategoryService;
 import jakarta.transaction.Transactional;
@@ -28,10 +28,10 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service("vocAnswerService")
 @RequiredArgsConstructor
-public class VocAnswerServiceImpl implements VocAnswerService {
+public class VOCAnswerServiceImpl implements VOCAnswerService {
 
-    private final VocAnswerRepository vocAnswerRepository;
-    private final VocAnswerMapper vocAnswerMapper;
+    private final VOCAnswerRepository vocAnswerRepository;
+    private final VOCAnswerMapper vocAnswerMapper;
     private final AdminService adminService;
     private final VocService vocService;
     private final VocMapper vocMapper;
@@ -40,23 +40,39 @@ public class VocAnswerServiceImpl implements VocAnswerService {
 
     @Override
     @Transactional
-    public VocAnswerDTO registerVocAnswer(VocAnswerDTO vocAnswerDTO) {
+    public VOCAnswerDTO registerVOCAnswer(VOCAnswerDTO vocAnswerDTO) {
         log.info("VOC 답변 등록 중: {}", vocAnswerDTO);
-        Admin user = validAdmin(adminService, vocAnswerDTO.getAdminCode(), log, vocAnswerDTO);
-        Voc voc = getVoc(vocAnswerDTO);
+        Admin user = validAdmin(adminService, vocAnswerDTO.getAdminCode(), log);
+        Voc voc = getVOC(vocAnswerDTO);
 
-        VocAnswer vocAnswer = vocAnswerMapper.toEntity(vocAnswerDTO, user, voc);
+        VOCAnswer vocAnswer = vocAnswerMapper.toEntity(vocAnswerDTO, user, voc);
         vocAnswer.setCreatedAt(LocalDateTime.now());
         vocAnswer.setUpdatedAt(LocalDateTime.now());
 
         log.info("데이터베이스에 VOC 답변 저장 중: {}", vocAnswer);
-        VocAnswer savedVocAnswer = vocAnswerRepository.save(vocAnswer);
-        log.info("저장된 VOC 답변 객체: {}", savedVocAnswer);
+        VOCAnswer savedVOCAnswer = vocAnswerRepository.save(vocAnswer);
+        log.info("저장된 VOC 답변 객체: {}", savedVOCAnswer);
 
-        return vocAnswerMapper.fromEntityToDto(savedVocAnswer);
+        return vocAnswerMapper.fromEntityToDTO(savedVOCAnswer);
     }
 
-    private Voc getVoc(VocAnswerDTO vocAnswerDTO) {
+    @Override
+    @Transactional
+    public VOCAnswerDTO editVOCAnswer(VOCAnswerDTO vocAnswerDTO) {
+        log.info("VOC 답변 수정 중: {}", vocAnswerDTO);
+
+        VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerDTO.getVocAnswerCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+        vocAnswer.setVocAnswerContent(vocAnswerDTO.getVocAnswerContent());
+        vocAnswer.setUpdatedAt(LocalDateTime.now());
+
+        log.info("데이터베이스에 수정된 VOC 답변 저장 중: {}", vocAnswer);
+        VOCAnswer updatedCampaignTemplate = vocAnswerRepository.save(vocAnswer);
+        log.info("수정된 VOC 답변 객체: {}", updatedCampaignTemplate);
+
+        return vocAnswerMapper.fromEntityToDTO(updatedCampaignTemplate);
+    }
+
+    private Voc getVOC(VOCAnswerDTO vocAnswerDTO) {
         VocDTO vocDTO = vocService.findByVocCode(vocAnswerDTO.getVocCode());
         if (vocDTO == null) {
             log.warn("존재하지 않는 VOC : {}", vocAnswerDTO.getVocCode());
@@ -69,7 +85,7 @@ public class VocAnswerServiceImpl implements VocAnswerService {
         return vocMapper.toEntity(vocDTO, vocCategory, member);
     }
 
-    public Admin validAdmin(AdminService adminService, Long adminCode, Logger log, VocAnswerDTO vocAnswerDTO) {
+    public Admin validAdmin(AdminService adminService, Long adminCode, Logger log) {
         AdminDTO adminDTO = adminService.findByAdminCode(adminCode);
         if (adminDTO == null) {
             log.warn("존재하지 않는 직원 : {}", adminCode);
