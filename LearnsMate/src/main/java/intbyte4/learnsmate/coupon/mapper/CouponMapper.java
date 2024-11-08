@@ -1,0 +1,62 @@
+package intbyte4.learnsmate.coupon.mapper;
+
+import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
+import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class CouponMapper {
+
+    public CouponDTO toDTO (CouponEntity entity) {
+        return CouponDTO.builder()
+                .couponCode(entity.getCouponCode())
+                .couponName(entity.getCouponName())
+                .couponContents(entity.getCouponContents())
+                .couponDiscountRate(entity.getCouponDiscountRate())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .couponStartDate(entity.getCouponStartDate())
+                .couponExpireDate(entity.getCouponExpireDate())
+                .couponCategoryCode(entity.getCouponCategoryCode())
+                .adminCode(entity.getAdmin().getAdminCode())
+                .tutorCode(entity.getTutor().getMemberCode())
+                .build();
+    }
+
+    public CouponDTO fromCouponRegisterRequestVOtoDTO (CouponRegisterRequestVO vo) {
+        return CouponDTO.builder()
+                .couponCode(vo.getCouponCode())
+                .couponName(vo.getCouponName())
+                .couponContents(vo.getCouponContents())
+                .couponDiscountRate(vo.getCouponDiscountRate())
+                .createdAt(vo.getCreatedAt())
+                .updatedAt(vo.getUpdatedAt())
+                .couponStartDate(vo.getCouponStartDate())
+                .couponExpireDate(vo.getCouponExpireDate())
+                .couponFlag(true)
+                .couponCategoryCode(vo.getCouponCategoryCode())
+                .adminCode(vo.getAdminCode())
+                .tutorCode(vo.getTutorCode())
+                .build();
+    }
+
+    public CouponRegisterResponseVO fromDtoToRegisterResponseVO (CouponDTO couponDTO) {
+        return CouponRegisterResponseVO.builder()
+                .couponCode(couponDTO.getCouponCode())
+                .couponName(couponDTO.getCouponName())
+                .couponContents(couponDTO.getCouponContents())
+                .couponDiscountRate(couponDTO.getCouponDiscountRate())
+                .createdAt(couponDTO.getCreatedAt())
+                .updatedAt(couponDTO.getUpdatedAt())
+                .couponStartDate(couponDTO.getCouponStartDate())
+                .couponExpireDate(couponDTO.getCouponExpireDate())
+                .couponCategoryCode(couponDTO.getCouponCategoryCode())
+                .adminCode(couponDTO.getAdminCode())
+                .tutorCode(couponDTO.getTutorCode())
+                .build();
+    }
+}
