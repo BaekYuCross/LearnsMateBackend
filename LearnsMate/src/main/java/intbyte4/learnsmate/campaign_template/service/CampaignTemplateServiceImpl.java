@@ -48,7 +48,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate savedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
         log.info("저장된 템플릿 객체: {}", savedCampaignTemplate);
 
-        return campaignTemplateMapper.fromEntityToDto(savedCampaignTemplate);
+        return campaignTemplateMapper.fromEntityToDTO(savedCampaignTemplate);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate updatedCampaignTemplate = campaignTemplateRepository.save(campaignTemplate);
         log.info("수정된 템플릿 객체: {}", updatedCampaignTemplate);
 
-        return campaignTemplateMapper.fromEntityToDto(updatedCampaignTemplate);
+        return campaignTemplateMapper.fromEntityToDTO(updatedCampaignTemplate);
     }
 
     @Override

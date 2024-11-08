@@ -15,6 +15,18 @@ import java.time.LocalDateTime;
 @Component
 public class CampaignTemplateMapper {
 
+    public CampaignTemplateDTO fromEntityToDTO(CampaignTemplate campaignTemplate) {
+        return CampaignTemplateDTO.builder()
+                .campaignTemplateCode(campaignTemplate.getCampaignTemplateCode())
+                .campaignTemplateTitle(campaignTemplate.getCampaignTemplateTitle())
+                .campaignTemplateContents(campaignTemplate.getCampaignTemplateContents())
+                .campaignTemplateFlag(campaignTemplate.getCampaignTemplateFlag())
+                .createdAt(campaignTemplate.getCreatedAt())
+                .updatedAt(campaignTemplate.getUpdatedAt())
+                .adminCode(campaignTemplate.getAdmin().getAdminCode())
+                .build();
+    }
+
     public ResponseFindTemplateVO fromEntityToVO(CampaignTemplate campaignTemplate) {
         return ResponseFindTemplateVO.builder()
                 .campaignTemplateCode(campaignTemplate.getCampaignTemplateCode())
