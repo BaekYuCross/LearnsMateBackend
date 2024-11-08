@@ -7,6 +7,7 @@ import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestEditVOCAnswerVO;
 import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestRegisterVOCAnswerVO;
 import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseEditVOCAnswerVO;
+import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseFindVOCAnswerVO;
 import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseRegisterVOCAnswerVO;
 import org.springframework.stereotype.Component;
 
@@ -64,6 +65,17 @@ public class VOCAnswerMapper {
                 .vocAnswerContent(vocAnswerDTO.getVocAnswerContent())
                 .voc(voc)
                 .admin(user)
+                .build();
+    }
+
+    public ResponseFindVOCAnswerVO fromEntityToResponseVO(VOCAnswer vocAnswer) {
+        return ResponseFindVOCAnswerVO.builder()
+                .vocAnswerCode(vocAnswer.getVocAnswerCode())
+                .vocAnswerContent(vocAnswer.getVocAnswerContent())
+                .vocCode(vocAnswer.getVoc().getVocCode())
+                .adminCode(vocAnswer.getAdmin().getAdminCode())
+                .createdAt(vocAnswer.getCreatedAt())
+                .updatedAt(vocAnswer.getUpdatedAt())
                 .build();
     }
 }
