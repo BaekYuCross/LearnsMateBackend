@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController("campaignTemplateController")
@@ -95,7 +96,13 @@ public class CampaignTemplateController {
     @Operation(summary = "직원 - 캠페인 템플릿 전체 조회")
     @GetMapping("/list")
     public ResponseEntity<List<ResponseFindTemplateVO>> listTemplates() {
-        return ResponseEntity.status(HttpStatus.OK).body(campaignTemplateService.findAllByTemplate());
+        List<CampaignTemplateDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
+        List<ResponseFindTemplateVO> response = new ArrayList<>();
+        for (CampaignTemplateDTO campaignTemplateDTO : campaignTemplateDTOList) {
+            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
+            response.add(vocVO);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "직원 - 캠페인 템플릿 단 건 조회")
@@ -103,7 +110,8 @@ public class CampaignTemplateController {
     public ResponseEntity<?> getTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
         log.info("템플릿 조회 요청된 템플릿 코드 : {}", campaignTemplateCode);
         try {
-            ResponseFindTemplateVO response = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
+            ResponseFindTemplateVO response = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {
