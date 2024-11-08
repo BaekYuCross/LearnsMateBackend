@@ -65,7 +65,7 @@ public class VocAnswerServiceImpl implements VocAnswerService {
         log.info(vocDTO.toString());
 
         VocCategory vocCategory = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
-        Member member = memberService.findByMemberCode(vocDTO.getMemberCode());
+        Member member = memberService.findByStudentCode(vocDTO.getMemberCode());
         return vocMapper.toEntity(vocDTO, vocCategory, member);
     }
 
