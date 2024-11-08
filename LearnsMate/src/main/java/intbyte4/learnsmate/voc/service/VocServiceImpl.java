@@ -23,7 +23,7 @@ public class VocServiceImpl implements VocService {
 
     @Override
     public List<VocDTO> findAllByVoc() {
-        log.info("템플릿 전체 조회 중");
+        log.info("VOC 전체 조회 중");
         List<Voc> vocList = vocRepository.findAll();
         List<VocDTO> vocDTOList = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class VocServiceImpl implements VocService {
 
     @Override
     public VocDTO findByVocCode(Long vocCode) {
-        log.info("템플릿 단 건 조회 중: {}", vocCode);
+        log.info("VOC 단 건 조회 중: {}", vocCode);
         Voc voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
 
