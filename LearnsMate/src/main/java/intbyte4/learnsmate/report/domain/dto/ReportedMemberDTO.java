@@ -10,5 +10,10 @@ import lombok.*;
 @Builder
 public class ReportedMemberDTO {
     private Member reportedMember;
-    private Long reportCount;
+    private Integer reportCount;
+
+    public ReportedMemberDTO(Member reportedMember, Long reportCount) {
+        this.reportedMember = reportedMember;
+        this.reportCount = reportCount != null ? reportCount.intValue() : 0; // Long to Integer 변환
+    }
 }
