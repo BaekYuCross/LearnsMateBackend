@@ -1,10 +1,10 @@
 package intbyte4.learnsmate.coupon.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -18,36 +18,43 @@ import java.time.LocalDateTime;
 public class CouponEntity {
 
     @Id
-    @Column(name = "coupon_code")
-    private Long couponCode;
+    @Column(name = "coupon_code", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String couponCode;
 
-    @Column(name = "coupon_name")
+    @Column(name = "coupon_name", nullable = false)
     private String couponName;
 
-    @Column(name = "coupon_contents")
+    @Column(name = "coupon_contents", nullable = false)
     private String couponContents;
 
-    @Column(name = "coupon_discount_rate")
+    @Column(name = "coupon_discount_rate", nullable = false)
     private int couponDiscountRate;
 
-    @Column(name = "coupon_type")
-    private String couponType;
-
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "coupon_flag")
+    @Column(name = "coupon_start_date", nullable = false)
+    private LocalDateTime couponStartDate;
+
+    @Column(name = "coupon_expire_date", nullable = false)
+    private LocalDateTime couponExpireDate;
+
+    @Column(name = "coupon_flag", nullable = false)
     private Boolean couponFlag;
 
-    @Column(name = "campaign_code")
-    private Long campaignCode;
+    @Column(name = "coupon_category_code", nullable = false)
+    private int couponCategoryCode;
 
-    @Column(name = "admin_code")
-    private Long adminCode;
+    @ManyToOne
+    @JoinColumn (name = "admin_code")
+    private Admin admin;
 
-    @Column(name=" tutor_code")
-    private Long tutorCode;
+    @ManyToOne
+    @JoinColumn(name = " tutor_code")
+    @Where(clause = "member_type = 'TUTOR'")
+    private Member tutor;
 }
