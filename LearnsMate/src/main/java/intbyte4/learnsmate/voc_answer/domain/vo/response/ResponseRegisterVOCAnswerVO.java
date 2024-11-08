@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class ResponseRegisterVOCAnswerVO {
     @JsonProperty("voc_answer_code")
     private Long vocAnswerCode;
-    @JsonProperty("vos_answer_content")
+    @JsonProperty("voc_answer_content")
     private String vocAnswerContent;
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
