@@ -15,7 +15,6 @@ public class IssueCouponDTO {
     private LocalDateTime couponIssueDate;
     private Boolean couponUseStatus;
     private LocalDateTime couponUseDate;
-    private Boolean issueCouponStatus;
     private Long studentCode;
     private Long couponCode;
 }

@@ -4,6 +4,7 @@ import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponFindResponseVO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponRegisterResponseVO;
+import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponUseResponseVO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,6 +31,14 @@ public class IssueCouponMapper {
         return IssueCouponFindResponseVO.builder()
                 .couponIssuanceCode(issueCouponDTO.getCouponIssuanceCode())
                 .couponIssueDate(issueCouponDTO.getCouponIssueDate())
+                .build();
+    }
+
+    public IssueCouponUseResponseVO fromDtoToUseResponseVO(IssueCouponDTO usedCoupon) {
+        return IssueCouponUseResponseVO.builder()
+                .couponIssuanceCode(usedCoupon.getCouponIssuanceCode())
+                .couponUseStatus(usedCoupon.getCouponUseStatus())
+                .couponUseDate(usedCoupon.getCouponUseDate())
                 .build();
     }
 }
