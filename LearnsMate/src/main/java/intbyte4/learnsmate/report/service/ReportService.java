@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -51,5 +52,14 @@ public class ReportService {
                 = reportRepository.findMembersWithReportsCountGreaterThanEqualFive();
 
         return reportedMoreThanFiveMemberList;
+    }
+
+    // memberCode로 신고당한 모든 신고내역 조회
+    public List<ReportDTO> findAllReportByMemberCode(Long memberCode) {
+        List<Report> reportList = reportRepository.findByReportedMember_MemberCode(memberCode);
+
+        return reportList.stream()
+                    .map(reportMapper::fromReportToReportDTO)
+                    .collect(Collectors.toList());
     }
 }

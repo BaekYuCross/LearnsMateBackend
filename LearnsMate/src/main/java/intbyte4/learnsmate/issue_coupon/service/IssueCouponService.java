@@ -9,4 +9,6 @@ public interface IssueCouponService {
     List<IssueCouponDTO> issueCouponsToStudents(IssueCouponRegisterRequestVO request);
 
     List<IssueCouponDTO> findIssuedCouponsByStudent(Long studentCode);
+
+    IssueCouponDTO useIssuedCoupon(Long studentCode, String couponIssuanceCode);
 }
