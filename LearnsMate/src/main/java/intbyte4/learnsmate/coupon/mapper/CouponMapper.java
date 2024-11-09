@@ -26,7 +26,7 @@ public class CouponMapper {
                 .updatedAt(entity.getUpdatedAt())
                 .couponStartDate(entity.getCouponStartDate())
                 .couponExpireDate(entity.getCouponExpireDate())
-                .couponCategoryCode(entity.getCouponCategoryCode())
+                .couponCategoryCode(entity.getCouponCategory().getCouponCategoryCode())
                 .adminCode(entity.getAdmin().getAdminCode())
                 .tutorCode(entity.getTutor().getMemberCode())
                 .build();
