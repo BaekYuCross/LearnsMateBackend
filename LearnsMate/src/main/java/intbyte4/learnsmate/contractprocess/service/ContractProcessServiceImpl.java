@@ -44,9 +44,28 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         return contractProcessMapper.toDTO(contractProcess);
     }
 
+    // 강사별 강의별 승인과정 절차 조회
+    @Override
+    public List<ContractProcessDTO> getApprovalProcessByLectureCode(Long tutorCode) {
+        // 해당 강사의 모든 강의를 조회
+        List<LectureDTO> lectures = lectureService.getLecturesByTutorCode(tutorCode);
 
+        if (lectures.isEmpty()) {
+            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+        }
 
+        // 각 강의에 대해 승인 과정 절차를 조회하고, 이를 ContractProcessDTO로 변환하여 반환
+        return lectures.stream()
+                .map(lecture -> {
+                    // 강의의 lectureCode를 통해 해당 강의의 승인 과정 절차를 조회
+                    ContractProcess contractProcess = contractProcessRepository.findByLectureCode(lecture.getLectureCode())
+                            .orElseThrow(() -> new CommonException(StatusEnum.CONTRACT_PROCESS_NOT_FOUND));
 
+                    // ContractProcess를 ContractProcessDTO로 변환
+                    return contractProcessMapper.toDTO(contractProcess);
+                })
+                .collect(Collectors.toList());
+    }
 
 
 
