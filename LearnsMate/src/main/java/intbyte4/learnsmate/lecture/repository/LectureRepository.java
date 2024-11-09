@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface LectureRepository extends JpaRepository<Lecture,Long> , JpaSpecificationExecutor<Lecture> {
-    List<Lecture> findAllByTutorCode(Long tutorCode);
+//    List<Lecture> findAllByTutorCode(Long tutorCode);
 }

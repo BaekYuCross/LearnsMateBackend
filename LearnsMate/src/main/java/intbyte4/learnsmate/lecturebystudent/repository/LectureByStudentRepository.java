@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface LectureByStudentRepository extends JpaRepository<LectureByStudent, Long> {
-    List<LectureByStudent> findByStudentCode(Long studentCode);
+
+//    List<LectureByStudent> findByStudentCode(Long memberCode);
 }

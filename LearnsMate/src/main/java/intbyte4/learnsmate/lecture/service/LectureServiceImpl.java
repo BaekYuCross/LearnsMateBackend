@@ -9,6 +9,8 @@ import intbyte4.learnsmate.lecture.domain.dto.TutorLectureVideoCountDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.videobylecture.domain.dto.CountVideoByLectureDTO;
 import intbyte4.learnsmate.videobylecture.service.VideoByLectureService;
@@ -54,13 +56,15 @@ public class LectureServiceImpl implements LectureService {
     // 강사별 강의 모두 조회
     @Override
     public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
-        List<Lecture> lectures = lectureRepository.findAllByTutorCode(tutorCode);
-        if (lectures.isEmpty()) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
-        return lectures.stream()
-                .map(lectureMapper::toDTO)
-                .collect(Collectors.toList());
+//        MemberDTO tutor = memberService.findByMemberCode(tutorCode);
+//        List<Lecture> lectures = lectureRepository.findAllByTutorCode(tutor.getMemberCode());
+//        if (lectures.isEmpty()) {
+//            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+//        }
+//        return lectures.stream()
+//                .map(lectureMapper::toDTO)
+//                .collect(Collectors.toList());
+        return null;
     }
 
 
