@@ -67,6 +67,35 @@ public class ContractProcessServiceImpl implements ContractProcessService {
                 .collect(Collectors.toList());
     }
 
+    // 계약과정 등록
+//    @Transactional
+//    @Override
+//    public ContractProcessDTO createContractProcess(Long lectureCode, ContractProcessDTO contractProcessDTO) {
+//        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+//
+//        Member tutor = memberService.findByMemberCode(lectureDTO.getTutorCode());
+//
+//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
+//
+//        AdminDTO adminDTO = adminService.findByAdminCode(contractProcessDTO.getAdminCode());
+//        Admin admin = adminDTO.convertToEntity();
+//
+//        ContractProcess contractProcess = ContractProcess.builder()
+//                .lecture(lecture)
+//                .admin(admin)
+//                .approvalProcess(1)
+//                .createdAt(LocalDateTime.now())
+//                .note("신규 계약 등록")
+//                .build();
+//
+//        contractProcessRepository.save(contractProcess);
+//
+//        return contractProcessMapper.toDTO(contractProcess);
+//    }
+
+
+
+
 
 
 }
