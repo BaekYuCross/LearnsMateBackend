@@ -7,7 +7,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "Member")
+@Entity(name = "member")
 @Table(name = "member")
 @Getter
 @AllArgsConstructor
@@ -57,4 +57,9 @@ public class Member {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    // flag를 비활성화하는 메서드
+    public void deactivate() {
+        this.memberFlag = false;
+    }
 }

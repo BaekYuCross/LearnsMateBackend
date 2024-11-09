@@ -1,7 +1,6 @@
 package intbyte4.learnsmate.campaign.domain.entity;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
