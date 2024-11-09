@@ -12,9 +12,12 @@ import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.couponbycampaign.service.CouponByCampaignService;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
-import intbyte4.learnsmate.userpercampaign.domain.dto.UserPerCampaignDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
+import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,10 @@ public class CampaignServiceImpl implements CampaignService {
     private final AdminService adminService;
     private final UserPerCampaignService userPerCampaignService;
     private final CouponByCampaignService couponByCampaignService;
+    private final MemberService memberService;
+    private final CouponService couponService;
     private final CampaignMapper campaignMapper;
+    private final MemberMapper memberMapper;
 
     @Override
     public CampaignDTO registerCampaign(CampaignDTO requestCampaign
@@ -63,18 +68,15 @@ public class CampaignServiceImpl implements CampaignService {
 
         campaignRepository.save(campaign);
 
-//        List<MemberDTO> memberList = requestStudentList.stream()
-//                .flatMap(student -> memberService.findMemberListByStudentCode(student.getMemberCode()).stream())
-//                .peek(userPerCampaignService::registerUserPerCampaign)
-//                .collect(Collectors.toList());
-//
-//        List<CouponDTO> couponList = requestCouponList.stream()
-//                .flatMap(coupon -> couponService.findCouponListByCouponCode(coupon.getCouponCode()).stream())
-//                .peek(couponByCampaignService::registerCouponByCampaign)
-//                .collect(Collectors.toList());
+        requestStudentList.forEach(memberDTO -> {
+            Member foundStudent = memberService.findByStudentCode(memberDTO.getMemberCode());
+            userPerCampaignService.registerUserPerCampaign(memberMapper.fromMembertoMemberDTO(foundStudent));
+        });
 
-
-
+        requestCouponList.forEach(couponDTO -> {
+            CouponDTO foundCoupon = couponService.findCouponByCouponCode(couponDTO.getCouponCode());
+            couponByCampaignService.registerCouponByCampaign(foundCoupon);
+        });
 
         return campaignMapper.toDTO(campaign);
     }
