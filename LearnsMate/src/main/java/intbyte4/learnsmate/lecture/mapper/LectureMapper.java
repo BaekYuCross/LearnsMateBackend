@@ -2,8 +2,11 @@ package intbyte4.learnsmate.lecture.mapper;
 
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import org.springframework.stereotype.Component;
@@ -66,6 +69,38 @@ public class LectureMapper {
                 .build();
     }
 
+    // VO -> DTO 변환
+    public LectureDTO fromRequestVOtoDto(RequestEditLectureInfoVO vo) {
+        return LectureDTO.builder()
+                .lectureTitle(vo.getLectureTitle())
+                .lectureCategoryEnum(vo.getLectureCategoryEnum())
+                .lectureConfirmStatus(vo.getLectureConfirmStatus())
+                .updatedAt(LocalDateTime.now())
+                .lectureImage(vo.getLectureImage())
+                .lecturePrice(vo.getLecturePrice())
+                .lectureStatus(vo.getLectureStatus())
+                .lectureClickCount(vo.getLectureClickCount())
+                .lectureLevel(vo.getLectureLevel())
+                .build();
+    }
+
+    // VO -> DTO 변환
+    public LectureDTO fromRegisterRequestVOtoDto(RequestRegisterLectureVO vo) {
+        return LectureDTO.builder()
+                .lectureTitle(vo.getLectureTitle())
+                .lectureCategoryEnum(vo.getLectureCategoryEnum())
+                .lectureConfirmStatus(vo.getLectureConfirmStatus())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .lectureImage(vo.getLectureImage())
+                .lecturePrice(vo.getLecturePrice())
+                .lectureStatus(vo.getLectureStatus())
+                .lectureClickCount(0)
+                .lectureLevel(vo.getLectureLevel())
+                .tutorCode(vo.getTutorCode())
+                .build();
+    }
+
 
     public ResponseEditLectureInfoVO fromDtoToEditResponseVO(LectureDTO updatedLecture) {
         return ResponseEditLectureInfoVO.builder()
@@ -78,6 +113,22 @@ public class LectureMapper {
                 .lectureStatus(updatedLecture.getLectureStatus())
                 .lectureClickCount(updatedLecture.getLectureClickCount())
                 .lectureLevel(updatedLecture.getLectureLevel())
+                .build();
+    }
+
+    public ResponseRegisterLectureVO fromDtoToRegisterResponseVO(LectureDTO Lecture) {
+        return ResponseRegisterLectureVO.builder()
+                .lectureTitle(Lecture.getLectureTitle())
+                .lectureCategoryEnum(Lecture.getLectureCategoryEnum())
+                .lectureConfirmStatus(Lecture.getLectureConfirmStatus())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .lectureImage(Lecture.getLectureImage())
+                .lecturePrice(Lecture.getLecturePrice())
+                .lectureStatus(Lecture.getLectureStatus())
+                .lectureClickCount(0)
+                .lectureLevel(Lecture.getLectureLevel())
+                .tutorCode(Lecture.getTutorCode())
                 .build();
     }
 
