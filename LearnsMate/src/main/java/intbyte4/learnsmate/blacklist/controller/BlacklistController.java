@@ -117,4 +117,17 @@ public class BlacklistController {
 
         return ResponseEntity.status(HttpStatus.OK).body(voList);
     }
+
+    // 강사 예비 블랙리스트 단건 조회
+    @GetMapping("/tutor/reserved/{tutorcode}")
+    public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findTutorReservedBlacklist(@PathVariable("tutorcode") Long tutorCode) {
+        // 결국 예비 블랙리스트가 없어서 계산해서 가져와야함. -> Report에서 tutorcode에 해당하는 모든 Report 가져오고
+        // -> 그 report 안에 있는 comment code를 통해서 comment도 가져와야함.
+        List<BlacklistReportCommentDTO> dtoList = blacklistService.findMemberReservedBlacklist(tutorCode);
+
+        List<ResponseFindReservedBlacklistOneVO> voList
+                = blacklistMapper.fromBlacklistReportCommentDTOToResponseFindReservedBlacklistOneVO(dtoList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(voList);
+    }
 }
