@@ -12,6 +12,8 @@ public interface LectureVideoByStudentRepository extends JpaRepository<LectureVi
     @Query("SELECT COUNT(lvs) FROM LectureVideoByStudent lvs WHERE lvs.videoCode.lecture.lectureCode = :lectureCode")
     long countByLectureCode(Long lectureCode);
 
-
+    // 강의에 속한 완료된 동영상만 카운트 (lectureStatus가 true인 경우)
+    @Query("SELECT COUNT(lvs) FROM LectureVideoByStudent lvs WHERE lvs.videoCode.lecture.lectureCode = :lectureCode AND lvs.lectureStatus = true")
+    long countCompletedVideos(Long lectureCode);
 }
 
