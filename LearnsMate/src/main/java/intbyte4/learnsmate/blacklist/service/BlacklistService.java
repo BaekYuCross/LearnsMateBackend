@@ -66,8 +66,8 @@ public class BlacklistService {
         return reportedMoreThanFiveMemberList;
     }
 
-    // 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
-    public List<BlacklistReportCommentDTO> findMemberReservedBlacklist(Long memberCode) {
+    // 블랙이스트에서 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
+    public List<BlacklistReportCommentDTO> findBlacklistReportComment(Long memberCode) {
 
         // 1. Report table에서 memberCode와 reportedMemberCode 가 같은거 가져오기
         List<ReportDTO> reportDTOlist = reportService.findAllReportByMemberCode(memberCode);
