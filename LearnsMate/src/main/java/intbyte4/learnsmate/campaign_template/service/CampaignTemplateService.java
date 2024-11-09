@@ -13,5 +13,5 @@ public interface CampaignTemplateService {
 
     List<CampaignTemplateDTO> findAllByTemplate();
 
-    CampaignTemplateDTO findByTemplateCode(CampaignTemplateDTO campaignTemplateDTO);
+    CampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode);
 }

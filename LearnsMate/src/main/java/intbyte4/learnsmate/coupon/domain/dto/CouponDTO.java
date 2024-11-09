@@ -9,17 +9,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class CouponDTO {
 
-    private Long couponCode;
+    private String couponCode;
     private String couponName;
     private String couponContents;
     private int couponDiscountRate;
-    private String couponType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime couponStartDate;
+    private LocalDateTime couponExpireDate;
     private Boolean couponFlag;
-    private Long campaignCode;
+    private int couponCategoryCode;
     private Long adminCode;
     private Long tutorCode;
 }
