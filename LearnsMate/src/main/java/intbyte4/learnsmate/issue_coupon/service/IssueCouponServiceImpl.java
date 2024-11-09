@@ -1,6 +1,5 @@
 package intbyte4.learnsmate.issue_coupon.service;
 
-import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
