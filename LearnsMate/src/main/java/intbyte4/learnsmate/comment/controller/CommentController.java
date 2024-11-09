@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.comment.controller;
 
 import intbyte4.learnsmate.comment.domain.dto.CommentDTO;
+import intbyte4.learnsmate.comment.domain.vo.request.ResponseFindCommentVO;
 import intbyte4.learnsmate.comment.mapper.CommentMapper;
 import intbyte4.learnsmate.comment.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class CommentController {
 
     // 1. comment 모두 조회 -> 사실 이게 우리쪽에서 comment를 봐야하는가? 봐야하지 않을까? 블랙리스트에서 어떤 코멘트가 신고먹었는지는?
     @GetMapping
-    public ResponseEntity<?> findAllComments() {
+    public ResponseEntity<List<ResponseFindCommentVO>> findAllComments() {
         List<CommentDTO> commentDTOList = commentService.findAllComments();
 
         return ResponseEntity.status(HttpStatus.OK).body(commentDTOList.stream()
@@ -39,7 +40,7 @@ public class CommentController {
 
     // 1-2. commentCode로 단건 조회
     @GetMapping("/{commentcode}")
-    public ResponseEntity<?> findCommentByCommentCode(@PathVariable("commentcode") Long commentCode) {
+    public ResponseEntity<ResponseFindCommentVO> findCommentByCommentCode(@PathVariable("commentcode") Long commentCode) {
         CommentDTO commentDTO = commentService.findComentByCommentCode(commentCode);
 
         return ResponseEntity.status(HttpStatus.OK)
