@@ -38,7 +38,7 @@ public class CouponController {
 
     @Operation(summary = "쿠폰 단 건 조회")
     @GetMapping("/coupon/{couponCode}")
-    public ResponseEntity<CouponFindResponseVO> getCouponByCouponCode(@PathVariable("couponCode") String couponCode) {
+    public ResponseEntity<CouponFindResponseVO> getCouponByCouponCode(@PathVariable("couponCode") Long couponCode) {
         CouponDTO couponDTO = couponService.findCouponByCouponCode(couponCode);
         CouponFindResponseVO response = couponMapper.fromDTOToFindResponseVO(couponDTO);
 

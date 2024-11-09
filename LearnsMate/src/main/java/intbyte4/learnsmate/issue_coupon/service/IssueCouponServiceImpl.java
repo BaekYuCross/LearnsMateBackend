@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.issue_coupon.service;
 
+import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
@@ -49,7 +50,7 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         for (Long studentCode : request.getStudentCodes()) {
             Member student = memberService.findByStudentCode(studentCode);
             for (Long couponCode : request.getCouponCodes()) {
-                CouponEntity coupon = couponService.findCouponByCouponCode(couponCode);
+                CouponEntity coupon = couponService.findByCouponCode(couponCode);
 
                 IssueCoupon issueCoupon = setCouponIssuanceCode(coupon, student);
 
@@ -60,7 +61,7 @@ public class IssueCouponServiceImpl implements IssueCouponService {
     }
 
     private IssueCoupon setCouponIssuanceCode(CouponEntity coupon, Member student) {
-        String couponCategoryCode = coupon.getCouponCategory().getCouponCategoryCode();
+        int couponCategoryCode = coupon.getCouponCategory().getCouponCategoryCode();
         String formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String uniqueCode = UUID.randomUUID().toString().substring(0, 8);
         String couponIssuanceCode = String.format("C%s-%s%s", couponCategoryCode, formattedDate, uniqueCode);
@@ -74,7 +75,6 @@ public class IssueCouponServiceImpl implements IssueCouponService {
                 .couponIssueDate(LocalDateTime.now())
                 .couponUseStatus(false)
                 .couponUseDate(null)
-                .issueCouponStatus(true)
                 .student(student)
                 .coupon(coupon)
                 .build();
