@@ -80,7 +80,7 @@ public class MemberService {
     }
 
     // memberCode -> MemberDTO 반환 메서드
-    public MemberDTO findMemberListByStudentCode(Long memberCode) {
+    public MemberDTO findMemberByStudentCode(Long memberCode) {
         Member student = memberRepository.finByMemberFlagTrueAndMemberCode(memberCode);
         if(!student.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.RESTRICTED);
         return memberMapper.fromMembertoMemberDTO(student);
