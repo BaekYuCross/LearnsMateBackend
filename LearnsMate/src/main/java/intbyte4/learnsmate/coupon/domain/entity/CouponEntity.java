@@ -21,7 +21,7 @@ public class CouponEntity {
     @Id
     @Column(name = "coupon_code", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String couponCode;
+    private Long couponCode;
 
     @Column(name = "coupon_name", nullable = false)
     private String couponName;
@@ -49,7 +49,7 @@ public class CouponEntity {
 
     @ManyToOne
     @JoinColumn (name = "coupon_category_code", nullable = false)
-    private CouponCategory couponCategoryCode;
+    private CouponCategory couponCategory;
 
     @ManyToOne
     @JoinColumn (name = "admin_code")
