@@ -15,8 +15,6 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.couponbycampaign.service.CouponByCampaignService;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
-import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +35,6 @@ public class CampaignServiceImpl implements CampaignService {
     private final MemberService memberService;
     private final CouponService couponService;
     private final CampaignMapper campaignMapper;
-    private final MemberMapper memberMapper;
 
     @Override
     public CampaignDTO registerCampaign(CampaignDTO requestCampaign
@@ -69,13 +66,15 @@ public class CampaignServiceImpl implements CampaignService {
         campaignRepository.save(campaign);
 
         requestStudentList.forEach(memberDTO -> {
-            Member foundStudent = memberService.findByStudentCode(memberDTO.getMemberCode());
-            userPerCampaignService.registerUserPerCampaign(memberMapper.fromMembertoMemberDTO(foundStudent));
+            MemberDTO foundStudent = memberService.findMemberByStudentCode(memberDTO.getMemberCode());
+            if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
+            userPerCampaignService.registerUserPerCampaign(foundStudent, requestCampaign);
         });
 
         requestCouponList.forEach(couponDTO -> {
             CouponDTO foundCoupon = couponService.findCouponByCouponCode(couponDTO.getCouponCode());
-            couponByCampaignService.registerCouponByCampaign(foundCoupon);
+            if (foundCoupon == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
+            couponByCampaignService.registerCouponByCampaign(foundCoupon, requestCampaign);
         });
 
         return campaignMapper.toDTO(campaign);
