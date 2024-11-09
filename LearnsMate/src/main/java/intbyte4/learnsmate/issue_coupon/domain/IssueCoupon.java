@@ -8,7 +8,7 @@ import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "IssueCoupon")
+@Entity(name = "issueCoupon")
 @Table(name = "issue_coupon")
 @AllArgsConstructor
 @NoArgsConstructor
