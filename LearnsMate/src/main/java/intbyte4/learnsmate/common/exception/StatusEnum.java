@@ -26,6 +26,7 @@ public enum StatusEnum {
     TEMPLATE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 템플릿입니다."),
     CAMPAIGN_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 캠페인입니다."),
     PAYMENT_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 결제내역입니다."),
+    CONTRACT_PROCESS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 계약과정입니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 
