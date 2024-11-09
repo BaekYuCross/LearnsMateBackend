@@ -54,13 +54,6 @@ public class MemberService {
         return tutorName;
     }
 
-    public List<MemberDTO> findMemberListByStudentCode(Long memberCode) {
-        List<Member> member = memberRepository.finByMemberFlagTrueAndMemberCode(memberCode);
-        return member.stream()
-                .map(memberMapper::fromMembertoMemberDTO)
-                .toList();
-    }
-
     public Member findByStudentCode(Long memberCode) {
         Member student = memberRepository.findById(memberCode).orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
         if (!student.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.RESTRICTED);
