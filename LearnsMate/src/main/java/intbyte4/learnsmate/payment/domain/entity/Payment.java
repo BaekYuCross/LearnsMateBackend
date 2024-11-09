@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.payment.domain.entity;
 
 
-import intbyte4.learnsmate.lecturebystudent.domain.entity.LectureByStudent;
+import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import jakarta.persistence.*;
 import lombok.*;
 
