@@ -2,6 +2,7 @@ package intbyte4.learnsmate.campaign.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
@@ -37,6 +38,7 @@ public class CampaignServiceImpl implements CampaignService {
     private final MemberService memberService;
     private final CouponService couponService;
     private final CampaignMapper campaignMapper;
+    private final AdminMapper adminMapper;
 
     @Override
     public CampaignDTO registerCampaign(CampaignDTO requestCampaign
@@ -46,7 +48,7 @@ public class CampaignServiceImpl implements CampaignService {
         LocalDateTime sendTime;
 
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
-        Admin admin = adminDTO.convertToEntity();
+        Admin admin = adminMapper.toEntity(adminDTO);
 
         if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
             sendTime = LocalDateTime.now();
@@ -95,7 +97,7 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
-        Admin admin = adminDTO.convertToEntity();
+        Admin admin = adminMapper.toEntity(adminDTO);
 
         Campaign updatedCampaign = campaignMapper.toEntity(requestCampaign, admin);
 
