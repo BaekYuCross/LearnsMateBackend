@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.mapper;
 
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
@@ -100,6 +101,24 @@ public class MemberMapper{
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt()) // 보통 생성 시점은 VO에서 넘어오지 않을 수 있으므로 확인 필요
                 .updatedAt(LocalDateTime.now()) // 업데이트 시간은 현재 시간으로 설정
+                .build();
+    }
+
+    public MemberDTO fromRequestFindCampaignStudentVOToMemberDTO(RequestFindCampaignStudentVO request) {
+        return MemberDTO.builder()
+                .memberCode(request.getMemberCode())
+                .memberType(request.getMemberType())
+                .memberEmail(request.getMemberEmail())
+//                .memberPassword(request.getMemberPassword()) // 필요 시 비밀번호 포함
+                .memberName(request.getMemberName())
+                .memberAge(request.getMemberAge())
+                .memberPhone(request.getMemberPhone())
+                .memberAddress(request.getMemberAddress())
+                .memberBirth(request.getMemberBirth())
+                .memberFlag(request.getMemberFlag())
+                .memberDormantStatus(request.getMemberDormantStatus())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }
