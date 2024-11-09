@@ -1,10 +1,11 @@
 package intbyte4.learnsmate.lecture.controller;
 
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
@@ -46,20 +47,21 @@ public class LectureController {
 
     @Operation(summary = "강의 등록")
     @PutMapping("/{lectureCode}")
-    public ResponseEntity<ResponseEditLectureInfoVO> registerLecture(
-            @PathVariable("lectureCode")  Long lectureCode) {
-        LectureDTO updatedLecture = lectureService.registerLecture(lectureCode);
-        return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToEditResponseVO(updatedLecture));
+    public ResponseEntity<ResponseRegisterLectureVO> registerLecture(
+            @RequestBody RequestRegisterLectureVO registerLectureVO) {
+        LectureDTO lectureDTO = lectureService.registerLecture(lectureMapper.fromRegisterRequestVOtoDto(registerLectureVO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToRegisterResponseVO(lectureDTO));
     }
 
     @Operation(summary = "강의 수정")
     @PatchMapping("/{lectureCode}/info")
     public ResponseEntity<ResponseEditLectureInfoVO> updateLecture(
             @PathVariable("lectureCode")  Long lectureCode,
-            @RequestBody RequestEditLectureInfoVO requestEditLectureInfoVO) {
-        LectureDTO updatedLecture = lectureService.updateLecture(lectureCode, requestEditLectureInfoVO);
+            @RequestBody RequestEditLectureInfoVO requestVO) {
+        LectureDTO updatedLecture = lectureService.updateLecture(lectureCode, lectureMapper.fromRequestVOtoDto(requestVO));
         return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToEditResponseVO(updatedLecture));
     }
+
 
     @Operation(summary = "강의 삭제")
     @PatchMapping("/{lectureCode}/status")
