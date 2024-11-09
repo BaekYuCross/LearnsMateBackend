@@ -7,15 +7,13 @@ import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class LectureByStudentDTO {
-
     private Long lectureByStudentCode;
     private Boolean refundStatus;
     private Lecture lecture;
     private Member student;
-
-
 }
