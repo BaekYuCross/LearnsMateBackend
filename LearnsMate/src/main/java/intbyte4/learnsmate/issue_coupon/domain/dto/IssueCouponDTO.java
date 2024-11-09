@@ -11,10 +11,11 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 public class IssueCouponDTO {
-    private int couponIssuanceCode;
+    private String couponIssuanceCode;
     private LocalDateTime couponIssueDate;
     private Boolean couponUseStatus;
     private LocalDateTime couponUseDate;
+    private Boolean issueCouponStatus;
     private Long studentCode;
     private Long couponCode;
 }
