@@ -1,17 +1,15 @@
-package intbyte4.learnsmate.contractprocess.domain.dto;
+package intbyte4.learnsmate.contractprocess.domain.vo;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-
-@Getter
-@Setter
+@Data
 @Builder
-@ToString
-@RequiredArgsConstructor
 @AllArgsConstructor
-public class ContractProcessDTO {
+public class ResponseContractProcessVO {
 
     private Long contractProcessCode;
     private Integer approvalProcess;

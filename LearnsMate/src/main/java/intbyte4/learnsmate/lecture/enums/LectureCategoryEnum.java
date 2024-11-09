@@ -1,6 +1,6 @@
 package intbyte4.learnsmate.lecture.enums;
 
-public enum LectureCategory {
+public enum LectureCategoryEnum {
     BACKEND,
     FRONTEND,
     DEVOPS,
