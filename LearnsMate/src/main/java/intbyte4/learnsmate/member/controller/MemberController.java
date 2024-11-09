@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.controller;
 
+import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -55,6 +56,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
     }
 
+    // 회원가입시 멤버 저장하는 컨트롤러 메서드
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
 
@@ -63,5 +65,28 @@ public class MemberController {
         memberService.saveMember(memberDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");
+    }
+
+    // 회원 수정하는 컨트롤러 메서드
+    @PatchMapping("/{membercode}")
+    public ResponseEntity<String> editMember(@PathVariable("membercode") Long memberCode, @RequestBody RequestEditMemberVO request) {
+        // request에는 membercode가 없음.
+        MemberDTO memberDTO = memberMapper.fromRequestEditMemberVOToMemberDTO(request);
+        memberDTO.setMemberCode(memberCode);
+
+        memberService.editMember(memberDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body("수정 성공");
+    }
+
+    // 회원 삭제하는 컨트롤러 메서드
+    @PatchMapping("/delete/{membercode}")
+    public ResponseEntity<String> deleteMember(@PathVariable("membercode") Long memberCode) {
+        MemberDTO memberDTO = new MemberDTO();
+        memberDTO.setMemberCode(memberCode);
+
+        memberService.deleteMember(memberCode);
+
+        return ResponseEntity.status(HttpStatus.OK).body("삭제 성공");
     }
 }
