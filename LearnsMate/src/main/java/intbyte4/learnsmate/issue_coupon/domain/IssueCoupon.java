@@ -21,7 +21,7 @@ public class IssueCoupon {
     @Id
     @Column(name = "coupon_issuance_code", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int couponIssuanceCode;
+    private String couponIssuanceCode;
 
     @Column(name = "coupon_issue_date", nullable = false)
     private LocalDateTime couponIssueDate;

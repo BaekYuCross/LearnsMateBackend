@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface IssueCouponService {
     List<IssueCouponDTO> issueCouponsToStudents(IssueCouponRegisterRequestVO request);
+
+    List<IssueCouponDTO> findIssuedCouponsByStudent(Long studentCode);
 }

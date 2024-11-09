@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CouponRegisterRequestVO {
     @JsonProperty("coupon_code")
-    private String couponCode;
+    private Long couponCode;
 
     @JsonProperty("coupon_name")
     private String couponName;
@@ -20,7 +20,7 @@ public class CouponRegisterRequestVO {
     private String couponContents;
 
     @JsonProperty("coupon_discount_rate")
-    private int couponDiscountRate;
+    private Integer couponDiscountRate;
 
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
@@ -38,7 +38,7 @@ public class CouponRegisterRequestVO {
     private Boolean couponFlag;
 
     @JsonProperty("coupon_category_code")
-    private int couponCategoryCode;
+    private Integer couponCategoryCode;
 
     @JsonProperty("admin_code")
     private Long adminCode;

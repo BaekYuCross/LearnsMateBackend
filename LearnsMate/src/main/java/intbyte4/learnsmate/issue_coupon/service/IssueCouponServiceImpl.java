@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.issue_coupon.service;
 
+import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("issueCouponService")
@@ -36,13 +38,21 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         return issuedCoupons;
     }
 
+    @Override
+    public List<IssueCouponDTO> findIssuedCouponsByStudent(Long studentCode) {
+        List<IssueCoupon> issueCouponList = issueCouponRepository.findAllByStudentAndActiveCoupon(studentCode);
+        return issueCouponList.stream()
+                .map(issueCouponMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     private void registerIssueCoupon(IssueCouponRegisterRequestVO request, List<IssueCouponDTO> issuedCoupons) {
         for (Long studentCode : request.getStudentCodes()) {
             Member student = memberService.findByStudentCode(studentCode);
             for (Long couponCode : request.getCouponCodes()) {
-                CouponEntity coupon = couponService.findCouponByCouponCode(couponCode);
+                CouponEntity coupon = couponService.findByCouponCode(couponCode);
 
-                IssueCoupon issueCoupon = getIssueCoupon(coupon, student);
+                IssueCoupon issueCoupon = setCouponIssuanceCode(coupon, student);
 
                 issueCouponRepository.save(issueCoupon);
                 issuedCoupons.add(issueCouponMapper.toDTO(issueCoupon));
@@ -50,20 +60,24 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         }
     }
 
-    private IssueCoupon getIssueCoupon(CouponEntity coupon, Member student) {
-        String couponCategoryCode = coupon.getCouponCategory().getCouponCategoryCode();
+    private IssueCoupon setCouponIssuanceCode(CouponEntity coupon, Member student) {
+        int couponCategoryCode = coupon.getCouponCategory().getCouponCategoryCode();
         String formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String uniqueCode = UUID.randomUUID().toString().substring(0, 8);
         String couponIssuanceCode = String.format("C%s-%s%s", couponCategoryCode, formattedDate, uniqueCode);
 
-        IssueCoupon issueCoupon = IssueCoupon.builder()
+        return getIssueCoupon(coupon, student, couponIssuanceCode);
+    }
+
+    private static IssueCoupon getIssueCoupon(CouponEntity coupon, Member student, String couponIssuanceCode) {
+        return IssueCoupon.builder()
                 .couponIssuanceCode(couponIssuanceCode)
                 .couponIssueDate(LocalDateTime.now())
                 .couponUseStatus(false)
+                .couponUseDate(null)
                 .student(student)
                 .coupon(coupon)
                 .build();
-        return issueCoupon;
     }
 
 }
