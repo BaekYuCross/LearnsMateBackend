@@ -7,7 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "CampaignTemplate")
+@Entity(name = "campaignTemplate")
 @Table(name = "campaign_template")
 @Getter
 @Setter

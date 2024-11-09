@@ -15,5 +15,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<String> findMemberNameByMemberCode(Long memberCode);
 
-    Member finByMemberFlagTrueAndMemberCode(Long memberCode);
+    Member findByMemberFlagTrueAndMemberCodeAndMemberType(Long memberCode, MemberType memberType);
 }

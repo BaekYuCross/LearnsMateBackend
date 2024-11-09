@@ -3,7 +3,7 @@ package intbyte4.learnsmate.coupon_category.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity(name = "CouponCategory")
+@Entity(name = "couponCategory")
 @Table(name = "coupon_category")
 @Getter
 @Setter

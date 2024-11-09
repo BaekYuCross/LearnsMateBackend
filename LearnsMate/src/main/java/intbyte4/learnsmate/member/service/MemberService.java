@@ -79,10 +79,16 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    // memberCode -> MemberDTO 반환 메서드
-    public MemberDTO findMemberByStudentCode(Long memberCode) {
-        Member student = memberRepository.finByMemberFlagTrueAndMemberCode(memberCode);
-        if(!student.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.RESTRICTED);
-        return memberMapper.fromMembertoMemberDTO(student);
+    // memberCode, memberType -> memberDTO로 반환 메서드
+    public MemberDTO findMemberByMemberCode(Long memberCode, MemberType memberType) {
+        Member member = memberRepository.findByMemberFlagTrueAndMemberCodeAndMemberType(memberCode, memberType);
+
+        if(memberType.equals(MemberType.STUDENT)){ // 학생을 찾는 경우
+            if(member.getMemberType().equals(MemberType.STUDENT)){ throw new CommonException(StatusEnum.RESTRICTED); }
+        }else if(memberType.equals(MemberType.TUTOR)){ // 강사를 찾는 경우
+            if(member.getMemberType().equals(MemberType.TUTOR)){ throw new CommonException(StatusEnum.RESTRICTED); }
+        }
+
+        return memberMapper.fromMembertoMemberDTO(member);
     }
 }
