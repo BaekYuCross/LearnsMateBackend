@@ -11,6 +11,12 @@ import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.service.CouponService;
+import intbyte4.learnsmate.couponbycampaign.service.CouponByCampaignService;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.service.MemberService;
+import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,34 +30,53 @@ import java.util.Objects;
 public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
     private final AdminService adminService;
+    private final UserPerCampaignService userPerCampaignService;
+    private final CouponByCampaignService couponByCampaignService;
+    private final MemberService memberService;
+    private final CouponService couponService;
     private final CampaignMapper campaignMapper;
 
     @Override
-    public CampaignDTO registerCampaign(CampaignDTO request) {
+    public CampaignDTO registerCampaign(CampaignDTO requestCampaign
+            , List<MemberDTO> requestStudentList
+            , List<CouponDTO> requestCouponList) {
+
         LocalDateTime sendTime;
 
-
-        AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
+        AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminDTO.convertToEntity();
 
-        if (Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
+        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
             sendTime = LocalDateTime.now();
         } else {
-            sendTime = request.getCampaignSendDate();
+            sendTime = requestCampaign.getCampaignSendDate();
         };
 
         Campaign campaign = Campaign.builder()
                 .campaignCode(null)
-                .campaignTitle(request.getCampaignTitle())
-                .campaignContents(request.getCampaignContents())
-                .campaignType(CampaignTypeEnum.valueOf(request.getCampaignType()))
+                .campaignTitle(requestCampaign.getCampaignTitle())
+                .campaignContents(requestCampaign.getCampaignContents())
+                .campaignType(CampaignTypeEnum.valueOf(requestCampaign.getCampaignType()))
                 .campaignSendDate(sendTime)
-                .createdAt(request.getCreatedAt())
+                .createdAt(requestCampaign.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .admin(admin)
                 .build();
 
         campaignRepository.save(campaign);
+
+        requestStudentList.forEach(memberDTO -> {
+            MemberDTO foundStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
+                    ,memberDTO.getMemberType());
+            if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
+            userPerCampaignService.registerUserPerCampaign(foundStudent, requestCampaign);
+        });
+
+        requestCouponList.forEach(couponDTO -> {
+            CouponDTO foundCoupon = couponService.findCouponByCouponCode(couponDTO.getCouponCode());
+            if (foundCoupon == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
+            couponByCampaignService.registerCouponByCampaign(foundCoupon, requestCampaign);
+        });
 
         return campaignMapper.toDTO(campaign);
     }
