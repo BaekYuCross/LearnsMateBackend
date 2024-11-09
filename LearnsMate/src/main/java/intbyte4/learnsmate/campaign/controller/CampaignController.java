@@ -2,7 +2,6 @@ package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignByCampaignCodeVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
@@ -27,12 +26,12 @@ public class CampaignController {
     private final CampaignService campaignService;
     private final CampaignMapper campaignMapper;
 
-    @Operation(summary = "직원 - 캠페인 등록")
-    @PostMapping("/register")
-    public ResponseEntity<ResponseRegisterCampaignVO> createCampaign(@RequestBody RequestRegisterCampaignVO request) {
-        CampaignDTO campaignDTO = campaignService.registerCampaign(campaignMapper.fromRegisterRequestVOtoDTO(request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToRegisterResponseVO(campaignDTO));
-    }
+//    @Operation(summary = "직원 - 캠페인 등록")
+//    @PostMapping("/register")
+//    public ResponseEntity<ResponseRegisterCampaignVO> createCampaign(@RequestBody RequestRegisterCampaignVO request) {
+//        CampaignDTO campaignDTO = campaignService.registerCampaign(campaignMapper.fromRegisterRequestVOtoDTO(request));
+//        return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToRegisterResponseVO(campaignDTO));
+//    }
 
     @Operation(summary = "직원 - 예약된 캠페인 수정")
     @PutMapping("/edit/{campaignCode}")
