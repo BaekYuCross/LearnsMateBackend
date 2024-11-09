@@ -3,11 +3,15 @@ package intbyte4.learnsmate.lecture.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.contractprocess.service.ContractProcessService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.TutorLectureVideoCountDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
-import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.member.service.MemberService;
+import intbyte4.learnsmate.videobylecture.domain.dto.CountVideoByLectureDTO;
+import intbyte4.learnsmate.videobylecture.service.VideoByLectureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,10 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
+    private final VideoByLectureService videoByLectureService;
+    private final ContractProcessService contractProcessService;
+    private final MemberService memberService;
+
 
     // 전체 강의 조회
     @Override
@@ -43,6 +51,18 @@ public class LectureServiceImpl implements LectureService {
         return lectureMapper.toDTO(lecture);
     }
 
+    // 강사별 강의 모두 조회
+    @Override
+    public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
+        List<Lecture> lectures = lectureRepository.findAllByTutorCode(tutorCode);
+        if (lectures.isEmpty()) {
+            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+        }
+        return lectures.stream()
+                .map(lectureMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
 
     // 카테고리별 강의 조회
 //    public List<Lecture> filterLectures(LectureFilterDTO filter) {
@@ -50,20 +70,44 @@ public class LectureServiceImpl implements LectureService {
 //        return lectureRepository.findAll(spec);
 //    }
 
+
     // 강의 등록
     @Override
     @Transactional
-    public LectureDTO registerLecture(Long lectureCode) {
+    public LectureDTO registerLecture(LectureDTO lectureDTO) {
+
+//        // Lecture 엔티티 빌드
+//        Lecture lecture = Lecture.builder()
+//                .lectureTitle(lectureDTO.getLectureTitle())
+//                .lectureCategoryEnum(lectureDTO.getLectureCategoryEnum())
+//                .lectureConfirmStatus(false) // 계약과정에서 승인 과정이 7이면 true로 변경
+//                .createdAt(LocalDateTime.now())
+//                .updatedAt(LocalDateTime.now())
+//                .lectureImage(lectureDTO.getLectureImage())
+//                .lecturePrice(lectureDTO.getLecturePrice())
+//                .tutorCode(memberService.findByMemberCode(lectureDTO.getTutorCode()))
+//                .lectureStatus(true)
+//                .lectureClickCount(0)
+//                .lectureLevel(lectureDTO.getLectureLevel())
+//                .build();
+//
+//
+//        lectureRepository.save(lecture);
+//
+//        contractProcessService.createContractProcess(lecture.getLectureCode(), contractProcessDTO);
+//
+//        return lectureMapper.toDTO(lecture);
         return null;
     }
+
 
     // 강의 수정
     @Override
     @Transactional
-    public LectureDTO updateLecture(Long lectureCode, RequestEditLectureInfoVO requestEditLectureInfoVO) {
+    public LectureDTO updateLecture(Long lectureCode, LectureDTO lectureDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
-        lecture.toUpdate(requestEditLectureInfoVO);
+        lecture.toUpdate(lectureDTO);
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
@@ -77,6 +121,27 @@ public class LectureServiceImpl implements LectureService {
         lecture.toDelete();
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
+    }
+
+    // 강사별 강의와 강의별 동영상 개수 조회 서비스 메서드
+    @Override
+    public List<TutorLectureVideoCountDTO> getVideoCountByLecture(Long tutorCode) {
+        // 강사별 강의 목록 조회
+        List<LectureDTO> lectures = getLecturesByTutorCode(tutorCode);
+        // 강의별 동영상 개수 조회 + 강의 타이틀 담기
+        return lectures.stream()
+                .map(lecture -> {
+                    // 각 강의에 대한 동영상 개수 조회
+                    CountVideoByLectureDTO videoCountDTO = videoByLectureService.getVideoByLecture(lecture.getLectureCode());
+
+                    // 강의명과 동영상 개수를 DTO로 반환
+                    return TutorLectureVideoCountDTO.builder()
+                            .lectureCode(lecture.getLectureCode())
+                            .lectureTitle(lecture.getLectureTitle())
+                            .videoCount(videoCountDTO.getVideoCount())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
 }
