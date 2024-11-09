@@ -59,4 +59,23 @@ public class MemberService {
         if (!student.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.RESTRICTED);
         return student;
     }
+
+    // 멤버 회원정보 수정 메서드
+    public void editMember(MemberDTO memberDTO) {
+        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
+        memberRepository.findById(member.getMemberCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.USER_NOT_FOUND));
+
+        memberRepository.save(member);
+    }
+
+    // 멤버 회원 삭제 flag false 메서드
+    public void deleteMember(Long memberCode) {
+        Member member = memberRepository.findById(memberCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.USER_NOT_FOUND));
+
+        member.deactivate();
+
+        memberRepository.save(member);
+    }
 }
