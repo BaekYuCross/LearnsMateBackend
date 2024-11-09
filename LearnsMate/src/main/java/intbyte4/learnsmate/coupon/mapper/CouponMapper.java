@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.coupon.mapper;
 
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
@@ -93,6 +94,23 @@ public class CouponMapper {
                 .couponCategoryCode(couponDTO.getCouponCategoryCode())
                 .adminCode(couponDTO.getAdminCode())
                 .tutorCode(couponDTO.getTutorCode())
+                .build();
+    }
+
+    public CouponDTO fromRequestFindCampaignCouponVOToCouponDTO(RequestFindCampaignCouponVO request) {
+        return CouponDTO.builder()
+                .couponCode(request.getCouponCode())
+                .couponName(request.getCouponName())
+                .couponContents(request.getCouponContents())
+                .couponDiscountRate(request.getCouponDiscountRate())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
+                .couponStartDate(request.getCouponStartDate())
+                .couponExpireDate(request.getCouponExpireDate())
+                .couponFlag(true)
+                .couponCategoryCode(request.getCouponCategoryCode())
+                .adminCode(request.getAdminCode())
+                .tutorCode(request.getTutorCode())
                 .build();
     }
 }
