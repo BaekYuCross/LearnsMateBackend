@@ -29,13 +29,8 @@ public class CampaignTemplateMapper {
 
     public CampaignTemplateDTO fromRegisterRequestVOToDto(RequestRegisterTemplateVO requestRegisterTemplateVO) {
         return CampaignTemplateDTO.builder()
-                .campaignTemplateCode(requestRegisterTemplateVO.getCampaignTemplateCode())
                 .campaignTemplateTitle(requestRegisterTemplateVO.getCampaignTemplateTitle())
                 .campaignTemplateContents(requestRegisterTemplateVO.getCampaignTemplateContents())
-                .campaignTemplateFlag(requestRegisterTemplateVO.getCampaignTemplateFlag())
-                .createdAt(requestRegisterTemplateVO.getCreatedAt())
-                .updatedAt(requestRegisterTemplateVO.getUpdatedAt())
-                .adminCode(requestRegisterTemplateVO.getAdminCode())
                 .build();
     }
 
@@ -62,7 +57,6 @@ public class CampaignTemplateMapper {
         return ResponseEditTemplateVO.builder()
                 .campaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle())
                 .campaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents())
-                .updatedAt(LocalDateTime.now())
                 .build();
     }
 
