@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.report.service;
 
 import intbyte4.learnsmate.report.domain.dto.ReportDTO;
+import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.domain.entity.Report;
 import intbyte4.learnsmate.report.mapper.ReportMapper;
 import intbyte4.learnsmate.report.repository.ReportRepository;
@@ -41,5 +42,14 @@ public class ReportService {
         long count = reportRepository.countByReportedMember_MemberCode(reportDTO.getReportedMemberCode());
 
         ReportDTO responseDTO = new ReportDTO();
+    }
+
+    // repository를 돌면서 5회이상 신고된 사람 모두 구해오기
+    public List<ReportedMemberDTO> findReportCountByMemberCode() {
+
+        List<ReportedMemberDTO> reportedMoreThanFiveMemberList
+                = reportRepository.findMembersWithReportsCountGreaterThanEqualFive();
+
+        return reportedMoreThanFiveMemberList;
     }
 }

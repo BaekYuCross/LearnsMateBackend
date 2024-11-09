@@ -6,7 +6,6 @@ import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignByCampaignCodeVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
@@ -107,12 +106,6 @@ public class CampaignMapper {
                 .updatedAt(dto.getUpdatedAt())
                 .adminCode(dto.getAdminCode())
                 .build()).collect(Collectors.toList());
-    }
-
-    public CampaignDTO fromFindRequestVOtoDTO(RequestFindCampaignByCampaignCodeVO vo) {
-        return CampaignDTO.builder()
-                .campaignCode(vo.getCampaignCode())
-                .build();
     }
 
     public ResponseFindCampaignVO fromDtoToFindResponseVO(CampaignDTO dto) {

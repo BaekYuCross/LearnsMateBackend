@@ -17,7 +17,4 @@ public class ResponseEditTemplateVO {
 
     @JsonProperty("campaign_template_contents")
     private final String campaignTemplateContents;
-
-    @JsonProperty("updated_at")
-    private final LocalDateTime updatedAt;
 }
