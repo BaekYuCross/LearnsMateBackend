@@ -27,5 +27,11 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(adminMapper.fromDtoToFindResponseVO(updatedAdmin));
     }
 
-
+    @Operation(summary = "직원 정보 수정")
+    @PatchMapping("/{adminCode}")
+    public ResponseEntity<ResponseEditAdminVO> updateAdmin(@PathVariable Long adminCode,
+                                                           @RequestBody RequestEditAdminVO editAdminVO) {
+        AdminDTO updatedAdmin = adminService.updateAdmin(adminCode, adminMapper.fromVoToDto(editAdminVO));
+        return ResponseEntity.status(HttpStatus.OK).body(adminMapper.fromDtoToEditResponseVO(updatedAdmin));
+    }
 }
