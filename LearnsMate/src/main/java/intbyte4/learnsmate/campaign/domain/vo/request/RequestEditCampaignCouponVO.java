@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 public class RequestEditCampaignCouponVO {
     @JsonProperty("coupon_code")
-    private String couponCode;
+    private Long couponCode;
 
     @JsonProperty("coupon_name")
     private String couponName;

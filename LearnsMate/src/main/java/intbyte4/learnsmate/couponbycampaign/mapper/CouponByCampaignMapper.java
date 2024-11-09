@@ -15,8 +15,8 @@ public class CouponByCampaignMapper {
     public CouponByCampaignDTO toDTO(CouponByCampaign entity) {
         return CouponByCampaignDTO.builder()
                 .couponByCampaignCode(entity.getCouponByCampaignCode())
-                .CouponCode(entity.getCoupon().getCouponCode())
-                .CampaignCode(entity.getCampaign().getCampaignCode())
+                .couponCode(entity.getCoupon().getCouponCode())
+                .campaignCode(entity.getCampaign().getCampaignCode())
                 .build();
     }
 

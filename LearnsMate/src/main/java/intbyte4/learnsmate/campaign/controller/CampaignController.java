@@ -54,7 +54,7 @@ public class CampaignController {
     }
 
     @Operation(summary = "직원 - 예약된 캠페인 수정")
-    @PutMapping("/edit/{campaignCode}")
+    @PutMapping("/edit")
     public ResponseEntity<ResponseEditCampaignVO> updateCampaign
             (@RequestBody RequestEditCampaignVO requestCampaign,
              @RequestBody List<RequestEditCampaignStudentVO> requestStudentList,
