@@ -10,27 +10,20 @@ import lombok.*;
 @Table(name = "lecture_video_by_student")
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Builder
-public class LectureVideoByStudent { // 복합 키... 너란놈... 공부해볼게...
+public class LectureVideoByStudent {
 
     @Id
-    @Column(name = "video_code", nullable = false)
-    private Long videoCode;
+    @ManyToOne
+    @JoinColumn(name = "video_code", nullable = false)
+    private VideoByLecture videoCode;
 
     @Id
-    @Column(name = "lecture_by_student_code", nullable = false)
-    private Long lectureByStudentCode;
+    @ManyToOne
+    @JoinColumn(name = "lecture_by_student_code", nullable = false)
+    private LectureByStudent lectureByStudentCode;
 
     @Column(name = "lecture_status", nullable = false)
     private Boolean lectureStatus;
-
-//    @ManyToOne
-//    @JoinColumn(name = "video_code", nullable = false)
-//    private VideoByLecture videoByLecture;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "lecture_by_student_code", nullable = false)
-//    private LectureByStudent lectureByStudent;
 }

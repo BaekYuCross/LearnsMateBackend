@@ -8,6 +8,7 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
+import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,17 +38,24 @@ public class CouponServiceImpl implements CouponService {
     }
     // 쿠폰 단 건 조회 (쿠폰코드로)
     @Override
-    public CouponDTO findCouponByCouponCode(String couponCode) {
+    public CouponDTO findCouponByCouponCode(Long couponCode) {
         CouponEntity couponEntity = couponRepository.findById(couponCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         return couponMapper.toDTO(couponEntity);
+    }
+
+    @Override
+    public CouponEntity findByCouponCode(Long couponCode) {
+        CouponEntity couponEntity = couponRepository.findById(couponCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        return couponEntity;
     }
 
     // 쿠폰 필터링해서 조회
 
     // 쿠폰 등록
     @Override
-    public CouponDTO registerCoupon(CouponRegisterRequestVO request, Admin admin, Member tutor) {
+    public CouponDTO registerCoupon(CouponRegisterRequestVO request, Admin admin, Member tutor, CouponCategory couponCategory) {
 
         /* todo. 따로 Mapper에 메소드 빼서 변환하기 */
         CouponEntity newCoupon = CouponEntity.builder()
@@ -60,7 +68,7 @@ public class CouponServiceImpl implements CouponService {
                 .couponStartDate(request.getCouponStartDate())
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)
-                .couponCategoryCode(request.getCouponCategoryCode())
+                .couponCategory(couponCategory)
                 .admin(admin)
                 .tutor(tutor)
                 .build();

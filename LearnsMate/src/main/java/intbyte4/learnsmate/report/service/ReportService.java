@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.report.service;
 
 import intbyte4.learnsmate.report.domain.dto.ReportDTO;
+import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.domain.entity.Report;
 import intbyte4.learnsmate.report.mapper.ReportMapper;
 import intbyte4.learnsmate.report.repository.ReportRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -41,5 +43,23 @@ public class ReportService {
         long count = reportRepository.countByReportedMember_MemberCode(reportDTO.getReportedMemberCode());
 
         ReportDTO responseDTO = new ReportDTO();
+    }
+
+    // repository를 돌면서 5회이상 신고된 사람 모두 구해오기
+    public List<ReportedMemberDTO> findReportCountByMemberCode() {
+
+        List<ReportedMemberDTO> reportedMoreThanFiveMemberList
+                = reportRepository.findMembersWithReportsCountGreaterThanEqualFive();
+
+        return reportedMoreThanFiveMemberList;
+    }
+
+    // memberCode로 신고당한 모든 신고내역 조회
+    public List<ReportDTO> findAllReportByMemberCode(Long memberCode) {
+        List<Report> reportList = reportRepository.findByReportedMember_MemberCode(memberCode);
+
+        return reportList.stream()
+                    .map(reportMapper::fromReportToReportDTO)
+                    .collect(Collectors.toList());
     }
 }
