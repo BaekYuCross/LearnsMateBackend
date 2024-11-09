@@ -66,7 +66,8 @@ public class CampaignServiceImpl implements CampaignService {
         campaignRepository.save(campaign);
 
         requestStudentList.forEach(memberDTO -> {
-            MemberDTO foundStudent = memberService.findMemberByStudentCode(memberDTO.getMemberCode());
+            MemberDTO foundStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
+                    ,memberDTO.getMemberType());
             if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
             userPerCampaignService.registerUserPerCampaign(foundStudent, requestCampaign);
         });
