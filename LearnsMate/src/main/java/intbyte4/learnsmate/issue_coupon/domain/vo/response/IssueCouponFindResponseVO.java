@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class IssueCouponRegisterResponseVO {
-
+public class IssueCouponFindResponseVO {
     @JsonProperty("coupon_issuance_code")
     private String couponIssuanceCode;
 
