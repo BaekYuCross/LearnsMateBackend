@@ -2,6 +2,7 @@ package intbyte4.learnsmate.campaign_template.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
@@ -26,6 +27,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     private final CampaignTemplateRepository campaignTemplateRepository;
     private final CampaignTemplateMapper campaignTemplateMapper;
     private final AdminService adminService;
+    private final AdminMapper adminMapper;
 
     @Override
     @Transactional
@@ -88,7 +90,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     }
 
     private CampaignTemplate convertToCampaignTemplate(CampaignTemplateDTO campaignTemplateDTO, AdminDTO adminDTO) {
-        Admin user = adminDTO.convertToEntity();
+        Admin user = adminMapper.toEntity(adminDTO);
         campaignTemplateDTO.setCampaignTemplateFlag(true);
         campaignTemplateDTO.setCreatedAt(LocalDateTime.now());
         campaignTemplateDTO.setUpdatedAt(LocalDateTime.now());

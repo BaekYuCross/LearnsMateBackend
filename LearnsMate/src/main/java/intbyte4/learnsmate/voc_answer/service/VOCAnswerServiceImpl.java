@@ -2,6 +2,7 @@ package intbyte4.learnsmate.voc_answer.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
@@ -37,6 +38,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     private final VOCMapper vocMapper;
     private final VocCategoryService vocCategoryService;
     private final MemberService memberService;
+    private final AdminMapper adminMapper;
 
     @Override
     @Transactional
@@ -101,7 +103,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         }
         log.info(adminDTO.toString());
 
-        return adminDTO.convertToEntity();
+        return adminMapper.toEntity(adminDTO);
     }
 
 
