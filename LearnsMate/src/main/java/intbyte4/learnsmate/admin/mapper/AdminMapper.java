@@ -2,6 +2,9 @@ package intbyte4.learnsmate.admin.mapper;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.domain.vo.request.RequestEditAdminVO;
+import intbyte4.learnsmate.admin.domain.vo.response.ResponseEditAdminVO;
+import intbyte4.learnsmate.admin.domain.vo.response.ResponseFindAdminVO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,4 +53,41 @@ public class AdminMapper {
                 .updatedAt(adminDTO.getUpdatedAt())
                 .build();
     }
+
+    // RequestEditAdminVO -> AdminDTO 변환
+    public AdminDTO fromVoToDto(RequestEditAdminVO requestEditAdminVO) {
+        return AdminDTO.builder()
+                .adminEmail(requestEditAdminVO.getAdminEmail())
+                .adminPassword(requestEditAdminVO.getAdminPassword())
+                .adminName(requestEditAdminVO.getAdminName())
+                .adminPhone(requestEditAdminVO.getAdminPhone())
+                .adminAddress(requestEditAdminVO.getAdminAddress())
+                .adminBirthday(requestEditAdminVO.getAdminBirthday())
+                .build();
+    }
+
+    // AdminDTO -> FindResponseVO 변환
+    public ResponseFindAdminVO fromDtoToFindResponseVO(AdminDTO adminDTO) {
+        return ResponseFindAdminVO.builder()
+                .adminCode(adminDTO.getAdminCode())
+                .adminEmail(adminDTO.getAdminEmail())
+                .adminName(adminDTO.getAdminName())
+                .adminPhone(adminDTO.getAdminPhone())
+                .adminStatus(adminDTO.getAdminStatus())
+                .adminLastLoginDate(adminDTO.getAdminLastLoginDate())
+                .build();
+    }
+
+    // AdminDTO -> EditResponseVO 변환
+    public ResponseEditAdminVO fromDtoToEditResponseVO(AdminDTO adminDTO) {
+        return ResponseEditAdminVO.builder()
+                .adminCode(adminDTO.getAdminCode())
+                .adminEmail(adminDTO.getAdminEmail())
+                .adminName(adminDTO.getAdminName())
+                .adminPhone(adminDTO.getAdminPhone())
+                .adminStatus(adminDTO.getAdminStatus())
+                .adminLastLoginDate(adminDTO.getAdminLastLoginDate())
+                .build();
+    }
+
 }
