@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.contractprocess.domain.entity;
 
+import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,7 +35,7 @@ public class ContractProcess {
     @JoinColumn(name = "lecture_code", nullable = false)
     private Lecture lecture;
 
-//    @ManyToOne
-//    @JoinColumn(name = "admin_code", nullable = false)
-//    private Admin admin;
+    @ManyToOne
+    @JoinColumn(name = "admin_code", nullable = false)
+    private Admin admin;
 }

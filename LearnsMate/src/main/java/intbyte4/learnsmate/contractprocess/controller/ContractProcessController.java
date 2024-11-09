@@ -33,5 +33,15 @@ public class ContractProcessController {
         return ResponseEntity.status(HttpStatus.OK).body(contractProcessMapper.fromDtoToResponseVO(contractProcessDTO));
     }
 
+    @Operation(summary = "강사별 강의별 계약과정 조회")
+    @GetMapping("/tutor/{tutorCode}")
+    public ResponseEntity<List<ResponseContractProcessVO>> getApprovalProcessByLectureCode(@PathVariable("tutorCode") Long tutorCode) {
+        List<ContractProcessDTO> contractProcessDTOs = contractProcessService.getApprovalProcessByLectureCode(tutorCode);
 
+        List<ResponseContractProcessVO> responseVOs = contractProcessDTOs.stream()
+                .map(contractProcessMapper::fromDtoToResponseVO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseVOs);
+    }
 }
