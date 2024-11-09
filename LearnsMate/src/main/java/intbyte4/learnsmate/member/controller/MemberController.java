@@ -56,6 +56,26 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
     }
 
+    //////////////////// 쿠폰, 강의, voc 서비스 메서드 추가 필요 ///////////////////////////
+    // 2-1. 학생 단건 조회(member flag가 true + member_type이 STUDENT)
+    @GetMapping("/student/{studentcode}")
+    public ResponseEntity<ResponseFindMemberVO> findStudentByStudentCode(@PathVariable("studentcode") Long memberCode) {
+
+        MemberDTO memberDTO = memberService.findMemberByMemberCode(memberCode, MemberType.STUDENT);
+
+        return ResponseEntity.status(HttpStatus.OK).body(memberMapper.fromMemberDTOtoResponseFindMemberVO(memberDTO));
+    }
+
+    // 2-2. 강사 단건 조회(member flag가 true + member_type이 TUTOR)
+    @GetMapping("/tutor/{tutorcoe}")
+    public ResponseEntity<ResponseFindMemberVO> findTutorByTutorCode(@PathVariable("tutorcode") Long memberCode) {
+
+        MemberDTO memberDTO = memberService.findMemberByMemberCode(memberCode, MemberType.TUTOR);
+
+        return ResponseEntity.status(HttpStatus.OK).body(memberMapper.fromMemberDTOtoResponseFindMemberVO(memberDTO));
+    }
+    ////////////////////////////////////////////////////////////
+
     // 회원가입시 멤버 저장하는 컨트롤러 메서드
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
