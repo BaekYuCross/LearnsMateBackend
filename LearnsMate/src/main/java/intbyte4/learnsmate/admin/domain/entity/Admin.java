@@ -43,7 +43,7 @@ public class Admin {
     @Column(name = "admin_birthday", nullable = false)
     private LocalDateTime adminBirthday;
 
-    @Column(name = "admin_jobtype", nullable = false)
+    @Column(name = "admin_job_type", nullable = false)
     private String adminJobType;
 
     @Column(name = "admin_level", nullable = false)
@@ -52,7 +52,7 @@ public class Admin {
     @Column(name = "admin_status", nullable = false)
     private Boolean adminStatus;
 
-    @Column(name = "admin_lastlogindate", nullable = false)
+    @Column(name = "admin_last_login_date", nullable = false)
     private LocalDateTime adminLastLoginDate;
 
     @Column(name = "created_at", nullable = false)
@@ -60,4 +60,14 @@ public class Admin {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public void toUpdate(AdminDTO request) {
+        this.adminEmail = request.getAdminEmail();
+        this.adminPassword = request.getAdminPassword();
+        this.adminName = request.getAdminName();
+        this.adminPhone = request.getAdminPhone();
+        this.adminAddress = request.getAdminAddress();
+        this.adminBirthday = request.getAdminBirthday();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

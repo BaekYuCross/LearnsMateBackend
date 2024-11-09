@@ -1,6 +1,5 @@
 package intbyte4.learnsmate.admin.domain.dto;
 
-import intbyte4.learnsmate.admin.domain.entity.Admin;
 import lombok.*;
 
 import java.time.LocalDateTime;
