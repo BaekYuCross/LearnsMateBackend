@@ -2,12 +2,18 @@ package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.service.CampaignService;
+import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.mapper.CouponMapper;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +31,28 @@ public class CampaignController {
 
     private final CampaignService campaignService;
     private final CampaignMapper campaignMapper;
+    private final MemberMapper memberMapper;
+    private final CouponMapper couponMapper;
 
-//    @Operation(summary = "직원 - 캠페인 등록")
-//    @PostMapping("/register")
-//    public ResponseEntity<ResponseRegisterCampaignVO> createCampaign(@RequestBody RequestRegisterCampaignVO request) {
-//        CampaignDTO campaignDTO = campaignService.registerCampaign(campaignMapper.fromRegisterRequestVOtoDTO(request));
-//        return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToRegisterResponseVO(campaignDTO));
-//    }
+    @Operation(summary = "직원 - 캠페인 등록")
+    @PostMapping("/register")
+    public ResponseEntity<ResponseRegisterCampaignVO> createCampaign
+            (@RequestBody RequestRegisterCampaignVO requestCampaign
+                    , List<RequestFindCampaignStudentVO> requestStudentList
+                    , List<RequestFindCampaignCouponVO> requestCouponList) {
+        List<MemberDTO> studentDTOList = requestStudentList.stream()
+                .map(memberMapper::fromRequestFindCampaignStudentVOToMemberDTO)
+                .toList();
+
+        List<CouponDTO> couponDTOList = requestCouponList.stream()
+                .map(couponMapper::fromRequestFindCampaignCouponVOToCouponDTO)
+                .toList();
+
+        CampaignDTO campaignDTO = campaignService.registerCampaign(campaignMapper
+                .fromRegisterRequestVOtoDTO(requestCampaign), studentDTOList, couponDTOList);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToRegisterResponseVO(campaignDTO));
+    }
 
     @Operation(summary = "직원 - 예약된 캠페인 수정")
     @PutMapping("/edit/{campaignCode}")
