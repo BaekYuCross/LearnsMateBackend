@@ -10,7 +10,9 @@ public interface CampaignService {
     CampaignDTO registerCampaign(CampaignDTO requestCampaign
             , List<MemberDTO> requestStudentList
             , List<CouponDTO> requestCouponList);
-    CampaignDTO editCampaign(CampaignDTO request, Long campaignCode);
+    CampaignDTO editCampaign(CampaignDTO requestCampaign
+            , List<MemberDTO> requestStudentList
+            , List<CouponDTO> requestCouponList);
     void removeCampaign(CampaignDTO request);
     List<CampaignDTO> findAllCampaigns();
     CampaignDTO findCampaign(CampaignDTO request);
