@@ -65,7 +65,7 @@ public class BlacklistController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // 직원 - 예비 블랙리스트 조회(학생)
+    // 직원 - 예비 블랙리스트 전체 조회(학생)
     @GetMapping("/student/reserved")
     public ResponseEntity<List<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist() {
         // dto로 받아와야하는데 어떤 dto로 받아올까?
@@ -83,6 +83,7 @@ public class BlacklistController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // 직원 - 예비 블랙리스트 전체 조회(강사)
     @GetMapping("/tutor/reserved")
     public ResponseEntity<List<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(){
         // dto로 받아와야하는데 어떤 dto로 받아올까?
