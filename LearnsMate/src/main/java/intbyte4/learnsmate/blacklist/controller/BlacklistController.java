@@ -2,9 +2,12 @@ package intbyte4.learnsmate.blacklist.controller;
 
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReportVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTutorBlacklistVO;
 import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.service.BlacklistService;
 import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +62,42 @@ public class BlacklistController {
             response.add(blacklistMapper.fromBlacklistDTOToResponseFindReportVO(blacklistDTO));
         }
 
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // 직원 - 예비 블랙리스트 조회(학생)
+    @GetMapping("/student/reserved")
+    public ResponseEntity<List<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist() {
+        // dto로 받아와야하는데 어떤 dto로 받아올까?
+        // 학생코드, 학생명, 누적 신고 횟수 이렇게가 필요함. -> dto 하나 만들자.
+        List<ReportedMemberDTO> reservedBlacklistDTOList
+                = blacklistService.findAllReservedBlacklistByMemberType(MemberType.STUDENT);
+
+        // ReportedMemberDTO -> ResponseFindReservedStudentBlacklistVO
+        List<ResponseFindReservedStudentBlacklistVO> response = new ArrayList<>();
+        for(ReportedMemberDTO reservedBlacklistDTO : reservedBlacklistDTOList) {
+            response.add(
+                    blacklistMapper.fromReportedMemberDTOToResponseFindReservedStudentBlacklistVO(reservedBlacklistDTO)
+            );
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/tutor/reserved")
+    public ResponseEntity<List<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(){
+        // dto로 받아와야하는데 어떤 dto로 받아올까?
+        // 강사코드, 강사명, 누적 신고 횟수 이렇게가 필요함. -> dto 하나 만들자.
+        List<ReportedMemberDTO> reservedBlacklistDTOList
+                = blacklistService.findAllReservedBlacklistByMemberType(MemberType.TUTOR);
+
+        // ReportedMemberDTO -> ResponseFindReservedTutorBlacklistVO
+        List<ResponseFindReservedTutorBlacklistVO> response = new ArrayList<>();
+
+        for(ReportedMemberDTO reservedBlacklistDTO : reservedBlacklistDTOList) {
+            response.add(
+                    blacklistMapper.fromReportedMemberDTOToResponseFindReservedTutorBlacklistVO(reservedBlacklistDTO)
+            );
+        }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
