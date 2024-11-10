@@ -34,14 +34,12 @@ public class CampaignController {
     @Operation(summary = "직원 - 캠페인 등록")
     @PostMapping("/register")
     public ResponseEntity<ResponseRegisterCampaignVO> createCampaign
-            (@RequestBody RequestRegisterCampaignVO requestCampaign,
-             @RequestBody List<RequestFindCampaignStudentVO> requestStudentList,
-             @RequestBody List<RequestFindCampaignCouponVO> requestCouponList) {
-        List<MemberDTO> studentDTOList = requestStudentList.stream()
+            (@RequestBody RequestRegisterCampaignVO requestCampaign) {
+        List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
                 .map(memberMapper::fromRequestFindCampaignStudentVOToMemberDTO)
                 .toList();
 
-        List<CouponDTO> couponDTOList = requestCouponList.stream()
+        List<CouponDTO> couponDTOList = requestCampaign.getCouponList().stream()
                 .map(couponMapper::fromRequestFindCampaignCouponVOToCouponDTO)
                 .toList();
 
@@ -56,14 +54,12 @@ public class CampaignController {
     @Operation(summary = "직원 - 예약된 캠페인 수정")
     @PutMapping("/edit")
     public ResponseEntity<ResponseEditCampaignVO> updateCampaign
-            (@RequestBody RequestEditCampaignVO requestCampaign,
-             @RequestBody List<RequestEditCampaignStudentVO> requestStudentList,
-             @RequestBody List<RequestEditCampaignCouponVO> requestCouponList) {
-        List<MemberDTO> studentDTOList = requestStudentList.stream()
+            (@RequestBody RequestEditCampaignVO requestCampaign) {
+        List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
                 .map(memberMapper::fromRequestEditCampaignStudentVOToMemberDTO)
                 .toList();
 
-        List<CouponDTO> couponDTOList = requestCouponList.stream()
+        List<CouponDTO> couponDTOList = requestCampaign.getCouponList().stream()
                 .map(couponMapper::fromRequestEditCampaignCouponVOToCouponDTO)
                 .toList();
 
