@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.payment.domain.entity;
 
 
+import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,9 +31,9 @@ public class Payment {
     @JoinColumn(name = "lecture_by_student_code", nullable = false)
     private LectureByStudent lectureByStudent;
 
-//    @ManyToOne
-//    @JoinColumn(name = "coupon_issuance_code", nullable = false)
-//    private IssueCoupon couponIssuance;
+    @ManyToOne
+    @JoinColumn(name = "coupon_issuance_code", nullable = false)
+    private IssueCoupon couponIssuance;
 
 
 }
