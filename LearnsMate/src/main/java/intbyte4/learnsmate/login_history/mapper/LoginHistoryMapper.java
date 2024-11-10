@@ -2,7 +2,9 @@ package intbyte4.learnsmate.login_history.mapper;
 
 import intbyte4.learnsmate.login_history.domain.dto.LoginHistoryDTO;
 import intbyte4.learnsmate.login_history.domain.entity.LoginHistory;
+import intbyte4.learnsmate.login_history.domain.vo.request.RequestSaveLoginHistoryVO;
 import intbyte4.learnsmate.login_history.domain.vo.response.ResponseFindLoginHistoryVO;
+import intbyte4.learnsmate.member.domain.entity.Member;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -52,6 +54,20 @@ public class LoginHistoryMapper {
                 .lastLoginDate(loginHistoryDTO.getLastLoginDate())
                 .lastLogoutDate(loginHistoryDTO.getLastLogoutDate())
                 .memberCode(loginHistoryDTO.getMemberCode())
+                .build();
+    }
+
+    public LoginHistoryDTO fromRequestSaveLoginHistoryVOtoLoginHistoryDTO(RequestSaveLoginHistoryVO request) {
+        return LoginHistoryDTO.builder()
+                .lastLoginDate(request.getLastLoginDate())
+                .memberCode(request.getMemberCode())
+                .build();
+    }
+
+    public LoginHistory fromLoginHistoryDTOtoLoginHistory(LoginHistoryDTO dto, Member member) {
+        return LoginHistory.builder()
+                .lastLoginDate(dto.getLastLoginDate())
+                .member(member)
                 .build();
     }
 }
