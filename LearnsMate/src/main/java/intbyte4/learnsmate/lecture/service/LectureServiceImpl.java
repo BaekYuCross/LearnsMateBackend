@@ -5,7 +5,6 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.contractprocess.service.ContractProcessService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.dto.TutorLectureVideoCountDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
@@ -18,8 +17,6 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
-import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
-import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +30,6 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
-    private final VideoByLectureService videoByLectureService;
     private final LectureCategoryService lectureCategoryService;
     private final ContractProcessService contractProcessService;
     private final MemberService memberService;
@@ -144,27 +140,6 @@ public class LectureServiceImpl implements LectureService {
         lecture.toDelete();
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
-    }
-
-    // 강사별 강의와 강의별 동영상 개수 조회 서비스 메서드
-    @Override
-    public List<TutorLectureVideoCountDTO> getVideoCountByLecture(Long tutorCode) {
-        List<LectureDTO> lectures = getLecturesByTutorCode(tutorCode);
-        // 강의별 동영상 개수 조회 + 강의 타이틀 담기
-        return lectures.stream()
-                .map(lecture -> {
-                    // 각 강의에 대한 동영상 개수 조회
-                    CountVideoByLectureDTO videoCountDTO =
-                            videoByLectureService.getVideoByLecture(lecture.getLectureCode());
-
-                    // 강의명과 동영상 개수를 DTO로 반환
-                    return TutorLectureVideoCountDTO.builder()
-                            .lectureCode(lecture.getLectureCode())
-                            .lectureTitle(lecture.getLectureTitle())
-                            .videoCount(videoCountDTO.getVideoCount())
-                            .build();
-                })
-                .collect(Collectors.toList());
     }
 
 }

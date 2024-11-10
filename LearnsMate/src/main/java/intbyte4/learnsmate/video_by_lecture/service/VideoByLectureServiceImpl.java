@@ -30,7 +30,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
     private final MemberMapper memberMapper;
     private final LectureCategoryMapper lectureCategoryMapper;
 
-    // 강의의 동영상 개수 조회
+    // 강사별 강의와 강의별 동영상 개수 조회 서비스 메서드
     @Override
     public CountVideoByLectureDTO getVideoByLecture(Long lectureCode) {
 
@@ -43,8 +43,14 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
         Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+
         long videoCount = videoByLectureRepository.countByLectureCode(lecture);
-        return new CountVideoByLectureDTO(lectureCode, videoCount);
+
+        return CountVideoByLectureDTO.builder()
+                .lectureCode(lectureCode)
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .videoCount(videoCount)
+                .build();
     }
 
 }

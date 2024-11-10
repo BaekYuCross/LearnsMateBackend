@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CountVideoByLectureDTO {
     private Long lectureCode;
+    private String lectureTitle;
     private long videoCount;
+
 }
