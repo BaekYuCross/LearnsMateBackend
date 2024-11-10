@@ -3,7 +3,6 @@ package intbyte4.learnsmate.lecture.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.contractprocess.service.ContractProcessService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -31,7 +30,6 @@ public class LectureServiceImpl implements LectureService {
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
     private final LectureCategoryService lectureCategoryService;
-    private final ContractProcessService contractProcessService;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
     private final LectureCategoryMapper lectureCategoryMapper;

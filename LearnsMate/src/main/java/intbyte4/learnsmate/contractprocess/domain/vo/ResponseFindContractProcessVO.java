@@ -1,15 +1,18 @@
 package intbyte4.learnsmate.contractprocess.domain.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @AllArgsConstructor
-public class ResponseContractProcessVO {
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class ResponseFindContractProcessVO {
 
     private Long contractProcessCode;
     private Integer approvalProcess;
