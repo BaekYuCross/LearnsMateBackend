@@ -2,9 +2,8 @@ package intbyte4.learnsmate.lecture.domain.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
-import intbyte4.learnsmate.lecture.enums.LectureCategory;
-import intbyte4.learnsmate.lecture.enums.LectureLevel;
+import intbyte4.learnsmate.lecture.enums.LectureCategoryEnum;
+import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,7 +21,7 @@ public class LectureDTO {
     private String lectureTitle;
 
     @JsonProperty("lecture_category")
-    private LectureCategory lectureCategory;
+    private LectureCategoryEnum lectureCategoryEnum;
 
     @JsonProperty("lecture_confirm_status")
     private Boolean lectureConfirmStatus;
@@ -49,21 +48,6 @@ public class LectureDTO {
     private Integer lectureClickCount;
 
     @JsonProperty("lecture_level")
-    private LectureLevel lectureLevel;
+    private LectureLevelEnum lectureLevel;
 
-    public Lecture toLecture() {
-        return Lecture.builder()
-                .lectureCode(this.lectureCode)
-                .lectureTitle(this.lectureTitle)
-                .lectureCategory(this.lectureCategory)
-                .lectureConfirmStatus(this.lectureConfirmStatus)
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
-                .lectureImage(this.lectureImage)
-                .lecturePrice(this.lecturePrice)
-                .lectureStatus(this.lectureStatus)
-                .lectureClickCount(this.lectureClickCount)
-                .lectureLevel(this.lectureLevel)
-                .build();
-    }
 }

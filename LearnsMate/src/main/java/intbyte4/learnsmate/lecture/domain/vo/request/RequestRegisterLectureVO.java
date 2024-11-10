@@ -1,8 +1,9 @@
-package intbyte4.learnsmate.lecture.domain.vo;
+package intbyte4.learnsmate.lecture.domain.vo.request;
 
-import intbyte4.learnsmate.lecture.enums.LectureCategory;
-import intbyte4.learnsmate.lecture.enums.LectureLevel;
+import intbyte4.learnsmate.lecture.enums.LectureCategoryEnum;
+import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,14 +12,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class EditLectureInfoVO {
+@Builder
+public class RequestRegisterLectureVO {
     private String lectureTitle;
-    private LectureCategory lectureCategory;
+    private LectureCategoryEnum lectureCategoryEnum;
     private Boolean lectureConfirmStatus;
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String lectureImage;
     private Integer lecturePrice;
+    private Long tutorCode;
     private Boolean lectureStatus;
     private Integer lectureClickCount;
-    private LectureLevel lectureLevel;
+    private LectureLevelEnum lectureLevel;
 }

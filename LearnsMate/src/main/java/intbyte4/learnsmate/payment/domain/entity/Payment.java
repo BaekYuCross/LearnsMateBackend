@@ -24,7 +24,6 @@ public class Payment {
     private Integer paymentPrice;
 
     @Column(name = "created_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -32,7 +31,7 @@ public class Payment {
     private LectureByStudent lectureByStudent;
 
 //    @ManyToOne
-//    @JoinColumn(name = "coupon_issuance_code")
+//    @JoinColumn(name = "coupon_issuance_code", nullable = false)
 //    private IssueCoupon couponIssuance;
 
 
