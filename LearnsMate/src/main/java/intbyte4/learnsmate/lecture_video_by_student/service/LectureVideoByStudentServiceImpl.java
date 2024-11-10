@@ -6,6 +6,11 @@ import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
 import intbyte4.learnsmate.lecture_video_by_student.repository.LectureVideoByStudentRepository;
+import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
+import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +23,18 @@ public class LectureVideoByStudentServiceImpl implements LectureVideoByStudentSe
 
     private final LectureVideoByStudentRepository lectureVideoByStudentRepository;
     private final LectureByStudentService lectureByStudentService;
+    private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
+    // 강의코드 , 강의 제목 , 총 동영상 수 , 완료된 동영상 수 , 진척도 조회
     @Override
     public List<LectureVideoProgressDTO> getVideoProgressByStudent(Long studentCode) {
+        // 학생 조회
+        MemberDTO studentDTO = memberService.findMemberByMemberCode(studentCode, MemberType.STUDENT);
+        Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
+
         // 학생이 수강한 모든 강의 목록 조회
-        List<LectureByStudentDTO> lecturesByStudent = lectureByStudentService.findByStudentCode(studentCode);
+        List<LectureByStudentDTO> lecturesByStudent = lectureByStudentService.findByStudentCode(student.getMemberCode());
         if (lecturesByStudent.isEmpty()) {
             throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
         }
