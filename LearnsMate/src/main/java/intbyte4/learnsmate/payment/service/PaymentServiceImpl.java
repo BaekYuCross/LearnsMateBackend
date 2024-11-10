@@ -31,4 +31,16 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
+    // 직원이 특정 결제 내역을 단건 상세 조회
+    @Override
+    public PaymentDTO getPaymentDetails(Long paymentCode) {
+        Payment payment = paymentRepository.findById(paymentCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
+        return paymentMapper.toDTO(payment);
+    }
+
+    // 직원이 예상 매출액과 할인 매출액을 비교해서 조회
+
+    // 직원이 기간 별 매출액을 리스트와 그래프로 조회
+
 }
