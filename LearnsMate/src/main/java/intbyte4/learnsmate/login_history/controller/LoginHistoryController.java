@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public class LoginHistoryController {
     }
 
     // 3. 특정 멤버의 모든 로그인 내역 확인
-    @GetMapping("/member/login/{membercode}")
+    @GetMapping("/member/{membercode}")
     public ResponseEntity<List<ResponseFindLoginHistoryVO>> findAllByMemberCode(@PathVariable("membercode") Long memberCode) {
 
         List<LoginHistoryDTO> loginHistoryDTOList = loginHistoryService.findAllLoginHistoryByMemberCode(memberCode);
