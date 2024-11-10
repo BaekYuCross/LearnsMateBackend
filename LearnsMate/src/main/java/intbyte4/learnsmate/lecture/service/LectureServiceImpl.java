@@ -9,6 +9,8 @@ import intbyte4.learnsmate.lecture.domain.dto.TutorLectureVideoCountDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
+import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
@@ -26,6 +28,7 @@ public class LectureServiceImpl implements LectureService {
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
     private final VideoByLectureService videoByLectureService;
+    private final LectureCategoryService lectureCategoryService;
     private final ContractProcessService contractProcessService;
     private final MemberService memberService;
 
@@ -107,12 +110,18 @@ public class LectureServiceImpl implements LectureService {
     @Override
     @Transactional
     public LectureDTO updateLecture(Long lectureCode, LectureDTO lectureDTO) {
+
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
-        lecture.toUpdate(lectureDTO);
+
+        LectureCategory lectureCategory =
+                lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+
+        lecture.toUpdate(lectureDTO, lectureCategory);
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
+
 
     // 강의 삭제
     @Override
