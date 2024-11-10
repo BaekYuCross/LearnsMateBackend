@@ -44,7 +44,7 @@ public class LoginHistoryController {
     }
 
     // 3. 특정 멤버의 모든 로그인 기록 확인
-    @GetMapping("/member/{membercode}")
+    @GetMapping("/member/login/{membercode}")
     public ResponseEntity<List<ResponseFindLoginHistoryVO>> findAllByMemberCode(@PathVariable("membercode") Long memberCode) {
 
         List<LoginHistoryDTO> loginHistoryDTOList = loginHistoryService.findAllLoginHistoryByMemberCode(memberCode);
@@ -54,7 +54,7 @@ public class LoginHistoryController {
     }
 
     // 4. 특정 멤버의 모든 로그아웃 기록 확인
-    @GetMapping("/member/1/{membercode}")
+    @GetMapping("/member/logout/{membercode}")
     public ResponseEntity<?> findAllLogoutHistoryByMemberCode(@PathVariable Long membercode){
         return null;
     }
