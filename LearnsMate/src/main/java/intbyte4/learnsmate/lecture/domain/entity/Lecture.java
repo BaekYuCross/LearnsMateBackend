@@ -48,7 +48,7 @@ public class Lecture {
     @ManyToOne
     @JoinColumn(name = "tutor_code", nullable = false)
     @Where(clause = "member_type = 'TUTOR'")
-    private Member tutorCode;
+    private Member tutor;;
 
     @Column(name = "lecture_status", nullable = false)
     private Boolean lectureStatus;

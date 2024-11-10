@@ -30,7 +30,7 @@ public class LectureMapper {
                 .lectureStatus(entity.getLectureStatus())
                 .lectureClickCount(entity.getLectureClickCount())
                 .lectureLevel(entity.getLectureLevel())
-                .tutorCode(entity.getTutorCode().getMemberCode())
+                .tutorCode(entity.getTutor().getMemberCode())
                 .build();
     }
 
@@ -47,7 +47,7 @@ public class LectureMapper {
                 .lectureStatus(dto.getLectureStatus())
                 .lectureClickCount(dto.getLectureClickCount())
                 .lectureLevel(dto.getLectureLevel())
-                .tutorCode(tutor)
+                .tutor(tutor)
                 .build();
     }
 

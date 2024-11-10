@@ -11,6 +11,10 @@ import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
+import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
@@ -31,6 +35,7 @@ public class LectureServiceImpl implements LectureService {
     private final LectureCategoryService lectureCategoryService;
     private final ContractProcessService contractProcessService;
     private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
 
     // 전체 강의 조회
@@ -57,15 +62,19 @@ public class LectureServiceImpl implements LectureService {
     // 강사별 강의 모두 조회
     @Override
     public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
-//        MemberDTO tutor = memberService.findByMemberCode(tutorCode);
-//        List<Lecture> lectures = lectureRepository.findAllByTutorCode(tutor.getMemberCode());
-//        if (lectures.isEmpty()) {
-//            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-//        }
-//        return lectures.stream()
-//                .map(lectureMapper::toDTO)
-//                .collect(Collectors.toList());
-        return null;
+        // tutorCode를 이용해 MemberDTO를 조회한 후 Member 객체로 변환
+        MemberDTO tutorDTO = memberService.findMemberByMemberCode(tutorCode, MemberType.TUTOR);
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+
+        List<Lecture> lectures = lectureRepository.findAllByTutor(tutor);
+
+        if (lectures.isEmpty()) {
+            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+        }
+
+        return lectures.stream()
+                .map(lectureMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 
