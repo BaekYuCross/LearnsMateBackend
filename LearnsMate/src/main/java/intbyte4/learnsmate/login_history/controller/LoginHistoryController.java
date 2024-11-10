@@ -24,7 +24,7 @@ public class LoginHistoryController {
 
     // 1. 모든 Login History 기록 조회
     @GetMapping
-    public ResponseEntity<List<ResponseFindLoginHistoryVO>> findAllLoginHistory(){
+    public ResponseEntity<List<ResponseFindLoginHistoryVO>> findAll(){
 
         List<LoginHistoryDTO> loginHistoryDTOList = loginHistoryService.findAllLoginHistory();
 
@@ -36,7 +36,7 @@ public class LoginHistoryController {
 
     // 2. 특정 Login History 기록 조회
     @GetMapping("/{loginhistorycode}")
-    public ResponseEntity<?> findLoginHistoryByLoginHistoryCode(@PathVariable("loginhistorycode") Long loginHistoryCode) {
+    public ResponseEntity<ResponseFindLoginHistoryVO> findByLoginHistoryCode(@PathVariable("loginhistorycode") Long loginHistoryCode) {
         LoginHistoryDTO loginHistoryDTO = loginHistoryService.findById(loginHistoryCode);
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -45,8 +45,12 @@ public class LoginHistoryController {
 
     // 3. 특정 멤버의 모든 로그인 기록 확인
     @GetMapping("/member/{membercode}")
-    public ResponseEntity<?> findAllLoginHistoryByMemberCode(@PathVariable Long membercode) {
-        return null;
+    public ResponseEntity<List<ResponseFindLoginHistoryVO>> findAllByMemberCode(@PathVariable("membercode") Long memberCode) {
+
+        List<LoginHistoryDTO> loginHistoryDTOList = loginHistoryService.findAllLoginHistoryByMemberCode(memberCode);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(loginHistoryMapper.fromLoginHistoryDTOToResponseFindLoginHistoryVO(loginHistoryDTOList));
     }
 
     // 4. 특정 멤버의 모든 로그아웃 기록 확인
