@@ -7,12 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class RequestRegisterCampaignVO {
+    private List<RequestFindCampaignStudentVO> studentList;
+    private List<RequestFindCampaignCouponVO> couponList;
+
     @JsonProperty("campaign_code")
     private Long campaignCode;
 
