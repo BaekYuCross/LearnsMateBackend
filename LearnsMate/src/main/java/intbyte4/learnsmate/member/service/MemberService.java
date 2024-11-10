@@ -93,7 +93,7 @@ public class MemberService {
     }
 
     // 멤버 타입과 상관 없이 멤버 코드로 조회하는 메서드
-    public MemberDTO findByMemberCode(Long memberCode){
+    public MemberDTO findById(Long memberCode){
         Member member = memberRepository.findById(memberCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.USER_NOT_FOUND));
 
