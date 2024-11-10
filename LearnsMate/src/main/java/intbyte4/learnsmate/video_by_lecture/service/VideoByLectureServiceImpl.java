@@ -64,8 +64,8 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
 
     // 강의코드별 모든 강의별 동영상 조회
     @Override
-    public List<VideoByLectureDTO> findVideoByLectureByLectureCode(Long lectureCode, LectureDTO lecturedto) {
-        LectureDTO lectureDTO = lectureService.getLectureById(lecturedto.getLectureCode());
+    public List<VideoByLectureDTO> findVideoByLectureByLectureCode(Long lectureCode) {
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
 
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
@@ -83,7 +83,6 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         return videoByLectures.stream()
                 .map(videoByLectureMapper::toDTO)
                 .collect(Collectors.toList());
-    }
-
+}
 
 }
