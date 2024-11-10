@@ -3,7 +3,6 @@ package intbyte4.learnsmate.lecturebystudent.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.common.mapper.MemberMapper;
 import intbyte4.learnsmate.lecturebystudent.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecturebystudent.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecturebystudent.mapper.LectureByStudentMapper;
