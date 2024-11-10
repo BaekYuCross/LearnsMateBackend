@@ -1,13 +1,12 @@
 package intbyte4.learnsmate.lecture.domain.entity;
 
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.enums.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 
@@ -27,9 +26,9 @@ public class Lecture {
     @Column(name = "lecture_title", nullable = false)
     private String lectureTitle;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "lecture_category", nullable = false)
-    private LectureCategoryEnum lectureCategoryEnum;
+    @ManyToOne
+    @JoinColumn(name = "lecture_category_code", nullable = false)
+    private LectureCategory lectureCategory;
 
     @Column(name = "lecture_confirm_status", nullable = false)
     private Boolean lectureConfirmStatus;
@@ -62,16 +61,16 @@ public class Lecture {
     private LectureLevelEnum lectureLevel;
 
 
-    public void toUpdate(@Validated LectureDTO lectureDTO) {
-         this.lectureTitle = lectureDTO.getLectureTitle();
-         this.lectureCategoryEnum = lectureDTO.getLectureCategoryEnum();
-         this.lectureConfirmStatus = lectureDTO.getLectureConfirmStatus();
-         this.updatedAt = LocalDateTime.now();
-         this.lectureImage = lectureDTO.getLectureImage();
-         this.lecturePrice = lectureDTO.getLecturePrice();
-         this.lectureStatus = lectureDTO.getLectureStatus();
-         this.lectureClickCount = lectureDTO.getLectureClickCount();
-         this.lectureLevel = lectureDTO.getLectureLevel();
+    public void toUpdate(LectureDTO lectureDTO, LectureCategory lectureCategory) {
+        this.lectureTitle = lectureDTO.getLectureTitle();
+        this.lectureCategory = lectureCategory;
+        this.lectureConfirmStatus = lectureDTO.getLectureConfirmStatus();
+        this.updatedAt = LocalDateTime.now();
+        this.lectureImage = lectureDTO.getLectureImage();
+        this.lecturePrice = lectureDTO.getLecturePrice();
+        this.lectureStatus = lectureDTO.getLectureStatus();
+        this.lectureClickCount = lectureDTO.getLectureClickCount();
+        this.lectureLevel = lectureDTO.getLectureLevel();
     }
 
     public void toDelete(){
