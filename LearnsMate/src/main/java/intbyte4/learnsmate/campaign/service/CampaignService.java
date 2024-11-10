@@ -16,4 +16,5 @@ public interface CampaignService {
     void removeCampaign(CampaignDTO request);
     List<CampaignDTO> findAllCampaigns();
     CampaignDTO findCampaign(CampaignDTO request);
+    List<CampaignDTO> findCampaignsByType(CampaignDTO request);
 }

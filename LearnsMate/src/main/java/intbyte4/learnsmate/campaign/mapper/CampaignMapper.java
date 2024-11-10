@@ -8,6 +8,7 @@ import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByTypeVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
 import lombok.RequiredArgsConstructor;
@@ -117,4 +118,16 @@ public class CampaignMapper {
                 .build();
     }
 
+    public List<ResponseFindCampaignByTypeVO> fromDtoListToFindCampaignByTypeVO(List<CampaignDTO> dtoList) {
+        return dtoList.stream().map(dto -> ResponseFindCampaignByTypeVO.builder()
+                .campaignCode(dto.getCampaignCode())
+                .campaignTitle(dto.getCampaignTitle())
+                .campaignContents(dto.getCampaignContents())
+                .campaignType(dto.getCampaignType())
+                .campaignSendDate(dto.getCampaignSendDate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .adminCode(dto.getAdminCode())
+                .build()).collect(Collectors.toList());
+    }
 }
