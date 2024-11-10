@@ -68,4 +68,14 @@ public class LoginHistoryService {
         // 로그인 내역 코드 반환 -> 로그아웃 시간 저장 해야하기 때문
         return loginHistory.getLoginHistoryCode();
     }
+
+    // 특정 멤버가 로그아웃 할 시에 저장해놓은 코드를 통해 업데이트 로직 수행
+    public void saveLogoutTime(Long loginHistoryCode) {
+
+        LoginHistory loginHistory = loginHistoryRepository.findById(loginHistoryCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.LOGIN_HISTORY_NOT_FOUND));
+
+        loginHistory.updateLogoutDate();
+        loginHistoryRepository.save(loginHistory);
+    }
 }

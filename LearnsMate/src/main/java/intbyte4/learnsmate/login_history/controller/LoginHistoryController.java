@@ -65,6 +65,14 @@ public class LoginHistoryController {
                 .body(loginHistoryCode);
     }
 
+    // 5. 로그아웃 하는 경우 내역에 추가해주기
+    @PatchMapping("/member/{loginhistorycode}")
+    public ResponseEntity<String> saveLogoutTime(@PathVariable("loginhistorycode") Long loginHistoryCode){
+        loginHistoryService.saveLogoutTime(loginHistoryCode);
+
+        return ResponseEntity.status(HttpStatus.OK).body("수정 완료");
+    }
+
 
 
 }
