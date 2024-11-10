@@ -18,7 +18,7 @@ public class LoginHistoryService {
     private final LoginHistoryRepository loginHistoryRepository;
     private final LoginHistoryMapper loginHistoryMapper;
 
-    // 모든 로그인 내역 조회
+    // 모든 로그인 내역 조회 (List)
     public List<LoginHistoryDTO> findAllLoginHistory() {
         List<LoginHistory> LoginHistoryList = loginHistoryRepository.findAll();
 
@@ -27,7 +27,7 @@ public class LoginHistoryService {
                 .fromLoginHistoryToLoginHistoryDTO(LoginHistoryList);
     }
 
-    // 1개의 로그인 내역 조회
+    // 1개의 로그인 내역 조회 (1개)
     public LoginHistoryDTO findById(Long loginHistoryCode) {
         LoginHistory loginHistory = loginHistoryRepository.findById(loginHistoryCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LOGIN_HISTORY_NOT_FOUND));
@@ -35,5 +35,16 @@ public class LoginHistoryService {
         return loginHistoryMapper.fromLoginHistoryToLoginHistoryDTO(loginHistory);
     }
 
+    // 특정 멤버의 로그인 내역 조회 (List)
+    public List<LoginHistoryDTO> findAllLoginHistoryByMemberCode(Long memberCode) {
+        if(memberCode == null)
+            throw new CommonException(StatusEnum.MISSING_REQUEST_PARAMETER);
 
+        List<LoginHistory> loginHistoryList = loginHistoryRepository.findByMember_MemberCode(memberCode);
+        if(loginHistoryList == null || loginHistoryList.isEmpty()){
+            throw new CommonException(StatusEnum.LOGIN_HISTORY_NOT_FOUND);
+        }
+
+        return loginHistoryMapper.fromLoginHistoryToLoginHistoryDTO(loginHistoryList);
+    }
 }
