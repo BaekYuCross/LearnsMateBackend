@@ -2,10 +2,17 @@ package intbyte4.learnsmate.login_history.domain.entity;
 
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
+@Entity(name = "loginHistory")
+@Table(name = "login_history")
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Builder
 public class LoginHistory {
 
     @Id
