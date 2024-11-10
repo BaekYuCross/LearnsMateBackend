@@ -7,10 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface VideoByLectureRepository extends JpaRepository<VideoByLecture, Long> {
 
     // Lecture의 lectureCode로 VideoByLecture의 개수를 카운트하는 쿼리
     @Query("SELECT COUNT(v) FROM video_by_lecture v WHERE v.lecture.lectureCode = :lectureCode")
     long countByLectureCode(@Param("lectureCode") Lecture lecture);
+
+    List<VideoByLecture> findByLecture(Lecture lecture);
 }
