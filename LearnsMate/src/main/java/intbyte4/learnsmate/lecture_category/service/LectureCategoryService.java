@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.lecture_category.service;
 
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
+import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 
 public interface LectureCategoryService {
-    LectureCategory findByLectureCategoryCode(Integer lectureCategoryCode);
+    LectureCategoryDTO findByLectureCategoryCode(Integer lectureCategoryCode);
 }

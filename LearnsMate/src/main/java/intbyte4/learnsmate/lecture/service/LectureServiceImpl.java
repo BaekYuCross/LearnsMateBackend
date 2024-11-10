@@ -9,7 +9,9 @@ import intbyte4.learnsmate.lecture.domain.dto.TutorLectureVideoCountDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
+import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -36,6 +38,7 @@ public class LectureServiceImpl implements LectureService {
     private final ContractProcessService contractProcessService;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
+    private final LectureCategoryMapper lectureCategoryMapper;
 
 
     // 전체 강의 조회
@@ -62,7 +65,6 @@ public class LectureServiceImpl implements LectureService {
     // 강사별 강의 모두 조회
     @Override
     public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
-        // tutorCode를 이용해 MemberDTO를 조회한 후 Member 객체로 변환
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(tutorCode, MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
@@ -123,8 +125,9 @@ public class LectureServiceImpl implements LectureService {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
 
-        LectureCategory lectureCategory =
+        LectureCategoryDTO lectureCategoryDTO =
                 lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
         lecture.toUpdate(lectureDTO, lectureCategory);
         lectureRepository.save(lecture);
@@ -146,13 +149,13 @@ public class LectureServiceImpl implements LectureService {
     // 강사별 강의와 강의별 동영상 개수 조회 서비스 메서드
     @Override
     public List<TutorLectureVideoCountDTO> getVideoCountByLecture(Long tutorCode) {
-        // 강사별 강의 목록 조회
         List<LectureDTO> lectures = getLecturesByTutorCode(tutorCode);
         // 강의별 동영상 개수 조회 + 강의 타이틀 담기
         return lectures.stream()
                 .map(lecture -> {
                     // 각 강의에 대한 동영상 개수 조회
-                    CountVideoByLectureDTO videoCountDTO = videoByLectureService.getVideoByLecture(lecture.getLectureCode());
+                    CountVideoByLectureDTO videoCountDTO =
+                            videoByLectureService.getVideoByLecture(lecture.getLectureCode());
 
                     // 강의명과 동영상 개수를 DTO로 반환
                     return TutorLectureVideoCountDTO.builder()

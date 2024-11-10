@@ -1,7 +1,5 @@
 package intbyte4.learnsmate.lecture_by_student.service;
 
-
-import intbyte4.learnsmate.common.mapper.MemberMapper;
 import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
