@@ -43,7 +43,7 @@ public class LoginHistoryController {
                 .body(loginHistoryMapper.fromLoginHistoryDTOToResponseFindLoginHistoryVO(loginHistoryDTO));
     }
 
-    // 3. 특정 멤버의 모든 로그인 기록 확인
+    // 3. 특정 멤버의 모든 로그인 내역 확인
     @GetMapping("/member/login/{membercode}")
     public ResponseEntity<List<ResponseFindLoginHistoryVO>> findAllByMemberCode(@PathVariable("membercode") Long memberCode) {
 
@@ -53,11 +53,6 @@ public class LoginHistoryController {
                 .body(loginHistoryMapper.fromLoginHistoryDTOToResponseFindLoginHistoryVO(loginHistoryDTOList));
     }
 
-    // 4. 특정 멤버의 모든 로그아웃 기록 확인
-    @GetMapping("/member/logout/{membercode}")
-    public ResponseEntity<?> findAllLogoutHistoryByMemberCode(@PathVariable Long membercode){
-        return null;
-    }
 
 
 
