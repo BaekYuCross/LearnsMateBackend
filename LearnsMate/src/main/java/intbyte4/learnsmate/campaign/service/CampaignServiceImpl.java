@@ -50,7 +50,7 @@ public class CampaignServiceImpl implements CampaignService {
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
 
-        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
+        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
             sendTime = LocalDateTime.now();
         } else {
             sendTime = requestCampaign.getCampaignSendDate();
@@ -71,7 +71,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         requestStudentList.forEach(memberDTO -> {
             MemberDTO foundStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
-                    ,memberDTO.getMemberType());
+                    , memberDTO.getMemberType());
             if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
             userPerCampaignService.registerUserPerCampaign(foundStudent, requestCampaign);
         });
@@ -92,7 +92,7 @@ public class CampaignServiceImpl implements CampaignService {
         if (requestCampaign.getCampaignCode() == null) {
             throw new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND);
         }
-        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
+        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
             throw new CommonException(StatusEnum.UPDATE_NOT_ALLOWED);
         }
 
@@ -157,17 +157,17 @@ public class CampaignServiceImpl implements CampaignService {
 
         studentsToAdd.forEach(memberDTO -> {
             MemberDTO newStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
-                    ,memberDTO.getMemberType());
+                    , memberDTO.getMemberType());
             if (newStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
             userPerCampaignService.registerUserPerCampaign(newStudent, requestCampaign);
         });
     }
 
     @Override
-    public void removeCampaign(CampaignDTO request){
+    public void removeCampaign(CampaignDTO request) {
         Campaign campaign = campaignRepository.findById(request.getCampaignCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
-        if(Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType())){
+        if (Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
             throw new CommonException(StatusEnum.DELETE_NOT_ALLOWED);
         }
 
@@ -175,18 +175,32 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<CampaignDTO> findAllCampaigns(){
+    public List<CampaignDTO> findAllCampaigns() {
         List<Campaign> campaign = campaignRepository.findAll();
         List<CampaignDTO> campaignDTOList = new ArrayList<>();
-        campaign.forEach(dto -> campaignDTOList.add(campaignMapper.toDTO(dto)));
+        campaign.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));
 
         return campaignDTOList;
     }
 
     @Override
-    public CampaignDTO findCampaign(CampaignDTO request){
+    public CampaignDTO findCampaign(CampaignDTO request) {
         Campaign campaign = campaignRepository.findById(request.getCampaignCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
         return campaignMapper.toDTO(campaign);
+    }
+
+    @Override
+    public List<CampaignDTO> findCampaignsByType(CampaignDTO request) {
+        CampaignTypeEnum getCampaignType;
+        if (Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType()))
+            getCampaignType = CampaignTypeEnum.INSTANT;
+        else getCampaignType = CampaignTypeEnum.RESERVATION;
+
+        List<Campaign> campaignList = campaignRepository.findByCampaignType(getCampaignType);
+        List<CampaignDTO> campaignDTOList = new ArrayList<>();
+        campaignList.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));
+
+        return campaignDTOList;
     }
 }

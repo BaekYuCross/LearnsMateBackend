@@ -32,6 +32,7 @@ public enum StatusEnum {
     VOC_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 VOC 입니다."),
     COUPON_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
     COMMENT_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
+    LOGIN_HISTORY_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 로그인 내역입니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 
