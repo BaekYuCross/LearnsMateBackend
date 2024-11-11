@@ -149,9 +149,10 @@ public class CouponServiceImpl implements CouponService {
 
     private Lecture getLecture(Member tutor, Long lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
-        return lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        return lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+        return lectureMapper.toEntity(lectureDTO, tutor);
     }
 
     public void validAdmin(AdminService adminService, Long adminCode, Logger log) {

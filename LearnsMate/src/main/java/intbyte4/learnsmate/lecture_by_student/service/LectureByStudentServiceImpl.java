@@ -65,10 +65,11 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         // 환불되지 않은 수강생의 누적 명수 조회
         // --> refund_status가 보유상태라고 적혀있지만 영어는 환불상태.. 뭐가 맞을까?

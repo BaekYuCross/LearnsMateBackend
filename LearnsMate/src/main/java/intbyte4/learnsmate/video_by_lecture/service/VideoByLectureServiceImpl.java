@@ -48,10 +48,11 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         long videoCount = videoByLectureRepository.countByLectureCode(lecture);
 
@@ -70,10 +71,11 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         List<VideoByLecture> videoByLectures = videoByLectureRepository.findByLecture(lecture);
         if (videoByLectures.isEmpty()) {

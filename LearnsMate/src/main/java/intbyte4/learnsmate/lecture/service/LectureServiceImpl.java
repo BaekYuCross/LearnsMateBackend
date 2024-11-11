@@ -33,10 +33,10 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
-    private final LectureCategoryService lectureCategoryService;
+//    private final LectureCategoryService lectureCategoryService;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-    private final LectureCategoryMapper lectureCategoryMapper;
+//    private final LectureCategoryMapper lectureCategoryMapper;
     private final LectureCategoryByLectureService lectureCategoryByLectureService;
 
 
@@ -86,7 +86,7 @@ public class LectureServiceImpl implements LectureService {
 //    }
 
 
-    // 강의 등록 -> 강의별 강의 카테고리 등록 메소드 가져오기 . -> ㄱ
+    // 강의 등록 -> 강의별 강의 카테고리 등록 메소드 가져오기 .
     @Override
     @Transactional
     public LectureDTO registerLecture(LectureDTO lectureDTO, List<Integer> lectureCategoryCodeList) {
