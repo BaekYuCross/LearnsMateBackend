@@ -5,12 +5,11 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
+import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
-import intbyte4.learnsmate.member.domain.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -64,11 +63,8 @@ public class CouponServiceImpl implements CouponService {
 
     // 쿠폰 등록
     @Override
-    public CouponDTO registerCoupon(CouponRegisterRequestVO request, Admin admin, Member tutor, CouponCategory couponCategory) {
-
-        /* todo. 따로 Mapper에 메소드 빼서 변환하기 */
+    public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory) {
         CouponEntity newCoupon = CouponEntity.builder()
-                .couponCode(request.getCouponCode())
                 .couponName(request.getCouponName())
                 .couponContents(request.getCouponContents())
                 .couponDiscountRate(request.getCouponDiscountRate())
@@ -79,7 +75,6 @@ public class CouponServiceImpl implements CouponService {
                 .couponFlag(true)
                 .couponCategory(couponCategory)
                 .admin(admin)
-                .tutor(tutor)
                 .build();
 
         couponRepository.save(newCoupon);
