@@ -8,6 +8,7 @@ import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
+import intbyte4.learnsmate.member.domain.entity.Member;
 
 import java.util.List;
 
