@@ -1,5 +1,9 @@
 package intbyte4.learnsmate.contractprocess.service;
 
+import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
+import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
+import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.contractprocess.domain.dto.ContractProcessDTO;
 import intbyte4.learnsmate.contractprocess.domain.entity.ContractProcess;
@@ -21,6 +25,9 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 
 @Service
@@ -30,6 +37,8 @@ public class ContractProcessServiceImpl implements ContractProcessService {
     private final ContractProcessMapper contractProcessMapper;
     private final LectureCategoryService lectureCategoryService;
     private final LectureCategoryMapper lectureCategoryMapper;
+    private final AdminService adminService;
+    private final AdminMapper adminMapper;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
     private final LectureService lectureService;
@@ -48,58 +57,56 @@ public class ContractProcessServiceImpl implements ContractProcessService {
     // 강의별 승인과정 절차 조회
     @Override
     public ContractProcessDTO getApprovalProcessByLectureCode(Long lectureCode) {
-        // 강의 정보 조회
         LectureDTO lecturedto = lectureService.getLectureById(lectureCode);
 
-        // 강사 정보 조회
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lecturedto.getLectureCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        // 강의 카테고리 정보 조회
         LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lecturedto.getLectureCategoryCode());
         LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
-        // Lecture 객체 변환
         Lecture lecture = lectureMapper.toEntity(lecturedto, tutor, lectureCategory);
 
-        // 강의에 대한 계약 과정 조회
         ContractProcess contractProcess = contractProcessRepository.findByLecture(lecture);
 
         if (contractProcess == null) {
             throw new CommonException(StatusEnum.CONTRACT_PROCESS_NOT_FOUND);
         }
 
-        // ContractProcess를 DTO로 변환
         return contractProcessMapper.toDTO(contractProcess);
     }
 
 
 
     // 계약과정 등록
-//    @Transactional
-//    @Override
-//    public ContractProcessDTO createContractProcess(Long lectureCode, ContractProcessDTO contractProcessDTO) {
-//        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
-//
-//        Member tutor = memberService.findByMemberCode(lectureDTO.getTutorCode());
-//
-//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
-//
-//        AdminDTO adminDTO = adminService.findByAdminCode(contractProcessDTO.getAdminCode());
-//        Admin admin = adminDTO.convertToEntity();
-//
-//        ContractProcess contractProcess = ContractProcess.builder()
-//                .lecture(lecture)
-//                .admin(admin)
-//                .approvalProcess(1)
-//                .createdAt(LocalDateTime.now())
-//                .note("신규 계약 등록")
-//                .build();
-//
-//        contractProcessRepository.save(contractProcess);
-//
-//        return contractProcessMapper.toDTO(contractProcess);
-//    }
+    @Transactional
+    @Override
+    public ContractProcessDTO createContractProcess(Long lectureCode, ContractProcessDTO contractProcessDTO) {
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
+        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+        LectureCategory category = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, category);
+
+        AdminDTO adminDTO = adminService.findByAdminCode(contractProcessDTO.getAdminCode());
+        Admin admin = adminMapper.toEntity(adminDTO);
+
+
+        ContractProcess contractProcess = ContractProcess.builder()
+                .lecture(lecture)
+                .admin(admin)
+                .approvalProcess(contractProcessDTO.getApprovalProcess())
+                .createdAt(LocalDateTime.now())
+                .note("신규 강의 계약")
+                .build();
+
+
+        contractProcessRepository.save(contractProcess);
+
+        return contractProcessMapper.toDTO(contractProcess);
+    }
 
 }
