@@ -14,25 +14,30 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentServiceImpl {
+public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
-//
-//    // 직원이 전체 결제 내역을 조회
-//    public List<PaymentDTO> getAllPayments() {
-//        List<Payment> payments = paymentRepository.findAll();
-//        return payments.stream()
-//                .map(paymentMapper::toDTO)
-//                .collect(Collectors.toList());
-//    }
-//
-//
-//    // 직원이 특정 결제 내역을 단건 상세 조회
-//    public PaymentDTO getPaymentDetails(Long paymentId) {
-//        Payment payment = paymentRepository.findById(paymentId)
-//                .orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
-//        return new paymentMapper.toDTO(payment);
-//    }
+
+    // 직원이 전체 결제 내역을 조회
+    @Override
+    public List<PaymentDTO> getAllPayments() {
+        List<Payment> payments = paymentRepository.findAll();
+        if (payments.isEmpty()) {
+            throw new CommonException(StatusEnum.PAYMENT_NOT_FOUND);
+        }
+        return payments.stream()
+                .map(paymentMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    // 직원이 특정 결제 내역을 단건 상세 조회
+    @Override
+    public PaymentDTO getPaymentDetails(Long paymentCode) {
+        Payment payment = paymentRepository.findById(paymentCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
+        return paymentMapper.toDTO(payment);
+    }
 
     // 직원이 예상 매출액과 할인 매출액을 비교해서 조회
 

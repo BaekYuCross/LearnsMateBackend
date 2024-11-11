@@ -5,6 +5,7 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
+import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("couponService")
 @Slf4j
@@ -52,6 +54,13 @@ public class CouponServiceImpl implements CouponService {
     }
 
     // 쿠폰 필터링해서 조회
+    @Override
+    public List<CouponDTO> getCouponsByFilters(CouponFilterRequestVO request) {
+        List<CouponEntity> entities = couponRepository.findCouponsByFilters(request);
+        return entities.stream()
+                .map(coupon -> couponMapper.toDTO(coupon))
+                .collect(Collectors.toList());
+    }
 
     // 쿠폰 등록
     @Override

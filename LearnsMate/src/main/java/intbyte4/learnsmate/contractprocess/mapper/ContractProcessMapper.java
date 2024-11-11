@@ -3,11 +3,9 @@ package intbyte4.learnsmate.contractprocess.mapper;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.contractprocess.domain.dto.ContractProcessDTO;
 import intbyte4.learnsmate.contractprocess.domain.entity.ContractProcess;
-import intbyte4.learnsmate.contractprocess.domain.vo.ResponseContractProcessVO;
+import intbyte4.learnsmate.contractprocess.domain.vo.ResponseFindContractProcessVO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class ContractProcessMapper {
@@ -37,8 +35,8 @@ public class ContractProcessMapper {
     }
 
     // ContractProcessDTO를 ResponseContractProcessVO로 변환
-    public ResponseContractProcessVO fromDtoToResponseVO(ContractProcessDTO dto) {
-        return ResponseContractProcessVO.builder()
+    public ResponseFindContractProcessVO fromDtoToResponseVO(ContractProcessDTO dto) {
+        return ResponseFindContractProcessVO.builder()
                 .contractProcessCode(dto.getContractProcessCode())
                 .approvalProcess(dto.getApprovalProcess())
                 .createdAt(dto.getCreatedAt())
