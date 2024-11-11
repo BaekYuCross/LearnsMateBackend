@@ -35,7 +35,7 @@ public class PreferredTopicsService {
         return preferredTopicsMapper.fromEntityToDTO(List.of(preferredTopics));
     }
 
-    // 특정 멤버의 모든 선호주제 조회
+    // 특정 멤버의 모든 선호주제 조회 -> 프론트에서 처리
     public List<PreferredTopicsDTO> findAllByMemberCode(Long memberCode) {
 
         List<PreferredTopics> entityList = preferredTopicsRepository.findByMember_MemberCode(memberCode);
