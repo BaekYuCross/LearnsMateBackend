@@ -109,7 +109,7 @@ public class ContractProcessServiceImpl implements ContractProcessService {
                 .admin(admin)
                 .approvalProcess(contractProcessDTO.getApprovalProcess())
                 .createdAt(LocalDateTime.now())
-                .note("신규 강의 계약")
+                .note(null)
                 .build();
 
         contractProcessRepository.save(contractProcess);
