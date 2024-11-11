@@ -4,6 +4,7 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
@@ -55,13 +56,13 @@ public class CouponController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @Operation(summary = "쿠폰 등록")
-    @PostMapping("/register")
-    public ResponseEntity<CouponRegisterResponseVO> createCoupon (@RequestBody CouponRegisterRequestVO request
-            , Admin admin
+    @Operation(summary = "강사 - 쿠폰 등록")
+    @PostMapping("/tutor/register")
+    public ResponseEntity<CouponRegisterResponseVO> createCoupon (@RequestBody TutorCouponRegisterRequestVO request
             , Member tutor
-            ,CouponCategory couponCategory) {
-        CouponDTO couponDTO = couponService.registerCoupon(request, admin, tutor, couponCategory);
+            , CouponCategory couponCategory
+            , Long lectureCode) {
+        CouponDTO couponDTO = couponService.tutorRegisterCoupon(request, tutor, couponCategory, lectureCode);
         return ResponseEntity.status(HttpStatus.CREATED).body(couponMapper.fromDTOToRegisterResponseVO(couponDTO));
     }
 }
