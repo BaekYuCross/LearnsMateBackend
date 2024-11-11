@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.contractprocess.domain.vo;
+package intbyte4.learnsmate.contractprocess.domain.vo.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
