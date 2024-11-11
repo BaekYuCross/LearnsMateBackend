@@ -4,7 +4,6 @@ import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignCouponV
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
-import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
