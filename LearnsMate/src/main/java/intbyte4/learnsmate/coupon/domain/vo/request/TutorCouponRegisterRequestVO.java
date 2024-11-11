@@ -22,9 +22,6 @@ public class TutorCouponRegisterRequestVO {
     @JsonProperty("coupon_discount_rate")
     private Integer couponDiscountRate;
 
-    @JsonProperty("coupon_start_date")
-    private LocalDateTime couponStartDate;
-
     @JsonProperty("coupon_expire_date")
     private LocalDateTime couponExpireDate;
 }
