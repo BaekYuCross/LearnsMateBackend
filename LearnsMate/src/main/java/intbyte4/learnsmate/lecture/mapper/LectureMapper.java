@@ -8,7 +8,6 @@ import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +20,6 @@ public class LectureMapper {
         return LectureDTO.builder()
                 .lectureCode(entity.getLectureCode())
                 .lectureTitle(entity.getLectureTitle())
-                .lectureCategoryCode(entity.getLectureCategory().getLectureCategoryCode())
                 .lectureConfirmStatus(entity.getLectureConfirmStatus())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
@@ -34,11 +32,10 @@ public class LectureMapper {
                 .build();
     }
 
-    public Lecture toEntity(LectureDTO dto, Member tutor,LectureCategory lectureCategory) {
+    public Lecture toEntity(LectureDTO dto, Member tutor) {
         return Lecture.builder()
                 .lectureCode(dto.getLectureCode())
                 .lectureTitle(dto.getLectureTitle())
-                .lectureCategory(lectureCategory)
                 .lectureConfirmStatus(dto.getLectureConfirmStatus())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
@@ -57,7 +54,6 @@ public class LectureMapper {
         return ResponseFindLectureVO.builder()
                 .lectureCode(dto.getLectureCode())
                 .lectureTitle(dto.getLectureTitle())
-                .lectureCategoryCode(dto.getLectureCategoryCode())
                 .lectureConfirmStatus(dto.getLectureConfirmStatus())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
@@ -74,7 +70,6 @@ public class LectureMapper {
     public LectureDTO fromRequestVOtoDto(RequestEditLectureInfoVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
-                .lectureCategoryCode(vo.getLectureCategoryCode())
                 .lectureConfirmStatus(vo.getLectureConfirmStatus())
                 .updatedAt(LocalDateTime.now())
                 .lectureImage(vo.getLectureImage())
@@ -89,7 +84,6 @@ public class LectureMapper {
     public LectureDTO fromRegisterRequestVOtoDto(RequestRegisterLectureVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
-                .lectureCategoryCode(vo.getLectureCategoryCode())
                 .lectureConfirmStatus(vo.getLectureConfirmStatus())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -106,7 +100,6 @@ public class LectureMapper {
     public ResponseEditLectureInfoVO fromDtoToEditResponseVO(LectureDTO updatedLecture) {
         return ResponseEditLectureInfoVO.builder()
                 .lectureTitle(updatedLecture.getLectureTitle())
-                .lectureCategoryCode(updatedLecture.getLectureCategoryCode())
                 .lectureConfirmStatus(updatedLecture.getLectureConfirmStatus())
                 .updatedAt(updatedLecture.getUpdatedAt())
                 .lectureImage(updatedLecture.getLectureImage())
@@ -120,7 +113,6 @@ public class LectureMapper {
     public ResponseRegisterLectureVO fromDtoToRegisterResponseVO(LectureDTO Lecture) {
         return ResponseRegisterLectureVO.builder()
                 .lectureTitle(Lecture.getLectureTitle())
-                .lectureCategoryCode(Lecture.getLectureCategoryCode())
                 .lectureConfirmStatus(Lecture.getLectureConfirmStatus())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -137,7 +129,6 @@ public class LectureMapper {
         return ResponseRemoveLectureVO.builder()
                 .lectureCode(removedLecture.getLectureCode())
                 .lectureTitle(removedLecture.getLectureTitle())
-                .lectureCategoryCode(removedLecture.getLectureCategoryCode())
                 .lectureConfirmStatus(removedLecture.getLectureConfirmStatus())
                 .createdAt(removedLecture.getCreatedAt())
                 .updatedAt(removedLecture.getUpdatedAt())

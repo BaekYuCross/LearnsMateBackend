@@ -11,6 +11,8 @@ import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
+import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCategoryListDTO;
+import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -22,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,10 +32,8 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
-    private final LectureCategoryService lectureCategoryService;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-    private final LectureCategoryMapper lectureCategoryMapper;
 
 
     // 전체 강의 조회
@@ -86,17 +85,19 @@ public class LectureServiceImpl implements LectureService {
     // 강의 등록 -> 강의별 강의 카테고리 등록 메소드 가져오기 .
     @Override
     @Transactional
-    public LectureDTO registerLecture(LectureDTO lectureDTO) {
+    public LectureDTO registerLecture(LectureDTO lectureDTO, List<Integer> lectureCategoryCodeList) {
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//    lectureCategoryByLectureService의 등록 메서드 호출 필요
+//        OneLectureCategoryListDTO oneLectureCategoryListDTO
+//                = new OneLectureCategoryListDTO(lectureDTO.getLectureCode(), lectureCategoryCodeList);
+//        lectureCategoryByLectureService.saveLectureCategoryByLecture(oneLectureCategoryListDTO);
+
 
         MemberDTO memberDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
 
         Lecture lecture = Lecture.builder()
                 .lectureTitle(lectureDTO.getLectureTitle())
-                .lectureCategory(lectureCategory)
                 .lectureConfirmStatus(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -120,15 +121,18 @@ public class LectureServiceImpl implements LectureService {
     @Override
     @Transactional
     public LectureDTO updateLecture(Long lectureCode, LectureDTO lectureDTO) {
+        // LectureDTO에 lectureCode가 있으므로 파라미터를 저렇게 안넘겨줘도 될거 같아요.
 
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
 
-        LectureCategoryDTO lectureCategoryDTO =
-                lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        LectureCategoryDTO lectureCategoryDTO =
+//                lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+        // LectureCategory를 안쓰니까 위에꺼는 삭제해줘도 될거같아요.
 
-        lecture.toUpdate(lectureDTO, lectureCategory);
+//        lecture.toUpdate(lectureDTO, lectureCategory);
+        lecture.toUpdate(lectureDTO, null);
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
