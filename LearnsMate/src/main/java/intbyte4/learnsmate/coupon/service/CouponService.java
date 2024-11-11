@@ -31,4 +31,6 @@ public interface CouponService {
     CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode);
 
     CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin);
+
+    CouponDTO deleteAdminCoupon(Long couponCode, Admin admin);
 }
