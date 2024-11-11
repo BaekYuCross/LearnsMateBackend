@@ -3,7 +3,9 @@ package intbyte4.learnsmate.coupon.mapper;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
+import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
 import lombok.RequiredArgsConstructor;
@@ -112,5 +114,21 @@ public class CouponMapper {
                 .adminCode(request.getAdminCode())
                 .tutorCode(request.getTutorCode())
                 .build();
+    }
+
+    public List<CouponFilterResponseVO> fromDTOToCouponFilterResponseVO(List<CouponDTO> couponDTOList) {
+        return couponDTOList.stream().map(dto -> CouponFilterResponseVO.builder()
+                .couponCode(dto.getCouponCode())
+                .couponName(dto.getCouponName())
+                .couponContents(dto.getCouponContents())
+                .couponDiscountRate(dto.getCouponDiscountRate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .couponStartDate(dto.getCouponStartDate())
+                .couponExpireDate(dto.getCouponExpireDate())
+                .couponCategoryCode(dto.getCouponCategoryCode())
+                .adminCode(dto.getAdminCode())
+                .tutorCode(dto.getTutorCode())
+                .build()).collect(Collectors.toList());
     }
 }
