@@ -13,7 +13,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findByMemberFlagTrueAndMemberType(MemberType memberType);
 
-    Optional<String> findMemberNameByMemberCode(Long memberCode);
-
     Member findByMemberFlagTrueAndMemberCodeAndMemberType(Long memberCode, MemberType memberType);
 }
