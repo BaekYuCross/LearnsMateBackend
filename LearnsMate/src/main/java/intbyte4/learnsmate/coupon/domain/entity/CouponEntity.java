@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.coupon.domain.entity;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
@@ -59,4 +60,13 @@ public class CouponEntity {
     @JoinColumn(name = "tutor_code")
     @Where(clause = "member_type = 'TUTOR'")
     private Member tutor;
+
+    public void updateAdminCouponDetails(CouponDTO couponDTO) {
+        this.couponName = couponDTO.getCouponName();
+        this.couponContents = couponDTO.getCouponContents();
+        this.couponDiscountRate = couponDTO.getCouponDiscountRate();
+        this.couponStartDate = couponDTO.getCouponStartDate();
+        this.couponExpireDate = couponDTO.getCouponExpireDate();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
