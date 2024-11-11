@@ -61,6 +61,7 @@ public class PreferredTopicsController {
     }
 
     // 4. 특정 멤버 선호 주제 등록
+    @Operation(summary = "특정 멤버의 선호주제 리스트 등록")
     @PostMapping("/member")
     public ResponseEntity<String> savePreferredTopics(@RequestBody RequestSavePreferredHistoryVO request) {
         List<PreferredTopicsDTO> dtoList
