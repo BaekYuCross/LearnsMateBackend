@@ -46,6 +46,7 @@ public class PreferredTopicsController {
     }
 
     // 3. 특정 멤버가 선택한 모든 선호주제 조회
+    @GetMapping("/member/{membercode}")
     public ResponseEntity<List<ResponseFindPreferredTopicsVO>> findAllPreferredTopicsByMemberCode(
             @PathVariable("membercode") Long memberCode) {
         List<PreferredTopicsDTO> dtoList = preferredTopicsService.findAllByMemberCode(memberCode);
