@@ -131,6 +131,22 @@ public class CouponServiceImpl implements CouponService {
     // 쿠폰 수정
     // 쿠폰 삭제
 
+    @Override
+    @Transactional
+    public CouponDTO deleteAdminCoupon(Long couponCode, Admin admin) {
+        log.info("직원 쿠폰 삭제 중: couponCode = {}", couponCode);
+
+        validAdmin(adminService, admin.getAdminCode(), log);
+
+        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.deleteCoupon();
+
+        log.info("쿠폰 비활성화: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
     private Lecture getLecture(Member tutor, Long lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
         LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
