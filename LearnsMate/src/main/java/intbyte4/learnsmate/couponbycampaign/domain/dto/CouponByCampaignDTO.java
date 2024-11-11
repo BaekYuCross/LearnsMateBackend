@@ -10,6 +10,6 @@ import lombok.*;
 @Builder
 public class CouponByCampaignDTO {
     private Long couponByCampaignCode;
-    private String CouponCode;
-    private Long CampaignCode;
+    private Long couponCode;
+    private Long campaignCode;
 }

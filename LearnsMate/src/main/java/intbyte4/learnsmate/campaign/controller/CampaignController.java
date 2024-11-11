@@ -1,11 +1,10 @@
 package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
+import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
+import intbyte4.learnsmate.campaign.domain.vo.request.*;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByTypeVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
@@ -37,29 +36,40 @@ public class CampaignController {
     @Operation(summary = "직원 - 캠페인 등록")
     @PostMapping("/register")
     public ResponseEntity<ResponseRegisterCampaignVO> createCampaign
-            (@RequestBody RequestRegisterCampaignVO requestCampaign
-                    , List<RequestFindCampaignStudentVO> requestStudentList
-                    , List<RequestFindCampaignCouponVO> requestCouponList) {
-        List<MemberDTO> studentDTOList = requestStudentList.stream()
+            (@RequestBody RequestRegisterCampaignVO requestCampaign) {
+        List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
                 .map(memberMapper::fromRequestFindCampaignStudentVOToMemberDTO)
                 .toList();
 
-        List<CouponDTO> couponDTOList = requestCouponList.stream()
+        List<CouponDTO> couponDTOList = requestCampaign.getCouponList().stream()
                 .map(couponMapper::fromRequestFindCampaignCouponVOToCouponDTO)
                 .toList();
 
         CampaignDTO campaignDTO = campaignService.registerCampaign(campaignMapper
-                .fromRegisterRequestVOtoDTO(requestCampaign), studentDTOList, couponDTOList);
+                .fromRegisterRequestVOtoDTO(requestCampaign)
+                , studentDTOList
+                , couponDTOList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToRegisterResponseVO(campaignDTO));
     }
 
     @Operation(summary = "직원 - 예약된 캠페인 수정")
-    @PutMapping("/edit/{campaignCode}")
-    public ResponseEntity<ResponseEditCampaignVO> updateCampaign(@RequestBody RequestEditCampaignVO request
-            , @PathVariable("campaignCode") Long campaignCode) {
-        CampaignDTO campaignDTO = campaignService.editCampaign(campaignMapper.fromEditRequestVOtoDTO(request)
-                , campaignCode);
+    @PutMapping("/edit")
+    public ResponseEntity<ResponseEditCampaignVO> updateCampaign
+            (@RequestBody RequestEditCampaignVO requestCampaign) {
+        List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
+                .map(memberMapper::fromRequestEditCampaignStudentVOToMemberDTO)
+                .toList();
+
+        List<CouponDTO> couponDTOList = requestCampaign.getCouponList().stream()
+                .map(couponMapper::fromRequestEditCampaignCouponVOToCouponDTO)
+                .toList();
+
+        CampaignDTO campaignDTO = campaignService.editCampaign(campaignMapper
+                .fromEditRequestVOtoDTO(requestCampaign)
+                , studentDTOList
+                , couponDTOList);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToEditResponseVO(campaignDTO));
     }
 
@@ -92,5 +102,18 @@ public class CampaignController {
         CampaignDTO campaignDTO = campaignService.findCampaign(getCampaignCode);
 
         return ResponseEntity.status(HttpStatus.OK).body(campaignMapper.fromDtoToFindResponseVO(campaignDTO));
+    }
+
+    @Operation(summary = "직원 - 캠페인 타입별 조회")
+    @GetMapping("/type/{campaignType}")
+    public ResponseEntity<List<ResponseFindCampaignByTypeVO>> getCampaignsByType
+            (@PathVariable String campaignType){
+        CampaignDTO getCampaignCode = new CampaignDTO();
+        getCampaignCode.setCampaignType(campaignType);
+        List<CampaignDTO> campaignDTOList = campaignService.findCampaignsByType(getCampaignCode);
+        List<ResponseFindCampaignByTypeVO> responseFindCampaignByTypeVOList = campaignMapper
+                .fromDtoListToFindCampaignByTypeVO(campaignDTOList);
+
+        return new ResponseEntity<>(responseFindCampaignByTypeVOList, HttpStatus.OK);
     }
 }

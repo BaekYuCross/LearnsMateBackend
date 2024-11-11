@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.mapper;
 
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignStudentVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -105,6 +106,24 @@ public class MemberMapper{
     }
 
     public MemberDTO fromRequestFindCampaignStudentVOToMemberDTO(RequestFindCampaignStudentVO request) {
+        return MemberDTO.builder()
+                .memberCode(request.getMemberCode())
+                .memberType(request.getMemberType())
+                .memberEmail(request.getMemberEmail())
+//                .memberPassword(request.getMemberPassword()) // 필요 시 비밀번호 포함
+                .memberName(request.getMemberName())
+                .memberAge(request.getMemberAge())
+                .memberPhone(request.getMemberPhone())
+                .memberAddress(request.getMemberAddress())
+                .memberBirth(request.getMemberBirth())
+                .memberFlag(request.getMemberFlag())
+                .memberDormantStatus(request.getMemberDormantStatus())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public MemberDTO fromRequestEditCampaignStudentVOToMemberDTO(RequestEditCampaignStudentVO request) {
         return MemberDTO.builder()
                 .memberCode(request.getMemberCode())
                 .memberType(request.getMemberType())
