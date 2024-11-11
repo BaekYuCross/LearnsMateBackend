@@ -190,17 +190,5 @@ public class CampaignServiceImpl implements CampaignService {
         return campaignMapper.toDTO(campaign);
     }
 
-    @Override
-    public List<CampaignDTO> findCampaignsByType(CampaignDTO request) {
-        CampaignTypeEnum getCampaignType;
-        if (Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType()))
-            getCampaignType = CampaignTypeEnum.INSTANT;
-        else getCampaignType = CampaignTypeEnum.RESERVATION;
 
-        List<Campaign> campaignList = campaignRepository.findByCampaignType(getCampaignType);
-        List<CampaignDTO> campaignDTOList = new ArrayList<>();
-        campaignList.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));
-
-        return campaignDTOList;
-    }
 }
