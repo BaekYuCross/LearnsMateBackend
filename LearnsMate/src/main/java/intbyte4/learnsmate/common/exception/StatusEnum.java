@@ -40,6 +40,7 @@ public enum StatusEnum {
     PREFERRED_TOPICS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 선호 주제입니다."),
     MEMBER_PREFERRED_TOPICS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "해당 멤버의 선호 주제가 없습니다."),
     LECTURE_CATEGORY_BY_LECTURE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 강의별 강의 카테고리 입니다."),
+    ISSUE_COUPON_NOT_FOUND(404, HttpStatus.NOT_FOUND, "보유한 쿠폰이 없습니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 

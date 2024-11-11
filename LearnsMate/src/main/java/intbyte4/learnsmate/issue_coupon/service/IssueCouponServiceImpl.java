@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,4 +71,23 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         IssueCoupon issueCoupon = IssueCoupon.createIssueCoupon(coupon, student);
         return issueCouponRepository.save(issueCoupon);
     }
+
+    // 보유중인 쿠폰 조회
+    @Override
+    @Transactional
+    public List<IssueCouponDTO> findAllStudentCoupons(IssueCouponDTO dto, Long studentCode) {
+        // 발급일이 오늘 이전, 사용 여부는 false, 쿠폰 사용 일자 null인 것들만 조회
+        if (studentCode == null) {
+            throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
+        }
+        if (dto.getCouponIssueDate().isBefore(LocalDateTime.now()) && !dto.getCouponUseStatus() && dto.getCouponUseDate() == null) {
+            List<IssueCoupon> coupons = issueCouponRepository.findCouponsByStudentCode(studentCode);
+            return coupons.stream()
+                    .map(issueCouponMapper::toDTO)
+                    .collect(Collectors.toList());
+        }
+        throw new CommonException(StatusEnum.ISSUE_COUPON_NOT_FOUND);
+    }
+    // 사용한 쿠폰 조회
+    //
 }
