@@ -46,4 +46,6 @@ public class LectureCategoryByLectureController {
 
         return ResponseEntity.status(HttpStatus.OK).body(vo);
     }
+
+    // 등록 메서드는 서비스 코드만 하고? 삭제 메서드는?
 }
