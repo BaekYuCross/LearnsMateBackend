@@ -7,12 +7,6 @@ import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
-import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCategoryListDTO;
-import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -120,19 +114,11 @@ public class LectureServiceImpl implements LectureService {
     // 강의 수정
     @Override
     @Transactional
-    public LectureDTO updateLecture(Long lectureCode, LectureDTO lectureDTO) {
-        // LectureDTO에 lectureCode가 있으므로 파라미터를 저렇게 안넘겨줘도 될거 같아요.
-
-        Lecture lecture = lectureRepository.findById(lectureCode)
+    public LectureDTO updateLecture(LectureDTO lectureDTO) {
+        Lecture lecture = lectureRepository.findById(lectureDTO.getLectureCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
 
-//        LectureCategoryDTO lectureCategoryDTO =
-//                lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
-        // LectureCategory를 안쓰니까 위에꺼는 삭제해줘도 될거같아요.
-
-//        lecture.toUpdate(lectureDTO, lectureCategory);
-        lecture.toUpdate(lectureDTO, null);
+        lecture.toUpdate(lectureDTO);
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
