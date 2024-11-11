@@ -8,7 +8,6 @@ import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -35,4 +34,6 @@ public interface CouponService {
 
     @Transactional
     CouponDTO tutorEditCoupon(CouponDTO couponDTO, Member tutor);
+
+    CouponDTO deleteAdminCoupon(Long couponCode, Admin admin);
 }
