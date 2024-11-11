@@ -8,7 +8,6 @@ import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import org.springframework.stereotype.Component;
 
