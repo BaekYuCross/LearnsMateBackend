@@ -104,16 +104,4 @@ public class CampaignController {
         return ResponseEntity.status(HttpStatus.OK).body(campaignMapper.fromDtoToFindResponseVO(campaignDTO));
     }
 
-    @Operation(summary = "직원 - 캠페인 타입별 조회")
-    @GetMapping("/type/{campaignType}")
-    public ResponseEntity<List<ResponseFindCampaignByTypeVO>> getCampaignsByType
-            (@PathVariable String campaignType){
-        CampaignDTO getCampaignCode = new CampaignDTO();
-        getCampaignCode.setCampaignType(campaignType);
-        List<CampaignDTO> campaignDTOList = campaignService.findCampaignsByType(getCampaignCode);
-        List<ResponseFindCampaignByTypeVO> responseFindCampaignByTypeVOList = campaignMapper
-                .fromDtoListToFindCampaignByTypeVO(campaignDTOList);
-
-        return new ResponseEntity<>(responseFindCampaignByTypeVOList, HttpStatus.OK);
-    }
 }
