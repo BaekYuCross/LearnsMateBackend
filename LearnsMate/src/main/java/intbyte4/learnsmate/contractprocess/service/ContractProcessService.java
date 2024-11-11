@@ -13,8 +13,5 @@ public interface ContractProcessService {
     ContractProcessDTO getApprovalProcessByLectureCode(Long lectureCode);
 
     // 계약과정 등록
-    @Transactional
     ContractProcessDTO createContractProcess(Long lectureCode, ContractProcessDTO contractProcessDTO);
-
-    // 계약과정 등록
 }

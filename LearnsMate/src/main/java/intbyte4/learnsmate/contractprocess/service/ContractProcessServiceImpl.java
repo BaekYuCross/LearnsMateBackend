@@ -94,6 +94,15 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         AdminDTO adminDTO = adminService.findByAdminCode(contractProcessDTO.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
 
+        // 강의별 계약과정 ApprovalProcess이 같은 강의 코드와 같은 ApprovalProcess의 값이 존재하는지 확인
+        ContractProcess existingContractProcess = contractProcessRepository
+                .findByLectureAndApprovalProcess(lecture, contractProcessDTO.getApprovalProcess())
+                .orElse(null);
+
+        // 이미 존재하는 계약과정이 있으면 예외 처리
+        if (existingContractProcess != null) {
+            throw new CommonException(StatusEnum.EXISTING_CONTRACT_PROCESS);
+        }
 
         ContractProcess contractProcess = ContractProcess.builder()
                 .lecture(lecture)
@@ -103,10 +112,10 @@ public class ContractProcessServiceImpl implements ContractProcessService {
                 .note("신규 강의 계약")
                 .build();
 
-
         contractProcessRepository.save(contractProcess);
 
         return contractProcessMapper.toDTO(contractProcess);
     }
+
 
 }
