@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("vocService")
@@ -49,5 +50,21 @@ public class VOCServiceImpl implements VOCService {
         voc.setVocAnswerStatus(vocAnswerStatus);
         vocRepository.save(voc);
         log.info("VOC 답변 상태가 {}로 업데이트됐습니다.: {}", vocAnswerStatus, voc);
+    }
+
+    @Override
+    public List<VOCDTO> findUnansweredVOCByMember(Long memberCode) {
+        List<VOC> vocList = vocRepository.findUnansweredVOCByMember(memberCode);
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VOCDTO> findAnsweredVOCByMember(Long memberCode) {
+        List<VOC> vocList = vocRepository.findAnsweredVOCByMember(memberCode);
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
     }
 }

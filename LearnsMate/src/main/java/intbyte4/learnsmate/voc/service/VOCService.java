@@ -10,4 +10,8 @@ public interface VOCService {
     VOCDTO findByVOCCode(Long vocDTO);
 
     void updateVOCAnswerStatus(Long vocCode, boolean vocAnswerStatus);
+
+    List<VOCDTO> findUnansweredVOCByMember(Long memberCode);
+
+    List<VOCDTO> findAnsweredVOCByMember(Long memberCode);
 }
