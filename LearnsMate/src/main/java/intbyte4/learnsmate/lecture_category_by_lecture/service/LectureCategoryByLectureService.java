@@ -58,28 +58,29 @@ public class LectureCategoryByLectureService {
     // 특정 강의에 강의 카테고리 추가 메서드 -> 어떤 dto를 써야할까? OneLectureCategoryListDTO
     public void saveLectureCategoryByLecture(OneLectureCategoryListDTO dto){
 
+        // 어떠한 강의
         LectureDTO lectureDTO = lectureService.getLectureById(dto.getLectureCode());
 
+        // 강의 안에있는 멤버
         MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
         Member tutor = memberMapper.fromMemberDTOtoMember(memberDTO);
 
-        List<Integer> lectureCategoryCodeList = dto.getLectureCategoryCodeList();
-        List<LectureCategoryDTO> list = new ArrayList<>();
-        List<LectureCategory> lectureCategoryList = new ArrayList<>();
-        for (int i = 0; i < lectureCategoryCodeList.size(); i++) {
-            list.add(lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode()));
-            lectureCategoryList.add(lectureCategoryMapper.toEntity(
-                    lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode())
-            ));
-        }
-
-        // 하나의 강의가 필요 -> db 수정 필요
+        // 강의 완성
         Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
+        // 여러개의 강의 카테고리
+        List<LectureCategory> lectureCategoryList = new ArrayList<>();
+        for (int i = 0; i < dto.getLectureCategoryCodeList().size(); i++) {
+            LectureCategoryDTO categoryDTO = lectureCategoryService.findByLectureCategoryCode(dto.getLectureCategoryCodeList().get(i));
+            LectureCategory lectureCategory = lectureCategoryMapper.toEntity(categoryDTO);
+            lectureCategoryList.add(lectureCategory);
+        }
+
+        // 등록할 강의별 강의 카테고리 완성
         List<LectureCategoryByLecture> entitytList
                 = lectureCategoryByLectureMapper.fromLectureAndLectureCategoryListtoEntity(lecture, lectureCategoryList);
 
+        // 강의별 강의 카테고리 테이블에 저장
         lectureCategoryByLectureRepository.saveAll(entitytList);
-
     }
 }

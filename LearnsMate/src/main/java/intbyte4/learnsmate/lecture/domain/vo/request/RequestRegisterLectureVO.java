@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,4 +27,6 @@ public class RequestRegisterLectureVO {
     private Boolean lectureStatus;
     private Integer lectureClickCount;
     private LectureLevelEnum lectureLevel;
+
+    private List<Integer> lectureCategoryCodeList;
 }
