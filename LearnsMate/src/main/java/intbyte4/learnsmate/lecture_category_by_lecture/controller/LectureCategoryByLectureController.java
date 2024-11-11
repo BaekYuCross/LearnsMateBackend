@@ -26,11 +26,24 @@ public class LectureCategoryByLectureController {
     // 1. 모든 강의별 강의 카테고리 조회
     @Operation(summary = "모든 강의별 강의 카테고리 조회")
     @GetMapping
-    public ResponseEntity<?> findAll(){
+    public ResponseEntity<List<ResponseFindLectureCategoryByLectureVO>> findAll(){
         List<LectureCategoryByLectureDTO> dtoList = lectureCategoryByLectureService.findAll();
 
         List<ResponseFindLectureCategoryByLectureVO> voList = lectureCategoryByLectureMapper.fromDTOtoFindVO(dtoList);
 
         return ResponseEntity.status(HttpStatus.OK).body(voList);
+    }
+
+    // 2. 강의별 강의 카테고리 코드로 강의 카테고리 조회
+    @Operation(summary = "강의별 강의 카테고리 코드로 강의 카테고리 조회")
+    @GetMapping("/{lecturecategorybylecturecode}")
+    public ResponseEntity<ResponseFindLectureCategoryByLectureVO> findById(
+            @PathVariable("lecturecategorybylecturecode") Long code){
+        LectureCategoryByLectureDTO dto = lectureCategoryByLectureService.findById(code);
+
+        ResponseFindLectureCategoryByLectureVO vo
+                = lectureCategoryByLectureMapper.fromDTOtoFindVO(List.of(dto)).get(0);
+
+        return ResponseEntity.status(HttpStatus.OK).body(vo);
     }
 }
