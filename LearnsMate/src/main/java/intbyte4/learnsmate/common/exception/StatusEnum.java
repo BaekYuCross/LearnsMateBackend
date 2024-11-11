@@ -17,6 +17,8 @@ public enum StatusEnum {
     RESTRICTED(403, HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     DELETE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "삭제할 수 없습니다."),
     UPDATE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "수정할 수 없습니다."),
+    INACTIVATE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "비활성화할 수 없습니다."),
+    ACTIVATE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "활성화할 수 없습니다."),
 
 
     USER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
