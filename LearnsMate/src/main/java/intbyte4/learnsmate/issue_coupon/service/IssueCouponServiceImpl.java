@@ -89,5 +89,18 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         throw new CommonException(StatusEnum.ISSUE_COUPON_NOT_FOUND);
     }
     // 사용한 쿠폰 조회
-    //
+    @Override
+    @Transactional
+    public List<IssueCouponDTO> findAllUsedStudentCoupons(IssueCouponDTO dto, Long studentCode) {
+        if (studentCode == null) {
+            throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
+        }
+        if (dto.getCouponIssueDate().isBefore(LocalDateTime.now()) && dto.getCouponUseStatus() && dto.getCouponUseDate() != null) {
+            List<IssueCoupon> coupons = issueCouponRepository.findCouponsByStudentCode(studentCode);
+            return coupons.stream()
+                    .map(issueCouponMapper::toDTO)
+                    .collect(Collectors.toList());
+        }
+        throw new CommonException(StatusEnum.ISSUE_COUPON_NOT_FOUND);
+    }
 }
