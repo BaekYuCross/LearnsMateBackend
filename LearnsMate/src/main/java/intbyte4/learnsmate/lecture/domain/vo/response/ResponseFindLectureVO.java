@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class ResponseFindLectureVO {
     private Long lectureCode;
     private String lectureTitle;
-    private Integer lectureCategoryCode;
     private Boolean lectureConfirmStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
