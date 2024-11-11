@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +32,8 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
-//    private final LectureCategoryService lectureCategoryService;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-//    private final LectureCategoryMapper lectureCategoryMapper;
-    private final LectureCategoryByLectureService lectureCategoryByLectureService;
 
 
     // 전체 강의 조회
@@ -92,12 +88,10 @@ public class LectureServiceImpl implements LectureService {
     public LectureDTO registerLecture(LectureDTO lectureDTO, List<Integer> lectureCategoryCodeList) {
 
 //    lectureCategoryByLectureService의 등록 메서드 호출 필요
-        OneLectureCategoryListDTO oneLectureCategoryListDTO
-                = new OneLectureCategoryListDTO(lectureDTO.getLectureCode(), lectureCategoryCodeList);
-        lectureCategoryByLectureService.saveLectureCategoryByLecture(oneLectureCategoryListDTO);
+//        OneLectureCategoryListDTO oneLectureCategoryListDTO
+//                = new OneLectureCategoryListDTO(lectureDTO.getLectureCode(), lectureCategoryCodeList);
+//        lectureCategoryByLectureService.saveLectureCategoryByLecture(oneLectureCategoryListDTO);
 
-//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
         MemberDTO memberDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
