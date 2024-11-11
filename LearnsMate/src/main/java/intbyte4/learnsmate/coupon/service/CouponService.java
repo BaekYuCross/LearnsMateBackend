@@ -5,6 +5,8 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 
 import java.util.List;
@@ -25,4 +27,6 @@ public interface CouponService {
 
     // 쿠폰 등록
     CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory);
+
+    CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode);
 }
