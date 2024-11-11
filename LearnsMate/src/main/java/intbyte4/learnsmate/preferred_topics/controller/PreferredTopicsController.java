@@ -4,6 +4,7 @@ import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicsDTO;
 import intbyte4.learnsmate.preferred_topics.domain.vo.response.ResponseFindPreferredTopicsVO;
 import intbyte4.learnsmate.preferred_topics.mapper.PreferredTopicsMapper;
 import intbyte4.learnsmate.preferred_topics.service.PreferredTopicsService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class PreferredTopicsController {
     private final PreferredTopicsMapper preferredTopicsMapper;
 
     // 1. 모든 선호주제 조회
+    @Operation(summary = "직원 - 모든 선호주제 조회")
     @GetMapping
     public ResponseEntity<List<ResponseFindPreferredTopicsVO>> findAllPreferredTopics() {
 
@@ -34,7 +36,8 @@ public class PreferredTopicsController {
         return ResponseEntity.status(HttpStatus.OK).body(voList);
     }
 
-    // 2. 특정 멤버가 선호하는 모든 주제 조회
+    // 2. 특정 선호주제 조회
+    @Operation(summary = "직원 - 특정 선호주제 조회")
     @GetMapping("/{topicscode}")
     public ResponseEntity<ResponseFindPreferredTopicsVO> findPreferredTopics(@PathVariable("topicscode") Long topicsCode){
         List<PreferredTopicsDTO> dtoList = preferredTopicsService.findById(topicsCode);
@@ -46,6 +49,7 @@ public class PreferredTopicsController {
     }
 
     // 3. 특정 멤버가 선택한 모든 선호주제 조회
+    @Operation(summary = "특정 멤버가 선택한 모든 선호주제 조회")
     @GetMapping("/member/{membercode}")
     public ResponseEntity<List<ResponseFindPreferredTopicsVO>> findAllPreferredTopicsByMemberCode(
             @PathVariable("membercode") Long memberCode) {
