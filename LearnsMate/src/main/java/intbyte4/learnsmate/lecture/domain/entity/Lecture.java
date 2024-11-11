@@ -26,10 +26,6 @@ public class Lecture {
     @Column(name = "lecture_title", nullable = false)
     private String lectureTitle;
 
-    @ManyToOne
-    @JoinColumn(name = "lecture_category_code", nullable = false)
-    private LectureCategory lectureCategory;
-
     @Column(name = "lecture_confirm_status", nullable = false)
     private Boolean lectureConfirmStatus;
 
@@ -48,7 +44,7 @@ public class Lecture {
     @ManyToOne
     @JoinColumn(name = "tutor_code", nullable = false)
     @Where(clause = "member_type = 'TUTOR'")
-    private Member tutor;;
+    private Member tutor;
 
     @Column(name = "lecture_status", nullable = false)
     private Boolean lectureStatus;
@@ -63,7 +59,6 @@ public class Lecture {
 
     public void toUpdate(LectureDTO lectureDTO, LectureCategory lectureCategory) {
         this.lectureTitle = lectureDTO.getLectureTitle();
-        this.lectureCategory = lectureCategory;
         this.lectureConfirmStatus = lectureDTO.getLectureConfirmStatus();
         this.updatedAt = LocalDateTime.now();
         this.lectureImage = lectureDTO.getLectureImage();

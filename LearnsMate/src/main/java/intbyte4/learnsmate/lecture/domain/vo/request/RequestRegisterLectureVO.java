@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestRegisterLectureVO {
     private String lectureTitle;
-    private Integer lectureCategoryCode;
     private Boolean lectureConfirmStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -27,4 +27,6 @@ public class RequestRegisterLectureVO {
     private Boolean lectureStatus;
     private Integer lectureClickCount;
     private LectureLevelEnum lectureLevel;
+
+    private List<Integer> lectureCategoryCodeList;
 }

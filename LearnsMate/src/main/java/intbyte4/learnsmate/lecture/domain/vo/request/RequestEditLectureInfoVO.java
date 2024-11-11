@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestEditLectureInfoVO {
     private String lectureTitle;
-    private Integer lectureCategoryCode;
     private Boolean lectureConfirmStatus;
     private LocalDateTime updatedAt;
     private String lectureImage;

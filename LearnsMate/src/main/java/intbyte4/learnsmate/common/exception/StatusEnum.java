@@ -12,10 +12,13 @@ public enum StatusEnum {
     DATA_INTEGRITY_VIOLATION(400, HttpStatus.BAD_REQUEST, "데이터 무결성 위반입니다. 필수 값이 누락되었거나 유효하지 않습니다."),
     INVALID_PARAMETER_FORMAT(400, HttpStatus.BAD_REQUEST, "요청에 유효하지 않은 인자 형식입니다."),
     INVALID_PASSWORD(400, HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+    MINIMUM_KEYWORD_LENGTH_REQUIRED(400,HttpStatus.BAD_REQUEST, "검색어는 최소 두 글자 이상이어야 합니다."),
 
     RESTRICTED(403, HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     DELETE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "삭제할 수 없습니다."),
     UPDATE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "수정할 수 없습니다."),
+    INACTIVATE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "비활성화할 수 없습니다."),
+    ACTIVATE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "활성화할 수 없습니다."),
 
 
     USER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
@@ -36,6 +39,8 @@ public enum StatusEnum {
     VOC_ANSWER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 VOC 답변입니다."),
     PREFERRED_TOPICS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 선호 주제입니다."),
     MEMBER_PREFERRED_TOPICS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "해당 멤버의 선호 주제가 없습니다."),
+    LECTURE_CATEGORY_BY_LECTURE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 강의별 강의 카테고리 입니다."),
+    ISSUE_COUPON_NOT_FOUND(404, HttpStatus.NOT_FOUND, "보유한 쿠폰이 없습니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 
