@@ -65,7 +65,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     public VOCAnswerDTO editVOCAnswer(VOCAnswerDTO vocAnswerDTO) {
         log.info("VOC 답변 수정 중: {}", vocAnswerDTO);
 
-        VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerDTO.getVocAnswerCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+        VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerDTO.getVocAnswerCode()).orElseThrow(() -> new CommonException(StatusEnum.VOC_ANSWER_NOT_FOUND));
         vocAnswer.setVocAnswerContent(vocAnswerDTO.getVocAnswerContent());
         vocAnswer.setUpdatedAt(LocalDateTime.now());
 
@@ -78,7 +78,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
 
     @Override
     public VOCAnswerDTO findById(Long vocAnswerCode) {
-        VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerCode).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
+        VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerCode).orElseThrow(() -> new CommonException(StatusEnum.VOC_ANSWER_NOT_FOUND));
         return vocAnswerMapper.fromEntityToDTO(vocAnswer);
     }
 

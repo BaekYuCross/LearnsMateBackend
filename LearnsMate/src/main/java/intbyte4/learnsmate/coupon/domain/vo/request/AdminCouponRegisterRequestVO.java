@@ -9,10 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Builder
-public class CouponRegisterRequestVO {
-    @JsonProperty("coupon_code")
-    private Long couponCode;
-
+public class AdminCouponRegisterRequestVO {
     @JsonProperty("coupon_name")
     private String couponName;
 
@@ -22,27 +19,9 @@ public class CouponRegisterRequestVO {
     @JsonProperty("coupon_discount_rate")
     private Integer couponDiscountRate;
 
-    @JsonProperty("created_at")
-    private LocalDateTime createdAt;
-
-    @JsonProperty("updated_at")
-    private LocalDateTime updatedAt;
-
     @JsonProperty("coupon_start_date")
     private LocalDateTime couponStartDate;
 
     @JsonProperty("coupon_expire_date")
     private LocalDateTime couponExpireDate;
-
-    @JsonProperty("coupon_flag")
-    private Boolean couponFlag;
-
-    @JsonProperty("coupon_category_code")
-    private Integer couponCategoryCode;
-
-    @JsonProperty("admin_code")
-    private Long adminCode;
-
-    @JsonProperty("tutor_code")
-    private Long tutorCode;
 }
