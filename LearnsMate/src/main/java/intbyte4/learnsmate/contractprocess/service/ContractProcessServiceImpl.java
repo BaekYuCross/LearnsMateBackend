@@ -62,10 +62,11 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lecturedto.getLectureCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lecturedto.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lecturedto.getLectureCategoryCode());
+//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
-        Lecture lecture = lectureMapper.toEntity(lecturedto, tutor, lectureCategory);
+//        Lecture lecture = lectureMapper.toEntity(lecturedto, tutor, lectureCategory);
+        Lecture lecture = lectureMapper.toEntity(lecturedto, tutor);
 
         ContractProcess contractProcess = contractProcessRepository.findByLecture(lecture);
 
@@ -86,10 +87,11 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory category = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+//        LectureCategory category = lectureCategoryMapper.toEntity(lectureCategoryDTO);
 
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, category);
+//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, category);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         AdminDTO adminDTO = adminService.findByAdminCode(contractProcessDTO.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);

@@ -49,7 +49,7 @@ public class LectureController {
     @PutMapping("/{lectureCode}")
     public ResponseEntity<ResponseRegisterLectureVO> registerLecture(
             @RequestBody RequestRegisterLectureVO registerLectureVO) {
-        LectureDTO lectureDTO = lectureService.registerLecture(lectureMapper.fromRegisterRequestVOtoDto(registerLectureVO));
+        LectureDTO lectureDTO = lectureService.registerLecture(lectureMapper.fromRegisterRequestVOtoDto(registerLectureVO), registerLectureVO.getLectureCategoryCodeList());
         return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToRegisterResponseVO(lectureDTO));
     }
 
