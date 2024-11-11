@@ -45,5 +45,14 @@ public class PreferredTopicsController {
         return ResponseEntity.status(HttpStatus.OK).body(voList.get(0));
     }
 
+    // 3. 특정 멤버가 선택한 모든 선호주제 조회
+    public ResponseEntity<List<ResponseFindPreferredTopicsVO>> findAllPreferredTopicsByMemberCode(
+            @PathVariable("membercode") Long memberCode) {
+        List<PreferredTopicsDTO> dtoList = preferredTopicsService.findAllByMemberCode(memberCode);
 
+        List<ResponseFindPreferredTopicsVO> voList
+                = preferredTopicsMapper.fromPreferredTopicsDTOtoResponseFindPreferredTopicsVO(dtoList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(voList);
+    }
 }
