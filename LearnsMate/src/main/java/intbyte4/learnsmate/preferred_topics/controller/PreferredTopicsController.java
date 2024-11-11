@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.preferred_topics.controller;
 
 import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicsDTO;
+import intbyte4.learnsmate.preferred_topics.domain.vo.request.RequestSavePreferredHistoryVO;
 import intbyte4.learnsmate.preferred_topics.domain.vo.response.ResponseFindPreferredTopicsVO;
 import intbyte4.learnsmate.preferred_topics.mapper.PreferredTopicsMapper;
 import intbyte4.learnsmate.preferred_topics.service.PreferredTopicsService;
@@ -9,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -59,5 +58,16 @@ public class PreferredTopicsController {
                 = preferredTopicsMapper.fromPreferredTopicsDTOtoResponseFindPreferredTopicsVO(dtoList);
 
         return ResponseEntity.status(HttpStatus.OK).body(voList);
+    }
+
+    // 4. 특정 멤버 선호 주제 등록
+    @PostMapping("/member")
+    public ResponseEntity<String> savePreferredTopics(@RequestBody RequestSavePreferredHistoryVO request) {
+        List<PreferredTopicsDTO> dtoList
+                = preferredTopicsMapper.fromRequestSavePreferredHistoryVOtoPreferredTopicsDTOList(request);
+
+        preferredTopicsService.savePreferredTopics(dtoList);
+
+        return ResponseEntity.status(HttpStatus.OK).body("선호 주제 등록 성공");
     }
 }

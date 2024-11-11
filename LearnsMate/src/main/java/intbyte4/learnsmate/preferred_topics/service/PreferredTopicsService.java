@@ -2,6 +2,13 @@ package intbyte4.learnsmate.preferred_topics.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
+import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
+import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicsDTO;
 import intbyte4.learnsmate.preferred_topics.domain.entity.PreferredTopics;
 import intbyte4.learnsmate.preferred_topics.mapper.PreferredTopicsMapper;
@@ -10,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +25,9 @@ public class PreferredTopicsService {
 
     private final PreferredTopicsRepository preferredTopicsRepository;
     private final PreferredTopicsMapper preferredTopicsMapper;
+    private final MemberService memberService;
+    private final MemberMapper memberMapper;
+    private final LectureCategoryService lectureCategoryService;
 
     // 모든 선호 주제 조회
     public List<PreferredTopicsDTO> findAll() {
@@ -45,5 +56,30 @@ public class PreferredTopicsService {
         }
 
         return preferredTopicsMapper.fromEntityToDTO(entityList);
+    }
+
+    // 특정 멤버의 모든 선호 주제 저장 메서드
+    public void savePreferredTopics(List<PreferredTopicsDTO> dtoList) {
+
+        MemberDTO memberDTO = memberService.findById(dtoList.get(0).getMemberCode());
+        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
+
+        // LectureCategory 리스트를 가져오기
+        List<LectureCategoryDTO> categoryDTOList = dtoList.stream()
+                .map(PreferredTopicsDTO::getLectureCategoryCode) // DTO에서 LectureCategoryCode 추출
+                .map(lectureCategoryService::findByLectureCategoryCode) // 각 카테고리 코드로 LectureCategory 조회
+                .collect(Collectors.toList()); // 결과를 List로 수집
+
+        List<LectureCategory> categoryList = categoryDTOList.stream()
+                        .map(dto -> LectureCategory.builder()
+                                .lectureCategoryCode(dto.getLectureCategoryCode())
+                                .lectureCategoryName(dto.getLectureCategoryName())
+                                .build())
+                                .collect(Collectors.toList());
+
+        List<PreferredTopics> preferredTopicList
+                = preferredTopicsMapper.fromPreferredTopicsDTOListtoEntityList(member, categoryList);
+
+        preferredTopicsRepository.saveAll(preferredTopicList);
     }
 }
