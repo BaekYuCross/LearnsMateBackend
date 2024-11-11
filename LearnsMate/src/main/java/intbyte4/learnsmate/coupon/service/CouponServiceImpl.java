@@ -21,6 +21,7 @@ import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,14 +77,14 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    @Transactional
     public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory) {
         CouponEntity newCoupon = CouponEntity.builder()
                 .couponName(request.getCouponName())
-                .couponContents(request.getCouponContents())
                 .couponDiscountRate(request.getCouponDiscountRate())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .couponStartDate(request.getCouponStartDate())
+                .couponStartDate(LocalDateTime.now())
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)
                 .couponCategory(couponCategory)
@@ -96,6 +97,7 @@ public class CouponServiceImpl implements CouponService {
     };
 
     @Override
+    @Transactional
     public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode) {
         CouponEntity newCouponEntity = couponMapper.newCouponEntity(request, tutor, couponCategory);
 
@@ -104,6 +106,21 @@ public class CouponServiceImpl implements CouponService {
         couponByLectureService.registerCouponByLecture(lectureEntity, newCouponEntity);
 
         return couponMapper.toDTO(newCouponEntity);
+    }
+
+    @Override
+    @Transactional
+    public CouponDTO editAdminCoupon(CouponDTO couponDTO) {
+        log.info("직원 쿠폰 수정 중: {}", couponDTO);
+
+        CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode()).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.updateAdminCouponDetails(couponDTO);
+
+        log.info("데이터베이스에 수정된 직원 쿠폰 저장 중: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+        log.info("수정된 직원 쿠폰 객체: {}", updatedCoupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
     }
     // 쿠폰 수정
     // 쿠폰 삭제
