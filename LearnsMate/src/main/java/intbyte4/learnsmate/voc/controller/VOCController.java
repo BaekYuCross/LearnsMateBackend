@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController("vocController")
 @RequestMapping("voc")
@@ -55,5 +56,27 @@ public class VOCController {
             log.error("예상치 못한 오류", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
         }
+    }
+
+    @Operation(summary = "직원 - 특정 유저 미답변 VOC 리스트 조회")
+    @GetMapping("/{memberCode}/unanswered")
+    public ResponseEntity<List<ResponseFindVOCVO>> listUnansweredVOC(@PathVariable("memberCode") Long memberCode) {
+        log.info("특정 유저 미답변 VOC 조회 요청: userCode = {}", memberCode);
+        List<VOCDTO> vocDTOList = vocService.findUnansweredVOCByMember(memberCode);
+        List<ResponseFindVOCVO> response = vocDTOList.stream()
+                .map(vocMapper::fromDTOToResponseVO)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "직원 - 특정 유저 답변 VOC 리스트 조회")
+    @GetMapping("/{memberCode}/answered")
+    public ResponseEntity<List<ResponseFindVOCVO>> listAnsweredVOC(@PathVariable("memberCode") Long memberCode) {
+        log.info("특정 유저 답변 VOC 조회 요청: userCode = {}", memberCode);
+        List<VOCDTO> vocDTOList = vocService.findAnsweredVOCByMember(memberCode);
+        List<ResponseFindVOCVO> response = vocDTOList.stream()
+                .map(vocMapper::fromDTOToResponseVO)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

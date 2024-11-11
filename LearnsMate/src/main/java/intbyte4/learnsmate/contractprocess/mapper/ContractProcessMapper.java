@@ -3,8 +3,11 @@ package intbyte4.learnsmate.contractprocess.mapper;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.contractprocess.domain.dto.ContractProcessDTO;
 import intbyte4.learnsmate.contractprocess.domain.entity.ContractProcess;
-import intbyte4.learnsmate.contractprocess.domain.vo.ResponseFindContractProcessVO;
+import intbyte4.learnsmate.contractprocess.domain.vo.request.ResponseRegisterContractProcessVO;
+import intbyte4.learnsmate.contractprocess.domain.vo.response.RequestRegisterContractProcessVO;
+import intbyte4.learnsmate.contractprocess.domain.vo.response.ResponseFindContractProcessVO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,6 +48,29 @@ public class ContractProcessMapper {
                 .adminCode(dto.getAdminCode())
                 .build();
     }
+
+    public ResponseRegisterContractProcessVO fromDtoToRegisterResponseVO(ContractProcessDTO dto) {
+        return ResponseRegisterContractProcessVO.builder()
+                .contractProcessCode(dto.getContractProcessCode())
+                .approvalProcess(dto.getApprovalProcess())
+                .createdAt(dto.getCreatedAt())
+                .note(dto.getNote())
+                .lectureCode(dto.getLectureCode())
+                .adminCode(dto.getAdminCode())
+                .build();
+    }
+
+    public ContractProcessDTO fromRegisterRequestVOtoDto(RequestRegisterContractProcessVO vo) {
+        return ContractProcessDTO.builder()
+                .contractProcessCode(vo.getContractProcessCode())
+                .approvalProcess(vo.getApprovalProcess())
+                .createdAt(vo.getCreatedAt())
+                .note(vo.getNote())
+                .lectureCode(vo.getLectureCode())
+                .adminCode(vo.getAdminCode())
+                .build();
+    }
+
 
 
 }
