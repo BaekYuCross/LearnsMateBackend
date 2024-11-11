@@ -39,6 +39,7 @@ public enum StatusEnum {
     INVALID_VERIFICATION_CODE(400, HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),
     EMAIL_VERIFICATION_REQUIRED(400, HttpStatus.BAD_REQUEST, "이메일 인증이 필요합니다."),
 
+    EXISTING_CONTRACT_PROCESS(409, HttpStatus.CONFLICT, "존재하는 강의 계약과정입니다."),
     EMAIL_DUPLICATE(409, HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
     NICKNAME_DUPLICATE(409, HttpStatus.CONFLICT, "중복된 닉네임입니다."),
     COUPON_ALREADY_USED(409, HttpStatus.CONFLICT, "사용된 쿠폰입니다.");
