@@ -6,11 +6,9 @@ import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignByConditionVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByTypeVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +47,19 @@ public class CampaignMapper {
     }
 
     public CampaignDTO fromRegisterRequestVOtoDTO(RequestRegisterCampaignVO vo) {
+        return CampaignDTO.builder()
+                .campaignCode(vo.getCampaignCode())
+                .campaignTitle(vo.getCampaignTitle())
+                .campaignContents(vo.getCampaignContents())
+                .campaignType(String.valueOf(vo.getCampaignType()))
+                .campaignSendDate(vo.getCampaignSendDate())
+                .createdAt(vo.getCreatedAt())
+                .updatedAt(vo.getUpdatedAt())
+                .adminCode(vo.getAdminCode())
+                .build();
+    }
+
+    public CampaignDTO fromFindCampaignByConditionVOtoDTO(RequestFindCampaignByConditionVO vo){
         return CampaignDTO.builder()
                 .campaignCode(vo.getCampaignCode())
                 .campaignTitle(vo.getCampaignTitle())
@@ -118,8 +129,8 @@ public class CampaignMapper {
                 .build();
     }
 
-    public List<ResponseFindCampaignByTypeVO> fromDtoListToFindCampaignByTypeVO(List<CampaignDTO> dtoList) {
-        return dtoList.stream().map(dto -> ResponseFindCampaignByTypeVO.builder()
+    public List<ResponseFindCampaignByConditionVO> fromDtoListToFindCampaignByConditionVO(List<CampaignDTO> dtoList) {
+        return dtoList.stream().map(dto -> ResponseFindCampaignByConditionVO.builder()
                 .campaignCode(dto.getCampaignCode())
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
