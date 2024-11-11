@@ -8,7 +8,5 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-//public interface CampaignRepository extends JpaRepository<Campaign, Long>, CampaignRepositoryCustom {
-public interface CampaignRepository extends JpaRepository<Campaign, Long> {
-    List<Campaign> findByCampaignType(CampaignTypeEnum campaignType);
+public interface CampaignRepository extends JpaRepository<Campaign, Long>, CampaignRepositoryCustom {
 }
