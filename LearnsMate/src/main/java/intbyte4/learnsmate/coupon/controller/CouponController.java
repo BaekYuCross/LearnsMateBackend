@@ -2,7 +2,9 @@ package intbyte4.learnsmate.coupon.controller;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
@@ -42,6 +44,14 @@ public class CouponController {
         CouponDTO couponDTO = couponService.findCouponByCouponCode(couponCode);
         CouponFindResponseVO response = couponMapper.fromDTOToFindResponseVO(couponDTO);
 
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "쿠폰 필터링 조회")
+    @GetMapping("/filters")
+    public ResponseEntity<List<CouponFilterResponseVO>> filterCoupons(@RequestBody CouponFilterRequestVO request) {
+        List<CouponDTO> coupons = couponService.getCouponsByFilters(request);
+        List<CouponFilterResponseVO> response = couponMapper.fromDTOToCouponFilterResponseVO(coupons);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
