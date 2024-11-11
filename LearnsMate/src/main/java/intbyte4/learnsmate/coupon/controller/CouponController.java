@@ -84,7 +84,7 @@ public class CouponController {
             CouponDTO couponDTO = couponMapper.fromEditRequestVOToDto(request);
             couponDTO.setCouponCode(couponCode);
 
-            CouponDTO updatedCouponDTO = couponService.editAdminCoupon(couponDTO);
+            CouponDTO updatedCouponDTO = couponService.editAdminCoupon(couponDTO, admin);
 
             AdminCouponEditResponseVO response = couponMapper.fromDTOToEditResponseVO(updatedCouponDTO);
 

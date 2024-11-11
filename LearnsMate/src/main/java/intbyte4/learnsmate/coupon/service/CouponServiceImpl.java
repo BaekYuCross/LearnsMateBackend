@@ -1,6 +1,9 @@
 package intbyte4.learnsmate.coupon.service;
 
+import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
+import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -24,6 +27,7 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,6 +47,7 @@ public class CouponServiceImpl implements CouponService {
     private final LectureMapper lectureMapper;
     private final LectureCategoryService lectureCategoryService;
     private final LectureCategoryMapper lectureCategoryMapper;
+    private final AdminService adminService;
 
     // 쿠폰 전체 조회
     @Override
@@ -110,8 +115,9 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO editAdminCoupon(CouponDTO couponDTO) {
+    public CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin) {
         log.info("직원 쿠폰 수정 중: {}", couponDTO);
+        validAdmin(adminService, couponDTO.getAdminCode(), log);
 
         CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode()).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         coupon.updateAdminCouponDetails(couponDTO);
@@ -130,5 +136,14 @@ public class CouponServiceImpl implements CouponService {
         LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
         LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
         return lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+    }
+
+    public void validAdmin(AdminService adminService, Long adminCode, Logger log) {
+        AdminDTO adminDTO = adminService.findByAdminCode(adminCode);
+        if (adminDTO == null) {
+            log.warn("존재하지 않는 직원 : {}", adminCode);
+            throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
+        }
+        log.info(adminDTO.toString());
     }
 }
