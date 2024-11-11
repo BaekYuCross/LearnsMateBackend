@@ -20,7 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,34 +83,37 @@ public class LectureServiceImpl implements LectureService {
 //    }
 
 
-    // 강의 등록
+    // 강의 등록 -> 강의별 강의 카테고리 등록 메소드 가져오기 .
     @Override
     @Transactional
     public LectureDTO registerLecture(LectureDTO lectureDTO) {
 
-//        // Lecture 엔티티 빌드
-//        Lecture lecture = Lecture.builder()
-//                .lectureTitle(lectureDTO.getLectureTitle())
-//                .lectureCategoryEnum(lectureDTO.getLectureCategoryEnum())
-//                .lectureConfirmStatus(false) // 계약과정에서 승인 과정이 7이면 true로 변경
-//                .createdAt(LocalDateTime.now())
-//                .updatedAt(LocalDateTime.now())
-//                .lectureImage(lectureDTO.getLectureImage())
-//                .lecturePrice(lectureDTO.getLecturePrice())
-//                .tutorCode(memberService.findByMemberCode(lectureDTO.getTutorCode()))
-//                .lectureStatus(true)
-//                .lectureClickCount(0)
-//                .lectureLevel(lectureDTO.getLectureLevel())
-//                .build();
-//
-//
-//        lectureRepository.save(lecture);
-//
-//        contractProcessService.createContractProcess(lecture.getLectureCode(), contractProcessDTO);
-//
-//        return lectureMapper.toDTO(lecture);
-        return null;
+        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+
+        MemberDTO memberDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
+        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
+
+        Lecture lecture = Lecture.builder()
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .lectureCategory(lectureCategory)
+                .lectureConfirmStatus(false)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .lectureImage(lectureDTO.getLectureImage())
+                .lecturePrice(lectureDTO.getLecturePrice())
+                .tutor(member)
+                .lectureStatus(true)
+                .lectureClickCount(0)
+                .lectureLevel(lectureDTO.getLectureLevel())
+                .build();
+
+        lectureRepository.save(lecture);
+        return lectureMapper.toDTO(lecture);
     }
+
+
+    //강의별 계약과정이 강의 코드가 7개 라면 강의컬럼의 승인여부  true로 변환
 
 
     // 강의 수정

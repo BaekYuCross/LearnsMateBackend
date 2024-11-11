@@ -34,12 +34,16 @@ public enum StatusEnum {
     COUPON_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
     COMMENT_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
     LOGIN_HISTORY_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 로그인 내역입니다."),
+    VOC_ANSWER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 VOC 답변입니다."),
+    PREFERRED_TOPICS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 선호 주제입니다."),
+    MEMBER_PREFERRED_TOPICS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "해당 멤버의 선호 주제가 없습니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 
     INVALID_VERIFICATION_CODE(400, HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),
     EMAIL_VERIFICATION_REQUIRED(400, HttpStatus.BAD_REQUEST, "이메일 인증이 필요합니다."),
 
+    EXISTING_CONTRACT_PROCESS(409, HttpStatus.CONFLICT, "존재하는 강의 계약과정입니다."),
     EMAIL_DUPLICATE(409, HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
     NICKNAME_DUPLICATE(409, HttpStatus.CONFLICT, "중복된 닉네임입니다."),
     COUPON_ALREADY_USED(409, HttpStatus.CONFLICT, "사용된 쿠폰입니다.");

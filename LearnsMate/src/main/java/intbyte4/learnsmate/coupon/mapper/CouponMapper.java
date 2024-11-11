@@ -4,13 +4,18 @@ import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignCouponV
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
-import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponEditRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.response.AdminCouponEditResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
+import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
+import intbyte4.learnsmate.member.domain.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,23 +36,6 @@ public class CouponMapper {
                 .couponCategoryCode(entity.getCouponCategory().getCouponCategoryCode())
                 .adminCode(entity.getAdmin().getAdminCode())
                 .tutorCode(entity.getTutor().getMemberCode())
-                .build();
-    }
-
-    public CouponDTO fromCouponRegisterRequestVOToDTO(CouponRegisterRequestVO vo) {
-        return CouponDTO.builder()
-                .couponCode(vo.getCouponCode())
-                .couponName(vo.getCouponName())
-                .couponContents(vo.getCouponContents())
-                .couponDiscountRate(vo.getCouponDiscountRate())
-                .createdAt(vo.getCreatedAt())
-                .updatedAt(vo.getUpdatedAt())
-                .couponStartDate(vo.getCouponStartDate())
-                .couponExpireDate(vo.getCouponExpireDate())
-                .couponFlag(true)
-                .couponCategoryCode(vo.getCouponCategoryCode())
-                .adminCode(vo.getAdminCode())
-                .tutorCode(vo.getTutorCode())
                 .build();
     }
 
@@ -146,6 +134,57 @@ public class CouponMapper {
                 .couponCategoryCode(request.getCouponCategoryCode())
                 .adminCode(request.getAdminCode())
                 .tutorCode(request.getTutorCode())
+                .build();
+    }
+
+    public CouponEntity newCouponEntity(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory) {
+        return CouponEntity.builder()
+                .couponCode(request.getCouponCode())
+                .couponName(request.getCouponName())
+                .couponDiscountRate(request.getCouponDiscountRate())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .couponStartDate(LocalDateTime.now())
+                .couponExpireDate(request.getCouponExpireDate())
+                .couponFlag(true)
+                .couponCategory(couponCategory)
+                .tutor(tutor)
+                .build();
+    }
+
+    public CouponDTO fromEditRequestVOToDto(AdminCouponEditRequestVO request) {
+        return CouponDTO.builder()
+                .couponName(request.getCouponName())
+                .couponContents(request.getCouponContents())
+                .couponDiscountRate(request.getCouponDiscountRate())
+                .couponStartDate(request.getCouponStartDate())
+                .couponExpireDate(request.getCouponExpireDate())
+                .build();
+    }
+
+    public AdminCouponEditResponseVO fromDTOToEditResponseVO(CouponDTO updatedCouponDTO) {
+        return AdminCouponEditResponseVO.builder()
+                .couponName(updatedCouponDTO.getCouponName())
+                .couponContents(updatedCouponDTO.getCouponContents())
+                .couponDiscountRate(updatedCouponDTO.getCouponDiscountRate())
+                .couponStartDate(updatedCouponDTO.getCouponStartDate())
+                .couponExpireDate(updatedCouponDTO.getCouponExpireDate())
+                .build();
+    }
+
+    public CouponDTO fromEntityToDTO(CouponEntity updatedCoupon) {
+        return CouponDTO.builder()
+                .couponCode(updatedCoupon.getCouponCode())
+                .couponName(updatedCoupon.getCouponName())
+                .couponContents(updatedCoupon.getCouponContents())
+                .couponDiscountRate(updatedCoupon.getCouponDiscountRate())
+                .createdAt(updatedCoupon.getCreatedAt())
+                .updatedAt(updatedCoupon.getUpdatedAt())
+                .couponStartDate(updatedCoupon.getCouponStartDate())
+                .couponExpireDate(updatedCoupon.getCouponExpireDate())
+                .couponFlag(updatedCoupon.getCouponFlag())
+                .couponCategoryCode(updatedCoupon.getCouponCategory().getCouponCategoryCode())
+                .adminCode(updatedCoupon.getAdmin().getAdminCode())
                 .build();
     }
 }
