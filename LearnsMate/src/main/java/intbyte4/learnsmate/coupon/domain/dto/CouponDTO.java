@@ -21,6 +21,7 @@ public class CouponDTO {
     private LocalDateTime couponStartDate;
     private LocalDateTime couponExpireDate;
     private Boolean couponFlag;
+    private Boolean activeState;
     private Integer couponCategoryCode;
     private Long adminCode;
     private Long tutorCode;

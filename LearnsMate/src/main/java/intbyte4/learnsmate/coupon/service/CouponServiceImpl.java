@@ -2,7 +2,6 @@ package intbyte4.learnsmate.coupon.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
@@ -128,8 +127,22 @@ public class CouponServiceImpl implements CouponService {
 
         return couponMapper.fromEntityToDTO(updatedCoupon);
     }
-    // 쿠폰 수정
-    // 쿠폰 삭제
+
+    @Override
+    @Transactional
+    public CouponDTO tutorEditCoupon(CouponDTO couponDTO, Member tutor) {
+        log.info("강사 쿠폰 수정 중: {}", couponDTO);
+        validTutor(couponDTO, tutor);
+
+        CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode()).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.updateTutorCouponDetails(couponDTO);
+
+        log.info("데이터베이스에 수정된 강사 쿠폰 저장 중: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+        log.info("수정된 강사 쿠폰 객체: {}", updatedCoupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
 
     @Override
     @Transactional
@@ -142,6 +155,62 @@ public class CouponServiceImpl implements CouponService {
         coupon.deleteCoupon();
 
         log.info("쿠폰 비활성화: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
+    @Override
+    @Transactional
+    public CouponDTO tutorDeleteCoupon(CouponDTO couponDTO, Long couponCode, Member tutor) {
+        log.info("강사 쿠폰 삭제 중: couponCode = {}", couponCode);
+
+        validTutor(couponDTO, tutor);
+
+        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.deleteCoupon();
+
+        log.info("강사 쿠폰 삭제: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
+    @Override
+    @Transactional
+    public CouponDTO tutorInactiveCoupon(Long couponCode, CouponDTO couponDTO, Member tutor) {
+        log.info("강사 쿠폰 비활성화 중: couponCode = {}", couponCode);
+
+        validTutor(couponDTO, tutor);
+
+        if (!couponDTO.getActiveState()) {
+            throw new CommonException(StatusEnum.INACTIVATE_NOT_ALLOWED);
+        }
+
+        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.inactivateCoupon();
+
+        log.info("강사 쿠폰 비활성화: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
+    @Override
+    @Transactional
+    public CouponDTO tutorActivateCoupon(Long couponCode, CouponDTO couponDTO, Member tutor) {
+        log.info("강사 쿠폰 활성화 중: couponCode = {}", couponCode);
+
+        validTutor(couponDTO, tutor);
+
+        if (couponDTO.getActiveState()) {
+            throw new CommonException(StatusEnum.ACTIVATE_NOT_ALLOWED);
+        }
+
+        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.activateCoupon();
+
+        log.info("강사 쿠폰 활성화: {}", coupon);
         CouponEntity updatedCoupon = couponRepository.save(coupon);
 
         return couponMapper.fromEntityToDTO(updatedCoupon);
@@ -162,5 +231,13 @@ public class CouponServiceImpl implements CouponService {
             throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         }
         log.info(adminDTO.toString());
+    }
+
+    private static void validTutor(CouponDTO couponDTO, Member tutor) {
+        if (!couponDTO.getTutorCode().equals(tutor.getMemberCode())) {
+            log.warn("수정 권한 없음: {}", tutor);
+            throw new CommonException(StatusEnum.RESTRICTED);
+        }
+        log.info(tutor.toString());
     }
 }

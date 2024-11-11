@@ -1,12 +1,11 @@
 package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
-import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.*;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByTypeVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.service.CampaignService;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -20,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController("campaignController")
@@ -86,7 +86,7 @@ public class CampaignController {
     @Operation(summary = "직원 - 캠페인 전체 조회")
     @GetMapping("/campaigns")
     public ResponseEntity<List<ResponseFindCampaignVO>> getAllCampaigns() {
-        List<CampaignDTO> campaignDTOList = campaignService.findAllCampaigns();
+        List<CampaignDTO> campaignDTOList = campaignService.findAllCampaignList();
         List<ResponseFindCampaignVO> responseFindCampaignVOList = campaignMapper
                 .fromDtoListToFindCampaignVO(campaignDTOList);
 
@@ -104,16 +104,18 @@ public class CampaignController {
         return ResponseEntity.status(HttpStatus.OK).body(campaignMapper.fromDtoToFindResponseVO(campaignDTO));
     }
 
-    @Operation(summary = "직원 - 캠페인 타입별 조회")
-    @GetMapping("/type/{campaignType}")
-    public ResponseEntity<List<ResponseFindCampaignByTypeVO>> getCampaignsByType
-            (@PathVariable String campaignType){
-        CampaignDTO getCampaignCode = new CampaignDTO();
-        getCampaignCode.setCampaignType(campaignType);
-        List<CampaignDTO> campaignDTOList = campaignService.findCampaignsByType(getCampaignCode);
-        List<ResponseFindCampaignByTypeVO> responseFindCampaignByTypeVOList = campaignMapper
-                .fromDtoListToFindCampaignByTypeVO(campaignDTOList);
+    @Operation(summary = "직원 - 조건 별 캠페인 조회")
+    @GetMapping("/filter")
+    public ResponseEntity<List<ResponseFindCampaignByConditionVO>> filterCampaigns
+            (@RequestBody RequestFindCampaignByConditionVO requestCampaignList
+                    , LocalDateTime startDate
+                    , LocalDateTime endDate){
+        CampaignDTO campaignDTO = campaignMapper.fromFindCampaignByConditionVOtoDTO(requestCampaignList);
+        List<CampaignDTO> campaignDTOList = campaignService.findCampaignListByCondition(campaignDTO, startDate, endDate);
 
-        return new ResponseEntity<>(responseFindCampaignByTypeVOList, HttpStatus.OK);
+        List<ResponseFindCampaignByConditionVO> responseFindCampaignByConditionVOList = campaignMapper
+                .fromDtoListToFindCampaignByConditionVO(campaignDTOList);
+
+        return new ResponseEntity<>(responseFindCampaignByConditionVOList, HttpStatus.OK);
     }
 }

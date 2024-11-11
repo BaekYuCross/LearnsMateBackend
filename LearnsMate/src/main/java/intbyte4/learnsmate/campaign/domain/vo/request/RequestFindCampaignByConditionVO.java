@@ -1,7 +1,10 @@
-package intbyte4.learnsmate.campaign.domain.vo.response;
+package intbyte4.learnsmate.campaign.domain.vo.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -9,8 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
-public class ResponseFindCampaignByTypeVO {
+public class RequestFindCampaignByConditionVO {
     @JsonProperty("campaign_code")
     private Long campaignCode;
 
@@ -34,4 +36,7 @@ public class ResponseFindCampaignByTypeVO {
 
     @JsonProperty("admin_code")
     private Long adminCode;
+
+    @JsonProperty("tutor_code")
+    private Long tutorCode;
 }
