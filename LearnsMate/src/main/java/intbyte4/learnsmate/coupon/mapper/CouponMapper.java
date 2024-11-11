@@ -5,12 +5,16 @@ import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponV
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
+import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
+import intbyte4.learnsmate.member.domain.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -146,6 +150,21 @@ public class CouponMapper {
                 .couponCategoryCode(request.getCouponCategoryCode())
                 .adminCode(request.getAdminCode())
                 .tutorCode(request.getTutorCode())
+                .build();
+    }
+
+    public CouponEntity newCouponEntity(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory) {
+        return CouponEntity.builder()
+                .couponCode(request.getCouponCode())
+                .couponName(request.getCouponName())
+                .couponDiscountRate(request.getCouponDiscountRate())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .couponStartDate(LocalDateTime.now())
+                .couponExpireDate(request.getCouponExpireDate())
+                .couponFlag(true)
+                .couponCategory(couponCategory)
+                .tutor(tutor)
                 .build();
     }
 }
