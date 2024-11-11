@@ -45,15 +45,6 @@ public class MemberService {
         return memberDTOList;
     }
 
-    // 나현이가 필요한 강사 코드로 강사명 찾아오기
-    public String findTutorByMemberCode(Long memberCode){
-
-        String tutorName = memberRepository.findMemberNameByMemberCode(memberCode)
-                .orElseThrow(RuntimeException::new);
-
-        return tutorName;
-    }
-
     public Member findByStudentCode(Long memberCode) {
         Member student = memberRepository.findById(memberCode).orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
         if (!student.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.RESTRICTED);

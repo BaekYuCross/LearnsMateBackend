@@ -45,7 +45,7 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
     }
 
-    @Operation(summary = "강의 등록")
+    @Operation(summary = "강의와 강의별 강의 카테고리 등록")
     @PutMapping("/{lectureCode}")
     public ResponseEntity<ResponseRegisterLectureVO> registerLecture(
             @RequestBody RequestRegisterLectureVO registerLectureVO) {

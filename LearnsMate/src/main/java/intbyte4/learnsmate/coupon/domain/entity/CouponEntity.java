@@ -69,4 +69,8 @@ public class CouponEntity {
         this.couponExpireDate = couponDTO.getCouponExpireDate();
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void deleteCoupon() {
+        this.couponFlag = false;
+    }
 }
