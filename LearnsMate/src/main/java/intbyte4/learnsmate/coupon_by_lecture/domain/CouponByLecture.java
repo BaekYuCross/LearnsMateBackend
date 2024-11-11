@@ -20,13 +20,13 @@ public class CouponByLecture {
 
     @ManyToOne
     @JoinColumn(name = "coupon_code")
-    private CouponEntity couponCode;
+    private CouponEntity coupon;
 
     @ManyToOne
     @JoinColumn(name = "lecture_code")
-    private Lecture lectureCode;
+    private Lecture lecture;
 
     public void updateCouponDetails(CouponEntity coupon) {
-        this.couponCode = coupon;
+        this.coupon = coupon;
     }
 }
