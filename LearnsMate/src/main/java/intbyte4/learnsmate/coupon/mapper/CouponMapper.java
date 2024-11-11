@@ -5,11 +5,9 @@ import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponV
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponEditRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponEditRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.AdminCouponEditResponseVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
+import intbyte4.learnsmate.coupon.domain.vo.response.*;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -162,6 +160,15 @@ public class CouponMapper {
                 .build();
     }
 
+    public CouponDTO fromTutorEditRequestVOToDTO(TutorCouponEditRequestVO request) {
+        return CouponDTO.builder()
+                .couponName(request.getCouponName())
+                .couponStartDate(request.getCouponStartDate())
+                .couponExpireDate(request.getCouponExpireDate())
+                .couponDiscountRate(request.getCouponDiscountRate())
+                .build();
+    }
+
     public AdminCouponEditResponseVO fromDTOToEditResponseVO(CouponDTO updatedCouponDTO) {
         return AdminCouponEditResponseVO.builder()
                 .couponName(updatedCouponDTO.getCouponName())
@@ -169,6 +176,15 @@ public class CouponMapper {
                 .couponDiscountRate(updatedCouponDTO.getCouponDiscountRate())
                 .couponStartDate(updatedCouponDTO.getCouponStartDate())
                 .couponExpireDate(updatedCouponDTO.getCouponExpireDate())
+                .build();
+    }
+
+    public TutorCouponEditResponseVO fromTutorDTOToResponse(CouponDTO updatedCouponDTO) {
+        return TutorCouponEditResponseVO.builder()
+                .couponName(updatedCouponDTO.getCouponName())
+                .couponStartDate(updatedCouponDTO.getCouponStartDate())
+                .couponExpireDate(updatedCouponDTO.getCouponExpireDate())
+                .couponDiscountRate(updatedCouponDTO.getCouponDiscountRate())
                 .build();
     }
 

@@ -3,14 +3,8 @@ package intbyte4.learnsmate.coupon.controller;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
-import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponEditRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.AdminCouponEditResponseVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.CouponFilterResponseVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
-import intbyte4.learnsmate.coupon.domain.vo.response.CouponRegisterResponseVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.*;
+import intbyte4.learnsmate.coupon.domain.vo.response.*;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
@@ -77,8 +71,8 @@ public class CouponController {
     }
 
     @Operation(summary = "직원 - 쿠폰 수정")
-    @PostMapping("/admin/edit")
-    public ResponseEntity<?> editCoupon(@RequestBody AdminCouponEditRequestVO request, Admin admin, Long couponCode) {
+    @PatchMapping("/admin/edit/{couponCode}")
+    public ResponseEntity<?> editCoupon(@PathVariable("couponCode") Long couponCode, @RequestBody AdminCouponEditRequestVO request, Admin admin) {
         log.info("직원 쿠폰 수정 요청 : {}", request);
         try {
             CouponDTO couponDTO = couponMapper.fromEditRequestVOToDto(request);
@@ -96,6 +90,28 @@ public class CouponController {
         } catch (Exception e) {
             log.error("예상치 못한 오류", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
+        }
+    }
+    @Operation(summary = "강사 - 쿠폰 수정")
+    @PatchMapping("/tutor/edit/{couponCode}")
+    public ResponseEntity<?> tutorEditCoupon(@PathVariable("couponCode") Long couponCode, @RequestBody TutorCouponEditRequestVO request, Member tutor) {
+        try {
+            log.info("강사 쿠폰 수정 요청: {}", request);
+            CouponDTO couponDTO = couponMapper.fromTutorEditRequestVOToDTO(request);
+            couponDTO.setCouponCode(couponCode);
+
+            CouponDTO updatedCouponDTO = couponService.tutorEditCoupon(couponDTO, tutor);
+
+            TutorCouponEditResponseVO response = couponMapper.fromTutorDTOToResponse(updatedCouponDTO);
+
+            log.info("강사 쿠폰 수정 성공: {}", response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (CommonException e) {
+            log.error("강사 쿠폰 수정 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
         }
     }
 }

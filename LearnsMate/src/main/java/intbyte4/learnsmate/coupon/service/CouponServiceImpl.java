@@ -2,7 +2,6 @@ package intbyte4.learnsmate.coupon.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
@@ -24,6 +23,7 @@ import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +48,7 @@ public class CouponServiceImpl implements CouponService {
     private final LectureCategoryService lectureCategoryService;
     private final LectureCategoryMapper lectureCategoryMapper;
     private final AdminService adminService;
+    private final MemberService memberService;
 
     // 쿠폰 전체 조회
     @Override
@@ -128,8 +129,30 @@ public class CouponServiceImpl implements CouponService {
 
         return couponMapper.fromEntityToDTO(updatedCoupon);
     }
-    // 쿠폰 수정
-    // 쿠폰 삭제
+
+    @Override
+    @Transactional
+    public CouponDTO tutorEditCoupon(CouponDTO couponDTO, Member tutor) {
+        log.info("강사 쿠폰 수정 중: {}", couponDTO);
+        validTutor(couponDTO, tutor);
+
+        CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode()).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.updateTutorCouponDetails(couponDTO);
+
+        log.info("데이터베이스에 수정된 강사 쿠폰 저장 중: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+        log.info("수정된 강사 쿠폰 객체: {}", updatedCoupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
+    private static void validTutor(CouponDTO couponDTO, Member tutor) {
+        if (!couponDTO.getTutorCode().equals(tutor)) {
+            log.warn("수정 권한 없음: {}", tutor);
+            throw new CommonException(StatusEnum.RESTRICTED);
+        }
+        log.info(tutor.toString());
+    }
 
     private Lecture getLecture(Member tutor, Long lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);

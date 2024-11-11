@@ -69,4 +69,12 @@ public class CouponEntity {
         this.couponExpireDate = couponDTO.getCouponExpireDate();
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void updateTutorCouponDetails(CouponDTO couponDTO) {
+        this.couponName = couponDTO.getCouponName();
+        this.couponDiscountRate = couponDTO.getCouponDiscountRate();
+        this.couponStartDate = couponDTO.getCouponStartDate();
+        this.couponExpireDate = couponDTO.getCouponExpireDate();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
