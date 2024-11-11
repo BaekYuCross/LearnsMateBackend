@@ -12,6 +12,7 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -116,7 +117,7 @@ public class CouponController {
     }
 
     @Operation(summary = "직원 - 쿠폰 삭제 (비활성화)")
-    @PatchMapping("/admin/delete")
+    @PatchMapping("/admin/delete/{couponCode}")
     public ResponseEntity<?> deleteCoupon(@RequestParam("coupon_code") Long couponCode, Admin admin) {
         log.info("직원 쿠폰 삭제 요청: couponCode = {}", couponCode);
         try {
@@ -124,6 +125,54 @@ public class CouponController {
             return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
         } catch (CommonException e) {
             log.error("쿠폰 삭제 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
+        }
+    }
+
+    @Operation(summary = "강사 - 쿠폰 삭제")
+    @PatchMapping("/tutor/delete/{couponCode}")
+    public ResponseEntity<?> tutorDeleteCoupon(CouponDTO couponDTO, @RequestParam("coupon_code") Long couponCode, Member tutor) {
+        try {
+            log.info("강사 쿠폰 삭제 요청: couponCode = {}", couponCode);
+            CouponDTO updatedCoupon = couponService.tutorDeleteCoupon(couponDTO, couponCode, tutor);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
+        } catch (CommonException e) {
+            log.error("쿠폰 삭제 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
+        }
+    }
+
+    @Operation(summary = "강사 - 쿠폰 비활성화")
+    @PatchMapping("/tutor/inactivate/{couponCode}")
+    public ResponseEntity<?> tutorInactiveCoupon(@RequestParam("coupon_code") Long couponCode, CouponDTO couponDTO, Member tutor) {
+        try {
+            log.info("강사 쿠폰 비활성화 요청: {}", couponDTO);
+            CouponDTO updatedCoupon = couponService.tutorInactiveCoupon(couponCode, couponDTO, tutor);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
+        } catch (CommonException e) {
+            log.error("쿠폰 비활성화 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
+        }
+    }
+
+    @Operation(summary = "강사 - 쿠폰 활성화")
+    @PatchMapping("/tutor/activate/{couponCode}")
+    public ResponseEntity<?> tutorActiveCoupon(@RequestParam("coupon_code") Long couponCode, CouponDTO couponDTO, Member tutor) {
+        try {
+            log.info("강사 쿠폰 활성화 요청: {}", couponDTO);
+            CouponDTO updatedCoupon = couponService.tutorActivateCoupon(couponCode, couponDTO, tutor);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
+        } catch (CommonException e) {
+            log.error("쿠폰 활성화 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("예상치 못한 오류 발생", e);

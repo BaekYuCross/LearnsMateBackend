@@ -48,6 +48,9 @@ public class CouponEntity {
     @Column(name = "coupon_flag", nullable = false)
     private Boolean couponFlag;
 
+    @Column(name = "active_state")
+    private Boolean activeState;
+
     @ManyToOne
     @JoinColumn (name = "coupon_category_code", nullable = false)
     private CouponCategory couponCategory;
@@ -80,5 +83,13 @@ public class CouponEntity {
 
     public void deleteCoupon() {
         this.couponFlag = false;
+    }
+
+    public void inactivateCoupon() {
+        this.activeState = false;
+    }
+
+    public void activateCoupon() {
+        this.activeState = true;
     }
 }

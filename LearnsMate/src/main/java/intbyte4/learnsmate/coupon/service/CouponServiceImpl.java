@@ -23,7 +23,6 @@ import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,6 @@ public class CouponServiceImpl implements CouponService {
     private final LectureCategoryService lectureCategoryService;
     private final LectureCategoryMapper lectureCategoryMapper;
     private final AdminService adminService;
-    private final MemberService memberService;
 
     // 쿠폰 전체 조회
     @Override
@@ -146,14 +144,6 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.fromEntityToDTO(updatedCoupon);
     }
 
-    private static void validTutor(CouponDTO couponDTO, Member tutor) {
-        if (!couponDTO.getTutorCode().equals(tutor)) {
-            log.warn("수정 권한 없음: {}", tutor);
-            throw new CommonException(StatusEnum.RESTRICTED);
-        }
-        log.info(tutor.toString());
-    }
-
     @Override
     @Transactional
     public CouponDTO deleteAdminCoupon(Long couponCode, Admin admin) {
@@ -165,6 +155,62 @@ public class CouponServiceImpl implements CouponService {
         coupon.deleteCoupon();
 
         log.info("쿠폰 비활성화: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
+    @Override
+    @Transactional
+    public CouponDTO tutorDeleteCoupon(CouponDTO couponDTO, Long couponCode, Member tutor) {
+        log.info("강사 쿠폰 삭제 중: couponCode = {}", couponCode);
+
+        validTutor(couponDTO, tutor);
+
+        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.deleteCoupon();
+
+        log.info("강사 쿠폰 삭제: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
+    @Override
+    @Transactional
+    public CouponDTO tutorInactiveCoupon(Long couponCode, CouponDTO couponDTO, Member tutor) {
+        log.info("강사 쿠폰 비활성화 중: couponCode = {}", couponCode);
+
+        validTutor(couponDTO, tutor);
+
+        if (!couponDTO.getActiveState()) {
+            throw new CommonException(StatusEnum.INACTIVATE_NOT_ALLOWED);
+        }
+
+        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.inactivateCoupon();
+
+        log.info("강사 쿠폰 비활성화: {}", coupon);
+        CouponEntity updatedCoupon = couponRepository.save(coupon);
+
+        return couponMapper.fromEntityToDTO(updatedCoupon);
+    }
+
+    @Override
+    @Transactional
+    public CouponDTO tutorActivateCoupon(Long couponCode, CouponDTO couponDTO, Member tutor) {
+        log.info("강사 쿠폰 활성화 중: couponCode = {}", couponCode);
+
+        validTutor(couponDTO, tutor);
+
+        if (couponDTO.getActiveState()) {
+            throw new CommonException(StatusEnum.ACTIVATE_NOT_ALLOWED);
+        }
+
+        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        coupon.activateCoupon();
+
+        log.info("강사 쿠폰 활성화: {}", coupon);
         CouponEntity updatedCoupon = couponRepository.save(coupon);
 
         return couponMapper.fromEntityToDTO(updatedCoupon);
@@ -184,5 +230,13 @@ public class CouponServiceImpl implements CouponService {
             throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         }
         log.info(adminDTO.toString());
+    }
+
+    private static void validTutor(CouponDTO couponDTO, Member tutor) {
+        if (!couponDTO.getTutorCode().equals(tutor.getMemberCode())) {
+            log.warn("수정 권한 없음: {}", tutor);
+            throw new CommonException(StatusEnum.RESTRICTED);
+        }
+        log.info(tutor.toString());
     }
 }
