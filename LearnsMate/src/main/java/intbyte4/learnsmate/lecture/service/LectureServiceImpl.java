@@ -127,15 +127,18 @@ public class LectureServiceImpl implements LectureService {
     @Override
     @Transactional
     public LectureDTO updateLecture(Long lectureCode, LectureDTO lectureDTO) {
+        // LectureDTO에 lectureCode가 있으므로 파라미터를 저렇게 안넘겨줘도 될거 같아요.
 
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
 
-        LectureCategoryDTO lectureCategoryDTO =
-                lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+//        LectureCategoryDTO lectureCategoryDTO =
+//                lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
+//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
+        // LectureCategory를 안쓰니까 위에꺼는 삭제해줘도 될거같아요.
 
-        lecture.toUpdate(lectureDTO, lectureCategory);
+//        lecture.toUpdate(lectureDTO, lectureCategory);
+        lecture.toUpdate(lectureDTO, null);
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
