@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentDTO {
@@ -14,6 +15,6 @@ public class PaymentDTO {
     private Integer paymentPrice;
     private LocalDateTime createdAt;
     private Long lectureByStudentCode;
-    private Long couponIssuanceCode;
+    private String couponIssuanceCode;
 
 }
