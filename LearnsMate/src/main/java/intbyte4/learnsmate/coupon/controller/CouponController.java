@@ -98,4 +98,21 @@ public class CouponController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
         }
     }
+
+    @Operation(summary = "직원 - 쿠폰 삭제 (비활성화)")
+    @PatchMapping("/admin/delete")
+    public ResponseEntity<?> deleteCoupon(@RequestParam("coupon_code") Long couponCode, Admin admin) {
+        log.info("직원 쿠폰 삭제 요청: couponCode = {}", couponCode);
+        try {
+            CouponDTO updatedCoupon = couponService.deleteAdminCoupon(couponCode, admin);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
+        } catch (CommonException e) {
+            log.error("쿠폰 삭제 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
+        }
+    }
+
 }
