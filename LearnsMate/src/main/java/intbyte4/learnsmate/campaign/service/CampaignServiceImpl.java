@@ -10,6 +10,7 @@ import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 
+import intbyte4.learnsmate.campaign.repository.CampaignRepositoryCustom;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -32,6 +33,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
+    private final CampaignRepositoryCustom campaignRepositoryCustom;
     private final AdminService adminService;
     private final UserPerCampaignService userPerCampaignService;
     private final CouponByCampaignService couponByCampaignService;
@@ -175,7 +177,7 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<CampaignDTO> findAllCampaigns() {
+    public List<CampaignDTO> findAllCampaignList() {
         List<Campaign> campaign = campaignRepository.findAll();
         List<CampaignDTO> campaignDTOList = new ArrayList<>();
         campaign.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));
@@ -190,5 +192,18 @@ public class CampaignServiceImpl implements CampaignService {
         return campaignMapper.toDTO(campaign);
     }
 
+    @Override
+    public List<CampaignDTO> findCampaignListByCondition
+            (CampaignDTO request, LocalDateTime startDate, LocalDateTime endDate) {
+        AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
+        Admin admin = adminMapper.toEntity(adminDTO);
 
+        List<Campaign> campaign = campaignRepositoryCustom
+                .searchBy(campaignMapper.toEntity(request,admin), startDate, endDate);
+
+        List<CampaignDTO> campaignDTOList = new ArrayList<>();
+        campaign.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));
+
+        return campaignDTOList;
+    }
 }
