@@ -58,10 +58,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final CouponService couponService;
     private final CouponCategoryService couponCategoryService;
     private final AdminService adminService;
-    private final IssueCouponService issueCouponService;
     private final CouponMapper couponMapper;
     private final AdminMapper adminMapper;
-    private final LectureVideoByStudentService lectureVideoByStudentService;
 
     // 직원이 전체 결제 내역을 조회
     @Override
@@ -113,6 +111,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         CouponDTO couponDTO = couponService.findCouponByCouponCode(issueCouponDTO.getCouponCode());
 
+        // 쿠폰카테고리는 왜 엔티티로 리턴하는 서비스 밖에 없는것이지? 하나 만들어주세요
         CouponCategory couponCategory = couponCategoryService.findByCouponCategoryCode(couponDTO.getCouponCategoryCode());
 
         AdminDTO adminDTO = adminService.findByAdminCode(couponDTO.getAdminCode());
@@ -129,7 +128,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             PaymentDTO paymentDTO = new PaymentDTO();
             paymentDTO.setPaymentCode(null);
-            paymentDTO.setPaymentPrice(lecture.getLecturePrice()); // 얘를 수정해야함. 쿠폰 적용되면 할인된 가격 들어가게. lectureService.가격(강의코드);
+            paymentDTO.setPaymentPrice(lecture.getLecturePrice());
             paymentDTO.setCreatedAt(LocalDateTime.now());
             paymentDTO.setLectureByStudentCode(lectureByStudentService.findStudentCodeByLectureCode(lecture));
             paymentDTO.setCouponIssuanceCode(issueCouponDTO.getCouponIssuanceCode());
@@ -141,7 +140,6 @@ public class PaymentServiceImpl implements PaymentService {
 
             payments.add(paymentDTO);
         });
-        //학생별강의동영상.저장메서드()
         lectureByStudentDTOList.forEach(lectureByStudentDTO -> {
             LectureVideoByStudentDTO lectureVideoByStudentDTO = new LectureVideoByStudentDTO();
             lectureVideoByStudentDTO.setVideoCode(null);
