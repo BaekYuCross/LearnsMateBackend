@@ -4,6 +4,8 @@ import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,5 +17,6 @@ public interface LectureByStudentRepository extends JpaRepository<LectureByStude
 
     long countByLectureAndOwnStatus(Lecture lecture, boolean ownStatus);
 
-    List<LectureByStudent> findByLecture_LectureCode(Long lectureCode);
+    @Query("SELECT l.lectureByStudentCode FROM lecture_by_student l WHERE l.lecture.lectureCode = :lectureCode")
+    List<Long> findLectureByStudentCodesByLectureCode(@Param("lectureCode") Long lectureCode);
 }

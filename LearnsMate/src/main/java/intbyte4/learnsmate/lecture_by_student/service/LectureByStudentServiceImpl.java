@@ -73,8 +73,11 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
 
     @Override
     @Transactional
+    // 파라미터로 lecture를 받는게 맞는지 우선 모르겠음
     public void updateOwnStatus(Lecture lecture) {
-        List<LectureByStudent> lectureByStudents = lectureByStudentRepository.findByLecture_LectureCode(lecture.getLectureCode());
+        // removeLecture에서 파라미터로 받은 lectureCode를 컬럼으로 가지고 있는 애들의 lectureByStudentCode 뽑아내기
+        List<Long> lectureByStudentCodes = lectureByStudentRepository.findLectureByStudentCodesByLectureCode(lecture.getLectureCode());
+        List<LectureByStudent> lectureByStudents = lectureByStudentRepository.findAllById(lectureByStudentCodes);
         for (LectureByStudent lectureByStudent : lectureByStudents) {
             lectureByStudent.changeOwnStatus();
         }

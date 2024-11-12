@@ -152,5 +152,4 @@ public class LectureServiceImpl implements LectureService {
         lectureByStudentService.updateOwnStatus(lecture);
         return lectureMapper.toDTO(lecture);
     }
-
 }
