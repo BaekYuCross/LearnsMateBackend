@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface LectureByStudentRepository extends JpaRepository<LectureByStudent, Long> {
 
-    List<LectureByStudent> findByStudentAndRefundStatus(Member student, boolean refundStatus);
+    List<LectureByStudent> findByStudentAndOwnStatus(Member student, boolean ownStatus);
 
-    long countByLectureAndRefundStatus(Lecture lecture, boolean refundStatus);
+    long countByLectureAndOwnStatus(Lecture lecture, boolean ownStatus);
 }

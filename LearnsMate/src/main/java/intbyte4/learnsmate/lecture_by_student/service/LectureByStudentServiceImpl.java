@@ -39,7 +39,7 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         MemberDTO studentDTO = memberService.findMemberByMemberCode(studentCode, MemberType.STUDENT);
         Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
 
-        List<LectureByStudent> lecturesByStudent = lectureByStudentRepository.findByStudentAndRefundStatus(student, true);
+        List<LectureByStudent> lecturesByStudent = lectureByStudentRepository.findByStudentAndOwnStatus(student, true);
 
         if (lecturesByStudent.isEmpty()) {
             throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
@@ -62,7 +62,7 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         // 환불되지 않은 수강생의 누적 명수 조회
-        return lectureByStudentRepository.countByLectureAndRefundStatus(lecture, true);
+        return lectureByStudentRepository.countByLectureAndOwnStatus(lecture, true);
     }
 
 }
