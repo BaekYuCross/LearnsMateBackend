@@ -1,6 +1,8 @@
 package intbyte4.learnsmate.lecture.controller;
 
+import intbyte4.learnsmate.facade.LectureFacade;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
@@ -26,12 +28,13 @@ import java.util.stream.Collectors;
 public class LectureController {
 
     private final LectureService lectureService;
+    private final LectureFacade LectureFacade;
     private final LectureMapper lectureMapper;
 
     @Operation(summary = "강의 정보 전체 조회")
     @GetMapping
     public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
-        List<LectureDTO> lectureDTOs = lectureService.getAllLecture();
+        List<LectureDetailDTO> lectureDTOs = LectureFacade.getAllLecture();
         List<ResponseFindLectureVO> lectureVOs = lectureDTOs.stream()
                 .map(lectureMapper::fromDtoToResponseVO)
                 .collect(Collectors.toList());
@@ -41,7 +44,7 @@ public class LectureController {
     @Operation(summary = "강의 단건 조회")
     @GetMapping("/{lectureCode}")
     public ResponseEntity<ResponseFindLectureVO> getLecture(@PathVariable("lectureCode") Long lectureCode) {
-        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+        LectureDetailDTO lectureDTO = LectureFacade.getLectureById(lectureCode);
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
     }
 
@@ -49,7 +52,7 @@ public class LectureController {
     @PutMapping("/{lectureCode}")
     public ResponseEntity<ResponseRegisterLectureVO> registerLecture(
             @RequestBody RequestRegisterLectureVO registerLectureVO) {
-        LectureDTO lectureDTO = lectureService.registerLecture(lectureMapper.fromRegisterRequestVOtoDto(registerLectureVO), registerLectureVO.getLectureCategoryCodeList());
+        LectureDTO lectureDTO = LectureFacade.registerLecture(lectureMapper.fromRegisterRequestVOtoDto(registerLectureVO), registerLectureVO.getLectureCategoryCodeList());
         return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToRegisterResponseVO(lectureDTO));
     }
 
