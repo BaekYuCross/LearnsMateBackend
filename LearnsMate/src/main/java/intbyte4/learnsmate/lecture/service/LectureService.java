@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.lecture.service;
 
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 
 import java.util.List;

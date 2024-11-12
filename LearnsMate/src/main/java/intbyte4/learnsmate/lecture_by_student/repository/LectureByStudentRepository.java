@@ -14,4 +14,8 @@ public interface LectureByStudentRepository extends JpaRepository<LectureByStude
     List<LectureByStudent> findByStudentAndRefundStatus(Member student, boolean refundStatus);
 
     long countByLectureAndRefundStatus(Lecture lecture, boolean refundStatus);
+
+    LectureByStudent findByLecture(Lecture lecture);
+
+    LectureByStudent findByLectureAndStudent(Lecture lecture, Member member);
 }
