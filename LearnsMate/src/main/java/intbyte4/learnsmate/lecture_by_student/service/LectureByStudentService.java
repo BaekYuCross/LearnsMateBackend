@@ -17,6 +17,8 @@ public interface LectureByStudentService {
 //    @Transactional
 //    void updateOwnStatus(Lecture lecture);
 
+    int calculateTotalRevenue(Long lectureCode);
+
     void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member);
 
     Long findStudentCodeByLectureCode(Lecture lecture);

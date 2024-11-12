@@ -57,7 +57,7 @@ public class Lecture {
     private LectureLevelEnum lectureLevel;
 
 
-    public void toUpdate(LectureDTO lectureDTO, LectureCategory lectureCategory) {
+    public void toUpdate(LectureDTO lectureDTO) {
         this.lectureTitle = lectureDTO.getLectureTitle();
         this.lectureConfirmStatus = lectureDTO.getLectureConfirmStatus();
         this.updatedAt = LocalDateTime.now();
