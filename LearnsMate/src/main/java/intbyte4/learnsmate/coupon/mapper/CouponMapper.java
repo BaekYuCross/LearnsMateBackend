@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.coupon.mapper;
 
+import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignCouponVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -34,6 +35,22 @@ public class CouponMapper {
                 .couponCategoryCode(entity.getCouponCategory().getCouponCategoryCode())
                 .adminCode(entity.getAdmin().getAdminCode())
                 .tutorCode(entity.getTutor().getMemberCode())
+                .build();
+    }
+
+    public CouponEntity toEntity (CouponDTO dto, CouponCategory category, Admin admin, Member tutor) {
+        return CouponEntity.builder()
+                .couponCode(dto.getCouponCode())
+                .couponName(dto.getCouponName())
+                .couponContents(dto.getCouponContents())
+                .couponDiscountRate(dto.getCouponDiscountRate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .couponStartDate(dto.getCouponStartDate())
+                .couponExpireDate(dto.getCouponExpireDate())
+                .couponCategory(category)
+                .admin(admin)
+                .tutor(tutor)
                 .build();
     }
 

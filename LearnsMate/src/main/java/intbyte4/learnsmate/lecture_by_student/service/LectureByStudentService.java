@@ -3,6 +3,7 @@ package intbyte4.learnsmate.lecture_by_student.service;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import jakarta.transaction.Transactional;
+import intbyte4.learnsmate.member.domain.entity.Member;
 
 import java.util.List;
 
@@ -15,4 +16,11 @@ public interface LectureByStudentService {
 
     @Transactional
     void updateOwnStatus(Lecture lecture);
+    long countStudentsByLectureAndRefundStatus(Long lectureCode);
+
+    void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member);
+
+    Long findStudentCodeByLectureCode(Lecture lecture);
+
+    LectureByStudentDTO findByLectureAndStudent(Lecture lecture, Member member);
 }

@@ -2,10 +2,12 @@ package intbyte4.learnsmate.member.mapper;
 
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignStudentVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleMemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import org.springframework.stereotype.Component;
 
@@ -138,6 +140,17 @@ public class MemberMapper{
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public ResponseFindMemberDetailVO fromFindSingleMemberDTOtoResponseFindMemberDetailVO(FindSingleMemberDTO dto) {
+        return ResponseFindMemberDetailVO.builder()
+                .memberDTO(dto.getMemberDTO())
+                .lectureDTOList(dto.getLectureDTOList())
+                .unusedCouponsList(dto.getUnusedCouponsList())
+                .usedCouponsList(dto.getUsedCouponsList())
+                .unansweredVOCByMemberList(dto.getUnansweredVOCByMemberList())
+                .answeredVOCByMemberList(dto.getAnsweredVOCByMemberList())
                 .build();
     }
 }

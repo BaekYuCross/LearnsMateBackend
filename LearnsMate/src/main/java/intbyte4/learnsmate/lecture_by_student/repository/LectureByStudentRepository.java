@@ -19,4 +19,9 @@ public interface LectureByStudentRepository extends JpaRepository<LectureByStude
 
     @Query("SELECT l.lectureByStudentCode FROM lecture_by_student l WHERE l.lecture.lectureCode = :lectureCode")
     List<Long> findLectureByStudentCodesByLectureCode(@Param("lectureCode") Long lectureCode);
+    long countByLectureAndRefundStatus(Lecture lecture, boolean refundStatus);
+
+    LectureByStudent findByLecture(Lecture lecture);
+
+    LectureByStudent findByLectureAndStudent(Lecture lecture, Member member);
 }

@@ -30,10 +30,8 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
 
     private final LectureByStudentRepository lectureByStudentRepository;
     private final LectureByStudentMapper lectureByStudentMapper;
-    private final LectureCategoryService lectureCategoryService;
     private final MemberService memberService;
     private final LectureService lectureService;
-    private final LectureCategoryMapper lectureCategoryMapper;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
 
@@ -83,6 +81,24 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         }
 
         lectureByStudentRepository.saveAll(lectureByStudents);
+    }
+    @Override
+    public void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member) {
+        LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(lectureByStudentDTO, lecture, member);
+
+        lectureByStudentRepository.save(lectureByStudent);
+    }
+
+    @Override
+    public Long findStudentCodeByLectureCode(Lecture lecture) {
+        LectureByStudent lectureByStudent = lectureByStudentRepository.findByLecture(lecture);
+        return lectureByStudent.getLectureByStudentCode();
+    }
+
+    @Override
+    public LectureByStudentDTO findByLectureAndStudent(Lecture lecture, Member member) {
+        LectureByStudent lectureByStudent = lectureByStudentRepository.findByLectureAndStudent(lecture, member);
+        return lectureByStudentMapper.toDTO(lectureByStudent);
     }
 }
 

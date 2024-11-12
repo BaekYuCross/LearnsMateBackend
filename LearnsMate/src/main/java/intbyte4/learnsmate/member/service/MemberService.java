@@ -2,29 +2,33 @@ package intbyte4.learnsmate.member.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
+import intbyte4.learnsmate.member.domain.dto.MemberIssueCouponDTO;
+import intbyte4.learnsmate.member.domain.dto.MemberVOCDTO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.repository.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.service.VOCService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-
-    @Autowired
-    public MemberService(MemberRepository memberRepository, MemberMapper memberMapper) {
-        this.memberRepository = memberRepository;
-        this.memberMapper = memberMapper;
-    }
+    private final IssueCouponService issueCouponService;
+    private final VOCService vocService;
 
     public void saveMember(MemberDTO memberDTO) {
         LocalDateTime now = LocalDateTime.now();
