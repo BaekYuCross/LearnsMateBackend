@@ -1,20 +1,15 @@
 package intbyte4.learnsmate.payment.service;
 
-import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
-import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -26,6 +21,7 @@ import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,11 +32,10 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
-    private final LectureCategoryMapper lectureCategoryMapper;
     private final LectureService lectureService;
     private final MemberService memberService;
-    private final LectureCategoryService lectureCategoryService;;
     private final LectureByStudentService lectureByStudentService;
+    private final IssueCouponService issueCouponService;
 
     // 직원이 전체 결제 내역을 조회
     @Override
@@ -64,27 +59,40 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentDTO lecturePayment(MemberDTO memberDTO, LectureDTO lectureDTO, CouponDTO couponDTO) {
-        LectureDTO selectedLecture = lectureService.getLectureById(lectureDTO.getLectureCode());
-        if (selectedLecture == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+    public PaymentDTO lecturePayment(MemberDTO memberDTO, List<LectureDTO> lectureDTOList, IssueCouponDTO issueCouponDTO) {
+        List<LectureDTO> selectedLectures = lectureDTOList.stream()
+                .map(dto -> lectureService.getLectureById(dto.getLectureCode()))
+                .toList();
 
         MemberDTO paidStudent = memberService
                 .findMemberByMemberCode(memberDTO.getMemberCode(),memberDTO.getMemberType());
         if(paidStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
 
-//        private Long lectureByStudentCode;
-//        private Boolean refundStatus;
-//        private Lecture lecture;
-//        private Member student;
-
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
-//        Lecture getLectureCode = lectureMapper.toEntity(lectureDTO, );
-        LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
-        lectureByStudentDTO.setRefundStatus(false);
-//        lectureByStudentDTO.setLecture(getLectureCode);
+        List<Lecture> lectureList = selectedLectures.stream()
+                .map(dto -> lectureMapper.toEntity(dto, member))
+                .toList();
 
-//        lectureByStudentService.registerLectureByStudent();
-        //학생별강의서비스.저장메서드()
+        lectureList.forEach(lecture -> {
+            LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
+            lectureByStudentDTO.setRefundStatus(false);
+            lectureByStudentDTO.setLecture(lecture);
+            lectureByStudentDTO.setStudent(member);
+
+            lectureByStudentService.registerLectureByStudent(lectureByStudentDTO, lecture, member);
+        });
+
+        lectureList.forEach(lecture -> {
+            PaymentDTO paymentDTO = new PaymentDTO();
+            paymentDTO.setPaymentCode(null);
+            paymentDTO.setPaymentPrice(lecture.getLecturePrice());
+            paymentDTO.setCreatedAt(LocalDateTime.now());
+            paymentDTO.setLectureByStudentCode(lectureByStudentService.findStudentCodeByLectureCode(lecture));
+            paymentDTO.setCouponIssuanceCode(issueCouponDTO.getCouponIssuanceCode());
+            // 또 매퍼로 바꿔야됨 ㅇㅇ
+//            paymentRepository.save();
+        });
+
         //결제레포.세이브()
         //학생별강의동영상.저장메서드()
         //
