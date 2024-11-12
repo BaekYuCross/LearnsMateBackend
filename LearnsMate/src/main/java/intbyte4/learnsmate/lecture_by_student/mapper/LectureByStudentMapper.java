@@ -25,7 +25,7 @@ public class LectureByStudentMapper {
     public LectureByStudent toEntity(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member student) {
         return LectureByStudent.builder()
                 .lectureByStudentCode(lectureByStudentDTO.getLectureByStudentCode())
-                .refundStatus(lectureByStudentDTO.getRefundStatus())
+                .ownStatus(lectureByStudentDTO.getOwnStatus())
                 .lecture(lecture)
                 .student(student)
                 .build();

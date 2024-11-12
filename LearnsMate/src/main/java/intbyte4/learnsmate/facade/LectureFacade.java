@@ -1,17 +1,31 @@
 package intbyte4.learnsmate.facade;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.mapper.LectureMapper;
+import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
+import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
+import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class LectureFacade {
     private final CouponService couponService;
+    private final LectureRepository lectureRepository;
+    private final LectureByStudentService lectureByStudentService;
+    private final LectureMapper lectureMapper;
+    private final LectureByStudentRepository lectureByStudentRepository;
 
     @Transactional
     public LectureDTO discountLecturePrice(LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO) {
@@ -23,10 +37,25 @@ public class LectureFacade {
         return lectureDTO;
     }
 
-    // 1. 멤버, 쿠폰, 강의
-    // 강의 쿠폰? 가져와야함. -> 쿠폰 디티오 가져옴 -> 쿠폰에 멤버코드가 있음.
-    // 멤버코드로 멤버 가져옴
-    // 끄,ㅌ임 ㅇㅈ?
-    // 하나의 파사드로 해결 가능 ㅇㅋ? 대ㅔ대ㅏㅂ대답대답대답
-    // 근데 리딩 서비스를 활용한다? 모든게 말끔하게 해결되지요?
+    @Transactional
+    public LectureDTO removeLecture(Long lectureCode) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
+        lecture.toDelete();
+        lectureRepository.save(lecture);
+
+        updateOwnStatus(lecture);
+        return lectureMapper.toDTO(lecture);
+    }
+
+    @Transactional
+    public void updateOwnStatus(Lecture lecture) {
+        List<Long> lectureByStudentCodes = lectureByStudentRepository.findLectureByStudentCodesByLectureCode(lecture.getLectureCode());
+        List<LectureByStudent> lectureByStudents = lectureByStudentRepository.findAllById(lectureByStudentCodes);
+        for (LectureByStudent lectureByStudent : lectureByStudents) {
+            lectureByStudent.changeOwnStatus();
+        }
+
+        lectureByStudentRepository.saveAll(lectureByStudents);
+    }
 }

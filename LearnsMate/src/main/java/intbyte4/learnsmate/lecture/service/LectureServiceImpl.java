@@ -3,29 +3,13 @@ package intbyte4.learnsmate.lecture.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
-import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
-import intbyte4.learnsmate.coupon.mapper.CouponMapper;
-import intbyte4.learnsmate.coupon.service.CouponService;
-import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureServiceImpl;
-import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
-import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
-import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
-import intbyte4.learnsmate.issue_coupon.repository.IssueCouponRepository;
-import intbyte4.learnsmate.issue_coupon.service.IssueCouponServiceImpl;
+import intbyte4.learnsmate.facade.LectureFacade;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
-import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentServiceImpl;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
-import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCategoryListDTO;
-import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -47,8 +31,7 @@ public class LectureServiceImpl implements LectureService {
     private final LectureMapper lectureMapper;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-    private final LectureByStudentServiceImpl lectureByStudentServiceImpl;
-    private final LectureByStudentService lectureByStudentService;
+    private final LectureFacade lectureFacade;
 
     // 전체 강의 조회
     @Override
@@ -151,15 +134,9 @@ public class LectureServiceImpl implements LectureService {
         return lectureMapper.toDTO(lecture);
     }
 
-    @Override
-    @Transactional
-    public LectureDTO removeLecture(Long lectureCode) {
-        Lecture lecture = lectureRepository.findById(lectureCode)
-                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
-        lecture.toDelete();
-        lectureRepository.save(lecture);
-
-        lectureByStudentService.updateOwnStatus(lecture);
-        return lectureMapper.toDTO(lecture);
-    }
+//    @Override
+//    @Transactional
+//    public LectureDTO removeLecture(Long lectureCode) {
+//        return lectureFacade.removeLecture(lectureCode);
+//    }
 }

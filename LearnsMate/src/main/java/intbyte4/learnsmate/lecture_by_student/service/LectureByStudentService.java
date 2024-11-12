@@ -11,12 +11,11 @@ public interface LectureByStudentService {
     // 학생별 모든 강의 조회
     List<LectureByStudentDTO> findByStudentCode(Long studentCode);
 
-    // 강의별 학생코드 개수 조회 refund_status 가 true인것만
-    long countStudentsByLectureAndOwnStatus(Long lectureCode);
+//    // 강의별 학생코드 개수 조회 refund_status 가 true인것만
+//    long countStudentsByLectureAndOwnStatus(Long lectureCode);
 
-    @Transactional
-    void updateOwnStatus(Lecture lecture);
-    long countStudentsByLectureAndRefundStatus(Long lectureCode);
+//    @Transactional
+//    void updateOwnStatus(Lecture lecture);
 
     void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member);
 

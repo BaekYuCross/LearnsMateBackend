@@ -100,7 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         lectureList.forEach(lecture -> {
             LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
-            lectureByStudentDTO.setRefundStatus(false);
+            lectureByStudentDTO.setOwnStatus(false);
             lectureByStudentDTO.setLecture(lecture);
             lectureByStudentDTO.setStudent(member);
 

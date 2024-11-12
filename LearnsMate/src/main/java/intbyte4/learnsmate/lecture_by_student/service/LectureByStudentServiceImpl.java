@@ -2,6 +2,7 @@ package intbyte4.learnsmate.lecture_by_student.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.facade.LectureFacade;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -10,8 +11,6 @@ import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -31,7 +30,6 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
     private final LectureByStudentRepository lectureByStudentRepository;
     private final LectureByStudentMapper lectureByStudentMapper;
     private final MemberService memberService;
-    private final LectureService lectureService;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
 
@@ -54,34 +52,27 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
     }
 
 
-    // 강의별 학생코드 개수 조회 (refund_status 가 true인것만)
-    @Override
-    public long countStudentsByLectureAndOwnStatus(Long lectureCode) {
-        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+//    // 강의별 학생코드 개수 조회 (refund_status 가 true인것만)
+//    @Override
+//    public long countStudentsByLectureAndOwnStatus(Long lectureCode) {
+//        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+//
+//        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
+//        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+//
+//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
+//
+//        // 환불되지 않은 수강생의 누적 명수 조회
+//        // --> refund_status가 보유상태라고 적혀있지만 영어는 환불상태.. 뭐가 맞을까?
+//        return lectureByStudentRepository.countByLectureAndOwnStatus(lecture, true);
+//    }
 
-        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
-        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+//    @Override
+//    @Transactional
+//    public void updateOwnStatus(Lecture lecture) {
+//        lectureFacade.updateOwnStatus(lecture);
+//    }
 
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
-
-        // 환불되지 않은 수강생의 누적 명수 조회
-        // --> refund_status가 보유상태라고 적혀있지만 영어는 환불상태.. 뭐가 맞을까?
-        return lectureByStudentRepository.countByLectureAndOwnStatus(lecture, true);
-    }
-
-    @Override
-    @Transactional
-    // 파라미터로 lecture를 받는게 맞는지 우선 모르겠음
-    public void updateOwnStatus(Lecture lecture) {
-        // removeLecture에서 파라미터로 받은 lectureCode를 컬럼으로 가지고 있는 애들의 lectureByStudentCode 뽑아내기
-        List<Long> lectureByStudentCodes = lectureByStudentRepository.findLectureByStudentCodesByLectureCode(lecture.getLectureCode());
-        List<LectureByStudent> lectureByStudents = lectureByStudentRepository.findAllById(lectureByStudentCodes);
-        for (LectureByStudent lectureByStudent : lectureByStudents) {
-            lectureByStudent.changeOwnStatus();
-        }
-
-        lectureByStudentRepository.saveAll(lectureByStudents);
-    }
     @Override
     public void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member) {
         LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(lectureByStudentDTO, lecture, member);
