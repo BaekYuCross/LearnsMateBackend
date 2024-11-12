@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.controller;
 
+import intbyte4.learnsmate.member.domain.dto.MemberIssueCouponDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
@@ -62,6 +63,7 @@ public class MemberController {
     public ResponseEntity<ResponseFindMemberVO> findStudentByStudentCode(@PathVariable("studentcode") Long memberCode) {
 
         MemberDTO memberDTO = memberService.findMemberByMemberCode(memberCode, MemberType.STUDENT);
+        MemberIssueCouponDTO memberIssueCouponDTO = memberService.memberIssueCoupon(memberCode);
 
         return ResponseEntity.status(HttpStatus.OK).body(memberMapper.fromMemberDTOtoResponseFindMemberVO(memberDTO));
     }
@@ -71,6 +73,7 @@ public class MemberController {
     public ResponseEntity<ResponseFindMemberVO> findTutorByTutorCode(@PathVariable("tutorcode") Long memberCode) {
 
         MemberDTO memberDTO = memberService.findMemberByMemberCode(memberCode, MemberType.TUTOR);
+        MemberIssueCouponDTO memberIssueCouponDTO = memberService.memberIssueCoupon(memberCode);
 
         return ResponseEntity.status(HttpStatus.OK).body(memberMapper.fromMemberDTOtoResponseFindMemberVO(memberDTO));
     }

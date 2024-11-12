@@ -2,29 +2,33 @@ package intbyte4.learnsmate.member.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
+import intbyte4.learnsmate.member.domain.dto.MemberIssueCouponDTO;
+import intbyte4.learnsmate.member.domain.dto.MemberVOCDTO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.repository.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.service.VOCService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-
-    @Autowired
-    public MemberService(MemberRepository memberRepository, MemberMapper memberMapper) {
-        this.memberRepository = memberRepository;
-        this.memberMapper = memberMapper;
-    }
+    private final IssueCouponService issueCouponService;
+    private final VOCService vocService;
 
     public void saveMember(MemberDTO memberDTO) {
         LocalDateTime now = LocalDateTime.now();
@@ -81,6 +85,26 @@ public class MemberService {
         }
 
         return memberMapper.fromMembertoMemberDTO(member);
+    }
+
+    // issueCoupon 메서드 사용하기
+    // -> 원래는 쿠폰 조회시에 한꺼번에 하려고 했지만 다른 서비스들도 저 메서드를 사용하기 때문에 따로 호출 할 예정
+    public MemberIssueCouponDTO memberIssueCoupon(Long memberCode) {
+
+        Map<String, List<IssueCouponDTO>> studentCoupons = issueCouponService.findAllStudentCoupons(memberCode);
+
+        List<IssueCouponDTO> unusedCoupons = studentCoupons.get("unusedCoupons");
+        List<IssueCouponDTO> usedCoupons = studentCoupons.get("usedCoupons");
+
+        return new MemberIssueCouponDTO(unusedCoupons, usedCoupons);
+    }
+
+    // voc 서비스를 호출해서 사용하기
+    public MemberVOCDTO findVOC(Long memberCode){
+        List<VOCDTO> unansweredVOCByMember = vocService.findUnansweredVOCByMember(memberCode);
+        List<VOCDTO> answeredVOCByMember = vocService.findAnsweredVOCByMember(memberCode);
+
+        return new MemberVOCDTO(unansweredVOCByMember, answeredVOCByMember);
     }
 
     // 멤버 타입과 상관 없이 멤버 코드로 조회하는 메서드
