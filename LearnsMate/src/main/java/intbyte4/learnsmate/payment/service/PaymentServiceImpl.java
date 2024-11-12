@@ -11,11 +11,9 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
-import intbyte4.learnsmate.coupon_category.domain.dto.CouponCategoryDTO;
 import intbyte4.learnsmate.coupon_category.service.CouponCategoryService;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
-import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -25,8 +23,6 @@ import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoByStudentDTO;
-import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentService;
-import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentServiceImpl;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -100,7 +96,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         lectureList.forEach(lecture -> {
             LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
-            lectureByStudentDTO.setRefundStatus(false);
+            lectureByStudentDTO.setOwnStatus(false);
             lectureByStudentDTO.setLecture(lecture);
             lectureByStudentDTO.setStudent(member);
 
