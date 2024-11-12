@@ -98,20 +98,4 @@ public class MemberService {
 
         return new MemberIssueCouponDTO(unusedCoupons, usedCoupons);
     }
-
-    // voc 서비스를 호출해서 사용하기
-    public MemberVOCDTO findVOC(Long memberCode){
-        List<VOCDTO> unansweredVOCByMember = vocService.findUnansweredVOCByMember(memberCode);
-        List<VOCDTO> answeredVOCByMember = vocService.findAnsweredVOCByMember(memberCode);
-
-        return new MemberVOCDTO(unansweredVOCByMember, answeredVOCByMember);
-    }
-
-    // 멤버 타입과 상관 없이 멤버 코드로 조회하는 메서드
-    public MemberDTO findById(Long memberCode){
-        Member member = memberRepository.findById(memberCode)
-                .orElseThrow(() -> new CommonException(StatusEnum.USER_NOT_FOUND));
-
-        return memberMapper.fromMembertoMemberDTO(member);
-    }
 }

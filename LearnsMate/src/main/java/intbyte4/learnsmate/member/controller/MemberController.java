@@ -1,14 +1,16 @@
 package intbyte4.learnsmate.member.controller;
 
-import intbyte4.learnsmate.member.domain.dto.MemberIssueCouponDTO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleMemberDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
+import intbyte4.learnsmate.member.service.MemberFacade;
 import intbyte4.learnsmate.member.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +20,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/member")
+@RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberFacade memberFacade;
     private final MemberMapper memberMapper;
-
-    @Autowired
-    public MemberController(MemberService memberService, MemberMapper memberMapper) {
-        this.memberService = memberService;
-        this.memberMapper = memberMapper;
-    }
 
     // 1. 모든 학생 조회(member_flag가 true인 사람 + member_type이 STUDENT)
     @GetMapping("/students")
@@ -57,27 +55,29 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
     }
 
-    //////////////////// 쿠폰, 강의, voc 서비스 메서드 추가 필요 ///////////////////////////
     // 2-1. 학생 단건 조회(member flag가 true + member_type이 STUDENT)
     @GetMapping("/student/{studentcode}")
-    public ResponseEntity<ResponseFindMemberVO> findStudentByStudentCode(@PathVariable("studentcode") Long memberCode) {
+    public ResponseEntity<ResponseFindMemberDetailVO> findStudentByStudentCode(@PathVariable("studentcode") Long memberCode) {
 
-        MemberDTO memberDTO = memberService.findMemberByMemberCode(memberCode, MemberType.STUDENT);
-        MemberIssueCouponDTO memberIssueCouponDTO = memberService.memberIssueCoupon(memberCode);
+        FindSingleMemberDTO dto = memberFacade.findMemberByMemberCode(memberCode);
 
-        return ResponseEntity.status(HttpStatus.OK).body(memberMapper.fromMemberDTOtoResponseFindMemberVO(memberDTO));
+        ResponseFindMemberDetailVO vo
+                = memberMapper.fromFindSingleMemberDTOtoResponseFindMemberDetailVO(dto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(vo);
     }
 
     // 2-2. 강사 단건 조회(member flag가 true + member_type이 TUTOR)
     @GetMapping("/tutor/{tutorcoe}")
-    public ResponseEntity<ResponseFindMemberVO> findTutorByTutorCode(@PathVariable("tutorcode") Long memberCode) {
+    public ResponseEntity<ResponseFindMemberDetailVO> findTutorByTutorCode(@PathVariable("tutorcode") Long memberCode) {
 
-        MemberDTO memberDTO = memberService.findMemberByMemberCode(memberCode, MemberType.TUTOR);
-        MemberIssueCouponDTO memberIssueCouponDTO = memberService.memberIssueCoupon(memberCode);
+        FindSingleMemberDTO dto = memberFacade.findMemberByMemberCode(memberCode);
 
-        return ResponseEntity.status(HttpStatus.OK).body(memberMapper.fromMemberDTOtoResponseFindMemberVO(memberDTO));
+        ResponseFindMemberDetailVO vo
+                = memberMapper.fromFindSingleMemberDTOtoResponseFindMemberDetailVO(dto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(vo);
     }
-    ////////////////////////////////////////////////////////////
 
     // 회원가입시 멤버 저장하는 컨트롤러 메서드
     @PostMapping
