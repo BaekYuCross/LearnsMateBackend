@@ -10,10 +10,6 @@ import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -31,14 +27,12 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
 
     private final LectureByStudentRepository lectureByStudentRepository;
     private final LectureByStudentMapper lectureByStudentMapper;
-    private final LectureCategoryService lectureCategoryService;
     private final MemberService memberService;
     private final LectureService lectureService;
-    private final LectureCategoryMapper lectureCategoryMapper;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
 
-    // 학생별 모든 강의 조회 (refund_status 가 true인것만)
+    // 학생별 모든 강의 조회 (ownStatus가 true인것만)
     @Override
     public List<LectureByStudentDTO> findByStudentCode(Long studentCode) {
 
@@ -57,7 +51,7 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
     }
 
 
-    // 강의별 학생코드 개수 조회 (refund_status 가 true인것만)
+    // 강의별 학생코드 개수 조회 (ownStatus 가 true인것만)
     @Override
     public long countStudentsByLectureAndRefundStatus(Long lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
@@ -68,7 +62,6 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         // 환불되지 않은 수강생의 누적 명수 조회
-        // --> refund_status가 보유상태라고 적혀있지만 영어는 환불상태.. 뭐가 맞을까?
         return lectureByStudentRepository.countByLectureAndRefundStatus(lecture, true);
     }
 
