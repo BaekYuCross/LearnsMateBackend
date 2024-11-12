@@ -58,3 +58,4 @@ public class LectureServiceImpl implements LectureService {
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
+}
