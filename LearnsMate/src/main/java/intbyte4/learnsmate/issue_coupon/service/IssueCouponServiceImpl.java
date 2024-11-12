@@ -64,7 +64,7 @@ public class IssueCouponServiceImpl implements IssueCouponService {
             throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
         }
         if (dto.getCouponIssueDate().isBefore(LocalDateTime.now()) && !dto.getCouponUseStatus() && dto.getCouponUseDate() == null) {
-            List<IssueCoupon> coupons = issueCouponRepository.findCouponsByStudentCode(studentCode);
+            List<IssueCoupon> coupons = issueCouponRepository.findCouponsByStudent_MemberCode(studentCode);
             return coupons.stream()
                     .map(issueCouponMapper::toDTO)
                     .collect(Collectors.toList());
@@ -79,7 +79,7 @@ public class IssueCouponServiceImpl implements IssueCouponService {
             throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
         }
         if (dto.getCouponIssueDate().isBefore(LocalDateTime.now()) && dto.getCouponUseStatus() && dto.getCouponUseDate() != null) {
-            List<IssueCoupon> coupons = issueCouponRepository.findCouponsByStudentCode(studentCode);
+            List<IssueCoupon> coupons = issueCouponRepository.findCouponsByStudent_MemberCode(studentCode);
             return coupons.stream()
                     .map(issueCouponMapper::toDTO)
                     .collect(Collectors.toList());
