@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.lecture.mapper;
 
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
@@ -12,6 +13,7 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Component
 public class LectureMapper {
@@ -50,19 +52,24 @@ public class LectureMapper {
 
 
     // DTO -> VO 변환
-    public ResponseFindLectureVO fromDtoToResponseVO(LectureDTO dto) {
+    // DTO -> VO 변환
+    public ResponseFindLectureVO fromDtoToResponseVO(LectureDetailDTO dto) {
         return ResponseFindLectureVO.builder()
                 .lectureCode(dto.getLectureCode())
                 .lectureTitle(dto.getLectureTitle())
                 .lectureConfirmStatus(dto.getLectureConfirmStatus())
                 .createdAt(dto.getCreatedAt())
-                .updatedAt(dto.getUpdatedAt())
                 .lectureImage(dto.getLectureImage())
                 .lecturePrice(dto.getLecturePrice())
+                .tutorCode(dto.getTutorCode())
+                .tutorName(dto.getTutorName())
                 .lectureStatus(dto.getLectureStatus())
+                .lectureCategory(dto.getLectureCategory())
                 .lectureClickCount(dto.getLectureClickCount())
                 .lectureLevel(dto.getLectureLevel())
-                .tutorCode(dto.getTutorCode())
+                .totalStudents(dto.getTotalStudents())
+                .totalRevenue(dto.getTotalRevenue())
+                .lectureVideos(dto.getLectureVideos())
                 .build();
     }
 
