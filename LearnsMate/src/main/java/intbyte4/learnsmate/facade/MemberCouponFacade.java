@@ -1,6 +1,5 @@
 package intbyte4.learnsmate.facade;
 
-import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
