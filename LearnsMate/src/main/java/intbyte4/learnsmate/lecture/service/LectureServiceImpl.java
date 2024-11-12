@@ -3,16 +3,13 @@ package intbyte4.learnsmate.lecture.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.coupon.service.CouponService;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.service.IssueCouponServiceImpl;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
-import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCategoryListDTO;
-import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -34,6 +31,7 @@ public class LectureServiceImpl implements LectureService {
     private final LectureMapper lectureMapper;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
+    private final IssueCouponServiceImpl issueCouponService;
 
 
     // 전체 강의 조회
@@ -149,4 +147,22 @@ public class LectureServiceImpl implements LectureService {
         return lectureMapper.toDTO(lecture);
     }
 
+    @Override
+    public LectureDTO discountLecture(LectureDTO lectureCode, IssueCouponDTO couponCode){
+        MemberDTO memberDTO = memberService.findMemberByMemberCode(lectureCode.getTutorCode(), MemberType.TUTOR);
+        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
+
+        Lecture getLectureCode = lectureMapper.toEntity(lectureCode,member);
+        Lecture lecture = lectureRepository.findById(getLectureCode.getLectureCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
+
+        LectureDTO lectureDTO = lectureMapper.toDTO(lecture);
+
+        if (couponCode.getCouponCode() != null) {
+            int discountRate = issueCouponService.
+
+
+        }
+        return null;
+    }
 }
