@@ -78,5 +78,11 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         LectureByStudent lectureByStudent = lectureByStudentRepository.findByLecture(lecture);
         return lectureByStudent.getLectureByStudentCode();
     }
+
+    @Override
+    public LectureByStudentDTO findByLectureAndStudent(Lecture lecture, Member member) {
+        LectureByStudent lectureByStudent = lectureByStudentRepository.findByLectureAndStudent(lecture, member);
+        return lectureByStudentMapper.toDTO(lectureByStudent);
+    }
 }
 

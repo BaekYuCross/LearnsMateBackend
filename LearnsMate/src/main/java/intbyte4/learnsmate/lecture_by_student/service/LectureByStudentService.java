@@ -16,4 +16,6 @@ public interface LectureByStudentService {
     void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member);
 
     Long findStudentCodeByLectureCode(Lecture lecture);
+
+    LectureByStudentDTO findByLectureAndStudent(Lecture lecture, Member member);
 }
