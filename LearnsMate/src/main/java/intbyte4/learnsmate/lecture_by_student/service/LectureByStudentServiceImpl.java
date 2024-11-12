@@ -2,10 +2,6 @@ package intbyte4.learnsmate.lecture_by_student.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
-import intbyte4.learnsmate.lecture.mapper.LectureMapper;
-import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
@@ -28,8 +24,6 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
     private final LectureByStudentRepository lectureByStudentRepository;
     private final LectureByStudentMapper lectureByStudentMapper;
     private final MemberService memberService;
-    private final LectureService lectureService;
-    private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
 
     // 학생별 모든 강의 조회 (ownStatus가 true인것만)
@@ -50,19 +44,17 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
                 .collect(Collectors.toList());
     }
 
-
     // 강의별 학생코드 개수 조회 (ownStatus 가 true인것만)
     @Override
     public long countStudentsByLectureAndRefundStatus(Long lectureCode) {
-        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+        // 강의 코드에 해당하는 환불되지 않은 수강생의 개수를 조회
+        return lectureByStudentRepository.countByLectureAndOwnStatus(lectureCode);
+    }
 
-        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
-        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
-
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
-
-        // 환불되지 않은 수강생의 누적 명수 조회
-        return lectureByStudentRepository.countByLectureAndOwnStatus(lecture, true);
+    // 강의 코드에 해당하는 결제 금액을 합산
+    @Override
+    public int calculateTotalRevenue(Long lectureCode) {
+        return lectureByStudentRepository.calculateTotalRevenueByLecture(lectureCode);
     }
 
 }
