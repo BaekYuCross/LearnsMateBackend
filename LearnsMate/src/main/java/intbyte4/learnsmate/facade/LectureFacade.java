@@ -6,6 +6,7 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
@@ -143,7 +144,7 @@ public class LectureFacade {
                     MemberDTO tutor = memberService.findMemberByMemberCode(lecture.getTutorCode(), MemberType.TUTOR);
 
                     // 누적 수강생 수 추가 (ownStatus가 true인 학생만 카운트)
-                    long totalStudents = lectureByStudentService.countStudentsByLectureAndRefundStatus(lecture.getLectureCode());
+                    long totalStudents = lectureByStudentService.countStudentsByLectureAndOwnStatus(lecture.getLectureCode());
 
                     // 누적 매출액 추가
                     int totalRevenue = lectureByStudentService.calculateTotalRevenue(lecture.getLectureCode());
@@ -189,7 +190,7 @@ public class LectureFacade {
         MemberDTO tutor = memberService.findMemberByMemberCode(lecture.getTutorCode(), MemberType.TUTOR);
 
         // 누적 수강생 수 추가 (ownStatus가 true인 학생만 카운트)
-        long totalStudents = lectureByStudentService.countStudentsByLectureAndRefundStatus(lecture.getLectureCode());
+        long totalStudents = lectureByStudentService.countStudentsByLectureAndOwnStatus(lecture.getLectureCode());
 
         // 누적 매출액 추가
         int totalRevenue = lectureByStudentService.calculateTotalRevenue(lecture.getLectureCode());
