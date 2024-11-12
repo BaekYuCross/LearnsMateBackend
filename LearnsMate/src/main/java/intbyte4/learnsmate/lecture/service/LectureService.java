@@ -10,6 +10,6 @@ public interface LectureService {
     LectureDTO getLectureById(Long lectureCode);
     List<LectureDTO> getLecturesByTutorCode(Long tutorCode);
     LectureDTO registerLecture(LectureDTO lectureDTO, List<Integer> lectureCategoryCodeList);
-    LectureDTO updateLecture(Long lectureId, LectureDTO requestEditLectureInfoVO);
+    LectureDTO updateLecture(LectureDTO lectureDTO);
     LectureDTO removeLecture(Long lectureCode);
 }

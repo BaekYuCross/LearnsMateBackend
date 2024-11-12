@@ -13,6 +13,8 @@ public interface LectureByStudentService {
     // 강의별 학생코드 개수 조회 refund_status 가 true인것만
     long countStudentsByLectureAndRefundStatus(Long lectureCode);
 
+    int calculateTotalRevenue(Long lectureCode);
+
     void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member);
 
     Long findStudentCodeByLectureCode(Lecture lecture);
