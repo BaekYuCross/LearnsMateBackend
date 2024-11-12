@@ -43,6 +43,7 @@ public class LectureServiceImpl implements LectureService {
     }
 
 
+
     // 강의 단건 조회
     @Override
     public LectureDTO getLectureById(Long lectureCode) {

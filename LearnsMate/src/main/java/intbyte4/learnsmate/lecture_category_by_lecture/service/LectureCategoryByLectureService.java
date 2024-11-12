@@ -3,9 +3,11 @@ package intbyte4.learnsmate.lecture_category_by_lecture.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
+import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
@@ -15,15 +17,20 @@ import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCate
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCategoryByLecture;
 import intbyte4.learnsmate.lecture_category_by_lecture.mapper.LectureCategoryByLectureMapper;
 import intbyte4.learnsmate.lecture_category_by_lecture.repository.LectureCategoryByLectureRepository;
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
+import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
+import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +38,8 @@ public class LectureCategoryByLectureService {
 
     private final LectureCategoryByLectureRepository lectureCategoryByLectureRepository;
     private final LectureCategoryByLectureMapper lectureCategoryByLectureMapper;
+    private final LectureByStudentService lectureByStudentService;
+    private final VideoByLectureService videoByLectureService;
     private final LectureService lectureService;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
@@ -82,4 +91,58 @@ public class LectureCategoryByLectureService {
         // 강의별 강의 카테고리 테이블에 저장
         lectureCategoryByLectureRepository.saveAll(entitytList);
     }
+
+    public List<String> findCategoryNamesByLectureCode(Long lectureCode) {
+        return lectureCategoryByLectureRepository.findCategoryNamesByLectureCode(lectureCode);
+    }
+
+
+//    @Override
+//    public List<LectureDetailDTO> getAllLecture() {
+//
+//        List<LectureDTO> lectureList = lectureService.getAllLecture(); // 강의 전체 찾기
+//
+//        // 강의가 없으면 빈 리스트 반환
+//        if (lectureList.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        return lectureList.stream()
+//                .map(lecture -> {
+//                    // 강사 정보 추가
+//                    MemberDTO tutor = memberService.findMemberByMemberCode(lecture.getTutorCode(), MemberType.TUTOR);
+//
+//                    // 누적 수강생 수 추가 (ownStatus가 true인 학생만 카운트)
+//                    long totalStudents = lectureByStudentService.countStudentsByLectureAndRefundStatus(lecture.getLectureCode());
+//
+//                    // 누적 매출액 추가
+//                    int totalRevenue = lectureByStudentService.calculateTotalRevenue(lecture.getLectureCode());
+//
+//                    // 강의 동영상 목록 추가
+//                    List<VideoByLectureDTO> lectureVideos = videoByLectureService.findVideoByLectureByLectureCode(lecture.getLectureCode());
+//
+//                    // 강의 카테고리 목록 추가
+//                    List<String> lectureCategories = findCategoryNamesByLectureCode(lecture.getLectureCode());
+//
+//                    // LectureDetailDTO 빌더 패턴으로 생성
+//                    return LectureDetailDTO.builder()
+//                            .lectureCode(lecture.getLectureCode())
+//                            .lectureTitle(lecture.getLectureTitle())
+//                            .lectureConfirmStatus(lecture.getLectureConfirmStatus())
+//                            .createdAt(lecture.getCreatedAt())
+//                            .lectureImage(lecture.getLectureImage())
+//                            .lecturePrice(lecture.getLecturePrice())
+//                            .tutorCode(tutor.getMemberCode())
+//                            .tutorName(tutor.getMemberName())
+//                            .lectureStatus(lecture.getLectureStatus())
+//                            .lectureCategory(String.join(", ", lectureCategories)) // 카테고리를 쉼표로 구분하여 설정
+//                            .lectureClickCount(lecture.getLectureClickCount())
+//                            .lectureLevel(lecture.getLectureLevel())
+//                            .totalStudents((int) totalStudents)
+//                            .totalRevenue(totalRevenue)
+//                            .lectureVideos(lectureVideos)
+//                            .build();
+//                })
+//                .collect(Collectors.toList());
+//    }
 }
