@@ -24,8 +24,6 @@ public interface CouponService {
 
     CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory);
 
-    CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode);
-
     CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin);
 
     CouponDTO tutorEditCoupon(CouponDTO couponDTO, Member tutor);
@@ -39,4 +37,7 @@ public interface CouponService {
 
     @Transactional
     CouponDTO tutorActivateCoupon(Long couponCode, CouponDTO couponDTO, Member tutor);
+
+    @Transactional
+    void saveCoupon(CouponEntity couponEntity);
 }
