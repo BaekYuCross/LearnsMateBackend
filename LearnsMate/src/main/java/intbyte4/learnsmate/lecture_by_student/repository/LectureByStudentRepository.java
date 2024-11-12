@@ -25,4 +25,8 @@ public interface LectureByStudentRepository extends JpaRepository<LectureByStude
             "JOIN p.lectureByStudent ls " +
             "WHERE ls.lecture.lectureCode = :lectureCode AND ls.ownStatus = true")
     int calculateTotalRevenueByLecture(@Param("lectureCode") Long lectureCode);
+
+    LectureByStudent findByLecture(Lecture lecture);
+
+    LectureByStudent findByLectureAndStudent(Lecture lecture, Member member);
 }

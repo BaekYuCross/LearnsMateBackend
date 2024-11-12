@@ -6,6 +6,7 @@ import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -57,5 +58,23 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         return lectureByStudentRepository.calculateTotalRevenueByLecture(lectureCode);
     }
 
+    @Override
+    public void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member) {
+        LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(lectureByStudentDTO, lecture, member);
+
+        lectureByStudentRepository.save(lectureByStudent);
+    }
+
+    @Override
+    public Long findStudentCodeByLectureCode(Lecture lecture) {
+        LectureByStudent lectureByStudent = lectureByStudentRepository.findByLecture(lecture);
+        return lectureByStudent.getLectureByStudentCode();
+    }
+
+    @Override
+    public LectureByStudentDTO findByLectureAndStudent(Lecture lecture, Member member) {
+        LectureByStudent lectureByStudent = lectureByStudentRepository.findByLectureAndStudent(lecture, member);
+        return lectureByStudentMapper.toDTO(lectureByStudent);
+    }
 }
 

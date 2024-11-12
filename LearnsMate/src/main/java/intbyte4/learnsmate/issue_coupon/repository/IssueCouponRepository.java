@@ -22,4 +22,15 @@ public interface IssueCouponRepository extends JpaRepository<IssueCoupon, Long> 
             "WHERE ic.couponIssuanceCode = :couponIssuanceCode " +
               "AND ic.student.memberCode = :studentCode")
     Optional<IssueCoupon> findByCouponIssuanceCodeAndStudentCode(@Param("couponIssuanceCode") String couponIssuanceCode, @Param("studentCode") Long studentCode);
+
+   List<IssueCoupon> findCouponsByStudent_MemberCode(@Param("studentCode") Long studentCode);
+
+    // 특정 학생의 사용하지 않은 쿠폰 조회
+    @Query("SELECT c FROM issueCoupon c WHERE c.student.memberCode = :studentCode AND c.couponIssueDate <= CURRENT_TIMESTAMP AND c.couponUseStatus = false AND c.couponUseDate IS NULL")
+    List<IssueCoupon> findUnusedCouponsByStudentCode(@Param("studentCode") Long studentCode);
+
+    // 특정 학생의 사용한 쿠폰 조회
+    @Query("SELECT c FROM issueCoupon c WHERE c.student.memberCode = :studentCode AND c.couponIssueDate <= CURRENT_TIMESTAMP AND c.couponUseStatus = true AND c.couponUseDate IS NOT NULL")
+    List<IssueCoupon> findUsedCouponsByStudentCode(@Param("studentCode") Long studentCode);
+
 }

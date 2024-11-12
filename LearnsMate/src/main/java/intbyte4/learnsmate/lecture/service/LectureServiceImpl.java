@@ -3,6 +3,16 @@ package intbyte4.learnsmate.lecture.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
+import intbyte4.learnsmate.coupon.mapper.CouponMapper;
+import intbyte4.learnsmate.coupon.service.CouponService;
+import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureServiceImpl;
+import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
+import intbyte4.learnsmate.issue_coupon.repository.IssueCouponRepository;
+import intbyte4.learnsmate.issue_coupon.service.IssueCouponServiceImpl;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;

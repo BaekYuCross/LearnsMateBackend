@@ -9,19 +9,9 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
-import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
-import intbyte4.learnsmate.lecture.mapper.LectureMapper;
-import intbyte4.learnsmate.lecture.service.LectureService;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,14 +31,8 @@ public class CouponServiceImpl implements CouponService {
 
     private final CouponRepository couponRepository;
     private final CouponMapper couponMapper;
-    private final CouponByLectureService couponByLectureService;
-    private final LectureService lectureService;
-    private final LectureMapper lectureMapper;
-    private final LectureCategoryService lectureCategoryService;
-    private final LectureCategoryMapper lectureCategoryMapper;
     private final AdminService adminService;
 
-    // 쿠폰 전체 조회
     @Override
     public List<CouponDTO> findAllCoupons() {
 
@@ -58,7 +42,7 @@ public class CouponServiceImpl implements CouponService {
 
         return couponDTOList;
     }
-    // 쿠폰 단 건 조회 (쿠폰코드로)
+
     @Override
     public CouponDTO findCouponByCouponCode(Long couponCode) {
         CouponEntity couponEntity = couponRepository.findById(couponCode)
@@ -71,7 +55,6 @@ public class CouponServiceImpl implements CouponService {
         return couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
     }
 
-    // 쿠폰 필터링해서 조회
     @Override
     public List<CouponDTO> getCouponsByFilters(CouponFilterRequestVO request) {
         List<CouponEntity> entities = couponRepository.findCouponsByFilters(request);
@@ -83,33 +66,10 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory) {
-        CouponEntity newCoupon = CouponEntity.builder()
-                .couponName(request.getCouponName())
-                .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .couponStartDate(LocalDateTime.now())
-                .couponExpireDate(request.getCouponExpireDate())
-                .couponFlag(true)
-                .couponCategory(couponCategory)
-                .admin(admin)
-                .build();
-
+        CouponEntity newCoupon = getCoupon(request, admin, couponCategory);
         couponRepository.save(newCoupon);
 
         return couponMapper.toDTO(newCoupon);
-    };
-
-    @Override
-    @Transactional
-    public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode) {
-        CouponEntity newCouponEntity = couponMapper.newCouponEntity(request, tutor, couponCategory);
-
-        Lecture lectureEntity = getLecture(tutor, lectureCode);
-        couponRepository.save(newCouponEntity);
-        couponByLectureService.registerCouponByLecture(lectureEntity, newCouponEntity);
-
-        return couponMapper.toDTO(newCouponEntity);
     }
 
     @Override
@@ -216,12 +176,10 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.fromEntityToDTO(updatedCoupon);
     }
 
-    private Lecture getLecture(Member tutor, Long lectureCode) {
-        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
-//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
-//        return lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
-        return lectureMapper.toEntity(lectureDTO, tutor);
+    @Override
+    @Transactional
+    public void saveCoupon(CouponEntity couponEntity) {
+        couponRepository.save(couponEntity);
     }
 
     public void validAdmin(AdminService adminService, Long adminCode, Logger log) {
@@ -239,5 +197,19 @@ public class CouponServiceImpl implements CouponService {
             throw new CommonException(StatusEnum.RESTRICTED);
         }
         log.info(tutor.toString());
+    }
+
+    private static CouponEntity getCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory) {
+        return CouponEntity.builder()
+                .couponName(request.getCouponName())
+                .couponDiscountRate(request.getCouponDiscountRate())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .couponStartDate(LocalDateTime.now())
+                .couponExpireDate(request.getCouponExpireDate())
+                .couponFlag(true)
+                .couponCategory(couponCategory)
+                .admin(admin)
+                .build();
     }
 }

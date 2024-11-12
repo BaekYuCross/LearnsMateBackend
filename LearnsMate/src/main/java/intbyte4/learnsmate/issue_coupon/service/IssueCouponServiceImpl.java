@@ -6,18 +6,17 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
-import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
 import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
 import intbyte4.learnsmate.issue_coupon.repository.IssueCouponRepository;
 import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,20 +26,16 @@ public class IssueCouponServiceImpl implements IssueCouponService {
 
     private final IssueCouponRepository issueCouponRepository;
     private final IssueCouponMapper issueCouponMapper;
-    private final MemberService memberService;
     private final CouponService couponService;
 
-    public List<IssueCouponDTO> issueCouponsToStudents(IssueCouponRegisterRequestVO request) {
-        List<IssueCouponDTO> issuedCoupons = new ArrayList<>();
+    @Override
+    @Transactional
+    public IssueCouponDTO createAndSaveIssueCoupon(Member student, Long couponCode) {
+        CouponEntity coupon = couponService.findByCouponCode(couponCode);
+        IssueCoupon issueCoupon = IssueCoupon.createIssueCoupon(coupon, student);
+        issueCouponRepository.save(issueCoupon);
 
-        for (Long studentCode : request.getStudentCodes()) {
-            Member student = findStudent(studentCode);
-            for (Long couponCode : request.getCouponCodes()) {
-                IssueCoupon issueCoupon = createAndSaveIssueCoupon(student, couponCode);
-                issuedCoupons.add(issueCouponMapper.toDTO(issueCoupon));
-            }
-        }
-        return issuedCoupons;
+        return issueCouponMapper.toDTO(issueCoupon);
     }
 
     @Override
@@ -61,13 +56,33 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         return issueCouponMapper.toDTO(issueCoupon);
     }
 
-    private Member findStudent(Long studentCode) {
-        return memberService.findByStudentCode(studentCode);
-    }
+    // 보유중인 쿠폰 조회
+    @Override
+    public Map<String, List<IssueCouponDTO>> findAllStudentCoupons(Long studentCode){
+        // studentCode 유효성 검증
+        if(studentCode == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
 
-    private IssueCoupon createAndSaveIssueCoupon(Member student, Long couponCode) {
-        CouponEntity coupon = couponService.findByCouponCode(couponCode);
-        IssueCoupon issueCoupon = IssueCoupon.createIssueCoupon(coupon, student);
-        return issueCouponRepository.save(issueCoupon);
+        // 1. studentCode로 되어있는 모든 쿠폰 가져오기(보유한거, 사용한거 구분)
+        //  1-1. 보유한 것 == 사용 여부가 false인 모든 쿠폰 + 쿠폰 사용일자가 null + 발급일이 now보다 적은것.
+        //  1-2. 사용한 것 == 사용 여부가 true인 모든 쿠폰 + 쿠폰 사용일자가 notnull + 발급일이 now보다 적은것.
+
+        // 보유 중인 쿠폰 조회
+        List<IssueCoupon> unusedCoupons = issueCouponRepository.findUnusedCouponsByStudentCode(studentCode);
+        List<IssueCouponDTO> unusedCouponDTOs = unusedCoupons.stream()
+                .map(issueCouponMapper::toDTO)
+                .collect(Collectors.toList());
+
+        // 사용한 쿠폰 조회
+        List<IssueCoupon> usedCoupons = issueCouponRepository.findUsedCouponsByStudentCode(studentCode);
+        List<IssueCouponDTO> usedCouponDTOs = usedCoupons.stream()
+                .map(issueCouponMapper::toDTO)
+                .collect(Collectors.toList());
+
+        // 결과를 Map으로 반환
+        Map<String, List<IssueCouponDTO>> result = new HashMap<>();
+        result.put("unusedCoupons", unusedCouponDTOs);
+        result.put("usedCoupons", usedCouponDTOs);
+
+        return result;
     }
 }
