@@ -8,11 +8,11 @@ import intbyte4.learnsmate.coupon.domain.vo.response.*;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
+import intbyte4.learnsmate.facade.CouponLectureFacade;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +27,7 @@ public class CouponController {
 
     private final CouponService couponService;
     private final CouponMapper couponMapper;
+    private final CouponLectureFacade couponLectureFacade;
 
     @Operation(summary = "쿠폰 전체 조회")
     @GetMapping("/coupons")
@@ -63,11 +64,8 @@ public class CouponController {
 
     @Operation(summary = "강사 - 쿠폰 등록")
     @PostMapping("/tutor/register")
-    public ResponseEntity<CouponRegisterResponseVO> createCoupon (@RequestBody TutorCouponRegisterRequestVO request
-            , Member tutor
-            , CouponCategory couponCategory
-            , Long lectureCode) {
-        CouponDTO couponDTO = couponService.tutorRegisterCoupon(request, tutor, couponCategory, lectureCode);
+    public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode) {
+        CouponDTO couponDTO = couponLectureFacade.tutorRegisterCoupon(request, tutor, couponCategory, lectureCode);
         return ResponseEntity.status(HttpStatus.CREATED).body(couponMapper.fromDTOToRegisterResponseVO(couponDTO));
     }
 
@@ -124,7 +122,7 @@ public class CouponController {
             CouponDTO updatedCoupon = couponService.deleteAdminCoupon(couponCode, admin);
             return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
         } catch (CommonException e) {
-            log.error("쿠폰 삭제 오류: {}", e.getMessage());
+            log.error("직원 쿠폰 삭제 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("예상치 못한 오류 발생", e);
@@ -140,7 +138,7 @@ public class CouponController {
             CouponDTO updatedCoupon = couponService.tutorDeleteCoupon(couponDTO, couponCode, tutor);
             return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
         } catch (CommonException e) {
-            log.error("쿠폰 삭제 오류: {}", e.getMessage());
+            log.error("강사 쿠폰 삭제 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("예상치 못한 오류 발생", e);
