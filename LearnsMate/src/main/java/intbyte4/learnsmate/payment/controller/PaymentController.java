@@ -1,7 +1,9 @@
 package intbyte4.learnsmate.payment.controller;
 
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
+import intbyte4.learnsmate.facade.PaymentFacade;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
+import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.service.PaymentServiceImpl;
@@ -20,13 +22,14 @@ import java.util.stream.Collectors;
 public class PaymentController {
 
     private final PaymentServiceImpl paymentService;
+    private final PaymentFacade paymentFacade;
     private final PaymentMapper paymentMapper;
 
 
     @Operation(summary = "전체 결제 내역 조회")
     @GetMapping
     public ResponseEntity<List<ResponseFindPaymentVO>> getAllPayments() {
-        List<PaymentDTO> payments = paymentService.getAllPayments();
+        List<PaymentDetailDTO> payments = paymentFacade.getAllPayments();
         List<ResponseFindPaymentVO> paymentVOs = payments.stream()
                 .map(paymentMapper::fromDtoToResponseVO)
                 .collect(Collectors.toList());
@@ -36,7 +39,7 @@ public class PaymentController {
     @Operation(summary = "특정 결제 내역 조회")
     @GetMapping("/{paymentCode}")
     public ResponseEntity<ResponseFindPaymentVO> getPaymentDetails(@PathVariable("paymentCode") Long paymentCode) {
-        PaymentDTO paymentDTO = paymentService.getPaymentDetails(paymentCode);
+        PaymentDetailDTO paymentDTO = paymentFacade.getPaymentDetails(paymentCode);
         return ResponseEntity.status(HttpStatus.OK).body(paymentMapper.fromDtoToResponseVO(paymentDTO));
     }
 

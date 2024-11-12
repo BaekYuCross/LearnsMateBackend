@@ -1,7 +1,5 @@
-package intbyte4.learnsmate.lecture.domain.vo.response;
+package intbyte4.learnsmate.lecture.domain.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import lombok.*;
@@ -9,12 +7,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ResponseFindLectureVO {
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class LectureDetailDTO {
     private Long lectureCode; // 강의코드
     private String lectureTitle; // 강의명
     private Boolean lectureConfirmStatus; // 강의 계약 상태
@@ -30,5 +28,4 @@ public class ResponseFindLectureVO {
     private int totalStudents; // 누적 수강생
     private int totalRevenue; // 누적 매출액
     private List<VideoByLectureDTO> lectureVideos;  // 강의 동영상 정보
-
 }
