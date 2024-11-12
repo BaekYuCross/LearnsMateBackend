@@ -10,8 +10,6 @@ import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.MemberType;
@@ -19,6 +17,7 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +44,7 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
         MemberDTO studentDTO = memberService.findMemberByMemberCode(studentCode, MemberType.STUDENT);
         Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
 
-        List<LectureByStudent> lecturesByStudent = lectureByStudentRepository.findByStudentAndRefundStatus(student, true);
+        List<LectureByStudent> lecturesByStudent = lectureByStudentRepository.findByStudentAndOwnStatus(student, true);
 
         if (lecturesByStudent.isEmpty()) {
             throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
@@ -59,7 +58,7 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
 
     // 강의별 학생코드 개수 조회 (refund_status 가 true인것만)
     @Override
-    public long countStudentsByLectureAndRefundStatus(Long lectureCode) {
+    public long countStudentsByLectureAndOwnStatus(Long lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
 
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
@@ -69,8 +68,18 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
 
         // 환불되지 않은 수강생의 누적 명수 조회
         // --> refund_status가 보유상태라고 적혀있지만 영어는 환불상태.. 뭐가 맞을까?
-        return lectureByStudentRepository.countByLectureAndRefundStatus(lecture, true);
+        return lectureByStudentRepository.countByLectureAndOwnStatus(lecture, true);
     }
 
+    @Override
+    @Transactional
+    public void updateOwnStatus(Lecture lecture) {
+        List<LectureByStudent> lectureByStudents = lectureByStudentRepository.findByLecture_LectureCode(lecture.getLectureCode());
+        for (LectureByStudent lectureByStudent : lectureByStudents) {
+            lectureByStudent.changeOwnStatus();
+        }
+
+        lectureByStudentRepository.saveAll(lectureByStudents);
+    }
 }
 

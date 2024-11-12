@@ -7,6 +7,9 @@ import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
+import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
+import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentServiceImpl;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
@@ -34,7 +37,8 @@ public class LectureServiceImpl implements LectureService {
     private final LectureMapper lectureMapper;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-
+    private final LectureByStudentServiceImpl lectureByStudentServiceImpl;
+    private final LectureByStudentService lectureByStudentService;
 
     // 전체 강의 조회
     @Override
@@ -137,8 +141,6 @@ public class LectureServiceImpl implements LectureService {
         return lectureMapper.toDTO(lecture);
     }
 
-
-    // 강의 삭제
     @Override
     @Transactional
     public LectureDTO removeLecture(Long lectureCode) {
@@ -146,6 +148,8 @@ public class LectureServiceImpl implements LectureService {
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
         lecture.toDelete();
         lectureRepository.save(lecture);
+
+        lectureByStudentService.updateOwnStatus(lecture);
         return lectureMapper.toDTO(lecture);
     }
 

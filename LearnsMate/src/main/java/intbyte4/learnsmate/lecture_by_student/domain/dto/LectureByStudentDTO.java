@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class LectureByStudentDTO {
     private Long lectureByStudentCode;
-    private Boolean refundStatus;
+    private Boolean ownStatus;
     private Lecture lecture;
     private Member student;
 }
