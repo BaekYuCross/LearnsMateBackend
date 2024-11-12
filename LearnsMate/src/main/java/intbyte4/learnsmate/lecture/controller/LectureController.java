@@ -30,6 +30,7 @@ public class LectureController {
     private final LectureService lectureService;
     private final LectureFacade LectureFacade;
     private final LectureMapper lectureMapper;
+    private final LectureFacade lectureFacade;
 
     @Operation(summary = "강의 정보 전체 조회")
     @GetMapping
@@ -68,7 +69,7 @@ public class LectureController {
     @Operation(summary = "강의 삭제")
     @PatchMapping("/{lectureCode}/status")
     public ResponseEntity<ResponseRemoveLectureVO> removeLecture(@PathVariable("lectureCode")  Long lectureCode) {
-        LectureDTO removedLecture = lectureService.removeLecture(lectureCode);
+        LectureDTO removedLecture = lectureFacade.removeLecture(lectureCode);
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToRemoveResponseVO(removedLecture));
     }
 

@@ -32,4 +32,8 @@ public class LectureByStudent {
     @JoinColumn(name = "student_code", nullable = false)
     @Where(clause = "member_type = 'STUDENT'")
     private Member student;
+
+    public void changeOwnStatus() {
+        this.ownStatus = false;
+    }
 }

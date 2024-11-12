@@ -33,7 +33,6 @@ public class LectureServiceImpl implements LectureService {
                 .collect(Collectors.toList());
     }
 
-
     // 강의 단건 조회
     @Override
     public LectureDTO getLectureById(Long lectureCode) {
@@ -42,13 +41,11 @@ public class LectureServiceImpl implements LectureService {
         return lectureMapper.toDTO(lecture);
     }
 
-
     // 카테고리별 강의 조회
 //    public List<Lecture> filterLectures(LectureFilterDTO filter) {
 //        Specification<Lecture> spec = LectureSpecifications.filterByCriteria(filter);
 //        return lectureRepository.findAll(spec);
 //    }
-
 
     // 강의 수정
     @Override
@@ -61,17 +58,3 @@ public class LectureServiceImpl implements LectureService {
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
-
-
-    // 강의 삭제
-    @Override
-    @Transactional
-    public LectureDTO removeLecture(Long lectureCode) {
-        Lecture lecture = lectureRepository.findById(lectureCode)
-                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
-        lecture.toDelete();
-        lectureRepository.save(lecture);
-        return lectureMapper.toDTO(lecture);
-    }
-
-}

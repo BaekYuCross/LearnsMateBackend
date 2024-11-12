@@ -6,12 +6,13 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
-import intbyte4.learnsmate.lecture.service.LectureService;
+import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
+import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
+import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -24,9 +25,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
+
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +36,10 @@ public class LectureFacade {
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
     private final CouponService couponService;
+    private final LectureByStudentService lectureByStudentService;
+    private final LectureByStudentRepository lectureByStudentRepository;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-    private final LectureByStudentService lectureByStudentService;
     private final VideoByLectureService videoByLectureService;
     private final LectureService lectureService;
     private final LectureCategoryByLectureService lectureCategoryByLectureService;
@@ -50,6 +52,28 @@ public class LectureFacade {
         CouponEntity coupon = couponService.findByCouponCode(issueCouponDTO.getCouponCode());
         lectureDTO.setLecturePrice(lectureDTO.getLecturePrice() * (1 - coupon.getCouponDiscountRate() / 100));
         return lectureDTO;
+    }
+
+    @Transactional
+    public LectureDTO removeLecture(Long lectureCode) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
+        lecture.toDelete();
+        lectureRepository.save(lecture);
+
+        updateOwnStatus(lecture);
+        return lectureMapper.toDTO(lecture);
+    }
+
+    @Transactional
+    public void updateOwnStatus(Lecture lecture) {
+        List<Long> lectureByStudentCodes = lectureByStudentRepository.findLectureByStudentCodesByLectureCode(lecture.getLectureCode());
+        List<LectureByStudent> lectureByStudents = lectureByStudentRepository.findAllById(lectureByStudentCodes);
+        for (LectureByStudent lectureByStudent : lectureByStudents) {
+            lectureByStudent.changeOwnStatus();
+        }
+
+        lectureByStudentRepository.saveAll(lectureByStudents);
     }
 
     // 강사별 강의 모두 조회

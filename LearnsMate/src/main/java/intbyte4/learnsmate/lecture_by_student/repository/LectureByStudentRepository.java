@@ -15,6 +15,9 @@ public interface LectureByStudentRepository extends JpaRepository<LectureByStude
 
     List<LectureByStudent> findByStudentAndOwnStatus(Member student, boolean ownStatus);
 
+    @Query("SELECT l.lectureByStudentCode FROM lecture_by_student l WHERE l.lecture.lectureCode = :lectureCode")
+    List<Long> findLectureByStudentCodesByLectureCode(@Param("lectureCode") Long lectureCode);
+
     // 강의 코드와 ownStatus가 true인 수강생의 개수를 조회하는 쿼리
     @Query("SELECT COUNT(ls) FROM lecture_by_student ls " +
             "WHERE ls.lecture.lectureCode = :lectureCode AND ls.ownStatus = true")
