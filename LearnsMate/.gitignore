@@ -1,9 +1,6 @@
 # Gradle 관련 파일
 .gradle/
 build/
-gradle/
-!gradle/wrapper/gradle-wrapper.jar
-!gradle/wrapper/gradle-wrapper.properties
 
 # IDE 설정 파일
 .idea/
