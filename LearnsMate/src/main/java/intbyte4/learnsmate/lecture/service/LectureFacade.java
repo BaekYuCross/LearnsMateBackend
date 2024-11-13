@@ -23,6 +23,7 @@ import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
+import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCategoryListDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -106,21 +107,14 @@ public class LectureFacade {
     }
 
 
-
-
-    // 강의 등록 -> 강의별 강의 카테고리 등록 메소드 가져오기 .
     @Transactional
-    public LectureDTO registerLecture(LectureDTO lectureDTO, List<Integer> lectureCategoryCodeList) {
+    public LectureDTO registerLecture(LectureDTO lectureDTO, List<Integer> lectureCategoryCodeList, List<VideoByLectureDTO> videoByLectureDTOList) {
 
-//    lectureCategoryByLectureService의 등록 메서드 호출 필요
-//        OneLectureCategoryListDTO oneLectureCategoryListDTO
-//                = new OneLectureCategoryListDTO(lectureDTO.getLectureCode(), lectureCategoryCodeList);
-//        lectureCategoryByLectureService.saveLectureCategoryByLecture(oneLectureCategoryListDTO);
-
-
+        // 강의를 담당하는 튜터 정보 조회 및 변환
         MemberDTO memberDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
-        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
+        Member tutor = memberMapper.fromMemberDTOtoMember(memberDTO);
 
+        // 강의 엔티티 생성 및 저장
         Lecture lecture = Lecture.builder()
                 .lectureTitle(lectureDTO.getLectureTitle())
                 .lectureConfirmStatus(false)
@@ -128,15 +122,30 @@ public class LectureFacade {
                 .updatedAt(LocalDateTime.now())
                 .lectureImage(lectureDTO.getLectureImage())
                 .lecturePrice(lectureDTO.getLecturePrice())
-                .tutor(member)
+                .tutor(tutor)
                 .lectureStatus(true)
                 .lectureClickCount(0)
                 .lectureLevel(lectureDTO.getLectureLevel())
                 .build();
 
         lectureRepository.save(lecture);
+
+        // 강의별 카테고리 등록
+        OneLectureCategoryListDTO oneLectureCategoryListDTO
+                = new OneLectureCategoryListDTO(lecture.getLectureCode(), lectureCategoryCodeList);
+        lectureCategoryByLectureService.saveLectureCategoryByLecture(oneLectureCategoryListDTO);
+
+        Long lectureCode = lecture.getLectureCode();
+
+        videoByLectureDTOList.forEach(videoDTO -> {
+            videoByLectureService.registerVideoByLecture(lectureCode, videoDTO);
+        });
+
+        // 강의 정보 DTO로 변환하여 반환
         return lectureMapper.toDTO(lecture);
     }
+
+
 
 
     //강의별 계약과정이 강의 코드가 7개 라면 강의컬럼의 승인여부  true로 변환
