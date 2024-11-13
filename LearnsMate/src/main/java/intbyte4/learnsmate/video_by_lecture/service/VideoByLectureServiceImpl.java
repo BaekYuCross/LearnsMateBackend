@@ -55,7 +55,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
 
     // 강의별 동영상 등록
     @Override
-    public VideoByLectureDTO registerVideoByLecture(Long lectureCode, VideoByLectureDTO videoByLectureDTO) {
+    public void registerVideoByLecture(Long lectureCode, VideoByLectureDTO videoByLectureDTO) {
 
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
 
@@ -72,7 +72,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
 
         VideoByLecture savedVideoByLecture = videoByLectureRepository.save(videoByLecture);
 
-        return videoByLectureMapper.toDTO(savedVideoByLecture);
+        videoByLectureMapper.toDTO(savedVideoByLecture);
     }
 
 

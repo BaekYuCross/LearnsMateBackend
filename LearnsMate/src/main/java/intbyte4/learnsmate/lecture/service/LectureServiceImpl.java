@@ -48,6 +48,28 @@ public class LectureServiceImpl implements LectureService {
         return lectureMapper.toDTO(lecture);
     }
 
+    // 유저별 조회에서 count++ lectureClickCount int 올리기
+    @Override
+    public LectureDTO getLecturesByStudentCode(Long studentCode) {
+        // 학생 정보 조회
+        MemberDTO studentDTO = memberService.findMemberByMemberCode(studentCode, MemberType.STUDENT);
+        Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
+
+        // 학생이 조회하려는 강의를 가져옴
+        LectureDTO lectureDTO = getLectureById(studentCode);
+
+        // 해당 강의의 클릭 수 증가
+        Lecture lecture = lectureMapper.toEntity(lectureDTO,student);
+        lecture.incrementClickCount();  // 클릭 수를 증가시키는 메서드 추가 필요
+
+        // 강의 정보 업데이트
+        lectureRepository.save(lecture);
+
+        // 업데이트된 강의를 DTO로 변환하여 반환
+        return lectureMapper.toDTO(lecture);
+    }
+
+
     // 강사별 강의 모두 조회
     @Override
     public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
