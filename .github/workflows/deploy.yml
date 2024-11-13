@@ -96,7 +96,7 @@ jobs:
 
       - name: Generate deployment package
         run: |
-#          ./gradlew clean build
+          ./gradlew clean build
           mkdir -p deploy
           cp build/libs/*.jar deploy/application.jar
           cp Procfile deploy/Procfile
