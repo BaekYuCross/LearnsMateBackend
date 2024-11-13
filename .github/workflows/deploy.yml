@@ -1,6 +1,5 @@
 name: learnsmate-service
 
-# eb_prac!
 permissions:
   contents: read
   pull-requests: write
@@ -18,17 +17,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: LearnsMate
-        shell: bash
-
-      - name: Build with Gradle
-        run: ./gradlew clean build -x test
         working-directory: LearnsMate
         shell: bash
 
@@ -70,19 +67,20 @@ jobs:
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
 
-#      - name: Check for Tests
-#        run: |
-#          if git diff --name-only origin/main HEAD | grep -qvE '(\.xml$|\.yml$|config/)'; then
-#            if [ -z "$(find src/test -name '*ServiceTests.java')" ]; then
-#              echo "No ServiceTest found, failing the build."
-#              exit 1
-#            fi
-#          else
-#            echo "Only configuration files changed, skipping test check."
-#          fi
+      - name: Check for Tests
+        run: |
+          if git diff --name-only origin/main HEAD | grep -qvE '(\.xml$|\.yml$|config/)'; then
+            if [ -z "$(find src/test -name '*ServiceTests.java')" ]; then
+              echo "No ServiceTest found, failing the build."
+              exit 1
+            fi
+          else
+            echo "Only configuration files changed, skipping test check."
+          fi
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
+        working-directory: LearnsMate
         shell: bash
 
       - name: Get current time
@@ -111,8 +109,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: intbyte
-          environment_name: Intbyte-env
+          application_name: camp1
+          environment_name: Camp1-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip
