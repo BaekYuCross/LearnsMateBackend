@@ -6,7 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.entity.QMember;
-import intbyte4.learnsmate.member.domain.vo.MemberFilterRequestVO;
+import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-        public List<Member> searchBy(MemberFilterRequestVO request) {
+        public List<Member> searchBy(MemberFilterRequestDTO request) {
         QMember member = QMember.member;
 
         BooleanBuilder builder = new BooleanBuilder()
