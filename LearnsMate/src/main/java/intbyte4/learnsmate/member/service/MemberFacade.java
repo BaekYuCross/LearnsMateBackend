@@ -8,11 +8,14 @@ import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
 import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentService;
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.FindSingleMemberDTO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.repository.MemberRepository;
+import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
+import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureFacade;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.service.VOCService;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +35,11 @@ public class MemberFacade {
     private final VOCService vocService;
     private final MemberMapper memberMapper;
     private final LectureVideoByStudentService lectureVideoByStudentService;
+    private final VideoByLectureFacade videoByLectureFacade;
 
     // 멤버 단일 조회시에 사용되는 서비스
     // memberCode로 학생 조회
-    public FindSingleMemberDTO findStudentByStudentCode(Long studentCode) {
+    public FindSingleStudentDTO findStudentByStudentCode(Long studentCode) {
         Member member = memberRepository.findById(studentCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
 
@@ -43,7 +47,7 @@ public class MemberFacade {
             throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
 
         // 0. 학생 개인정보
-        MemberDTO memberDTO = memberMapper.fromMembertoMemberDTO(member);
+        MemberDTO studentDTO = memberMapper.fromMembertoMemberDTO(member);
 
         // 1. 학생의 강의
         List<LectureVideoProgressDTO> LectureVideoProgressDTOList = lectureVideoByStudentService.getVideoProgressByStudent(studentCode);
@@ -57,8 +61,8 @@ public class MemberFacade {
         List<VOCDTO> unansweredVOCByMemberList = vocService.findUnansweredVOCByMember(studentCode);
         List<VOCDTO> answeredVOCByMemberList = vocService.findAnsweredVOCByMember(studentCode);
 
-        FindSingleMemberDTO dto = new FindSingleMemberDTO(
-                memberDTO,
+        FindSingleStudentDTO dto = new FindSingleStudentDTO(
+                studentDTO,
                 LectureVideoProgressDTOList,
                 unusedCouponList,
                 usedCouponList,
@@ -69,7 +73,7 @@ public class MemberFacade {
         return dto;
     }
 
-    public FindSingleMemberDTO findTutorByTutorCode(Long tutorCode) {
+    public FindSingleTutorDTO findTutorByTutorCode(Long tutorCode) {
         Member member = memberRepository.findById(tutorCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.TUTOR_NOT_FOUND));
 
@@ -77,10 +81,16 @@ public class MemberFacade {
             throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
 
         // 0. 강사 개인정보
-        MemberDTO memberDTO = memberMapper.fromMembertoMemberDTO(member);
+        MemberDTO tutorDTO = memberMapper.fromMembertoMemberDTO(member);
 
         // 1. 강사 강의 정보
+        List<CountVideoByLectureDTO> tutorLectureDetailList = videoByLectureFacade.getVideoByLecture(tutorCode);
 
-        return null;
+        FindSingleTutorDTO dto = new FindSingleTutorDTO(
+                tutorDTO,
+                tutorLectureDetailList
+        );
+
+        return dto;
     }
 }
