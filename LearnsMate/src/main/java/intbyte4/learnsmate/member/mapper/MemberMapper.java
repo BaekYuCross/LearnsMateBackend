@@ -146,7 +146,7 @@ public class MemberMapper{
     public ResponseFindMemberDetailVO fromFindSingleMemberDTOtoResponseFindMemberDetailVO(FindSingleMemberDTO dto) {
         return ResponseFindMemberDetailVO.builder()
                 .memberDTO(dto.getMemberDTO())
-                .lectureDTOList(dto.getLectureDTOList())
+                .LectureVideoProgressDTOList(dto.getLectureVideoProgressDTOList())
                 .unusedCouponsList(dto.getUnusedCouponsList())
                 .usedCouponsList(dto.getUsedCouponsList())
                 .unansweredVOCByMemberList(dto.getUnansweredVOCByMemberList())

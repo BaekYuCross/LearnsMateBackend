@@ -5,6 +5,8 @@ import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.service.LectureService;
+import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
+import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentService;
 import intbyte4.learnsmate.member.domain.dto.FindSingleMemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -28,6 +30,7 @@ public class MemberFacade {
     private final IssueCouponService issueCouponService;
     private final VOCService vocService;
     private final MemberMapper memberMapper;
+    private final LectureVideoByStudentService lectureVideoByStudentService;
 
     // 멤버 단일 조회시에 사용되는 서비스
     // memberCode로 학생 조회
@@ -39,6 +42,7 @@ public class MemberFacade {
         MemberDTO memberDTO = memberMapper.fromMembertoMemberDTO(member);
 
         // 1. 학생의 강의
+        List<LectureVideoProgressDTO> LectureVideoProgressDTOList = lectureVideoByStudentService.getVideoProgressByStudent(studentCode);
 
         // 2. 학생이 보유 or 사용한 쿠폰
         Map<String, List<IssueCouponDTO>> studentCoupons = issueCouponService.findAllStudentCoupons(studentCode);
@@ -51,7 +55,7 @@ public class MemberFacade {
 
         FindSingleMemberDTO dto = new FindSingleMemberDTO(
                 memberDTO,
-                null ,
+                LectureVideoProgressDTOList,
                 unusedCouponList,
                 usedCouponList,
                 unansweredVOCByMemberList,
