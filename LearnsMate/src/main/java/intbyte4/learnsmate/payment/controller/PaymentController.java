@@ -1,8 +1,14 @@
 package intbyte4.learnsmate.payment.controller;
 
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
+import intbyte4.learnsmate.facade.LectureFacade;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.mapper.LectureMapper;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
-import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
+import intbyte4.learnsmate.payment.domain.vo.*;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.service.PaymentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +27,10 @@ public class PaymentController {
 
     private final PaymentServiceImpl paymentService;
     private final PaymentMapper paymentMapper;
+    private final LectureMapper lectureMapper;
+    private final LectureFacade lectureFacade;
+    private final IssueCouponMapper issueCouponMapper;
+    private final MemberMapper memberMapper;
 
 
     @Operation(summary = "전체 결제 내역 조회")
@@ -38,6 +48,33 @@ public class PaymentController {
     public ResponseEntity<ResponseFindPaymentVO> getPaymentDetails(@PathVariable("paymentCode") Long paymentCode) {
         PaymentDTO paymentDTO = paymentService.getPaymentDetails(paymentCode);
         return ResponseEntity.status(HttpStatus.OK).body(paymentMapper.fromDtoToResponseVO(paymentDTO));
+    }
+
+    @Operation(summary = "결제 내역 등록")
+    @PostMapping("/register")
+    public ResponseEntity<List<ResponseRegisterPaymentVO>> registerPayment
+            (@RequestBody RequestRegisterPaymentVO requestRegisterPaymentVO) {
+        IssueCouponDTO issueCouponDTO = issueCouponMapper
+                .fromRequestRegisterIssueCouponPaymentVOToDTO(requestRegisterPaymentVO.getIssueCouponVO());
+
+        MemberDTO memberDTO = memberMapper
+                .fromRequestRegisterMemberPaymentVOToMemberDTO(requestRegisterPaymentVO.getMemberVO());
+
+        List<LectureDTO> lectureDTOList = requestRegisterPaymentVO.getLectureVOList().stream()
+                .map(lectureMapper::fromRequestRegisterLecturePaymentVOToDTO)
+                .toList();
+
+        List<LectureDTO> lectures = lectureDTOList.stream()
+                .map(lectureDTO -> lectureFacade.discountLecturePrice(lectureDTO, issueCouponDTO))
+                .toList();
+
+        List<PaymentDTO> payments = paymentService.lecturePayment(memberDTO, lectures, issueCouponDTO);
+
+        List<ResponseRegisterPaymentVO> responseList = payments.stream()
+                .map(paymentMapper::fromPaymentDTOtoResponseRegisterPaymentVO)
+                .toList();
+
+        return ResponseEntity.ok(responseList);
     }
 
 //    // 직원이 예상 매출액과 할인 매출액을 비교해서 조회 (추가 예시 메서드)
