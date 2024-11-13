@@ -1,13 +1,14 @@
 package intbyte4.learnsmate.payment.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.lecture.domain.entity.QLecture;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.QLectureByStudent;
 import intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.QLectureCategoryByLecture;
-import intbyte4.learnsmate.payment.domain.entity.Payment;
+import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
 import intbyte4.learnsmate.payment.domain.entity.QPayment;
 import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import jakarta.persistence.EntityManager;
@@ -26,7 +27,7 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
     }
 
     @Override
-    public List<Payment> findPaymentByFilters(PaymentFilterRequestVO request) {
+    public List<PaymentDetailDTO> findPaymentByFilters(PaymentFilterRequestVO request) {
         QPayment payment = QPayment.payment;
         QLectureByStudent lectureByStudent = QLectureByStudent.lectureByStudent;
         QLecture lecture = QLecture.lecture;
@@ -49,8 +50,26 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
                 .and(likeCouponIssuanceName(request.getCouponIssuanceName()));
 
         return queryFactory
-                .selectFrom(payment)
+                .select(Projections.constructor(
+                        PaymentDetailDTO.class,
+                        payment.paymentCode,
+                        payment.paymentPrice,
+                        payment.createdAt,
+                        lecture.lectureCode,
+                        lecture.lectureTitle,
+                        lecture.lecturePrice,
+                        lecture.tutor.memberCode,
+                        lecture.tutor.memberName,
+                        lectureByStudent.student.memberCode,
+                        lectureByStudent.student.memberName,
+                        lectureCategory.lectureCategoryCode,
+                        lectureCategory.lectureCategoryName,
+                        payment.couponIssuance.couponIssuanceCode,
+                        payment.couponIssuance.coupon.couponName
+                ))
+                .from(payment)
                 .join(payment.lectureByStudent, lectureByStudent) // Payment → LectureByStudent
+                .join(lectureByStudent.lecture, lecture)          // LectureByStudent → Lecture
                 .join(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture)) // Lecture → LectureCategoryByLecture
                 .join(lectureCategoryByLecture.lectureCategory, lectureCategory) // LectureCategoryByLecture → LectureCategory
                 .where(builder)

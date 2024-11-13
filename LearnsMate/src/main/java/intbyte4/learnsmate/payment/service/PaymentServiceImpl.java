@@ -17,7 +17,6 @@ import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
-import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
@@ -28,7 +27,9 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
+import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final MemberMapper memberMapper;
     private final LectureByStudentMapper lectureByStudentMapper;
     private final IssueCouponMapper issueCouponMapper;
-    private final LectureService lectureService;
     private final MemberService memberService;
     private final LectureByStudentService lectureByStudentService;
     private final CouponService couponService;
@@ -70,6 +70,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<PaymentDetailDTO> getPaymentsByFilters(PaymentFilterRequestVO request) {
+        return paymentRepository.findPaymentByFilters(request);
+    }
 
     // 직원이 특정 결제 내역을 단건 상세 조회
     @Override
