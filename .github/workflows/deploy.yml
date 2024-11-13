@@ -26,12 +26,12 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: ./LearnsMate
+        working-directory: LearnsMateBackend/LearnsMate
         shell: bash
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
-        working-directory: ./LearnsMate
+        working-directory: LearnsMateBackend/LearnsMate
         shell: bash
 
       - name: Get current time
@@ -59,4 +59,4 @@ jobs:
           top_p: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-top_p
           temperature: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-temperature
           max_tokens: 10000
-          MAX_PATCH_LENGTH: 10000
+          MAX_PATCH_LENGTH: 1000 # 리뷰 최대 길이를 줄여서 개수 제한
