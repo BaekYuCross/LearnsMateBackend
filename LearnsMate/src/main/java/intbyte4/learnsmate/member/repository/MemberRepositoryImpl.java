@@ -39,67 +39,67 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .fetch();
     }
 
-    // memberCode 검색 조건 (변동 없음)
+    // memberCode 검색 조건
     private BooleanBuilder searchByMemberCode(Member member) {
         BooleanBuilder builder = new BooleanBuilder();
         if (member.getMemberCode() != null) {
             builder.and(QMember.member.memberCode.eq(member.getMemberCode()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
-    // memberType 검색 조건 (변동 없음)
+    // memberType 검색 조건
     private BooleanBuilder searchByMemberType(Member member) {
         BooleanBuilder builder = new BooleanBuilder();
         if (member.getMemberType() != null) {
             builder.and(QMember.member.memberType.eq(member.getMemberType()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
-    // 이메일 검색 조건 (변동 없음)
+    // 이메일 검색 조건
     private BooleanBuilder searchByEmail(Member member) {
         BooleanBuilder builder = new BooleanBuilder();
         if (member.getMemberEmail() != null) {
             builder.and(QMember.member.memberEmail.containsIgnoreCase(member.getMemberEmail()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
-    // 비밀번호 검색 조건 (변동 없음)
+    // 비밀번호 검색 조건
     private BooleanBuilder searchByPassword(Member member) {
         BooleanBuilder builder = new BooleanBuilder();
         if (member.getMemberPassword() != null) {
             builder.and(QMember.member.memberPassword.eq(member.getMemberPassword()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
-    // 이름 검색 조건 (변동 없음)
+    // 이름 검색 조건
     private BooleanBuilder searchByName(Member member) {
         BooleanBuilder builder = new BooleanBuilder();
         if (member.getMemberName() != null) {
             builder.and(QMember.member.memberName.containsIgnoreCase(member.getMemberName()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
-    // 나이 검색 조건 (변동 없음)
+    // 나이 검색 조건
     private BooleanBuilder searchByAge(Member member) {
         BooleanBuilder builder = new BooleanBuilder();
         if (member.getMemberAge() != null) {
             builder.and(QMember.member.memberAge.eq(member.getMemberAge()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
-    // 연락처 검색 조건 (변동 없음)
+    // 연락처 검색 조건
     private BooleanBuilder searchByPhone(Member member) {
         BooleanBuilder builder = new BooleanBuilder();
         if (member.getMemberPhone() != null) {
             builder.and(QMember.member.memberPhone.containsIgnoreCase(member.getMemberPhone()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
     // 주소 검색 조건 (변동 없음)
@@ -108,7 +108,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         if (member.getMemberAddress() != null) {
             builder.and(QMember.member.memberAddress.containsIgnoreCase(member.getMemberAddress()));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
     // 생년월일 검색 조건 (범위 검색 - 수정됨)
@@ -120,7 +120,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         if (endDate != null) {
             builder.and(QMember.member.memberBirth.loe(endDate));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
     // 생성일 범위 검색 조건 (변동 없음)
@@ -132,10 +132,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         if (endDate != null) {
             builder.and(QMember.member.createdAt.loe(endDate));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 
-    // 수정일 범위 검색 조건 (변동 없음)
+    // 수정일 범위 검색 조건
     private BooleanBuilder searchByUpdatedAt(LocalDateTime startDate, LocalDateTime endDate) {
         BooleanBuilder builder = new BooleanBuilder();
         if (startDate != null) {
@@ -144,6 +144,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         if (endDate != null) {
             builder.and(QMember.member.updatedAt.loe(endDate));
         }
-        return builder; // 더이상 변동내용 없음.
+        return builder;
     }
 }
