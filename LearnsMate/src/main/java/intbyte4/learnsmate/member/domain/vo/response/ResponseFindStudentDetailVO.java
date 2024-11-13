@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ResponseFindMemberDetailVO {
+public class ResponseFindStudentDetailVO {
 
     MemberDTO memberDTO;
 
