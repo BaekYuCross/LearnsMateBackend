@@ -1,44 +1,36 @@
-HELP.md
-.gradle
-settings.gradle
-.gitattributes
+# Gradle 관련 파일
 .gradle/
-gradle/
-.idea/
 build/
+gradle/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+!gradle/wrapper/gradle-wrapper.properties
 
-### STS ###
+# IDE 설정 파일
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+bin/
+
+# Spring Tool Suite
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
 
-### IntelliJ IDEA ###
+# IntelliJ IDEA
 application-test.yml
-.idea
-*.json
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
-### NetBeans ###
+# VS Code
+.vscode/
+
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-### VS Code ###
-.vscode/
