@@ -1,10 +1,9 @@
-package intbyte4.learnsmate.facade;
+package intbyte4.learnsmate.coupon.service;
 
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
-import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CouponLectureFacade {
+public class CouponFacade {
 
     private final CouponService couponService;
     private final LectureService lectureService;
