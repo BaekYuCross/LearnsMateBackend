@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestRegisterPaymentVO {
+    private RequestRegisterIssueCouponPaymentVO issueCouponVO;
+    private RequestRegisterMemberPaymentVO memberVO;
+    private List<RequestRegisterLecturePaymentVO> LectureVOList;
 
     private Long paymentCode;
     private Integer paymentPrice;
