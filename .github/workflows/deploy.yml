@@ -33,6 +33,7 @@ jobs:
         run: sudo apt-get install -y gettext
 
       - name: Create application.yml.template
+        working-directory: LearnsMate
         run: |
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template <<EOL
@@ -56,6 +57,7 @@ jobs:
           EOL
 
       - name: Set Yaml
+        working-directory: LearnsMate
         run: |
           envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
           echo "Generated application.yml:"
@@ -68,6 +70,7 @@ jobs:
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
 
       - name: Check for Tests
+        working-directory: LearnsMate
         run: |
           if git diff --name-only origin/main HEAD | grep -qvE '(\.xml$|\.yml$|config/)'; then
             if [ -z "$(find src/test -name '*ServiceTests.java')" ]; then
