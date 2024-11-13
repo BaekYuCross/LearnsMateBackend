@@ -130,78 +130,33 @@ public class LectureFacade {
 
     // 강의 모두 조회
     public List<LectureDetailDTO> getAllLecture() {
+        List<LectureDTO> lectureList = lectureService.getAllLecture();
 
-        List<LectureDTO> lectureList = lectureService.getAllLecture(); // 강의 전체 찾기
-
-        // 강의가 없으면 빈 리스트 반환
         if (lectureList.isEmpty()) {
             throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
         }
 
         return lectureList.stream()
-                .map(lecture -> {
-                    // 강사 정보 추가
-                    MemberDTO tutor = memberService.findMemberByMemberCode(lecture.getTutorCode(), MemberType.TUTOR);
-
-                    // 누적 수강생 수 추가 (ownStatus가 true인 학생만 카운트)
-                    long totalStudents = lectureByStudentService.countStudentsByLectureAndOwnStatus(lecture.getLectureCode());
-
-                    // 누적 매출액 추가
-                    int totalRevenue = lectureByStudentService.calculateTotalRevenue(lecture.getLectureCode());
-
-                    // 강의 동영상 목록 추가
-                    List<VideoByLectureDTO> lectureVideos = videoByLectureService.findVideoByLectureByLectureCode(lecture.getLectureCode());
-
-                    // 강의 카테고리 목록 추가
-                    List<String> lectureCategories = lectureCategoryByLectureService.findCategoryNamesByLectureCode(lecture.getLectureCode());
-
-                    // LectureDetailDTO 빌더 패턴으로 생성
-                    return LectureDetailDTO.builder()
-                            .lectureCode(lecture.getLectureCode())
-                            .lectureTitle(lecture.getLectureTitle())
-                            .lectureConfirmStatus(lecture.getLectureConfirmStatus())
-                            .createdAt(lecture.getCreatedAt())
-                            .lectureImage(lecture.getLectureImage())
-                            .lecturePrice(lecture.getLecturePrice())
-                            .tutorCode(tutor.getMemberCode())
-                            .tutorName(tutor.getMemberName())
-                            .lectureStatus(lecture.getLectureStatus())
-                            .lectureCategory(String.join(", ", lectureCategories)) // 카테고리를 쉼표로 구분하여 설정
-                            .lectureClickCount(lecture.getLectureClickCount())
-                            .lectureLevel(lecture.getLectureLevel())
-                            .totalStudents((int) totalStudents)
-                            .totalRevenue(totalRevenue)
-                            .lectureVideos(lectureVideos)
-                            .build();
-                })
+                .map(this::buildLectureDetailDTO)
                 .collect(Collectors.toList());
     }
 
     // 강의 단건 조회
     public LectureDetailDTO getLectureById(Long lectureCode) {
-        // 강의 정보 찾기
-        LectureDTO lecture = lectureService.getLectureById(lectureCode); // 특정 강의 조회
-
+        LectureDTO lecture = lectureService.getLectureById(lectureCode);
         if (lecture == null) {
             throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
         }
+        return buildLectureDetailDTO(lecture);
+    }
 
-        // 강사 정보 추가
+    private LectureDetailDTO buildLectureDetailDTO(LectureDTO lecture) {
         MemberDTO tutor = memberService.findMemberByMemberCode(lecture.getTutorCode(), MemberType.TUTOR);
-
-        // 누적 수강생 수 추가 (ownStatus가 true인 학생만 카운트)
         long totalStudents = lectureByStudentService.countStudentsByLectureAndOwnStatus(lecture.getLectureCode());
-
-        // 누적 매출액 추가
         int totalRevenue = lectureByStudentService.calculateTotalRevenue(lecture.getLectureCode());
-
-        // 강의 동영상 목록 추가
         List<VideoByLectureDTO> lectureVideos = videoByLectureService.findVideoByLectureByLectureCode(lecture.getLectureCode());
-
-        // 강의 카테고리 목록 추가
         List<String> lectureCategories = lectureCategoryByLectureService.findCategoryNamesByLectureCode(lecture.getLectureCode());
 
-        // LectureDetailDTO 빌더 패턴으로 생성
         return LectureDetailDTO.builder()
                 .lectureCode(lecture.getLectureCode())
                 .lectureTitle(lecture.getLectureTitle())
@@ -212,7 +167,7 @@ public class LectureFacade {
                 .tutorCode(tutor.getMemberCode())
                 .tutorName(tutor.getMemberName())
                 .lectureStatus(lecture.getLectureStatus())
-                .lectureCategory(String.join(", ", lectureCategories)) // 카테고리를 쉼표로 구분하여 설정
+                .lectureCategory(String.join(", ", lectureCategories))
                 .lectureClickCount(lecture.getLectureClickCount())
                 .lectureLevel(lecture.getLectureLevel())
                 .totalStudents((int) totalStudents)
