@@ -146,11 +146,6 @@ public class LectureFacade {
     }
 
 
-
-
-    //강의별 계약과정이 강의 코드가 7개 라면 강의컬럼의 승인여부 true로 변환
-
-
     // 강의 모두 조회
     public List<LectureDetailDTO> getAllLecture() {
         List<LectureDTO> lectureList = lectureService.getAllLecture();

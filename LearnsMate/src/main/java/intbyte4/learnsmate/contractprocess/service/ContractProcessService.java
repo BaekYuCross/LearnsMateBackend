@@ -1,9 +1,6 @@
 package intbyte4.learnsmate.contractprocess.service;
 
 import intbyte4.learnsmate.contractprocess.domain.dto.ContractProcessDTO;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 public interface ContractProcessService {
     // 단건 조회
@@ -14,4 +11,5 @@ public interface ContractProcessService {
 
     // 계약과정 등록
     ContractProcessDTO createContractProcess(Long lectureCode, ContractProcessDTO contractProcessDTO);
+
 }
