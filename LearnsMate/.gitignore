@@ -27,7 +27,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-*.yml
+application-test.yml
 .idea
 *.json
 *.iws
