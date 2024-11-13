@@ -41,6 +41,10 @@ jobs:
             port: 5000
           
           spring:
+            application:
+              name: learnsmate
+          
+          spring:
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
@@ -54,6 +58,9 @@ jobs:
               properties:
                 hibernate:
                   '[format_sql]': true
+          openai:
+            model: gpt-4o
+            secret-key: \${SECRET_KEY}
           EOL
 
       - name: Set Yaml
@@ -68,6 +75,7 @@ jobs:
           RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
       - name: Check for Tests
         working-directory: LearnsMate
