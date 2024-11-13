@@ -51,6 +51,29 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         return videoByLectures.stream()
                 .map(videoByLectureMapper::toDTO)
                 .collect(Collectors.toList());
-}
+    }
+
+    // 강의별 동영상 등록
+    @Override
+    public VideoByLectureDTO registerVideoByLecture(Long lectureCode, VideoByLectureDTO videoByLectureDTO) {
+
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+
+        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
+
+        VideoByLecture videoByLecture = VideoByLecture.builder()
+                .lecture(lecture) // 강의 설정
+                .videoTitle(videoByLectureDTO.getVideoTitle())
+                .videoLink(videoByLectureDTO.getVideoLink())
+                .build();
+
+        VideoByLecture savedVideoByLecture = videoByLectureRepository.save(videoByLecture);
+
+        return videoByLectureMapper.toDTO(savedVideoByLecture);
+    }
+
 
 }
