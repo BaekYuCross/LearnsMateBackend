@@ -2,13 +2,18 @@ package intbyte4.learnsmate.member.mapper;
 
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignStudentVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
-import intbyte4.learnsmate.member.domain.dto.FindSingleMemberDTO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterStudentVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterTutorVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
-import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberDetailVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.payment.domain.vo.RequestRegisterMemberPaymentVO;
 import org.springframework.stereotype.Component;
 
@@ -144,10 +149,10 @@ public class MemberMapper{
                 .build();
     }
 
-    public ResponseFindMemberDetailVO fromFindSingleMemberDTOtoResponseFindMemberDetailVO(FindSingleMemberDTO dto) {
-        return ResponseFindMemberDetailVO.builder()
+    public ResponseFindStudentDetailVO fromFindSingleStudentDTOtoResponseFindStudentDetailVO(FindSingleStudentDTO dto) {
+        return ResponseFindStudentDetailVO.builder()
                 .memberDTO(dto.getMemberDTO())
-                .lectureDTOList(dto.getLectureDTOList())
+                .LectureVideoProgressDTOList(dto.getLectureVideoProgressDTOList())
                 .unusedCouponsList(dto.getUnusedCouponsList())
                 .usedCouponsList(dto.getUsedCouponsList())
                 .unansweredVOCByMemberList(dto.getUnansweredVOCByMemberList())
@@ -170,6 +175,48 @@ public class MemberMapper{
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public ResponseFindTutorDetailVO fromFindSingleTutorDTOtoResponseFindTutorDetailVO(FindSingleTutorDTO dto) {
+        return ResponseFindTutorDetailVO.builder()
+                .memberDTO(dto.getMemberDTO())
+                .tutorLectureDetailList(dto.getTutorLectureDetailList())
+                .build();
+    }
+
+    public MemberFilterRequestDTO fromRequestFilterStudentVOtoMemberFilterRequestDTO(RequestFilterStudentVO request) {
+        return MemberFilterRequestDTO.builder()
+                .memberCode(request.getMemberCode())
+                .memberType(request.getMemberType())
+                .memberEmail(request.getMemberEmail())
+                .memberName(request.getMemberName())
+                .memberAge(request.getMemberAge())
+                .memberPhone(request.getMemberPhone())
+                .memberAddress(request.getMemberAddress())
+                .birthStartDate(request.getBirthStartDate())
+                .birthEndDate(request.getBirthEndDate())
+                .createdStartDate(request.getCreatedStartDate())
+                .createdEndDate(request.getCreatedEndDate())
+                .updatedStartDate(request.getUpdatedStartDate())
+                .updatedEndDate(request.getUpdatedEndDate())
+                .build();
+    }
+    public MemberFilterRequestDTO fromRequestFiltertutorVOtoMemberFilterRequestDTO(RequestFilterTutorVO request) {
+        return MemberFilterRequestDTO.builder()
+                .memberCode(request.getMemberCode())
+//                .memberType(request.getMemberType())
+                .memberEmail(request.getMemberEmail())
+                .memberName(request.getMemberName())
+                .memberAge(request.getMemberAge())
+                .memberPhone(request.getMemberPhone())
+                .memberAddress(request.getMemberAddress())
+                .birthStartDate(request.getBirthStartDate())
+                .birthEndDate(request.getBirthEndDate())
+//                .createdStartDate(request.getCreatedStartDate())
+//                .createdEndDate(request.getCreatedEndDate())
+//                .updatedStartDate(request.getUpdatedStartDate())
+//                .updatedEndDate(request.getUpdatedEndDate())
                 .build();
     }
 }

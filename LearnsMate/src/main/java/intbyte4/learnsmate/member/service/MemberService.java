@@ -2,24 +2,20 @@ package intbyte4.learnsmate.member.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
-import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
-import intbyte4.learnsmate.member.domain.dto.MemberIssueCouponDTO;
-import intbyte4.learnsmate.member.domain.dto.MemberVOCDTO;
+import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.repository.MemberRepository;
-import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
-import intbyte4.learnsmate.voc.service.VOCService;
+import intbyte4.learnsmate.member.repository.MemberRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +23,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-    private final IssueCouponService issueCouponService;
-    private final VOCService vocService;
+    private final MemberRepositoryCustom memberRepositoryCustom;
 
     public void saveMember(MemberDTO memberDTO) {
         LocalDateTime now = LocalDateTime.now();
@@ -93,5 +88,23 @@ public class MemberService {
                 .orElseThrow(() -> new CommonException(StatusEnum.USER_NOT_FOUND));
 
         return memberMapper.fromMembertoMemberDTO(member);
+    }
+
+    // 학생 필터링하는 서비스 코드
+    public List<MemberDTO> filterStudent(MemberFilterRequestDTO dto){
+        List<Member> memberList = memberRepositoryCustom.searchBy(dto);
+
+        return memberList.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 강사 필터링하는 코드 -> 강사 필터링은 조건이 더 적음(멤버에 다 포함됨)
+    public List<MemberDTO> filterTutor(MemberFilterRequestDTO dto) {
+        List<Member> memberList = memberRepositoryCustom.searchBy(dto);
+
+        return memberList.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -13,18 +13,25 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RequestEditMemberVO {
+public class RequestFilterStudentVO {
+
     private Long memberCode;
     private MemberType memberType;
     private String memberEmail;
-    private String memberPassword;
     private String memberName;
     private Integer memberAge;
     private String memberPhone;
     private String memberAddress;
-    private LocalDateTime memberBirth;
-    private Boolean memberFlag;
-    private Boolean memberDormantStatus;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+    // 생년월일 범위
+    private LocalDateTime birthStartDate;
+    private LocalDateTime birthEndDate;
+
+    // 생성일 범위
+    private LocalDateTime createdStartDate;
+    private LocalDateTime createdEndDate;
+
+    // 수정일 범위
+    private LocalDateTime updatedStartDate;
+    private LocalDateTime updatedEndDate;
 }
