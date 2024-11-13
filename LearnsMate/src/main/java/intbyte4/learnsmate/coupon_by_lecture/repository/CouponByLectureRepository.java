@@ -2,6 +2,7 @@ package intbyte4.learnsmate.coupon_by_lecture.repository;
 
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon_by_lecture.domain.CouponByLecture;
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,6 @@ public interface CouponByLectureRepository extends JpaRepository<CouponByLecture
             "WHERE l.tutor.memberCode = :tutorCode " +
             "AND c.couponFlag = true")
     List<CouponByLecture> findByTutorCode(@Param("tutorCode") Long tutorCode);
+
+    CouponByLecture findByLectureAndCoupon(Lecture lecture, CouponEntity coupon);
 }

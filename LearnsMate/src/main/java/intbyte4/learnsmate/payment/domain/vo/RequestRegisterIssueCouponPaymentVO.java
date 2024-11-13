@@ -8,21 +8,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RequestRegisterPaymentVO {
-    private RequestRegisterIssueCouponPaymentVO issueCouponVO;
-    private RequestRegisterMemberPaymentVO memberVO;
-    private List<RequestRegisterLecturePaymentVO> LectureVOList;
-
-    private Long paymentCode;
-    private Integer paymentPrice;
-    private LocalDateTime createdAt;
-    private Long lectureByStudentCode;
+public class RequestRegisterIssueCouponPaymentVO {
     private String couponIssuanceCode;
+    private LocalDateTime couponIssueDate;
+    private Boolean couponUseStatus;
+    private LocalDateTime couponUseDate;
+    private Long studentCode;
+    private Long couponCode;
 }

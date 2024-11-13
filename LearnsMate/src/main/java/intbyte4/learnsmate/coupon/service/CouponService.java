@@ -5,7 +5,6 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
@@ -16,7 +15,7 @@ public interface CouponService {
 
     List<CouponDTO> findAllCoupons();
 
-    CouponDTO findCouponByCouponCode(Long couponCode);
+    CouponDTO findCouponDTOByCouponCode(Long couponCode);
 
     CouponEntity findByCouponCode(Long couponCode);
 
