@@ -1,14 +1,17 @@
-package intbyte4.learnsmate.member.domain.vo;
+package intbyte4.learnsmate.member.domain.dto;
 
 import intbyte4.learnsmate.member.domain.MemberType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class MemberFilterRequestVO {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
+public class MemberFilterRequestDTO {
     private Long memberCode;
     private MemberType memberType;
     private String memberEmail;
