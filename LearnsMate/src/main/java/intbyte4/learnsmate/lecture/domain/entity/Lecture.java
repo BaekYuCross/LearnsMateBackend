@@ -77,4 +77,8 @@ public class Lecture {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void incrementClickCount() {
+        this.lectureClickCount++;
+    }
+
 }
