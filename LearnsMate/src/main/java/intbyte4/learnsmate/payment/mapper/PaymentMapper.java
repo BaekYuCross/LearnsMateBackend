@@ -38,6 +38,8 @@ public class PaymentMapper {
     public ResponseFindPaymentVO fromDtoToResponseVO(PaymentDetailDTO paymentDTO) {
         return ResponseFindPaymentVO.builder()
                 .paymentCode(paymentDTO.getPaymentCode())
+                .paymentPrice(paymentDTO.getPaymentPrice())
+                .createdAt(paymentDTO.getCreatedAt())
                 .lectureCode(paymentDTO.getLectureCode())
                 .lectureTitle(paymentDTO.getLectureTitle())
                 .lecturePrice(paymentDTO.getLecturePrice())
