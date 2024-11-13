@@ -50,6 +50,7 @@ public enum StatusEnum {
     EXISTING_CONTRACT_PROCESS(409, HttpStatus.CONFLICT, "존재하는 강의 계약과정입니다."),
     EMAIL_DUPLICATE(409, HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
     NICKNAME_DUPLICATE(409, HttpStatus.CONFLICT, "중복된 닉네임입니다."),
+    COUPON_CANNOT_BE_SENT_BY_TUTOR(409, HttpStatus.CONFLICT, "강사가 보낸 쿠폰은 발송할 수 없습니다."),
     COUPON_ALREADY_USED(409, HttpStatus.CONFLICT, "사용된 쿠폰입니다.");
 
     private final int statusCode;
