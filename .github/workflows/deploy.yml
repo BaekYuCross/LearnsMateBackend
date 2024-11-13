@@ -26,6 +26,7 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+        working-directory: ./LearnsMate
         shell: bash
       ##############################################################
       # 이후 이 부분은 envsubst가 추가될 예정
