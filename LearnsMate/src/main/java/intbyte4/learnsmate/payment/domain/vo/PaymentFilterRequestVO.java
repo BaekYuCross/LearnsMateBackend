@@ -1,10 +1,15 @@
 package intbyte4.learnsmate.payment.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
 public class PaymentFilterRequestVO {
 
     @JsonProperty("payment_code")
@@ -47,7 +52,7 @@ public class PaymentFilterRequestVO {
     private String studentName; // 학생명
 
     @JsonProperty("lecture_category")
-    private String lectureCategory; // 강의 카테고리
+    private Integer lectureCategoryCode; // 강의 카테고리
 
     @JsonProperty("coupon_issuance_code")
     private String couponIssuanceCode; // 적용 쿠폰 코드
