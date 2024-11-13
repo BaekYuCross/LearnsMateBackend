@@ -57,27 +57,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final CouponMapper couponMapper;
     private final AdminMapper adminMapper;
 
-    // 직원이 전체 결제 내역을 조회
-    @Override
-    public List<PaymentDTO> getAllPayments() {
-        List<Payment> payments = paymentRepository.findAll();
-        if (payments.isEmpty()) {
-            throw new CommonException(StatusEnum.PAYMENT_NOT_FOUND);
-        }
-        return payments.stream()
-                .map(paymentMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-
-    // 직원이 특정 결제 내역을 단건 상세 조회
-    @Override
-    public PaymentDTO getPaymentDetails(Long paymentCode) {
-        Payment payment = paymentRepository.findById(paymentCode)
-                .orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
-        return paymentMapper.toDTO(payment);
-    }
-
     @Override
     public List<PaymentDTO> lecturePayment(MemberDTO memberDTO, List<LectureDTO> lectureDTOList, IssueCouponDTO issueCouponDTO) {
         List<LectureDTO> selectedLectures = lectureDTOList.stream()
