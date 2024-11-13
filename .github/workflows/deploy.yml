@@ -1,0 +1,62 @@
+name: learnsmate-service
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: LearnsMate
+        shell: bash
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+        working-directory: LearnsMate
+        shell: bash
+
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DDTHH-mm-ss
+          utcOffset: "+09:00"
+
+      - name: Show Current Time
+        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
+        shell: bash
+
+      - name: ChatGPT codeReviewer
+        uses: anc95/ChatGPT-CodeReview@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+          # Optional
+          LANGUAGE: Korean
+          OPENAI_API_ENDPOINT: https://api.openai.com/v1
+          MODEL: gpt-4o # https://platform.openai.com/docs/models
+          PROMPT: 코드 변경 내용을 검토하고 오류 또는 개선점을 찾아서 한글로 작성해주세요.
+          top_p: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-top_p
+          temperature: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-temperature
+          max_tokens: 10000
+          MAX_PATCH_LENGTH: 1000
