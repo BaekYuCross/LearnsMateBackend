@@ -11,6 +11,7 @@ import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
+import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +50,21 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
     }
 
-    @Operation(summary = "강의와 강의별 강의 카테고리 등록")
+    @Operation(summary = "강의와 강의별 동영상, 강의별 카테고리 및 동영상 등록")
     @PutMapping("/{lectureCode}")
     public ResponseEntity<ResponseRegisterLectureVO> registerLecture(
             @RequestBody RequestRegisterLectureVO registerLectureVO) {
-        LectureDTO lectureDTO = LectureFacade.registerLecture(lectureMapper.fromRegisterRequestVOtoDto(registerLectureVO), registerLectureVO.getLectureCategoryCodeList());
-        return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToRegisterResponseVO(lectureDTO));
+
+        LectureDTO lectureDTO = lectureMapper.fromRegisterRequestVOtoDto(registerLectureVO);
+        List<Integer> lectureCategoryCodeList = registerLectureVO.getLectureCategoryCodeList();
+        List<VideoByLectureDTO> videoByLectureDTOList = registerLectureVO.getVideoByLectureDTOList();
+
+        LectureDTO registeredLectureDTO = lectureFacade.registerLecture(lectureDTO, lectureCategoryCodeList, videoByLectureDTOList);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(lectureMapper.fromDtoToRegisterResponseVO(registeredLectureDTO));
     }
+
 
     @Operation(summary = "강의 수정")
     @PatchMapping("/{lectureCode}/info")
