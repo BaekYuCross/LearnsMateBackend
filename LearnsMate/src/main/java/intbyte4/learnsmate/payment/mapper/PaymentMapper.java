@@ -3,8 +3,8 @@ package intbyte4.learnsmate.payment.mapper;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
-import intbyte4.learnsmate.payment.domain.vo.RequestRegisterPaymentVO;
 import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
 import intbyte4.learnsmate.payment.domain.vo.ResponseRegisterPaymentVO;
 import org.springframework.stereotype.Component;
@@ -35,13 +35,22 @@ public class PaymentMapper {
     }
 
     // PaymentDTO -> PaymentResponseVO
-    public ResponseFindPaymentVO fromDtoToResponseVO(PaymentDTO paymentDTO) {
+    public ResponseFindPaymentVO fromDtoToResponseVO(PaymentDetailDTO paymentDTO) {
         return ResponseFindPaymentVO.builder()
                 .paymentCode(paymentDTO.getPaymentCode())
-                .paymentPrice(paymentDTO.getPaymentPrice())
-                .createdAt(paymentDTO.getCreatedAt())
-                .lectureByStudentCode(paymentDTO.getLectureByStudentCode())
+                .lectureCode(paymentDTO.getLectureCode())
+                .lectureTitle(paymentDTO.getLectureTitle())
+                .lecturePrice(paymentDTO.getLecturePrice())
+                .tutorCode(paymentDTO.getTutorCode())
+                .tutorName(paymentDTO.getTutorName())
+                .studentCode(paymentDTO.getStudentCode())
+                .studentName(paymentDTO.getStudentName())
+                .lectureStatus(paymentDTO.getLectureStatus())
+                .lectureCategory(paymentDTO.getLectureCategory())
+                .lectureClickCount(paymentDTO.getLectureClickCount())
+                .lectureLevel(paymentDTO.getLectureLevel())
                 .couponIssuanceCode(paymentDTO.getCouponIssuanceCode())
+                .couponIssuanceName(paymentDTO.getCouponIssuanceName())
                 .build();
     }
 

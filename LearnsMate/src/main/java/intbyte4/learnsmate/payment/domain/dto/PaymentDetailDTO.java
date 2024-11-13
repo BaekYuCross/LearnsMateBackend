@@ -1,21 +1,16 @@
-package intbyte4.learnsmate.payment.domain.vo;
-
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+package intbyte4.learnsmate.payment.domain.dto;
 import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Getter
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ResponseFindPaymentVO {
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class PaymentDetailDTO {
     private Long paymentCode;
     private Integer paymentPrice;
     private LocalDateTime createdAt;
@@ -32,4 +27,5 @@ public class ResponseFindPaymentVO {
     private LectureLevelEnum lectureLevel; // 강의 난이도
     private String couponIssuanceCode; // 적용 쿠폰 코드
     private String couponIssuanceName; // 적용 쿠폰명
+
 }

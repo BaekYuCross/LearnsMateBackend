@@ -57,6 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final CouponMapper couponMapper;
     private final AdminMapper adminMapper;
 
+    // payment facade에 있는 조회반환 값이랑 달라서 통계에 사용할 수 있으므로 남겨둠 지우지 마셈.
     // 직원이 전체 결제 내역을 조회
     @Override
     public List<PaymentDTO> getAllPayments() {
@@ -91,7 +92,7 @@ public class PaymentServiceImpl implements PaymentService {
             Lecture lecture = lectureMapper.toEntity(lectureDTO,tutor);
 
             LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
-            lectureByStudentDTO.setRefundStatus(false);
+            lectureByStudentDTO.setOwnStatus(false);
             lectureByStudentDTO.setLecture(lecture);
             lectureByStudentDTO.setStudent(student);
 
