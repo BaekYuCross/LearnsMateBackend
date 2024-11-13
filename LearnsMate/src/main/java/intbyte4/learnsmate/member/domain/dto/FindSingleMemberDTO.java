@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.member.domain.dto;
 
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import lombok.*;
 
@@ -17,7 +17,7 @@ public class FindSingleMemberDTO {
 
     MemberDTO memberDTO;
 
-    List<LectureDTO> lectureDTOList;
+    List<LectureVideoProgressDTO> LectureVideoProgressDTOList;
 
     List<IssueCouponDTO> unusedCouponsList;
     List<IssueCouponDTO> usedCouponsList;
