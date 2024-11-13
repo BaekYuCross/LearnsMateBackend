@@ -137,6 +137,15 @@ public class MemberController {
     @Operation(summary = "직원 - 강사 필터링 검색")
     @GetMapping("/filter/tutor")
     public ResponseEntity<?> findTutorByFilter(@RequestBody RequestFilterTutorVO request) {
-        return null;
+
+        MemberFilterRequestDTO dto =
+                memberMapper.fromRequestFiltertutorVOtoMemberFilterRequestDTO(request);
+
+        List<MemberDTO> memberDTOList = memberService.filterTutor(dto);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(memberDTOList.stream()
+                        .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
+                        .collect(Collectors.toList()));
     }
 }

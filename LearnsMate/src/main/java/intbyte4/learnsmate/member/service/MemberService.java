@@ -98,4 +98,13 @@ public class MemberService {
                 .map(memberMapper::fromMembertoMemberDTO)
                 .collect(Collectors.toList());
     }
+
+    // 강사 필터링하는 코드 -> 강사 필터링은 조건이 더 적음(멤버에 다 포함됨)
+    public List<MemberDTO> filterTutor(MemberFilterRequestDTO dto) {
+        List<Member> memberList = memberRepositoryCustom.searchBy(dto);
+
+        return memberList.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .collect(Collectors.toList());
+    }
 }
