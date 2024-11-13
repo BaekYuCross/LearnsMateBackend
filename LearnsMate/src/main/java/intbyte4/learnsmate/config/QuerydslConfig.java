@@ -1,7 +1,6 @@
 package intbyte4.learnsmate.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import intbyte4.learnsmate.campaign.domain.entity.QCampaign;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +16,4 @@ public class QuerydslConfig {
     public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(entityManager);
     }
-
-    @Bean
-    public QCampaign qCampaign() { return QCampaign.campaign; }
 }
