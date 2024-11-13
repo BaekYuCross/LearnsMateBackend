@@ -13,6 +13,7 @@ public enum StatusEnum {
     INVALID_PARAMETER_FORMAT(400, HttpStatus.BAD_REQUEST, "요청에 유효하지 않은 인자 형식입니다."),
     INVALID_PASSWORD(400, HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     MINIMUM_KEYWORD_LENGTH_REQUIRED(400,HttpStatus.BAD_REQUEST, "검색어는 최소 두 글자 이상이어야 합니다."),
+    ENUM_NOT_MATCH(400, HttpStatus.BAD_REQUEST, "타입이 옳지 않습니다."),
 
     RESTRICTED(403, HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     DELETE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "삭제할 수 없습니다."),
@@ -23,6 +24,7 @@ public enum StatusEnum {
 
     USER_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     STUDENT_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 학생입니다."),
+    TUTOR_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 강사입니다."),
     ADMIN_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 직원입니다."),
     LECTURE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 강의입니다."),
     VIDEO_BY_LECTURE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 강의별 동영상입니다."),
