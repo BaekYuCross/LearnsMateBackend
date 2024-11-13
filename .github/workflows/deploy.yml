@@ -6,7 +6,7 @@ permissions:
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize ]
+    types: [opened, reopened, synchronize]
   push:
     branches:
       - "main"
@@ -25,16 +25,13 @@ jobs:
           distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x gradlew
         working-directory: ./LearnsMate
         shell: bash
-      ##############################################################
-      # 이후 이 부분은 envsubst가 추가될 예정
-      ##############################################################
-
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
+        working-directory: ./LearnsMate
         shell: bash
 
       - name: Get current time
