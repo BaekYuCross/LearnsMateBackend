@@ -82,4 +82,15 @@ public class LectureServiceImpl implements LectureService {
         lectureRepository.save(lecture);
         return lectureMapper.toDTO(lecture);
     }
+
+    // 강의별 계약과정이 강의 코드가 7개 라면 강의컬럼의 승인여부 true로 변환
+    @Override
+    @Transactional
+    public LectureDTO updateLectureConfirmStatus(Long lectureCode) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
+        lecture.toAcceptConfirmStatus();
+        lectureRepository.save(lecture);
+        return lectureMapper.toDTO(lecture);
+    }
 }
