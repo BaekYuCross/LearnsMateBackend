@@ -44,7 +44,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public CouponDTO findCouponByCouponCode(Long couponCode) {
+    public CouponDTO findCouponDTOByCouponCode(Long couponCode) {
         CouponEntity couponEntity = couponRepository.findById(couponCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         return couponMapper.toDTO(couponEntity);

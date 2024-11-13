@@ -3,9 +3,11 @@ package intbyte4.learnsmate.lecture_category_by_lecture.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
+import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
@@ -15,6 +17,7 @@ import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCate
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCategoryByLecture;
 import intbyte4.learnsmate.lecture_category_by_lecture.mapper.LectureCategoryByLectureMapper;
 import intbyte4.learnsmate.lecture_category_by_lecture.repository.LectureCategoryByLectureRepository;
+
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -23,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 @Service
@@ -31,6 +35,7 @@ public class LectureCategoryByLectureService {
 
     private final LectureCategoryByLectureRepository lectureCategoryByLectureRepository;
     private final LectureCategoryByLectureMapper lectureCategoryByLectureMapper;
+
     private final LectureService lectureService;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
@@ -82,4 +87,9 @@ public class LectureCategoryByLectureService {
         // 강의별 강의 카테고리 테이블에 저장
         lectureCategoryByLectureRepository.saveAll(entitytList);
     }
+
+    public List<String> findCategoryNamesByLectureCode(Long lectureCode) {
+        return lectureCategoryByLectureRepository.findCategoryNamesByLectureCode(lectureCode);
+    }
+
 }

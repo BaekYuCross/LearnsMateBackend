@@ -6,11 +6,8 @@ import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponFindResponseVO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponRegisterResponseVO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponUseResponseVO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.member.domain.entity.Member;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import intbyte4.learnsmate.payment.domain.vo.RequestRegisterIssueCouponPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -58,6 +55,18 @@ public class IssueCouponMapper {
                 .couponIssuanceCode(usedCoupon.getCouponIssuanceCode())
                 .couponUseStatus(usedCoupon.getCouponUseStatus())
                 .couponUseDate(usedCoupon.getCouponUseDate())
+                .build();
+    }
+
+    public IssueCouponDTO fromRequestRegisterIssueCouponPaymentVOToDTO
+            (RequestRegisterIssueCouponPaymentVO issueCouponVO) {
+        return IssueCouponDTO.builder()
+                .couponIssuanceCode(issueCouponVO.getCouponIssuanceCode())
+                .couponIssueDate(issueCouponVO.getCouponIssueDate())
+                .couponUseStatus(issueCouponVO.getCouponUseStatus())
+                .couponUseDate(issueCouponVO.getCouponUseDate())
+                .studentCode(issueCouponVO.getStudentCode())
+                .couponCode(issueCouponVO.getCouponCode())
                 .build();
     }
 }
