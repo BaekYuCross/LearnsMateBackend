@@ -2,13 +2,16 @@ package intbyte4.learnsmate.member.mapper;
 
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignStudentVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
-import intbyte4.learnsmate.member.domain.dto.FindSingleMemberDTO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
+import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
-import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberDetailVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
+import intbyte4.learnsmate.payment.domain.vo.RequestRegisterMemberPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -143,14 +146,39 @@ public class MemberMapper{
                 .build();
     }
 
-    public ResponseFindMemberDetailVO fromFindSingleMemberDTOtoResponseFindMemberDetailVO(FindSingleMemberDTO dto) {
-        return ResponseFindMemberDetailVO.builder()
+    public ResponseFindStudentDetailVO fromFindSingleStudentDTOtoResponseFindStudentDetailVO(FindSingleStudentDTO dto) {
+        return ResponseFindStudentDetailVO.builder()
                 .memberDTO(dto.getMemberDTO())
-                .lectureDTOList(dto.getLectureDTOList())
+                .LectureVideoProgressDTOList(dto.getLectureVideoProgressDTOList())
                 .unusedCouponsList(dto.getUnusedCouponsList())
                 .usedCouponsList(dto.getUsedCouponsList())
                 .unansweredVOCByMemberList(dto.getUnansweredVOCByMemberList())
                 .answeredVOCByMemberList(dto.getAnsweredVOCByMemberList())
+                .build();
+    }
+
+    public MemberDTO fromRequestRegisterMemberPaymentVOToMemberDTO(RequestRegisterMemberPaymentVO request) {
+        return MemberDTO.builder()
+                .memberCode(request.getMemberCode())
+                .memberType(request.getMemberType())
+                .memberEmail(request.getMemberEmail())
+//                .memberPassword(request.getMemberPassword()) // 필요 시 비밀번호 포함
+                .memberName(request.getMemberName())
+                .memberAge(request.getMemberAge())
+                .memberPhone(request.getMemberPhone())
+                .memberAddress(request.getMemberAddress())
+                .memberBirth(request.getMemberBirth())
+                .memberFlag(request.getMemberFlag())
+                .memberDormantStatus(request.getMemberDormantStatus())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public ResponseFindTutorDetailVO fromFindSingleTutorDTOtoResponseFindTutorDetailVO(FindSingleTutorDTO dto) {
+        return ResponseFindTutorDetailVO.builder()
+                .memberDTO(dto.getMemberDTO())
+                .tutorLectureDetailList(dto.getTutorLectureDetailList())
                 .build();
     }
 }

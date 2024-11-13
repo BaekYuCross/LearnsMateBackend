@@ -1,19 +1,21 @@
-package intbyte4.learnsmate.member.domain.vo.request;
+package intbyte4.learnsmate.payment.domain.vo;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import intbyte4.learnsmate.member.domain.MemberType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Getter
 @Builder
-@ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RequestEditMemberVO {
+public class RequestRegisterMemberPaymentVO {
     private Long memberCode;
     private MemberType memberType;
     private String memberEmail;

@@ -27,8 +27,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-    private final IssueCouponService issueCouponService;
-    private final VOCService vocService;
 
     public void saveMember(MemberDTO memberDTO) {
         LocalDateTime now = LocalDateTime.now();

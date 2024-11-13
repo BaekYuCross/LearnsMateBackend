@@ -6,6 +6,7 @@ import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
+import intbyte4.learnsmate.payment.domain.vo.ResponseRegisterPaymentVO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,6 +38,8 @@ public class PaymentMapper {
     public ResponseFindPaymentVO fromDtoToResponseVO(PaymentDetailDTO paymentDTO) {
         return ResponseFindPaymentVO.builder()
                 .paymentCode(paymentDTO.getPaymentCode())
+                .paymentPrice(paymentDTO.getPaymentPrice())
+                .createdAt(paymentDTO.getCreatedAt())
                 .lectureCode(paymentDTO.getLectureCode())
                 .lectureTitle(paymentDTO.getLectureTitle())
                 .lecturePrice(paymentDTO.getLecturePrice())
@@ -53,4 +56,13 @@ public class PaymentMapper {
                 .build();
     }
 
+    public ResponseRegisterPaymentVO fromPaymentDTOtoResponseRegisterPaymentVO(PaymentDTO dto) {
+        return ResponseRegisterPaymentVO.builder()
+                .paymentCode(dto.getPaymentCode())
+                .paymentPrice(dto.getPaymentPrice())
+                .createdAt(dto.getCreatedAt())
+                .lectureByStudentCode(dto.getLectureByStudentCode())
+                .couponIssuanceCode(dto.getCouponIssuanceCode())
+                .build();
+    }
 }

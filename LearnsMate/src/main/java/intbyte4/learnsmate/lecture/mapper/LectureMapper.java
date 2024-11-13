@@ -10,6 +10,8 @@ import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.payment.domain.vo.RequestRegisterLecturePaymentVO;
+import intbyte4.learnsmate.payment.domain.vo.RequestRegisterPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -147,4 +149,18 @@ public class LectureMapper {
                 .lectureLevel(removedLecture.getLectureLevel())
                 .build();
     }
+    public LectureDTO fromRequestRegisterLecturePaymentVOToDTO(RequestRegisterLecturePaymentVO vo) {
+        return LectureDTO.builder()
+                .lectureTitle(vo.getLectureTitle())
+                .lectureConfirmStatus(vo.getLectureConfirmStatus())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .lectureImage(vo.getLectureImage())
+                .lecturePrice(vo.getLecturePrice())
+                .lectureStatus(vo.getLectureStatus())
+                .lectureClickCount(0)
+                .lectureLevel(vo.getLectureLevel())
+                .build();
+    }
+
 }

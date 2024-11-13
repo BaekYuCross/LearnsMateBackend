@@ -47,4 +47,10 @@ public class CouponByLectureServiceImpl implements CouponByLectureService {
                 .map(couponByLectureMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public CouponByLectureDTO findByCouponAndLecture(Lecture lecture, CouponEntity coupon) {
+        CouponByLecture couponByLecture = couponByLectureRepository.findByLectureAndCoupon(lecture, coupon);
+        return couponByLectureMapper.toDTO(couponByLecture);
+    }
 }
