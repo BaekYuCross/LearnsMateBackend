@@ -25,8 +25,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-        working-directory: LearnsMate
+        run: chmod +x ./gradlew
         shell: bash
 
       - name: Install envsubst
@@ -80,7 +79,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
-        working-directory: LearnsMate
         shell: bash
 
       - name: Get current time
@@ -103,7 +101,6 @@ jobs:
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
-        working-directory: LearnsMate
 
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v22
