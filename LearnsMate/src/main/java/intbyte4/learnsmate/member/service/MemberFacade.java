@@ -7,6 +7,7 @@ import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
 import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentService;
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.FindSingleMemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -34,9 +35,12 @@ public class MemberFacade {
 
     // 멤버 단일 조회시에 사용되는 서비스
     // memberCode로 학생 조회
-    public FindSingleMemberDTO findMemberByMemberCode(Long studentCode) {
+    public FindSingleMemberDTO findStudentByStudentCode(Long studentCode) {
         Member member = memberRepository.findById(studentCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
+
+        if(!member.getMemberType().equals(MemberType.STUDENT))
+            throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
 
         // 0. 학생 개인정보
         MemberDTO memberDTO = memberMapper.fromMembertoMemberDTO(member);
@@ -63,5 +67,20 @@ public class MemberFacade {
         );
 
         return dto;
+    }
+
+    public FindSingleMemberDTO findTutorByTutorCode(Long tutorCode) {
+        Member member = memberRepository.findById(tutorCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.TUTOR_NOT_FOUND));
+
+        if(!member.getMemberType().equals(MemberType.TUTOR))
+            throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
+
+        // 0. 강사 개인정보
+        MemberDTO memberDTO = memberMapper.fromMembertoMemberDTO(member);
+
+        // 1. 강사 강의 정보
+
+        return null;
     }
 }

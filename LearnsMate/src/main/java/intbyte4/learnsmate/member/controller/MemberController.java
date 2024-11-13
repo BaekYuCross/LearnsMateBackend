@@ -57,9 +57,9 @@ public class MemberController {
 
     // 2-1. 학생 단건 조회(member flag가 true + member_type이 STUDENT)
     @GetMapping("/student/{studentcode}")
-    public ResponseEntity<ResponseFindMemberDetailVO> findStudentByStudentCode(@PathVariable("studentcode") Long memberCode) {
+    public ResponseEntity<ResponseFindMemberDetailVO> findStudentByStudentCode(@PathVariable("studentcode") Long studentCode) {
 
-        FindSingleMemberDTO dto = memberFacade.findMemberByMemberCode(memberCode);
+        FindSingleMemberDTO dto = memberFacade.findStudentByStudentCode(studentCode);
 
         ResponseFindMemberDetailVO vo
                 = memberMapper.fromFindSingleMemberDTOtoResponseFindMemberDetailVO(dto);
@@ -69,9 +69,9 @@ public class MemberController {
 
     // 2-2. 강사 단건 조회(member flag가 true + member_type이 TUTOR)
     @GetMapping("/tutor/{tutorcoe}")
-    public ResponseEntity<ResponseFindMemberDetailVO> findTutorByTutorCode(@PathVariable("tutorcode") Long memberCode) {
+    public ResponseEntity<ResponseFindMemberDetailVO> findTutorByTutorCode(@PathVariable("tutorcode") Long tutorCode) {
 
-        FindSingleMemberDTO dto = memberFacade.findMemberByMemberCode(memberCode);
+        FindSingleMemberDTO dto = memberFacade.findTutorByTutorCode(tutorCode);
 
         ResponseFindMemberDetailVO vo
                 = memberMapper.fromFindSingleMemberDTOtoResponseFindMemberDetailVO(dto);
