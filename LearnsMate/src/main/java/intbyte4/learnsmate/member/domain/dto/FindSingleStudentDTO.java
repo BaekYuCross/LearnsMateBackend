@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @ToString
-public class FindSingleMemberDTO {
+public class FindSingleStudentDTO {
 
     MemberDTO memberDTO;
 
