@@ -59,7 +59,7 @@ public class PaymentFacade {
         if (couponIssuanceCode != null) {
             IssueCouponDTO issuedCoupon = issueCouponService.useIssuedCoupon(studentDTO.getMemberCode(), couponIssuanceCode);
             if (issuedCoupon != null) {
-                CouponDTO coupon = couponService.findCouponByCouponCode(issuedCoupon.getCouponCode());
+                CouponDTO coupon = couponService.findCouponDTOByCouponCode(issuedCoupon.getCouponCode());
                 couponName = coupon.getCouponName();
             }
         }
