@@ -1,11 +1,16 @@
 package intbyte4.learnsmate.issue_coupon.mapper;
 
+import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponFindResponseVO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponRegisterResponseVO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponUseResponseVO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.payment.domain.vo.RequestRegisterIssueCouponPaymentVO;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class IssueCouponMapper {
@@ -17,6 +22,17 @@ public class IssueCouponMapper {
                 .couponUseDate(issueCoupon.getCouponUseDate())
                 .studentCode(issueCoupon.getStudent().getMemberCode())
                 .couponCode(issueCoupon.getCoupon().getCouponCode())
+                .build();
+    }
+
+    public IssueCoupon toEntity(IssueCouponDTO dto, Member student, CouponEntity coupon) {
+        return IssueCoupon.builder()
+                .couponIssuanceCode(dto.getCouponIssuanceCode())
+                .couponIssueDate(dto.getCouponIssueDate())
+                .couponUseStatus(dto.getCouponUseStatus())
+                .couponUseDate(dto.getCouponUseDate())
+                .student(student)
+                .coupon(coupon)
                 .build();
     }
 
@@ -39,6 +55,18 @@ public class IssueCouponMapper {
                 .couponIssuanceCode(usedCoupon.getCouponIssuanceCode())
                 .couponUseStatus(usedCoupon.getCouponUseStatus())
                 .couponUseDate(usedCoupon.getCouponUseDate())
+                .build();
+    }
+
+    public IssueCouponDTO fromRequestRegisterIssueCouponPaymentVOToDTO
+            (RequestRegisterIssueCouponPaymentVO issueCouponVO) {
+        return IssueCouponDTO.builder()
+                .couponIssuanceCode(issueCouponVO.getCouponIssuanceCode())
+                .couponIssueDate(issueCouponVO.getCouponIssueDate())
+                .couponUseStatus(issueCouponVO.getCouponUseStatus())
+                .couponUseDate(issueCouponVO.getCouponUseDate())
+                .studentCode(issueCouponVO.getStudentCode())
+                .couponCode(issueCouponVO.getCouponCode())
                 .build();
     }
 }

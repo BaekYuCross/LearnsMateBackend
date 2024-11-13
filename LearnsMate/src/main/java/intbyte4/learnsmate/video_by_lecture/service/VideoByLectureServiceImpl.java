@@ -33,11 +33,9 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
     private final VideoByLectureRepository videoByLectureRepository;
     private final LectureService lectureService;
     private final MemberService memberService;
-    private final LectureCategoryService lectureCategoryService;
     private final VideoByLectureMapper videoByLectureMapper;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
-    private final LectureCategoryMapper lectureCategoryMapper;
 
     // 강사별 강의와 강의별 동영상 개수 조회
     @Override
@@ -48,10 +46,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
-
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         long videoCount = videoByLectureRepository.countByLectureCode(lecture);
 
@@ -70,10 +65,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
-
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, lectureCategory);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         List<VideoByLecture> videoByLectures = videoByLectureRepository.findByLecture(lecture);
         if (videoByLectures.isEmpty()) {

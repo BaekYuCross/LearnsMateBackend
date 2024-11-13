@@ -48,6 +48,9 @@ public class CouponEntity {
     @Column(name = "coupon_flag", nullable = false)
     private Boolean couponFlag;
 
+    @Column(name = "active_state")
+    private Boolean activeState;
+
     @ManyToOne
     @JoinColumn (name = "coupon_category_code", nullable = false)
     private CouponCategory couponCategory;
@@ -70,7 +73,23 @@ public class CouponEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void updateTutorCouponDetails(CouponDTO couponDTO) {
+        this.couponName = couponDTO.getCouponName();
+        this.couponDiscountRate = couponDTO.getCouponDiscountRate();
+        this.couponStartDate = couponDTO.getCouponStartDate();
+        this.couponExpireDate = couponDTO.getCouponExpireDate();
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public void deleteCoupon() {
         this.couponFlag = false;
+    }
+
+    public void inactivateCoupon() {
+        this.activeState = false;
+    }
+
+    public void activateCoupon() {
+        this.activeState = true;
     }
 }

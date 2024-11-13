@@ -21,8 +21,8 @@ public class LectureByStudent {
     @Column(name = "lecture_by_student_code", nullable = false)
     private Long lectureByStudentCode;
 
-    @Column(name = "refund_status", nullable = false)
-    private Boolean refundStatus;
+    @Column(name = "own_status", nullable = false)
+    private Boolean ownStatus;
 
     @ManyToOne
     @JoinColumn(name = "lecture_code", nullable = false)
@@ -32,4 +32,8 @@ public class LectureByStudent {
     @JoinColumn(name = "student_code", nullable = false)
     @Where(clause = "member_type = 'STUDENT'")
     private Member student;
+
+    public void changeOwnStatus() {
+        this.ownStatus = false;
+    }
 }

@@ -12,4 +12,6 @@ public interface CouponByLectureService {
     void updateCouponByLecture(CouponEntity coupon);
 
     List<CouponByLectureDTO> findCouponByLecture(Long tutorCode);
+
+    CouponByLectureDTO findByCouponAndLecture(Lecture lecture, CouponEntity coupon);
 }
