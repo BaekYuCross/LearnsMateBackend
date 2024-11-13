@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.payment.controller;
 
-import intbyte4.learnsmate.facade.PaymentFacade;
-import intbyte4.learnsmate.facade.LectureFacade;
+import intbyte4.learnsmate.payment.service.PaymentFacade;
+import intbyte4.learnsmate.lecture.service.LectureFacade;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;

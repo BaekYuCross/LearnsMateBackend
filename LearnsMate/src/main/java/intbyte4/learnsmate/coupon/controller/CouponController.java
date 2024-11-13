@@ -8,7 +8,7 @@ import intbyte4.learnsmate.coupon.domain.vo.response.*;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
-import intbyte4.learnsmate.facade.CouponLectureFacade;
+import intbyte4.learnsmate.coupon.service.CouponFacade;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class CouponController {
 
     private final CouponService couponService;
     private final CouponMapper couponMapper;
-    private final CouponLectureFacade couponLectureFacade;
+    private final CouponFacade couponFacade;
 
     @Operation(summary = "쿠폰 전체 조회")
     @GetMapping("/coupons")
@@ -65,7 +65,7 @@ public class CouponController {
     @Operation(summary = "강사 - 쿠폰 등록")
     @PostMapping("/tutor/register")
     public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode) {
-        CouponDTO couponDTO = couponLectureFacade.tutorRegisterCoupon(request, tutor, couponCategory, lectureCode);
+        CouponDTO couponDTO = couponFacade.tutorRegisterCoupon(request, tutor, couponCategory, lectureCode);
         return ResponseEntity.status(HttpStatus.CREATED).body(couponMapper.fromDTOToRegisterResponseVO(couponDTO));
     }
 

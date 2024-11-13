@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.facade;
+package intbyte4.learnsmate.payment.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;

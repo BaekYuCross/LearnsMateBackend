@@ -15,4 +15,6 @@ public interface ContractProcessRepository extends JpaRepository<ContractProcess
     ContractProcess findByLecture(Lecture lecture);
 
     Optional<ContractProcess> findByLectureAndApprovalProcess(Lecture lecture, Integer approvalProcess);
+
+    long countByLecture(Lecture lecture);
 }

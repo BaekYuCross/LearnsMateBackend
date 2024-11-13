@@ -8,4 +8,7 @@ public interface CommentService {
     List<CommentDTO> findAllComments();
 
     CommentDTO findComentByCommentCode(Long commentCode);
+
+    // 강의별 댓글 1개 조회
+    List<CommentDTO> findCommentByLectureCode(Long lectureCode);
 }

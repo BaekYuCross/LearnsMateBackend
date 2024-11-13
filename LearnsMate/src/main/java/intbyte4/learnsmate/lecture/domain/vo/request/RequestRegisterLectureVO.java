@@ -3,6 +3,7 @@ package intbyte4.learnsmate.lecture.domain.vo.request;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,4 +30,5 @@ public class RequestRegisterLectureVO {
     private LectureLevelEnum lectureLevel;
 
     private List<Integer> lectureCategoryCodeList;
+    private List<VideoByLectureDTO> videoByLectureDTOList;
 }
