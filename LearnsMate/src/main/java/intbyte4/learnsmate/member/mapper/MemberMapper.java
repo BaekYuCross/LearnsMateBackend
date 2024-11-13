@@ -5,8 +5,10 @@ import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudent
 import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterStudentVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
@@ -179,6 +181,23 @@ public class MemberMapper{
         return ResponseFindTutorDetailVO.builder()
                 .memberDTO(dto.getMemberDTO())
                 .tutorLectureDetailList(dto.getTutorLectureDetailList())
+                .build();
+    }
+    public MemberFilterRequestDTO fromRequestFilterStudentVOtoMemberFilterRequestDTO(RequestFilterStudentVO request) {
+        return MemberFilterRequestDTO.builder()
+                .memberCode(request.getMemberCode())
+                .memberType(request.getMemberType())
+                .memberEmail(request.getMemberEmail())
+                .memberName(request.getMemberName())
+                .memberAge(request.getMemberAge())
+                .memberPhone(request.getMemberPhone())
+                .memberAddress(request.getMemberAddress())
+                .birthStartDate(request.getBirthStartDate())
+                .birthEndDate(request.getBirthEndDate())
+                .createdStartDate(request.getCreatedStartDate())
+                .createdEndDate(request.getCreatedEndDate())
+                .updatedStartDate(request.getUpdatedStartDate())
+                .updatedEndDate(request.getUpdatedEndDate())
                 .build();
     }
 }
