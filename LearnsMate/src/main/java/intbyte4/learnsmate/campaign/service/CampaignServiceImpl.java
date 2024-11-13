@@ -79,7 +79,7 @@ public class CampaignServiceImpl implements CampaignService {
         });
 
         requestCouponList.forEach(couponDTO -> {
-            CouponDTO foundCoupon = couponService.findCouponByCouponCode(couponDTO.getCouponCode());
+            CouponDTO foundCoupon = couponService.findCouponDTOByCouponCode(couponDTO.getCouponCode());
             if (foundCoupon == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
             couponByCampaignService.registerCouponByCampaign(foundCoupon, requestCampaign);
         });
@@ -132,7 +132,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .removeCouponByCampaign(coupon.getCouponByCampaignCode()));
 
         couponsToAdd.forEach(couponDTO -> {
-            CouponDTO newCoupon = couponService.findCouponByCouponCode(couponDTO.getCouponCode());
+            CouponDTO newCoupon = couponService.findCouponDTOByCouponCode(couponDTO.getCouponCode());
             if (newCoupon == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
             couponByCampaignService.registerCouponByCampaign(newCoupon, requestCampaign);
         });
