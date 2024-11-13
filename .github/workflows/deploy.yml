@@ -27,12 +27,12 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: LearnsMate
+        working-directory: LearnsMateBackend/LearnsMate
         shell: bash
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
-        working-directory: LearnsMate
+        working-directory: LearnsMateBackend/LearnsMate
         shell: bash
 
       - name: Install envsubst
