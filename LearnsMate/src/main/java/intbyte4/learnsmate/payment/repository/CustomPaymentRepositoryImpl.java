@@ -8,7 +8,7 @@ import intbyte4.learnsmate.lecture.domain.entity.QLecture;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.QLectureByStudent;
 import intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.QLectureCategoryByLecture;
-import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.entity.QPayment;
 import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import jakarta.persistence.EntityManager;
@@ -27,7 +27,7 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
     }
 
     @Override
-    public List<PaymentDetailDTO> findPaymentByFilters(PaymentFilterRequestVO request) {
+    public List<PaymentFilterDTO> findPaymentByFilters(PaymentFilterRequestVO request) {
         QPayment payment = QPayment.payment;
         QLectureByStudent lectureByStudent = QLectureByStudent.lectureByStudent;
         QLecture lecture = QLecture.lecture;
@@ -51,7 +51,7 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
 
         return queryFactory
                 .select(Projections.constructor(
-                        PaymentDetailDTO.class,
+                        PaymentFilterDTO.class,
                         payment.paymentCode,
                         payment.paymentPrice,
                         payment.createdAt,

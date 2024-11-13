@@ -1,16 +1,15 @@
 package intbyte4.learnsmate.payment.domain.dto;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+
 import lombok.*;
 
 import java.time.LocalDateTime;
-
 
 @Getter
 @Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentDetailDTO {
+public class PaymentFilterDTO {
     private Long paymentCode;
     private Integer paymentPrice;
     private LocalDateTime createdAt;
@@ -21,10 +20,7 @@ public class PaymentDetailDTO {
     private String tutorName; // 강사 명
     private Long studentCode; // 학생 코드
     private String studentName; // 학생 명
-    private Boolean lectureStatus; // 강의 상태
-    private String lectureCategory; // 강의 카테고리
-    private Integer lectureClickCount; // 강의 조회수
-    private LectureLevelEnum lectureLevel; // 강의 난이도
+    private Integer lectureCategoryCode; // 강의 카테고리
     private String couponIssuanceCode; // 적용 쿠폰 코드
     private String couponIssuanceName; // 적용 쿠폰명
 }

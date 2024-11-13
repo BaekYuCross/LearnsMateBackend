@@ -10,6 +10,7 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
 import intbyte4.learnsmate.payment.domain.vo.*;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
@@ -84,8 +85,8 @@ public class PaymentController {
 
     @Operation(summary = "필터별 결제 내역 조회")
     @GetMapping("/filter")
-    public ResponseEntity<List<PaymentDetailDTO>> getPaymentsByFilters(@RequestBody PaymentFilterRequestVO request) {
-        List<PaymentDetailDTO> payments = paymentService.getPaymentsByFilters(request);
+    public ResponseEntity<List<PaymentFilterDTO>> getPaymentsByFilters(@RequestBody PaymentFilterRequestVO request) {
+        List<PaymentFilterDTO> payments = paymentService.getPaymentsByFilters(request);
         return ResponseEntity.status(HttpStatus.OK).body(payments);
     }
 //    // 직원이 예상 매출액과 할인 매출액을 비교해서 조회 (추가 예시 메서드)

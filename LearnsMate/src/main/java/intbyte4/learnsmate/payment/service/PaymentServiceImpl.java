@@ -28,6 +28,7 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
@@ -71,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentDetailDTO> getPaymentsByFilters(PaymentFilterRequestVO request) {
+    public List<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request) {
         return paymentRepository.findPaymentByFilters(request);
     }
 
