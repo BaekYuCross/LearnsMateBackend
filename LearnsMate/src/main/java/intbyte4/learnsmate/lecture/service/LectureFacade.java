@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.facade;
+package intbyte4.learnsmate.lecture.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
@@ -23,7 +23,6 @@ import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
-import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -106,21 +105,7 @@ public class LectureFacade {
         lectureByStudentRepository.saveAll(lectureByStudents);
     }
 
-    // 강사별 강의 모두 조회
-    public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
-        MemberDTO tutorDTO = memberService.findMemberByMemberCode(tutorCode, MemberType.TUTOR);
-        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        List<Lecture> lectures = lectureRepository.findAllByTutor(tutor);
-
-        if (lectures.isEmpty()) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
-
-        return lectures.stream()
-                .map(lectureMapper::toDTO)
-                .collect(Collectors.toList());
-    }
 
 
     // 강의 등록 -> 강의별 강의 카테고리 등록 메소드 가져오기 .

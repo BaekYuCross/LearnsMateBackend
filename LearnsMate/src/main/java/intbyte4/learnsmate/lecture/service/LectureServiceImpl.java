@@ -7,6 +7,11 @@ import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
+import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +25,8 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
+    private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
     // 전체 강의 조회
     @Override
@@ -39,6 +46,23 @@ public class LectureServiceImpl implements LectureService {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
         return lectureMapper.toDTO(lecture);
+    }
+
+    // 강사별 강의 모두 조회
+    @Override
+    public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
+        MemberDTO tutorDTO = memberService.findMemberByMemberCode(tutorCode, MemberType.TUTOR);
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+
+        List<Lecture> lectures = lectureRepository.findAllByTutor(tutor);
+
+        if (lectures.isEmpty()) {
+            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+        }
+
+        return lectures.stream()
+                .map(lectureMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     // 카테고리별 강의 조회

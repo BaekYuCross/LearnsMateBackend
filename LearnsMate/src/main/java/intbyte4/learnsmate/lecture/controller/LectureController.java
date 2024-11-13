@@ -1,6 +1,6 @@
 package intbyte4.learnsmate.lecture.controller;
 
-import intbyte4.learnsmate.facade.LectureFacade;
+import intbyte4.learnsmate.lecture.service.LectureFacade;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
