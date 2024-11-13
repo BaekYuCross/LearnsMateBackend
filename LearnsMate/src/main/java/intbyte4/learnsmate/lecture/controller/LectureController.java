@@ -33,6 +33,17 @@ public class LectureController {
     private final LectureMapper lectureMapper;
     private final LectureFacade lectureFacade;
 
+    @Operation(summary = "학생이 강의를 클릭할 때 클릭 수 증가")
+    @PostMapping("/{lectureCode}/click")
+    public ResponseEntity<Void> incrementClickCount(@PathVariable("lectureCode") Long lectureCode) {
+        try {
+            lectureService.getLecturesByStudentCode(lectureCode);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @Operation(summary = "강의 정보 전체 조회")
     @GetMapping
     public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
