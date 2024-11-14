@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
@@ -10,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,5 +76,23 @@ public class VOCController {
                 .map(vocMapper::fromDTOToResponseVO)
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "VOC 필터링")
+    @PostMapping("/filter")
+    public ResponseEntity<List<VOCDTO>> filterVOC(@RequestBody VOCDTO vocDTO, MemberDTO memberDTO) {
+        log.info("VOC 필터링 요청 수신");
+        try {
+            List<VOCDTO> filteredVOCList = vocService.filterVOC(vocDTO, memberDTO);
+
+            log.info("VOC 필터링 성공, 필터링된 데이터 수: {}", filteredVOCList.size());
+            return ResponseEntity.ok(filteredVOCList);
+        } catch (CommonException e) {
+            log.error("VOC 필터링 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }
