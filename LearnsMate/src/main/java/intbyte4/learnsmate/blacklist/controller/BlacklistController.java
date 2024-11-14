@@ -2,6 +2,7 @@ package intbyte4.learnsmate.blacklist.controller;
 
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
+import intbyte4.learnsmate.blacklist.domain.vo.request.RequestSaveBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedBlacklistOneVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
@@ -11,29 +12,22 @@ import intbyte4.learnsmate.blacklist.service.BlacklistService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/blacklist")
 public class BlacklistController {
 
     private final BlacklistService blacklistService;
     private final BlacklistMapper blacklistMapper;
-
-    @Autowired
-    public BlacklistController(BlacklistService blacklistService, BlacklistMapper blacklistMapper) {
-        this.blacklistService = blacklistService;
-        this.blacklistMapper = blacklistMapper;
-    }
 
     // 1. 모든 학생 블랙리스트 조회
     @Operation(summary = "직원 - 학생 블랙리스트 전체 조회")
@@ -121,7 +115,7 @@ public class BlacklistController {
     }
 
     // 직원 - 예비 블랙리스트 전체 조회(강사)
-    @Operation(summary = "직원 - 학생 예비 블랙리스트 전체 조회")
+    @Operation(summary = "직원 - 강사 예비 블랙리스트 전체 조회")
     @GetMapping("/tutor/reserved")
     public ResponseEntity<List<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(){
         // dto로 받아와야하는데 어떤 dto로 받아올까?
@@ -157,7 +151,7 @@ public class BlacklistController {
     }
 
     // 강사 예비 블랙리스트 단건 조회
-    @Operation(summary = "직원 - 직원 예비 블랙리스트 단건 세부 조회")
+    @Operation(summary = "직원 - 강사 예비 블랙리스트 단건 세부 조회")
     @GetMapping("/tutor/reserved/{tutorcode}")
     public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findTutorReservedBlacklist(
             @PathVariable("tutorcode") Long tutorCode
@@ -170,5 +164,21 @@ public class BlacklistController {
                 = blacklistMapper.fromBlacklistReportCommentDTOToResponseFindReservedBlacklistOneVO(dtoList);
 
         return ResponseEntity.status(HttpStatus.OK).body(voList);
+    }
+
+    // 멤버 예비 블랙리스트 -> 블랙리스트 "등록" 메서드
+    @Operation(summary = "직원 - 예비 블랙리스트 블랙리스트 등록")
+    @PostMapping("/{membercode}")
+    public ResponseEntity<String> addMemberToBlacklist(
+            @PathVariable("membercode") Long memberCode,
+            @RequestBody RequestSaveBlacklistVO request
+    ){
+        BlacklistDTO blacklistDTO = new BlacklistDTO();
+        blacklistDTO.setMemberCode(memberCode);
+        blacklistDTO.setBlackReason(request.getBlackReason());
+
+        blacklistService.addMemberToBlacklist(blacklistDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body("블랙리스트 등록 성공");
     }
 }

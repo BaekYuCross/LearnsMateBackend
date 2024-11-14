@@ -1,5 +1,8 @@
 package intbyte4.learnsmate.blacklist.service;
 
+import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
+import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
@@ -8,11 +11,14 @@ import intbyte4.learnsmate.blacklist.repository.BlacklistRepository;
 import intbyte4.learnsmate.comment.domain.dto.CommentDTO;
 import intbyte4.learnsmate.comment.service.CommentService;
 import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.report.domain.dto.ReportDTO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.service.ReportService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class BlacklistService {
 
     private final BlacklistRepository blacklistRepository;
@@ -27,15 +34,8 @@ public class BlacklistService {
     private final ReportService reportService;
     private final MemberService memberService;
     private final CommentService commentService;
-
-    @Autowired
-    public BlacklistService(BlacklistRepository blacklistRepository, BlacklistMapper blacklistMapper, ReportService reportService, MemberService memberService, CommentService commentService) {
-        this.blacklistRepository = blacklistRepository;
-        this.blacklistMapper = blacklistMapper;
-        this.reportService = reportService;
-        this.memberService = memberService;
-        this.commentService = commentService;
-    }
+    private final MemberMapper memberMapper;
+    private final AdminMapper adminMapper;
 
     // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
     public List<BlacklistDTO> findAllBlacklistByMemberType(MemberType memberType) {
@@ -90,5 +90,26 @@ public class BlacklistService {
                     .build());
         }
         return blacklistReportCommentDTOList;
+    }
+
+    // 블랙리스트 등록 메서드
+    public void addMemberToBlacklist(BlacklistDTO dto) {
+        // 1. memberCode에 해당하는 사람
+        MemberDTO memberDTO = memberService.findById(dto.getMemberCode());
+        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
+
+        // 2. admin을 찾아와야 하는데 나중에 token으로 처리 할듯?
+        AdminDTO adminDTO = new AdminDTO();
+        Admin admin = adminMapper.toEntity(adminDTO);
+
+        // 3. BlacklistDTO 생성 -> 이유만 있으면 됨. -> 이유도 넘겨받아야함. -> dto 자체를 넘겨받으면 해결
+        // 블랙리스트로 저장해야하니까 Blacklist 엔티티를 만들어야함.
+        Blacklist blacklist = blacklistMapper.fromBlacklistDTOtoBlacklist(dto, member, admin);
+
+        // 4. 블랙리스트에 저장
+        blacklistRepository.save(blacklist);
+
+        // 5. 회원 flag false로 수정
+        memberService.deleteMember(dto.getMemberCode());
     }
 }
