@@ -2,7 +2,9 @@ package intbyte4.learnsmate.campaign.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
+import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.entity.QCampaign;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
@@ -14,40 +16,40 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    private final QCampaign qCampaign;
+    private final QCampaign qCampaign = QCampaign.campaign;
 
     @Override
-    public List<Campaign> searchBy(Campaign campaign, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Campaign> searchBy(CampaignDTO campaignDTO, LocalDateTime startDate, LocalDateTime endDate) {
 
         return queryFactory
                 .selectFrom(qCampaign)
-                .where(searchByType(campaign)
-                        .and(searchByTitle(campaign))
-                        .and(searchByPeriod(campaign, startDate, endDate))
-                        .and(searchBySentStatus(campaign))
-                        .and(searchByScheduledStatus(campaign))
+                .where(searchByType(campaignDTO)
+                        .and(searchByTitle(campaignDTO))
+                        .and(searchByPeriod(campaignDTO, startDate, endDate))
+                        .and(searchBySentStatus(campaignDTO))
+                        .and(searchByScheduledStatus(campaignDTO))
                 )
                 .fetch();
     }
 
-    public BooleanBuilder searchByType(Campaign campaign) {
+    public BooleanBuilder searchByType(CampaignDTO campaignDTO) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        if (campaign.getCampaignType() != null) {
-            booleanBuilder.and(qCampaign.campaignType.eq(campaign.getCampaignType()));
+        if (campaignDTO.getCampaignType() != null) {
+            booleanBuilder.and(qCampaign.campaignType.eq(CampaignTypeEnum.valueOf(campaignDTO.getCampaignType())));
         }
 
         return booleanBuilder;
     }
 
-    public BooleanBuilder searchByTitle(Campaign campaign) {
+    public BooleanBuilder searchByTitle(CampaignDTO campaignDTO) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        if (campaign.getCampaignTitle() == null) {
+        if (campaignDTO.getCampaignTitle() == null) {
             return booleanBuilder;
         }
 
-        String[] keywords = campaign.getCampaignTitle().split(" ");
+        String[] keywords = campaignDTO.getCampaignTitle().split(" ");
         if (keywords.length < 2) {
             throw new CommonException(StatusEnum.MINIMUM_KEYWORD_LENGTH_REQUIRED);
         }
@@ -59,9 +61,9 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
         return booleanBuilder;
     }
 
-    public BooleanBuilder searchByPeriod(Campaign campaign, LocalDateTime startDate, LocalDateTime endDate) {
+    public BooleanBuilder searchByPeriod(CampaignDTO campaignDTO, LocalDateTime startDate, LocalDateTime endDate) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (campaign.getCampaignSendDate() == null) return booleanBuilder;
+        if (campaignDTO.getCampaignSendDate() == null) return booleanBuilder;
 
         if (startDate != null) {
             booleanBuilder.and(qCampaign.campaignSendDate.goe(startDate));
@@ -74,18 +76,18 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
         return booleanBuilder;
     }
 
-    public BooleanBuilder searchBySentStatus(Campaign campaign) {
+    public BooleanBuilder searchBySentStatus(CampaignDTO campaignDTO) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (campaign.getCampaignSendDate() == null) return booleanBuilder;
+        if (campaignDTO.getCampaignSendDate() == null) return booleanBuilder;
 
         booleanBuilder.and(qCampaign.campaignSendDate.loe(LocalDateTime.now()));
 
         return booleanBuilder;
     }
 
-    public BooleanBuilder searchByScheduledStatus(Campaign campaign) {
+    public BooleanBuilder searchByScheduledStatus(CampaignDTO campaignDTO) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (campaign.getCampaignSendDate() == null) return booleanBuilder;
+        if (campaignDTO.getCampaignSendDate() == null) return booleanBuilder;
 
         booleanBuilder.and(qCampaign.campaignSendDate.goe(LocalDateTime.now()));
 

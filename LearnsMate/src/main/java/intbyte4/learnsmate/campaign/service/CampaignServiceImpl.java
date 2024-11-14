@@ -198,11 +198,9 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public List<CampaignDTO> findCampaignListByCondition
             (CampaignDTO request, LocalDateTime startDate, LocalDateTime endDate) {
-        AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
-        Admin admin = adminMapper.toEntity(adminDTO);
 
         List<Campaign> campaign = campaignRepositoryCustom
-                .searchBy(campaignMapper.toEntity(request,admin), startDate, endDate);
+                .searchBy(request, startDate, endDate);
 
         List<CampaignDTO> campaignDTOList = new ArrayList<>();
         campaign.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));

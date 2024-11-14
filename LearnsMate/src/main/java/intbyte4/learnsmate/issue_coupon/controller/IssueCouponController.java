@@ -1,6 +1,6 @@
 package intbyte4.learnsmate.issue_coupon.controller;
 
-import intbyte4.learnsmate.facade.MemberCouponFacade;
+import intbyte4.learnsmate.issue_coupon.service.IssueCouponFacade;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.response.IssueCouponFindResponseVO;
@@ -26,12 +26,12 @@ public class IssueCouponController {
 
     private final IssueCouponService issueCouponService;
     private final IssueCouponMapper issueCouponMapper;
-    private final MemberCouponFacade memberCouponFacade;
+    private final IssueCouponFacade issueCouponFacade;
 
     @Operation(summary = "학생에게 쿠폰 발급")
     @PostMapping("/register")
     public ResponseEntity<List<IssueCouponRegisterResponseVO>> registerIssuedCoupons(@RequestBody IssueCouponRegisterRequestVO request) {
-        List<IssueCouponDTO> issuedCoupons = memberCouponFacade.issueCouponsToStudents(request);
+        List<IssueCouponDTO> issuedCoupons = issueCouponFacade.issueCouponsToStudents(request);
         List<IssueCouponRegisterResponseVO> responseList = issuedCoupons.stream()
                 .map(issueCouponMapper::fromDtoToRegisterResponseVO)
                 .collect(Collectors.toList());

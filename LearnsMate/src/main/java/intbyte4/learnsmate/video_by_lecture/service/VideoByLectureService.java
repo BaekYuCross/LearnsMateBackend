@@ -7,4 +7,6 @@ import java.util.List;
 public interface VideoByLectureService {
     // 강의코드별 모든 강의별 동영상 조회
     List<VideoByLectureDTO> findVideoByLectureByLectureCode(Long lectureCode);
+
+    void registerVideoByLecture(Long lectureCode, VideoByLectureDTO videoByLectureDTO);
 }

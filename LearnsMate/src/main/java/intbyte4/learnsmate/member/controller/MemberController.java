@@ -2,7 +2,10 @@ package intbyte4.learnsmate.member.controller;
 
 import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
+import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterStudentVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterTutorVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -12,6 +15,7 @@ import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.service.MemberFacade;
 import intbyte4.learnsmate.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -113,5 +117,35 @@ public class MemberController {
         memberService.deleteMember(memberCode);
 
         return ResponseEntity.status(HttpStatus.OK).body("삭제 성공");
+    }
+
+    @Operation(summary = "직원 - 학생 필터링 검색")
+    @GetMapping("/filter/student")
+    public ResponseEntity<List<ResponseFindMemberVO>> findStudentByFilter(@RequestBody RequestFilterStudentVO request) {
+
+        MemberFilterRequestDTO dto =
+                memberMapper.fromRequestFilterStudentVOtoMemberFilterRequestDTO(request);
+
+        List<MemberDTO> memberDTOList = memberService.filterStudent(dto);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(memberDTOList.stream()
+                        .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
+                        .collect(Collectors.toList()));
+    }
+
+    @Operation(summary = "직원 - 강사 필터링 검색")
+    @GetMapping("/filter/tutor")
+    public ResponseEntity<?> findTutorByFilter(@RequestBody RequestFilterTutorVO request) {
+
+        MemberFilterRequestDTO dto =
+                memberMapper.fromRequestFiltertutorVOtoMemberFilterRequestDTO(request);
+
+        List<MemberDTO> memberDTOList = memberService.filterTutor(dto);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(memberDTOList.stream()
+                        .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
+                        .collect(Collectors.toList()));
     }
 }

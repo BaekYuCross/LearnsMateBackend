@@ -14,10 +14,6 @@ import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
-import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
-import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -35,8 +31,6 @@ import java.time.LocalDateTime;
 public class ContractProcessServiceImpl implements ContractProcessService {
     private final ContractProcessRepository contractProcessRepository;
     private final ContractProcessMapper contractProcessMapper;
-    private final LectureCategoryService lectureCategoryService;
-    private final LectureCategoryMapper lectureCategoryMapper;
     private final AdminService adminService;
     private final AdminMapper adminMapper;
     private final MemberService memberService;
@@ -62,10 +56,6 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lecturedto.getLectureCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lecturedto.getLectureCategoryCode());
-//        LectureCategory lectureCategory = lectureCategoryMapper.toEntity(lectureCategoryDTO);
-
-//        Lecture lecture = lectureMapper.toEntity(lecturedto, tutor, lectureCategory);
         Lecture lecture = lectureMapper.toEntity(lecturedto, tutor);
 
         ContractProcess contractProcess = contractProcessRepository.findByLecture(lecture);
@@ -87,10 +77,6 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-//        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureDTO.getLectureCategoryCode());
-//        LectureCategory category = lectureCategoryMapper.toEntity(lectureCategoryDTO);
-
-//        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor, category);
         Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         AdminDTO adminDTO = adminService.findByAdminCode(contractProcessDTO.getAdminCode());
@@ -115,6 +101,14 @@ public class ContractProcessServiceImpl implements ContractProcessService {
                 .build();
 
         contractProcessRepository.save(contractProcess);
+
+        long contractProcessCount = contractProcessRepository.countByLecture(lecture);
+        LectureDTO lecturedto = lectureMapper.toDTO(lecture);
+
+        // 계약과정이 7개일 경우 강의 승인 상태 변경
+        if (contractProcessCount == 7) {
+            lectureService.updateLectureConfirmStatus(lecturedto.getLectureCode());
+        }
 
         return contractProcessMapper.toDTO(contractProcess);
     }
