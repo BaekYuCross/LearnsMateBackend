@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@IdClass(LectureVideoByStudentId.class) // 복합 키 클래스 지정
+@IdClass(LectureVideoByStudentId.class)
 @Table(name = "lecture_video_by_student")
 @AllArgsConstructor
 @NoArgsConstructor
