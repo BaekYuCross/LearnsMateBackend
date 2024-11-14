@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.lecture.domain.dto;
 
 
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;

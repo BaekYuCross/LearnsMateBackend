@@ -1,6 +1,6 @@
 package intbyte4.learnsmate.lecture.domain.dto;
 
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import lombok.*;
 
