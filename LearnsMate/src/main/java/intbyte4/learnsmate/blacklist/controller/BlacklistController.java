@@ -195,7 +195,7 @@ public class BlacklistController {
     }
 
     @Operation(summary = "강사 - 블랙리스트 필터링 기능 추가")
-    @GetMapping("/filter/student")
+    @GetMapping("/filter/tutor")
     public ResponseEntity<?> filterBlackTutor(@RequestBody RequestFilterBlacklistMemberVO vo){
         BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
         dto.setMemberType(MemberType.TUTOR);
