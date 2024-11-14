@@ -52,8 +52,6 @@ jobs:
           spring:
             application:
               name: learnsmate
-          
-          spring:
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
