@@ -1,9 +1,7 @@
 package intbyte4.learnsmate.blacklist.domain.dto;
 
-
+import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -11,16 +9,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @ToString
-public class BlacklistDTO {
-
-    private Long blackCode;
+public class BlacklistFilterRequestDTO {
     private Long memberCode;
     private String memberName;
     private String memberEmail;
-    private String blackReason;
-
-    private LocalDateTime createdAt;
-
-    private Long adminCode;
-    private String adminName;
+    private MemberType memberType;
 }
