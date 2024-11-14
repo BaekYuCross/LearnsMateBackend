@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestRegisterPaymentVO {
-    private RequestRegisterIssueCouponPaymentVO issueCouponVO;
+    private List<RequestRegisterIssueCouponPaymentVO> issueCouponVOList;
     private RequestRegisterMemberPaymentVO memberVO;
     private List<RequestRegisterLecturePaymentVO> LectureVOList;
 
