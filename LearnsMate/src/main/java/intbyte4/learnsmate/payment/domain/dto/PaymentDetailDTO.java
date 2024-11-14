@@ -1,5 +1,5 @@
 package intbyte4.learnsmate.payment.domain.dto;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -27,5 +27,4 @@ public class PaymentDetailDTO {
     private LectureLevelEnum lectureLevel; // 강의 난이도
     private String couponIssuanceCode; // 적용 쿠폰 코드
     private String couponIssuanceName; // 적용 쿠폰명
-
 }

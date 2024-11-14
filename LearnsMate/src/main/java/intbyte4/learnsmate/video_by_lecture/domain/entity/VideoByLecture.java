@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.video_by_lecture.domain.entity;
 
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,4 +29,9 @@ public class VideoByLecture {
     @ManyToOne
     @JoinColumn(name = "lecture_code", nullable = false)
     private Lecture lecture;
+
+    public void toUpdate( VideoByLectureDTO videoByLectureDTO ) {
+        this.videoLink = videoByLectureDTO.getVideoLink();
+        this.videoTitle = videoByLectureDTO.getVideoTitle();
+    }
 }

@@ -4,6 +4,7 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -73,7 +74,7 @@ public class PreferredTopicsService {
         List<LectureCategory> categoryList = categoryDTOList.stream()
                         .map(dto -> LectureCategory.builder()
                                 .lectureCategoryCode(dto.getLectureCategoryCode())
-                                .lectureCategoryName(dto.getLectureCategoryName())
+                                .lectureCategoryName(LectureCategoryEnum.valueOf(dto.getLectureCategoryName()))
                                 .build())
                                 .collect(Collectors.toList());
 

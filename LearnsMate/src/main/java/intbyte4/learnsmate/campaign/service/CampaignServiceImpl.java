@@ -81,6 +81,9 @@ public class CampaignServiceImpl implements CampaignService {
         requestCouponList.forEach(couponDTO -> {
             CouponDTO foundCoupon = couponService.findCouponDTOByCouponCode(couponDTO.getCouponCode());
             if (foundCoupon == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
+            else if (foundCoupon.getTutorCode() != null) {
+                throw new CommonException(StatusEnum.COUPON_CANNOT_BE_SENT_BY_TUTOR);
+            }
             couponByCampaignService.registerCouponByCampaign(foundCoupon, requestCampaign);
         });
 
@@ -195,11 +198,9 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public List<CampaignDTO> findCampaignListByCondition
             (CampaignDTO request, LocalDateTime startDate, LocalDateTime endDate) {
-        AdminDTO adminDTO = adminService.findByAdminCode(request.getAdminCode());
-        Admin admin = adminMapper.toEntity(adminDTO);
 
         List<Campaign> campaign = campaignRepositoryCustom
-                .searchBy(campaignMapper.toEntity(request,admin), startDate, endDate);
+                .searchBy(request, startDate, endDate);
 
         List<CampaignDTO> campaignDTOList = new ArrayList<>();
         campaign.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));

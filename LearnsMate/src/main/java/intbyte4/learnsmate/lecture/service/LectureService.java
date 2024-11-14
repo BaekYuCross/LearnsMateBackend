@@ -8,5 +8,7 @@ import java.util.List;
 public interface LectureService {
     List<LectureDTO> getAllLecture();
     LectureDTO getLectureById(Long lectureCode);
-    LectureDTO updateLecture(LectureDTO lectureDTO);
+    LectureDTO getLecturesByStudentCode(Long studentCode);
+    List<LectureDTO> getLecturesByTutorCode(Long tutorCode);
+    LectureDTO updateLectureConfirmStatus(Long lectureCode);
 }

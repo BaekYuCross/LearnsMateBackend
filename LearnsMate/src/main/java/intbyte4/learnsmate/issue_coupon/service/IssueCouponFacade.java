@@ -1,8 +1,7 @@
-package intbyte4.learnsmate.facade;
+package intbyte4.learnsmate.issue_coupon.service;
 
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
-import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MemberCouponFacade {
+public class IssueCouponFacade {
 
     private final MemberService memberService;
     private final IssueCouponService issueCouponService;

@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@IdClass(LectureVideoByStudent.class)
+@IdClass(LectureVideoByStudentId.class)
 @Table(name = "lecture_video_by_student")
 @AllArgsConstructor
 @NoArgsConstructor
