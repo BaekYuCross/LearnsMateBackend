@@ -18,7 +18,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-        public List<Member> searchBy(MemberFilterRequestDTO request) {
+    public List<Member> searchBy(MemberFilterRequestDTO request) {
         QMember member = QMember.member;
 
         BooleanBuilder builder = new BooleanBuilder()
