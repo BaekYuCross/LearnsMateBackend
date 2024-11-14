@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface VOCRepository extends JpaRepository<VOC, Long> {
+public interface VOCRepository extends JpaRepository<VOC, Long>, VOCRepositoryCustom {
 
     @Query("SELECT v FROM Voc v " +
             "WHERE v.member.memberCode = :memberCode " +
