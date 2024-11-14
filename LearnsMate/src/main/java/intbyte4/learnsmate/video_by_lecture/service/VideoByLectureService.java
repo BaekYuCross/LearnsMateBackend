@@ -9,4 +9,7 @@ public interface VideoByLectureService {
     List<VideoByLectureDTO> findVideoByLectureByLectureCode(Long lectureCode);
 
     void registerVideoByLecture(Long lectureCode, VideoByLectureDTO videoByLectureDTO);
+
+    // 동영상 제목과 링크 수정 메서드
+    VideoByLectureDTO updateVideoByLecture(VideoByLectureDTO videoByLectureDTO);
 }

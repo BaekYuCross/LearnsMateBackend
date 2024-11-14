@@ -75,5 +75,18 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         videoByLectureMapper.toDTO(savedVideoByLecture);
     }
 
+    // 동영상 제목과 링크 수정 메서드
+    @Override
+    public VideoByLectureDTO updateVideoByLecture(VideoByLectureDTO videoByLectureDTO) {
+        VideoByLecture videoByLecture = videoByLectureRepository.findById(videoByLectureDTO.getLectureCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.VIDEO_BY_LECTURE_NOT_FOUND));
+
+        videoByLecture.toUpdate(videoByLectureDTO);
+
+        VideoByLecture updatedVideoByLecture = videoByLectureRepository.save(videoByLecture);
+        return videoByLectureMapper.toDTO(updatedVideoByLecture);
+    }
+
+
 
 }
