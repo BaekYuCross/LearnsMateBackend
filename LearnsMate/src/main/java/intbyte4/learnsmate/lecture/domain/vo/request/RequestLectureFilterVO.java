@@ -2,7 +2,6 @@ package intbyte4.learnsmate.lecture.domain.vo.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +20,7 @@ public class RequestLectureFilterVO {
     private Long tutorCode; // 강사 코드
     private String tutorName; // 강사명
     private String lectureCategoryName; // 강의 카테고리
-    private LectureLevelEnum lectureLevel; // 강의 난이도
+    private String lectureLevel; // 강의 난이도
     private Boolean lectureConfirmStatus; // 강의 계약 상태
     private Boolean lectureStatus; // 강의 상태
     private Integer minPrice; // 최소 금액

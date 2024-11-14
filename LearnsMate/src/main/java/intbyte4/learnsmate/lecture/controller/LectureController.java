@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class LectureController {
 
     private final LectureService lectureService;
-    private final LectureFacade LectureFacade;
     private final LectureMapper lectureMapper;
     private final LectureFacade lectureFacade;
 
@@ -47,7 +46,7 @@ public class LectureController {
     @Operation(summary = "강의 정보 전체 조회")
     @GetMapping
     public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
-        List<LectureDetailDTO> lectureDTOs = LectureFacade.getAllLecture();
+        List<LectureDetailDTO> lectureDTOs = lectureFacade.getAllLecture();
         List<ResponseFindLectureVO> lectureVOs = lectureDTOs.stream()
                 .map(lectureMapper::fromDtoToResponseVO)
                 .collect(Collectors.toList());
@@ -57,7 +56,7 @@ public class LectureController {
     @Operation(summary = "강의 단건 조회")
     @GetMapping("/{lectureCode}")
     public ResponseEntity<ResponseFindLectureVO> getLecture(@PathVariable("lectureCode") Long lectureCode) {
-        LectureDetailDTO lectureDTO = LectureFacade.getLectureById(lectureCode);
+        LectureDetailDTO lectureDTO = lectureFacade.getLectureById(lectureCode);
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
     }
 
@@ -81,9 +80,19 @@ public class LectureController {
     @PatchMapping("/{lectureCode}/info")
     public ResponseEntity<ResponseEditLectureInfoVO> updateLecture(
             @RequestBody RequestEditLectureInfoVO requestVO) {
-        LectureDTO updatedLecture = lectureService.updateLecture(lectureMapper.fromRequestVOtoDto(requestVO));
-        return ResponseEntity.status(HttpStatus.CREATED).body(lectureMapper.fromDtoToEditResponseVO(updatedLecture));
+
+        LectureDTO lectureDTO = lectureMapper.fromRequestVOtoDto(requestVO);
+
+        LectureDTO updatedLecture = lectureFacade.updateLecture(lectureDTO,
+                requestVO.getNewVideoTitle(),
+                requestVO.getNewVideoLink(),
+                requestVO.getLectureCategoryCodeList());
+
+        ResponseEditLectureInfoVO responseVO = lectureMapper.fromDtoToEditResponseVO(updatedLecture);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseVO);
     }
+
 
 
     @Operation(summary = "강의 삭제")
