@@ -1,15 +1,20 @@
 package intbyte4.learnsmate.blacklist.mapper;
 
+import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
+import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
-import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReportVO;
+import intbyte4.learnsmate.blacklist.domain.vo.request.RequestFilterBlacklistMemberVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedBlacklistOneVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTutorBlacklistVO;
+import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,24 +25,35 @@ public class BlacklistMapper {
     public BlacklistDTO fromBlacklistToBlacklistDTO(Blacklist blacklist) {
         return BlacklistDTO.builder()
                 .blackCode(blacklist.getBlackCode())
+                .memberCode(blacklist.getMember().getMemberCode())
+                .memberName(blacklist.getMember().getMemberName())
+                .memberEmail(blacklist.getMember().getMemberEmail())
                 .blackReason(blacklist.getBlackReason())
                 .createdAt(blacklist.getCreatedAt())
-                .updatedAt(blacklist.getUpdatedAt())
-                .memberCode(blacklist.getMember().getMemberCode())
-                .reportCode(blacklist.getReport().getReportCode())
                 .adminCode(blacklist.getAdmin().getAdminCode())
+                .adminName(blacklist.getAdmin().getAdminName())
                 .build();
     }
 
-    public ResponseFindReportVO fromBlacklistDTOToResponseFindReportVO(BlacklistDTO blacklistDTO) {
-        return ResponseFindReportVO.builder()
-                .blackCode(blacklistDTO.getBlackCode())
-                .blackReason(blacklistDTO.getBlackReason())
-                .createdAt(blacklistDTO.getCreatedAt())
-                .updatedAt(blacklistDTO.getUpdatedAt())
-                .memberCode(blacklistDTO.getMemberCode())
-                .reportCode(blacklistDTO.getReportCode())
-                .adminCode(blacklistDTO.getAdminCode())
+    public ResponseFindBlacklistVO fromBlacklistDTOToResponseFindReportVO(BlacklistDTO dto) {
+        return ResponseFindBlacklistVO.builder()
+                .blackCode(dto.getBlackCode())
+                .memberCode(dto.getMemberCode())
+                .memberName(dto.getMemberName())
+                .memberEmail(dto.getMemberEmail())
+                .blackReason(dto.getBlackReason())
+                .createdAt(dto.getCreatedAt())
+                .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
+                .build();
+    }
+
+    public Blacklist fromBlacklistDTOtoBlacklist(BlacklistDTO dto, Member member, Admin admin) {
+        return Blacklist.builder()
+                .createdAt(LocalDateTime.now())
+                .blackReason(dto.getBlackReason())
+                .admin(admin)
+                .member(member)
                 .build();
     }
 
@@ -65,4 +81,13 @@ public class BlacklistMapper {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public BlacklistFilterRequestDTO fromFilterMemberVOtoFilterMemberDTO(RequestFilterBlacklistMemberVO vo) {
+        return BlacklistFilterRequestDTO.builder()
+                .memberCode(vo.getMemberCode())
+                .memberName(vo.getMemberName())
+                .memberEmail(vo.getMemberEmail())
+                .build();
+    }
+
 }
