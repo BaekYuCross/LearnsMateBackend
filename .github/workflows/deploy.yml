@@ -123,13 +123,27 @@ jobs:
           cd deploy && zip -r deploy.zip .
         working-directory: LearnsMate
 
-      - name: Beanstalk Deploy
+      - name: Beanstalk1 Deploy
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: intbyte-env
           environment_name: Intbyte-env
+          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+          region: ap-northeast-2
+          deployment_package: LearnsMate/deploy/deploy.zip
+          use_existing_version_if_available: false
+          wait_for_deployment: true
+          wait_for_environment_recovery: 300
+
+      - name: Beanstalk2 Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: intbyte-env2
+          environment_name: Intbyte-env2
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: LearnsMate/deploy/deploy.zip
