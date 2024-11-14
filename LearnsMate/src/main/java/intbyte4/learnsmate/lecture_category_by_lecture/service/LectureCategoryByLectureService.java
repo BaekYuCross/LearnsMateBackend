@@ -90,4 +90,42 @@ public class LectureCategoryByLectureService {
         return lectureCategoryByLectureRepository.findCategoryNamesByLectureCode(lectureCode);
     }
 
+
+    // 강의와 카테고리 간 관계 업데이트 메서드
+    public void updateLectureCategoryByLecture(OneLectureCategoryListDTO dto) {
+        // 해당 강의 정보 가져오기
+        LectureDTO lectureDTO = lectureService.getLectureById(dto.getLectureCode());
+
+        // 강의의 멤버 (강사) 정보 가져오기
+        MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
+        Member tutor = memberMapper.fromMemberDTOtoMember(memberDTO);
+
+        // 강의 엔티티로 변환
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
+
+        // 수정할 강의 카테고리 목록
+        List<LectureCategory> lectureCategoryList = new ArrayList<>();
+        for (int categoryCode : dto.getLectureCategoryCodeList()) {
+            // 카테고리 DTO 가져오기
+            LectureCategoryDTO categoryDTO = lectureCategoryService.findByLectureCategoryCode(categoryCode);
+            // 카테고리 엔티티로 변환
+            LectureCategory lectureCategory = lectureCategoryMapper.toEntity(categoryDTO);
+            lectureCategoryList.add(lectureCategory);
+        }
+
+        // 기존 강의와 연결된 카테고리들 찾기
+        List<LectureCategoryByLecture> existingCategories = lectureCategoryByLectureRepository.findByLecture(lecture);
+        if (!existingCategories.isEmpty()) {
+            // 기존 카테고리 삭제
+            lectureCategoryByLectureRepository.deleteAll(existingCategories);
+        }
+
+        // 새로 연결할 강의별 강의 카테고리 엔티티 생성
+        List<LectureCategoryByLecture> entityList = lectureCategoryByLectureMapper.fromLectureAndLectureCategoryListToEntity(lecture, lectureCategoryList);
+
+        // 강의별 강의 카테고리 테이블에 저장
+        lectureCategoryByLectureRepository.saveAll(entityList);
+    }
+
+
 }

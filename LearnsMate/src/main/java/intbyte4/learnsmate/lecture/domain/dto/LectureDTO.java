@@ -1,7 +1,6 @@
 package intbyte4.learnsmate.lecture.domain.dto;
 
 
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +22,6 @@ public class LectureDTO {
     private Long tutorCode;
     private Boolean lectureStatus;
     private Integer lectureClickCount;
-    private LectureLevelEnum lectureLevel;
+    private String lectureLevel;
 
 }

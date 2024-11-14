@@ -18,6 +18,7 @@ public class LectureCategory {
     @Column(name = "lecture_category_code")
     private Integer lectureCategoryCode;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "lecture_category_name")
-    private String lectureCategoryName;
+    private LectureCategoryEnum lectureCategoryName;
 }

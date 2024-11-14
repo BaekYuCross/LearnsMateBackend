@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.lecture_category_by_lecture.repository;
 
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCategoryByLecture;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,6 @@ public interface LectureCategoryByLectureRepository extends JpaRepository<Lectur
             "JOIN lcl.lectureCategory lc " +
             "WHERE lcl.lecture.lectureCode = :lectureCode")
     List<String> findCategoryNamesByLectureCode(@Param("lectureCode") Long lectureCode);
+
+    List<LectureCategoryByLecture> findByLecture(Lecture lecture);
 }

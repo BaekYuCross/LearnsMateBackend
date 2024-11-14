@@ -1,7 +1,6 @@
 package intbyte4.learnsmate.lecture.domain.entity;
 
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -64,7 +63,7 @@ public class Lecture {
         this.lecturePrice = lectureDTO.getLecturePrice();
         this.lectureStatus = lectureDTO.getLectureStatus();
         this.lectureClickCount = lectureDTO.getLectureClickCount();
-        this.lectureLevel = lectureDTO.getLectureLevel();
+        this.lectureLevel = LectureLevelEnum.valueOf(lectureDTO.getLectureLevel());
     }
 
     public void toDelete(){
