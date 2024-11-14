@@ -43,7 +43,7 @@ public class BlacklistController {
 
         List<ResponseFindBlacklistVO> response = new ArrayList<>();
 
-        // dto -> ResponseFindReportVO로 전환해주기
+        // dto -> ResponseFindBlacklistVO로 전환해주기
         for(BlacklistDTO blacklistDTO : blacklistDTOList) {
             response.add(blacklistMapper.fromBlacklistDTOToResponseFindReportVO(blacklistDTO));
         }
@@ -60,7 +60,7 @@ public class BlacklistController {
 
         List<ResponseFindBlacklistVO> response = new ArrayList<>();
 
-        // dto -> ResponseFindReportVO로 전환해주기
+        // dto -> ResponseFindBlacklistVO로 전환해주기
         for(BlacklistDTO blacklistDTO : blacklistDTOList) {
             response.add(blacklistMapper.fromBlacklistDTOToResponseFindReportVO(blacklistDTO));
         }
@@ -70,7 +70,9 @@ public class BlacklistController {
 
     // 3. 학생 블랙리스트 단건 조회
     @GetMapping("/student/{studentcode}")
-    public ResponseEntity<?> findStudentBlacklist(@PathVariable("studentcode") Long studentCode) {
+    public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findStudentBlacklist(
+            @PathVariable("studentcode") Long studentCode
+    ) {
         // 보여줘야 하는것들
         // 학생 정보 + 신고정보 + 댓글정보 -> 예비 블랙리스트하고 똑같이 하면 될거같네
         List<BlacklistReportCommentDTO> dtoList = blacklistService.findBlacklistReportComment(studentCode);
@@ -83,7 +85,9 @@ public class BlacklistController {
 
     // 4. 강사 블랙리스트 단건 조회
     @GetMapping("/tutor/{tutorcode}")
-    public ResponseEntity<?> findTutorBlacklist(@PathVariable("tutorcode") Long tutorCode) {
+    public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findTutorBlacklist(
+            @PathVariable("tutorcode") Long tutorCode
+    ) {
         List<BlacklistReportCommentDTO> dtoList = blacklistService.findBlacklistReportComment(tutorCode);
 
         List<ResponseFindReservedBlacklistOneVO> voList
