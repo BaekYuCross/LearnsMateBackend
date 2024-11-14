@@ -60,9 +60,11 @@ public class BlacklistService {
         // 모든 멤버 가져옴.
         List<ReportedMemberDTO> reportedMoreThanFiveMemberList = reportService.findReportCountByMemberCode();
 
-        // 멤버 타입이 동일한거만 가져오기 -> 원래는 sql에서 처리해야하지만 많지 않을것이기 때문에 백엔드에서 처리해도 무방하다 생각
+        // 멤버 타입이 동일한거만 가져오기 -> 원래는 sql로 처리해야하지만 많지 않을것이기 때문에 백엔드에서 처리해도 무방하다 생각
+        // + flag가 true인 사람 가져오기
         List<ReportedMemberDTO> filteredList = reportedMoreThanFiveMemberList.stream()
-                .filter(dto -> dto.getReportedMember().getMemberType().equals(memberType))
+                .filter(dto -> dto.getReportedMember().getMemberType().equals(memberType)
+                                && dto.getReportedMember().getMemberFlag())
                 .collect(Collectors.toList());
 
         return filteredList;
