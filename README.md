@@ -4,10 +4,10 @@
 
 
 
-# Group 4 Team Member - 'LearnsBuddy'
+# Group 5 Team Member - 'LearnsBuddy'
 
 
-| <img src="healthtart_readmeimages/00.조원/조제훈.png" height=130/> | <img src="healthtart_readmeimages/00.조원/백경석.jpg" height=130/> | <img src="healthtart_readmeimages/00.조원/유제은.jpg" height=130/> | <img src="healthtart_readmeimages/00.조원/이나현.jpg" height=130/> | <img src="healthtart_readmeimages/00.조원/이서현.jpg" height=130/> | 
+| <img src="learnsmate_readmeimages/00.조원/조제훈.png" height=130/> | <img src="learnsmate_readmeimages/00.조원/백경석.jpg" height=130/> | <img src="learnsmate_readmeimages/00.조원/유제은.jpg" height=130/> | <img src="learnsmate_readmeimages/00.조원/이나현.jpg" height=130/> | <img src="learnsmate_readmeimages/00.조원/이서현.jpg" height=130/> | 
 | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
 |                            조제훈                            |                            백경석                            |                            유제은                            |                            이나현                            |                            이서현                            |
 | [<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/JoJeHuni) <br>` ESFJ `| [<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/Hellin22) <br>` ENTP `| [<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/YuJeeun) <br>` INFP `| [<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/sksmsdlskgus) <br>` ENTJ `| [<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/sh694090) <br>` INFJ `|
