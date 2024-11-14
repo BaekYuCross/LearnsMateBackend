@@ -1,124 +1,159 @@
 package intbyte4.learnsmate.lecture.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.QLecture;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseLectureFilterRequestVO;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
+import intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.QLectureCategoryByLecture;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory.lectureCategory;
+
 @Repository
-@RequiredArgsConstructor
 public class CustomLectureRepositoryImpl implements CustomLectureRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final QLecture lecture = QLecture.lecture;
-    private final QLectureCategoryByLecture lectureCategoryByLecture = QLectureCategoryByLecture.lectureCategoryByLecture;
+
+    public CustomLectureRepositoryImpl(EntityManager entityManager) {
+        this.queryFactory = new JPAQueryFactory(entityManager);
+    }
 
     @Override
-    public List<Lecture> findLecturesByFilters(ResponseLectureFilterRequestVO request) {
+    public List<LectureFilterDTO> findLecturesByFilters(RequestLectureFilterVO request) {
+        QLecture lecture = QLecture.lecture;
+        QLectureCategory lectureCategory = QLectureCategory.lectureCategory;
+        QLectureCategoryByLecture lectureCategoryByLecture = QLectureCategoryByLecture.lectureCategoryByLecture;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(eqLectureCode(request))
+                .and(likeLectureTitle(request))
+                .and(eqTutorCode(request))
+                .and(eqTutorName(request))
+                .and(eqLectureCategoryName(request))
+                .and(eqLectureLevel(request))
+                .and(eqLectureConfirmStatus(request))
+                .and(eqLectureStatus(request))
+                .and(betweenLecturePrice(request))
+                .and(betweenCreatedAt(request));
+
         return queryFactory
-                .selectFrom(lecture)
-                .where(
-                        filterByLectureCode(request),
-                        filterByLectureTitle(request),
-                        filterByTutorCode(request),
-                        filterByTutorName(request),
-                        filterByLectureCategory(request),
-                        filterByLectureLevel(request),
-                        filterByLectureConfirmStatus(request),
-                        filterByLectureStatus(request),
-                        filterByPriceRange(request),
-                        filterByCreationDate(request)
-                )
+                .select(Projections.constructor(
+                        LectureFilterDTO.class,
+                        lecture.lectureCode,
+                        lecture.lectureTitle,
+                        lecture.tutor.memberCode,
+                        lecture.tutor.memberName,
+                        lectureCategory.lectureCategoryName,
+                        lecture.lectureLevel,
+                        lecture.lectureConfirmStatus,
+                        lecture.lectureStatus,
+                        lecture.lecturePrice,
+                        lecture.createdAt
+                ))
+                .from(lecture)
+                .join(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
+                .join(lectureCategoryByLecture.lectureCategory, lectureCategory)
+                .where(builder)
                 .fetch();
     }
 
-    private BooleanBuilder filterByLectureCode(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getLectureCode() != null) {
-            builder.and(lecture.lectureCode.eq(request.getLectureCode()));
+    private BooleanExpression eqLectureCode(RequestLectureFilterVO request) {
+
+        if (request.getLectureCode() == null) {
+            return null;
         }
-        return builder;
+        return QLecture.lecture.lectureCode.eq(request.getLectureCode());
     }
 
-    private BooleanBuilder filterByLectureTitle(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getLectureTitle() != null) {
-            builder.and(lecture.lectureTitle.likeIgnoreCase("%" + request.getLectureTitle() + "%"));
+    private BooleanExpression likeLectureTitle(RequestLectureFilterVO request) {
+
+        if (request.getLectureTitle() == null) {
+            return null;
         }
-        return builder;
+        return QLecture.lecture.lectureTitle.likeIgnoreCase("%" + request.getLectureTitle() + "%");
     }
 
-    private BooleanBuilder filterByTutorCode(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getTutorCode() != null) {
-            builder.and(lecture.tutor.memberCode.eq(request.getTutorCode()));
+    private BooleanExpression eqTutorCode(RequestLectureFilterVO request) {
+
+        if (request.getTutorCode() == null) {
+            return null;
         }
-        return builder;
+        return QLecture.lecture.tutor.memberCode.eq(request.getTutorCode());
     }
 
-    private BooleanBuilder filterByTutorName(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getTutorName() != null) {
-            builder.and(lecture.tutor.memberName.likeIgnoreCase("%" + request.getTutorName() + "%"));
+    private BooleanExpression eqTutorName(RequestLectureFilterVO request) {
+
+        if (request.getTutorName() == null) {
+            return null;
         }
-        return builder;
+        return QLecture.lecture.tutor.memberName.eq(request.getTutorName());
     }
 
-    private BooleanBuilder filterByLectureCategory(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getLectureCategory() != null) {
-            builder.and(lectureCategoryByLecture.lectureCategory.lectureCategoryName.eq(LectureCategoryEnum.valueOf(request.getLectureCategory())));
+    private BooleanExpression eqLectureCategoryName(RequestLectureFilterVO request) {
+
+        if (request.getLectureCategoryName() == null) {
+            return null;
         }
-        return builder;
+        return lectureCategory.lectureCategoryName.eq(request.getLectureCategoryName());
     }
 
-    private BooleanBuilder filterByLectureLevel(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getLectureLevel() != null) {
-            builder.and(lecture.lectureLevel.eq(request.getLectureLevel()));
+    private BooleanExpression eqLectureLevel(RequestLectureFilterVO request) {
+
+        if (request.getLectureLevel() == null) {
+            return null;
         }
-        return builder;
+        return QLecture.lecture.lectureLevel.eq(request.getLectureLevel());
     }
 
-    private BooleanBuilder filterByLectureConfirmStatus(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getLectureConfirmStatus() != null) {
-            builder.and(lecture.lectureConfirmStatus.eq(request.getLectureConfirmStatus()));
+    private BooleanExpression eqLectureConfirmStatus(RequestLectureFilterVO request) {
+
+        if (request.getLectureConfirmStatus() == null) {
+            return null;
         }
-        return builder;
+        return QLecture.lecture.lectureConfirmStatus.eq(request.getLectureConfirmStatus());
     }
 
-    private BooleanBuilder filterByLectureStatus(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getLectureStatus() != null) {
-            builder.and(lecture.lectureStatus.eq(request.getLectureStatus()));
+    private BooleanExpression eqLectureStatus(RequestLectureFilterVO request) {
+
+        if (request.getLectureStatus() == null) {
+            return null;
         }
-        return builder;
+        return QLecture.lecture.lectureStatus.eq(request.getLectureStatus());
     }
 
-    private BooleanBuilder filterByPriceRange(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getMinPrice() != null && request.getMaxPrice() != null) {
-            builder.and(lecture.lecturePrice.between(request.getMinPrice(), request.getMaxPrice()));
+    private BooleanExpression betweenLecturePrice(RequestLectureFilterVO request) {
+
+        if (request.getMinPrice() == null && request.getMaxPrice() == null) {
+            return null;
         }
-        return builder;
+        if (request.getMinPrice() == null) {
+            return QLecture.lecture.lecturePrice.loe(request.getMaxPrice());
+        }
+        if (request.getMaxPrice() == null) {
+            return QLecture.lecture.lecturePrice.gt(request.getMinPrice());
+        }
+        return QLecture.lecture.lecturePrice.between(request.getMinPrice(), request.getMaxPrice());
     }
 
-    private BooleanBuilder filterByCreationDate(ResponseLectureFilterRequestVO request) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (request.getStartCreatedAt() != null) {
-            builder.and(lecture.createdAt.goe(request.getStartCreatedAt()));
+    private BooleanExpression betweenCreatedAt(RequestLectureFilterVO request) {
+
+        if (request.getStartCreatedAt() == null && request.getEndCreatedAt() == null) {
+            return null;
         }
-        if (request.getEndCreatedAt() != null) {
-            builder.and(lecture.createdAt.loe(request.getEndCreatedAt()));
+        if (request.getEndCreatedAt() == null) {
+            return QLecture.lecture.createdAt.gt(request.getStartCreatedAt());
         }
-        return builder;
+        if (request.getStartCreatedAt() == null) {
+            return QLecture.lecture.createdAt.lt(request.getEndCreatedAt());
+        }
+        return QLecture.lecture.createdAt.between(request.getStartCreatedAt(), request.getEndCreatedAt());
     }
 }
