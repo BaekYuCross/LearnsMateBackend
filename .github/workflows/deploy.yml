@@ -1,0 +1,138 @@
+name: learnsmate-service
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: LearnsMate
+        shell: bash
+
+      - name: Install envsubst
+        run: sudo apt-get install -y gettext
+
+      - name: Create application.yml.template
+        working-directory: LearnsMate
+        run: |
+          mkdir -p src/main/resources
+          cat > src/main/resources/application.yml.template <<EOL
+          server:
+            port: 5000
+          
+          management:
+            endpoints:
+              web:
+                exposure:
+                  include: health
+            endpoint:
+              health:
+                show-details: always
+          
+          spring:
+            application:
+              name: learnsmate
+            datasource:
+              driver-class-name: org.mariadb.jdbc.Driver
+              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
+              username: \${RDS_USERNAME}
+              password: \${RDS_PASSWORD}
+          
+            jpa:
+              generate-ddl: false
+              show-sql: true
+              database: mysql
+              properties:
+                hibernate:
+                  '[format_sql]': true
+          openai:
+            model: gpt-4o
+            secret-key: \${SECRET_KEY}
+          EOL
+
+      - name: Set Yaml
+        working-directory: LearnsMate
+        run: |
+          envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
+          echo "Generated application.yml:"
+          cat src/main/resources/application.yml
+        env:
+          RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
+          RDS_PORT: ${{ secrets.RDS_PORT }}
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+      - name: Check for Tests
+        working-directory: LearnsMate
+        run: |
+          if git diff --name-only origin/main HEAD | grep -qvE '(\.xml$|\.yml$|config/)'; then
+            if [ -z "$(find src/test -name '*ServiceTests.java')" ]; then
+              echo "No ServiceTest found, failing the build."
+              exit 1
+            fi
+          else
+            echo "Only configuration files changed, skipping test check."
+          fi
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+        working-directory: LearnsMate
+        shell: bash
+
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DDTHH-mm-ss
+          utcOffset: "+09:00"
+
+      - name: Show Current Time
+        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
+        shell: bash
+
+      - name: Generate deployment package
+        run: |
+          ./gradlew clean build -x test
+          mkdir -p deploy
+          cp build/libs/*.jar deploy/application.jar
+          cp Procfile deploy/Procfile
+          cp -r .ebextensions deploy/.ebextensions
+          cp -r .platform deploy/.platform
+          cd deploy && zip -r deploy.zip .
+        working-directory: LearnsMate
+
+      - name: Beanstalk Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: intbyte-env
+          environment_name: Intbyte-env
+          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+          region: ap-northeast-2
+          deployment_package: LearnsMate/deploy/deploy.zip
+          use_existing_version_if_available: false
+          wait_for_deployment: true
+          wait_for_environment_recovery: 300
