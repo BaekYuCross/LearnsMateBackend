@@ -24,7 +24,7 @@ public class LectureDetailDTO {
     private Boolean lectureStatus; // 강의 상태
     private String lectureCategory; // 강의 카테고리
     private Integer lectureClickCount; // 강의 조회수
-    private LectureLevelEnum lectureLevel; // 강의 난이도
+    private String lectureLevel; // 강의 난이도
     private int totalStudents; // 누적 수강생
     private int totalRevenue; // 누적 매출액
     private List<VideoByLectureDTO> lectureVideos;  // 강의 동영상 정보

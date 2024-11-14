@@ -63,7 +63,7 @@ public class Lecture {
         this.lecturePrice = lectureDTO.getLecturePrice();
         this.lectureStatus = lectureDTO.getLectureStatus();
         this.lectureClickCount = lectureDTO.getLectureClickCount();
-        this.lectureLevel = lectureDTO.getLectureLevel();
+        this.lectureLevel = LectureLevelEnum.valueOf(lectureDTO.getLectureLevel());
     }
 
     public void toDelete(){

@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.QLecture;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseLectureFilterRequestVO;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.QLectureCategoryByLecture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -73,7 +74,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     private BooleanBuilder filterByLectureCategory(ResponseLectureFilterRequestVO request) {
         BooleanBuilder builder = new BooleanBuilder();
         if (request.getLectureCategory() != null) {
-            builder.and(lectureCategoryByLecture.lectureCategory.lectureCategoryName.eq(request.getLectureCategory()));
+            builder.and(lectureCategoryByLecture.lectureCategory.lectureCategoryName.eq(LectureCategoryEnum.valueOf(request.getLectureCategory())));
         }
         return builder;
     }

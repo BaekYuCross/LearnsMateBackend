@@ -43,4 +43,14 @@ public class LectureCategoryByLectureMapper {
                 )
                 .collect(Collectors.toList());
     }
+
+    public List<LectureCategoryByLecture> fromLectureAndLectureCategoryListToEntity(Lecture lecture, List<LectureCategory> lectureCategoryList) {
+        return lectureCategoryList.stream()
+                .map(lectureCategory -> LectureCategoryByLecture.builder()
+                        .lecture(lecture)
+                        .lectureCategory(lectureCategory)
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
 }

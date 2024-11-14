@@ -10,6 +10,5 @@ public interface LectureService {
     LectureDTO getLectureById(Long lectureCode);
     LectureDTO getLecturesByStudentCode(Long studentCode);
     List<LectureDTO> getLecturesByTutorCode(Long tutorCode);
-    LectureDTO updateLecture(LectureDTO lectureDTO);
     LectureDTO updateLectureConfirmStatus(Long lectureCode);
 }

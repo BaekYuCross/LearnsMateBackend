@@ -3,6 +3,7 @@ package intbyte4.learnsmate.lecture.mapper;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
@@ -11,11 +12,9 @@ import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.payment.domain.vo.RequestRegisterLecturePaymentVO;
-import intbyte4.learnsmate.payment.domain.vo.RequestRegisterPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 @Component
 public class LectureMapper {
@@ -31,7 +30,7 @@ public class LectureMapper {
                 .lecturePrice(entity.getLecturePrice())
                 .lectureStatus(entity.getLectureStatus())
                 .lectureClickCount(entity.getLectureClickCount())
-                .lectureLevel(entity.getLectureLevel())
+                .lectureLevel(String.valueOf(entity.getLectureLevel()))
                 .tutorCode(entity.getTutor().getMemberCode())
                 .build();
     }
@@ -47,7 +46,7 @@ public class LectureMapper {
                 .lecturePrice(dto.getLecturePrice())
                 .lectureStatus(dto.getLectureStatus())
                 .lectureClickCount(dto.getLectureClickCount())
-                .lectureLevel(dto.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(dto.getLectureLevel()))
                 .tutor(tutor)
                 .build();
     }
@@ -68,7 +67,7 @@ public class LectureMapper {
                 .lectureStatus(dto.getLectureStatus())
                 .lectureCategory(dto.getLectureCategory())
                 .lectureClickCount(dto.getLectureClickCount())
-                .lectureLevel(dto.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(dto.getLectureLevel()))
                 .totalStudents(dto.getTotalStudents())
                 .totalRevenue(dto.getTotalRevenue())
                 .lectureVideos(dto.getLectureVideos())
@@ -85,7 +84,7 @@ public class LectureMapper {
                 .lecturePrice(vo.getLecturePrice())
                 .lectureStatus(vo.getLectureStatus())
                 .lectureClickCount(vo.getLectureClickCount())
-                .lectureLevel(vo.getLectureLevel())
+                .lectureLevel(String.valueOf(vo.getLectureLevel()))
                 .build();
     }
 
@@ -100,7 +99,7 @@ public class LectureMapper {
                 .lecturePrice(vo.getLecturePrice())
                 .lectureStatus(vo.getLectureStatus())
                 .lectureClickCount(0)
-                .lectureLevel(vo.getLectureLevel())
+                .lectureLevel(String.valueOf(vo.getLectureLevel()))
                 .tutorCode(vo.getTutorCode())
                 .build();
     }
@@ -115,7 +114,7 @@ public class LectureMapper {
                 .lecturePrice(updatedLecture.getLecturePrice())
                 .lectureStatus(updatedLecture.getLectureStatus())
                 .lectureClickCount(updatedLecture.getLectureClickCount())
-                .lectureLevel(updatedLecture.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(updatedLecture.getLectureLevel()))
                 .build();
     }
 
@@ -129,7 +128,7 @@ public class LectureMapper {
                 .lecturePrice(Lecture.getLecturePrice())
                 .lectureStatus(Lecture.getLectureStatus())
                 .lectureClickCount(0)
-                .lectureLevel(Lecture.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(Lecture.getLectureLevel()))
                 .tutorCode(Lecture.getTutorCode())
                 .build();
     }
@@ -146,7 +145,7 @@ public class LectureMapper {
                 .tutorCode(removedLecture.getTutorCode())
                 .lectureStatus(removedLecture.getLectureStatus())
                 .lectureClickCount(removedLecture.getLectureClickCount())
-                .lectureLevel(removedLecture.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(removedLecture.getLectureLevel()))
                 .build();
     }
     public LectureDTO fromRequestRegisterLecturePaymentVOToDTO(RequestRegisterLecturePaymentVO vo) {
@@ -159,7 +158,7 @@ public class LectureMapper {
                 .lecturePrice(vo.getLecturePrice())
                 .lectureStatus(vo.getLectureStatus())
                 .lectureClickCount(0)
-                .lectureLevel(vo.getLectureLevel())
+                .lectureLevel(String.valueOf(vo.getLectureLevel()))
                 .build();
     }
 
