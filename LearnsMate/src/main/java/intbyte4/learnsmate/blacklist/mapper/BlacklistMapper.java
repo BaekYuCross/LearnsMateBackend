@@ -22,9 +22,7 @@ public class BlacklistMapper {
                 .blackCode(blacklist.getBlackCode())
                 .blackReason(blacklist.getBlackReason())
                 .createdAt(blacklist.getCreatedAt())
-                .updatedAt(blacklist.getUpdatedAt())
                 .memberCode(blacklist.getMember().getMemberCode())
-                .reportCode(blacklist.getReport().getReportCode())
                 .adminCode(blacklist.getAdmin().getAdminCode())
                 .build();
     }
@@ -34,9 +32,7 @@ public class BlacklistMapper {
                 .blackCode(blacklistDTO.getBlackCode())
                 .blackReason(blacklistDTO.getBlackReason())
                 .createdAt(blacklistDTO.getCreatedAt())
-                .updatedAt(blacklistDTO.getUpdatedAt())
                 .memberCode(blacklistDTO.getMemberCode())
-                .reportCode(blacklistDTO.getReportCode())
                 .adminCode(blacklistDTO.getAdminCode())
                 .build();
     }

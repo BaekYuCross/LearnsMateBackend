@@ -17,7 +17,5 @@ public class ResponseFindReportVO {
     private Long blackCode;
     private String blackReason;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private Long memberCode;
-    private Long reportCode;
     private Long adminCode;}
