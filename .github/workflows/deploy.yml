@@ -40,11 +40,18 @@ jobs:
           server:
             port: 5000
           
+          management:
+            endpoints:
+              web:
+                exposure:
+                  include: health
+            endpoint:
+              health:
+                show-details: always
+          
           spring:
             application:
               name: learnsmate
-          
-          spring:
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
