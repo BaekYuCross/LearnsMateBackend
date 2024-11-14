@@ -2,6 +2,7 @@ package intbyte4.learnsmate.voc.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
@@ -66,5 +67,23 @@ public class VOCServiceImpl implements VOCService {
         return vocList.stream()
                 .map(vocMapper::fromEntityToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VOCDTO> filterVOC(VOCDTO vocDTO, MemberDTO memberDTO) {
+        log.info("VOC 필터링 요청: {}", vocDTO);
+        List<VOC> filteredVOCList = vocRepository.searchBy(vocDTO, memberDTO);
+
+        if (filteredVOCList.isEmpty()) {
+            log.info("필터 조건에 맞는 VOC가 없습니다.");
+            throw new CommonException(StatusEnum.VOC_NOT_FOUND);
+        }
+
+        List<VOCDTO> vocDTOList = filteredVOCList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+
+        log.info("필터링된 VOC 수: {}", vocDTOList.size());
+        return vocDTOList;
     }
 }
