@@ -20,5 +20,5 @@ public interface PaymentService {
     // 직원이 특정 결제 내역을 단건 상세 조회
     PaymentDTO getPaymentDetails(Long paymentCode);
 
-    List<PaymentDTO> lecturePayment(MemberDTO memberDTO, List<LectureDTO> lectureDTOList, IssueCouponDTO issueCouponDTO);
+    List<PaymentDTO> lecturePayment(MemberDTO memberDTO, List<LectureDTO> lectureDTOList, List<IssueCouponDTO> issueCouponDTOList);
 }
