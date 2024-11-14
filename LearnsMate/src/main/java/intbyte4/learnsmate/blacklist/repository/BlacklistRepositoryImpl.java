@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
 import intbyte4.learnsmate.blacklist.domain.entity.QBlacklist;
+import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -22,7 +23,8 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
         BooleanBuilder builder = new BooleanBuilder()
                 .and(eqMemberCode(request.getMemberCode()))
                 .and(likeMemberName(request.getMemberName()))
-                .and(likeMemberEmail(request.getMemberEmail()));
+                .and(likeMemberEmail(request.getMemberEmail())
+                .and(eqMemberType(request.getMemberType())));
 
         return queryFactory
                 .selectFrom(blacklist)
@@ -43,5 +45,10 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
     // memberEmail 검색 조건
     private BooleanExpression likeMemberEmail(String memberEmail) {
         return memberEmail == null ? null : QBlacklist.blacklist.member.memberEmail.containsIgnoreCase(memberEmail);
+    }
+
+    // memberType 검색 조건 (학생 또는 강사)
+    private BooleanExpression eqMemberType(MemberType memberType) {
+        return memberType == null ? null : QBlacklist.blacklist.member.memberType.eq(memberType);
     }
 }
