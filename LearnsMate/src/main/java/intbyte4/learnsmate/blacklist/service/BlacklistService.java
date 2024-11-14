@@ -4,6 +4,7 @@ import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
+import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
 import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
@@ -104,5 +105,16 @@ public class BlacklistService {
 
         // 5. 회원 flag false로 수정
         memberService.deleteMember(dto.getMemberCode());
+    }
+
+    // 블랙리스트 필터링 메서드
+    public List<BlacklistDTO> filterBlacklistMember(BlacklistFilterRequestDTO dto){
+        List<Blacklist> blacklistList = blacklistRepository.searchBy(dto);
+
+        List<BlacklistDTO> blacklistDTOList = blacklistList.stream()
+                .map(blacklistMapper::fromBlacklistToBlacklistDTO)
+                .collect(Collectors.toList());
+
+        return blacklistDTOList;
     }
 }

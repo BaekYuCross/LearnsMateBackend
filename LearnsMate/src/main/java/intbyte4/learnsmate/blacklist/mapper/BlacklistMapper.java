@@ -2,8 +2,10 @@ package intbyte4.learnsmate.blacklist.mapper;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
+import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
+import intbyte4.learnsmate.blacklist.domain.vo.request.RequestFilterBlacklistMemberVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedBlacklistOneVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
@@ -78,6 +80,14 @@ public class BlacklistMapper {
                         .commentDTO(dto.getCommentDTO())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public BlacklistFilterRequestDTO fromFilterMemberVOtoFilterMemberDTO(RequestFilterBlacklistMemberVO vo) {
+        return BlacklistFilterRequestDTO.builder()
+                .memberCode(vo.getMemberCode())
+                .memberName(vo.getMemberName())
+                .memberEmail(vo.getMemberEmail())
+                .build();
     }
 
 }

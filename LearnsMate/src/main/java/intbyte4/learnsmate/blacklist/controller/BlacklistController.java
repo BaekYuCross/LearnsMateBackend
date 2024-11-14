@@ -1,7 +1,9 @@
 package intbyte4.learnsmate.blacklist.controller;
 
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
+import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
+import intbyte4.learnsmate.blacklist.domain.vo.request.RequestFilterBlacklistMemberVO;
 import intbyte4.learnsmate.blacklist.domain.vo.request.RequestSaveBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedBlacklistOneVO;
@@ -13,7 +15,6 @@ import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -180,5 +181,27 @@ public class BlacklistController {
         blacklistService.addMemberToBlacklist(blacklistDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body("블랙리스트 등록 성공");
+    }
+
+    @Operation(summary = "학생 - 블랙리스트 필터링 기능 추가")
+    @GetMapping("/filter/student")
+    public ResponseEntity<?> filterBlackStudent(@RequestBody RequestFilterBlacklistMemberVO vo){
+        BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
+        dto.setMemberType(MemberType.STUDENT);
+
+        List<BlacklistDTO> blacklistDTOList = blacklistService.filterBlacklistMember(dto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(blacklistDTOList);
+    }
+
+    @Operation(summary = "강사 - 블랙리스트 필터링 기능 추가")
+    @GetMapping("/filter/student")
+    public ResponseEntity<?> filterBlackTutor(@RequestBody RequestFilterBlacklistMemberVO vo){
+        BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
+        dto.setMemberType(MemberType.TUTOR);
+
+        List<BlacklistDTO> blacklistDTOList = blacklistService.filterBlacklistMember(dto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(blacklistDTOList);
     }
 }
