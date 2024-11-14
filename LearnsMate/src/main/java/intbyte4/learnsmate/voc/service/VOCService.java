@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.voc.service;
 
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface VOCService {
     List<VOCDTO> findUnansweredVOCByMember(Long memberCode);
 
     List<VOCDTO> findAnsweredVOCByMember(Long memberCode);
+
+    List<VOCDTO> filterVOC(VOCDTO vocDTO, MemberDTO memberDTO);
 }
