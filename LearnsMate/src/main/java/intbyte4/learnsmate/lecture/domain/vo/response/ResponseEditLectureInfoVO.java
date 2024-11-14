@@ -6,6 +6,7 @@ import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +22,8 @@ public class ResponseEditLectureInfoVO {
     private Boolean lectureStatus;
     private Integer lectureClickCount;
     private LectureLevelEnum lectureLevel;
+
+    private String newVideoTitle;
+    private String newVideoLink;
+    private List<Integer> lectureCategoryCodeList;
 }

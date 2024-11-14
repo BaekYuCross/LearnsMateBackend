@@ -18,6 +18,7 @@ import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
@@ -125,7 +126,7 @@ public class LectureFacade {
                 .tutor(tutor)
                 .lectureStatus(true)
                 .lectureClickCount(0)
-                .lectureLevel(lectureDTO.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
                 .build();
 
         lectureRepository.save(lecture);
@@ -193,4 +194,38 @@ public class LectureFacade {
                 .lectureVideos(lectureVideos)
                 .build();
     }
+
+    @Transactional
+    public LectureDTO updateLecture(LectureDTO lectureDTO, String newVideoTitle, String newVideoLink, List<Integer> lectureCategoryCodeList) {
+        Lecture lecture = lectureRepository.findById(lectureDTO.getLectureCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
+
+        // 강의 정보 업데이트
+        lecture.toUpdate(lectureDTO);
+        lectureRepository.save(lecture);
+
+        // 비디오 정보 업데이트
+        List<VideoByLectureDTO> videoByLectureDTOs = videoByLectureService.findVideoByLectureByLectureCode(lectureDTO.getLectureCode());
+        for (VideoByLectureDTO videoDTO : videoByLectureDTOs) {
+            VideoByLectureDTO updatedVideoDTO = VideoByLectureDTO.builder()
+                    .lectureCode(videoDTO.getLectureCode())
+                    .videoTitle(newVideoTitle)
+                    .videoLink(newVideoLink)
+                    .build();
+
+            videoByLectureService.updateVideoByLecture(updatedVideoDTO);
+        }
+
+        // 강의 카테고리 수정
+        if (lectureCategoryCodeList != null && !lectureCategoryCodeList.isEmpty()) {
+            OneLectureCategoryListDTO categoryDTO = new OneLectureCategoryListDTO();
+            categoryDTO.setLectureCode(lectureDTO.getLectureCode());
+            categoryDTO.setLectureCategoryCodeList(lectureCategoryCodeList);
+            lectureCategoryByLectureService.updateLectureCategoryByLecture(categoryDTO);
+        }
+
+        return lectureMapper.toDTO(lecture);
+    }
+
+
 }
