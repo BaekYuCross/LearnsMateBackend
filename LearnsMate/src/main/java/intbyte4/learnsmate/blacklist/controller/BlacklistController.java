@@ -10,6 +10,7 @@ import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.service.BlacklistService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ public class BlacklistController {
     }
 
     // 1. 모든 학생 블랙리스트 조회
+    @Operation(summary = "직원 - 학생 블랙리스트 전체 조회")
     @GetMapping("/student")
     public ResponseEntity<List<ResponseFindBlacklistVO>> findAllStudentBlacklist() {
 
@@ -52,6 +54,7 @@ public class BlacklistController {
     }
 
     // 2. 모든 강사 블랙리스트 조회
+    @Operation(summary = "직원 - 강사 블랙리스트 전체 조회")
     @GetMapping("/tutor")
     public ResponseEntity<List<ResponseFindBlacklistVO>> findAllTutorBlacklist() {
 
@@ -69,6 +72,7 @@ public class BlacklistController {
     }
 
     // 3. 학생 블랙리스트 단건 조회
+    @Operation(summary = "직원 - 학생 블랙리스트 단건 세부 조회")
     @GetMapping("/student/{studentcode}")
     public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findStudentBlacklist(
             @PathVariable("studentcode") Long studentCode
@@ -84,6 +88,7 @@ public class BlacklistController {
     }
 
     // 4. 강사 블랙리스트 단건 조회
+    @Operation(summary = "직원 - 강사 블랙리스트 단건 세부 조회")
     @GetMapping("/tutor/{tutorcode}")
     public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findTutorBlacklist(
             @PathVariable("tutorcode") Long tutorCode
@@ -97,6 +102,7 @@ public class BlacklistController {
     }
 
     // 직원 - 예비 블랙리스트 전체 조회(학생)
+    @Operation(summary = "직원 - 학생 예비 블랙리스트 전체 조회")
     @GetMapping("/student/reserved")
     public ResponseEntity<List<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist() {
         // dto로 받아와야하는데 어떤 dto로 받아올까?
@@ -115,6 +121,7 @@ public class BlacklistController {
     }
 
     // 직원 - 예비 블랙리스트 전체 조회(강사)
+    @Operation(summary = "직원 - 학생 예비 블랙리스트 전체 조회")
     @GetMapping("/tutor/reserved")
     public ResponseEntity<List<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(){
         // dto로 받아와야하는데 어떤 dto로 받아올까?
@@ -134,6 +141,7 @@ public class BlacklistController {
     }
 
     // 학생 예비 블랙리스트 단건 조회
+    @Operation(summary = "직원 - 학생 예비 블랙리스트 단건 세부 조회")
     @GetMapping("/student/reserved/{studentcode}")
     public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findStudentReservedBlacklist(@PathVariable("studentcode") Long studentCode) {
         // 결국 예비 블랙리스트가 없어서 계산해서 가져와야함. -> Report에서 tutorcode에 해당하는 모든 Report 가져오고
@@ -147,6 +155,7 @@ public class BlacklistController {
     }
 
     // 강사 예비 블랙리스트 단건 조회
+    @Operation(summary = "직원 - 직원 예비 블랙리스트 단건 세부 조회")
     @GetMapping("/tutor/reserved/{tutorcode}")
     public ResponseEntity<List<ResponseFindReservedBlacklistOneVO>> findTutorReservedBlacklist(@PathVariable("tutorcode") Long tutorCode) {
         // 결국 예비 블랙리스트가 없어서 계산해서 가져와야함. -> Report에서 tutorcode에 해당하는 모든 Report 가져오고
