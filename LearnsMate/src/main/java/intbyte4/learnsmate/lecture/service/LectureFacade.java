@@ -62,25 +62,41 @@ public class LectureFacade {
     private final AdminMapper adminMapper;
 
     @Transactional
-    public LectureDTO discountLecturePrice(LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO) {
-        MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());
-        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+    public List<LectureDTO> discountLecturePrice(List<LectureDTO> lectureDTOList, List<IssueCouponDTO> issueCouponDTOList) {
+        return lectureDTOList.stream()
+                .map(lectureDTO -> {
+                    MemberDTO memberDTO = new MemberDTO();
+                    memberDTO.setMemberCode(lectureDTO.getTutorCode());
+                    Member tutor = memberMapper.fromMemberDTOtoMember(memberDTO);
+                    Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
-        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
+                    IssueCouponDTO matchedCoupon = issueCouponDTOList.stream()
+                            .filter(issueCouponDTO -> {
+                                CouponDTO couponDTO = couponService.findCouponDTOByCouponCode(issueCouponDTO.getCouponCode());
+                                CouponCategory couponCategory = couponCategoryService.findByCouponCategoryCode(couponDTO.getCouponCategoryCode());
 
-        CouponDTO couponDTO = couponService.findCouponDTOByCouponCode(issueCouponDTO.getCouponCode());
-        // 쿠폰카테고리디티오로 반환하는게 필요
-        CouponCategory couponCategory = couponCategoryService.findByCouponCategoryCode(couponDTO.getCouponCategoryCode());
+                                AdminDTO adminDTO = adminService.findByAdminCode(couponDTO.getAdminCode());
+                                Admin admin = adminMapper.toEntity(adminDTO);
 
-        AdminDTO adminDTO = adminService.findByAdminCode(couponDTO.getAdminCode());
-        Admin admin = adminMapper.toEntity(adminDTO);
-        CouponEntity coupon = couponMapper.toEntity(couponDTO,couponCategory,admin,tutor);
+                                MemberDTO tutorDTO = memberService.findMemberByMemberCode(couponDTO.getTutorCode(), MemberType.TUTOR);
+                                Member tutorEntity = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
-        CouponByLectureDTO couponByLectureDTO = couponByLectureService.findByCouponAndLecture(lecture, coupon);
-        if(couponByLectureDTO == null) return lectureDTO;
-        lectureDTO.setLecturePrice(lectureDTO.getLecturePrice() * (1 - couponDTO.getCouponDiscountRate() / 100));
-        return lectureDTO;
+                                CouponEntity couponEntity = couponMapper.toEntity(couponDTO, couponCategory, admin, tutorEntity);
+                                CouponByLectureDTO couponByLectureDTO = couponByLectureService.findByCouponAndLecture(lecture, couponEntity);
+                                return couponByLectureDTO != null;
+                            })
+                            .findFirst()
+                            .orElse(null);
+
+                    if (matchedCoupon != null) {
+                        CouponDTO couponDTO = couponService.findCouponDTOByCouponCode(matchedCoupon.getCouponCode());
+                        lectureDTO.setLecturePrice(lectureDTO.getLecturePrice() * (1 - couponDTO.getCouponDiscountRate() / 100));
+                    }
+                    return lectureDTO;
+                })
+                .toList();
     }
+
 
     @Transactional
     public LectureDTO removeLecture(Long lectureCode) {
