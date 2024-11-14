@@ -2,7 +2,7 @@ package intbyte4.learnsmate.blacklist.controller;
 
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
-import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReportVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedBlacklistOneVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTutorBlacklistVO;
@@ -36,12 +36,12 @@ public class BlacklistController {
 
     // 1. 모든 학생 블랙리스트 조회
     @GetMapping("/student")
-    public ResponseEntity<List<ResponseFindReportVO>> findAllStudentBlacklist() {
+    public ResponseEntity<List<ResponseFindBlacklistVO>> findAllStudentBlacklist() {
 
         // service에서 dto 반환
         List<BlacklistDTO> blacklistDTOList = blacklistService.findAllBlacklistByMemberType(MemberType.STUDENT);
 
-        List<ResponseFindReportVO> response = new ArrayList<>();
+        List<ResponseFindBlacklistVO> response = new ArrayList<>();
 
         // dto -> ResponseFindReportVO로 전환해주기
         for(BlacklistDTO blacklistDTO : blacklistDTOList) {
@@ -53,12 +53,12 @@ public class BlacklistController {
 
     // 2. 모든 강사 블랙리스트 조회
     @GetMapping("/tutor")
-    public ResponseEntity<List<ResponseFindReportVO>> findAllTutorBlacklist() {
+    public ResponseEntity<List<ResponseFindBlacklistVO>> findAllTutorBlacklist() {
 
         // service에서 dto 반환
         List<BlacklistDTO> blacklistDTOList = blacklistService.findAllBlacklistByMemberType(MemberType.TUTOR);
 
-        List<ResponseFindReportVO> response = new ArrayList<>();
+        List<ResponseFindBlacklistVO> response = new ArrayList<>();
 
         // dto -> ResponseFindReportVO로 전환해주기
         for(BlacklistDTO blacklistDTO : blacklistDTOList) {

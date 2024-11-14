@@ -44,10 +44,6 @@ public class BlacklistService {
 
         List<BlacklistDTO> blacklistDTOList = new ArrayList<>();
 
-//                .memberCode(blacklist.getMemberCode())
-//                .reportCode(blacklist.getReportCode())
-//                .adminCode(blacklist.getAdminCode())
-
         for (Blacklist blacklist : blacklistList) {
             // Blacklsit -> BlacklsitDTO
             blacklistDTOList.add(blacklistMapper.fromBlacklistToBlacklistDTO(blacklist));

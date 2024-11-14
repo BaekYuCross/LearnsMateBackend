@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ResponseBlacklistVO {
+public class ResponseFindBlacklistVO {
 
     private Long blackCode;
     private String blackReason;

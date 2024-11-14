@@ -3,7 +3,7 @@ package intbyte4.learnsmate.blacklist.mapper;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
-import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReportVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedBlacklistOneVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTutorBlacklistVO;
@@ -27,8 +27,8 @@ public class BlacklistMapper {
                 .build();
     }
 
-    public ResponseFindReportVO fromBlacklistDTOToResponseFindReportVO(BlacklistDTO blacklistDTO) {
-        return ResponseFindReportVO.builder()
+    public ResponseFindBlacklistVO fromBlacklistDTOToResponseFindReportVO(BlacklistDTO blacklistDTO) {
+        return ResponseFindBlacklistVO.builder()
                 .blackCode(blacklistDTO.getBlackCode())
                 .blackReason(blacklistDTO.getBlackReason())
                 .createdAt(blacklistDTO.getCreatedAt())
