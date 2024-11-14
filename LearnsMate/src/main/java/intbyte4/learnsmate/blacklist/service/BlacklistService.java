@@ -57,12 +57,18 @@ public class BlacklistService {
     // 2. Member table에서 가져오기(true인 놈들)
     public List<ReportedMemberDTO> findAllReservedBlacklistByMemberType(MemberType memberType) {
 
+        // 모든 멤버 가져옴.
         List<ReportedMemberDTO> reportedMoreThanFiveMemberList = reportService.findReportCountByMemberCode();
 
-        return reportedMoreThanFiveMemberList;
+        // 멤버 타입이 동일한거만 가져오기 -> 원래는 sql에서 처리해야하지만 많지 않을것이기 때문에 백엔드에서 처리해도 무방하다 생각
+        List<ReportedMemberDTO> filteredList = reportedMoreThanFiveMemberList.stream()
+                .filter(dto -> dto.getReportedMember().getMemberType().equals(memberType))
+                .collect(Collectors.toList());
+
+        return filteredList;
     }
 
-    // 블랙이스트에서 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
+    // 블랙리스트에서 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
     public List<BlacklistReportCommentDTO> findBlacklistReportComment(Long memberCode) {
 
         // 1. Report table에서 memberCode와 reportedMemberCode 가 같은거 가져오기
