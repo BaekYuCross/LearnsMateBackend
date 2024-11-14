@@ -44,6 +44,15 @@ jobs:
             application:
               name: learnsmate
           
+          management:
+            endpoints:
+              web:
+                exposure:
+                  include: health
+            endpoint:
+              health:
+                show-details: always
+          
           spring:
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver

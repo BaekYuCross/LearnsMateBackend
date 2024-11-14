@@ -49,6 +49,10 @@ dependencies {
     // 엑셀 파일 처리를 위한 apache poi
     implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
+
+    // EC2 인스턴스 헬스 체크를 위한 actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 tasks.named('test') {
