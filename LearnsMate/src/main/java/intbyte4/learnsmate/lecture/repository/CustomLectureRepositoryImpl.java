@@ -5,6 +5,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import intbyte4.learnsmate.lecture.domain.entity.QLecture;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
 import intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory;
@@ -102,7 +103,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
         if (request.getLectureCategoryName() == null) {
             return null;
         }
-        return lectureCategory.lectureCategoryName.eq(request.getLectureCategoryName());
+        return lectureCategory.lectureCategoryName.eq(LectureCategoryEnum.valueOf(request.getLectureCategoryName()));
     }
 
     private BooleanExpression eqLectureLevel(RequestLectureFilterVO request) {
@@ -110,7 +111,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
         if (request.getLectureLevel() == null) {
             return null;
         }
-        return QLecture.lecture.lectureLevel.eq(request.getLectureLevel());
+        return QLecture.lecture.lectureLevel.eq(LectureLevelEnum.valueOf(request.getLectureLevel()));
     }
 
     private BooleanExpression eqLectureConfirmStatus(RequestLectureFilterVO request) {
