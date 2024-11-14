@@ -17,7 +17,6 @@ import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.service.PaymentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +59,9 @@ public class PaymentController {
     @PostMapping("/register")
     public ResponseEntity<List<ResponseRegisterPaymentVO>> registerPayment
             (@RequestBody RequestRegisterPaymentVO requestRegisterPaymentVO) {
-        IssueCouponDTO issueCouponDTO = issueCouponMapper
-                .fromRequestRegisterIssueCouponPaymentVOToDTO(requestRegisterPaymentVO.getIssueCouponVO());
+        List<IssueCouponDTO> issueCouponDTOList = requestRegisterPaymentVO.getIssueCouponVOList().stream()
+                .map(issueCouponMapper::fromRequestRegisterIssueCouponPaymentVOToDTO)
+                .toList();
 
         MemberDTO memberDTO = memberMapper
                 .fromRequestRegisterMemberPaymentVOToMemberDTO(requestRegisterPaymentVO.getMemberVO());
@@ -70,11 +70,9 @@ public class PaymentController {
                 .map(lectureMapper::fromRequestRegisterLecturePaymentVOToDTO)
                 .toList();
 
-        List<LectureDTO> lectures = lectureDTOList.stream()
-                .map(lectureDTO -> lectureFacade.discountLecturePrice(lectureDTO, issueCouponDTO))
-                .toList();
+        List<LectureDTO> lectures = lectureFacade.discountLecturePrice(lectureDTOList, issueCouponDTOList);
 
-        List<PaymentDTO> payments = paymentService.lecturePayment(memberDTO, lectures, issueCouponDTO);
+        List<PaymentDTO> payments = paymentService.lecturePayment(memberDTO, lectures, issueCouponDTOList);
 
         List<ResponseRegisterPaymentVO> responseList = payments.stream()
                 .map(paymentMapper::fromPaymentDTOtoResponseRegisterPaymentVO)
@@ -82,6 +80,7 @@ public class PaymentController {
 
         return ResponseEntity.ok(responseList);
     }
+
 
     @Operation(summary = "필터별 결제 내역 조회")
     @GetMapping("/filter")
