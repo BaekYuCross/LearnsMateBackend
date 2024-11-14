@@ -12,10 +12,14 @@ import java.time.LocalDateTime;
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseFindBlacklistVO {
-
     private Long blackCode;
-    private String blackReason;
-    private LocalDateTime createdAt;
     private Long memberCode;
+    private String memberName;
+    private String memberEmail;
+    private String blackReason;
+
+    private LocalDateTime createdAt;
+
     private Long adminCode;
+    private String adminName;
 }

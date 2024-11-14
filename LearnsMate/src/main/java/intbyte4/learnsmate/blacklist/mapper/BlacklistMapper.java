@@ -23,20 +23,35 @@ public class BlacklistMapper {
     public BlacklistDTO fromBlacklistToBlacklistDTO(Blacklist blacklist) {
         return BlacklistDTO.builder()
                 .blackCode(blacklist.getBlackCode())
+                .memberCode(blacklist.getMember().getMemberCode())
+                .memberName(blacklist.getMember().getMemberName())
+                .memberEmail(blacklist.getMember().getMemberEmail())
                 .blackReason(blacklist.getBlackReason())
                 .createdAt(blacklist.getCreatedAt())
-                .memberCode(blacklist.getMember().getMemberCode())
                 .adminCode(blacklist.getAdmin().getAdminCode())
+                .adminName(blacklist.getAdmin().getAdminName())
                 .build();
     }
 
-    public ResponseFindBlacklistVO fromBlacklistDTOToResponseFindReportVO(BlacklistDTO blacklistDTO) {
+    public ResponseFindBlacklistVO fromBlacklistDTOToResponseFindReportVO(BlacklistDTO dto) {
         return ResponseFindBlacklistVO.builder()
-                .blackCode(blacklistDTO.getBlackCode())
-                .blackReason(blacklistDTO.getBlackReason())
-                .createdAt(blacklistDTO.getCreatedAt())
-                .memberCode(blacklistDTO.getMemberCode())
-                .adminCode(blacklistDTO.getAdminCode())
+                .blackCode(dto.getBlackCode())
+                .memberCode(dto.getMemberCode())
+                .memberName(dto.getMemberName())
+                .memberEmail(dto.getMemberEmail())
+                .blackReason(dto.getBlackReason())
+                .createdAt(dto.getCreatedAt())
+                .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
+                .build();
+    }
+
+    public Blacklist fromBlacklistDTOtoBlacklist(BlacklistDTO dto, Member member, Admin admin) {
+        return Blacklist.builder()
+                .createdAt(LocalDateTime.now())
+                .blackReason(dto.getBlackReason())
+                .admin(admin)
+                .member(member)
                 .build();
     }
 
@@ -65,12 +80,4 @@ public class BlacklistMapper {
                 .collect(Collectors.toList());
     }
 
-    public Blacklist fromBlacklistDTOtoBlacklist(BlacklistDTO dto, Member member, Admin admin) {
-        return Blacklist.builder()
-                .createdAt(LocalDateTime.now())
-                .blackReason(dto.getBlackReason())
-                .admin(admin)
-                .member(member)
-                .build();
-    }
 }
