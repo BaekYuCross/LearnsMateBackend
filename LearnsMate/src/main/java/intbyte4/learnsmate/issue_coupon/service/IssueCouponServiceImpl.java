@@ -85,4 +85,11 @@ public class IssueCouponServiceImpl implements IssueCouponService {
 
         return result;
     }
+
+    @Override
+    public void updateCouponUseStatus(IssueCouponDTO issueCouponDTO, Member member, CouponEntity couponEntity) {
+        issueCouponDTO.setCouponUseStatus(true);
+        IssueCoupon issueCoupon = issueCouponMapper.toEntity(issueCouponDTO, member, couponEntity);
+        issueCouponRepository.save(issueCoupon);
+    }
 }

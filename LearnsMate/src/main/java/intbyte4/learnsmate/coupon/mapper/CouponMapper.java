@@ -38,7 +38,7 @@ public class CouponMapper {
                 .build();
     }
 
-    public CouponEntity toEntity (CouponDTO dto, CouponCategory category, Admin admin, Member tutor) {
+    public CouponEntity toAdminCouponEntity (CouponDTO dto, CouponCategory category, Admin admin) {
         return CouponEntity.builder()
                 .couponCode(dto.getCouponCode())
                 .couponName(dto.getCouponName())
@@ -50,6 +50,20 @@ public class CouponMapper {
                 .couponExpireDate(dto.getCouponExpireDate())
                 .couponCategory(category)
                 .admin(admin)
+                .build();
+    }
+
+    public CouponEntity toTutorCouponEntity (CouponDTO dto, CouponCategory category, Member tutor) {
+        return CouponEntity.builder()
+                .couponCode(dto.getCouponCode())
+                .couponName(dto.getCouponName())
+                .couponContents(dto.getCouponContents())
+                .couponDiscountRate(dto.getCouponDiscountRate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .couponStartDate(dto.getCouponStartDate())
+                .couponExpireDate(dto.getCouponExpireDate())
+                .couponCategory(category)
                 .tutor(tutor)
                 .build();
     }

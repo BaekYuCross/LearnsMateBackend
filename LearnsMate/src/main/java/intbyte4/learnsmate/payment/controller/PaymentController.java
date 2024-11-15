@@ -57,30 +57,24 @@ public class PaymentController {
 
     @Operation(summary = "결제 내역 등록")
     @PostMapping("/register")
-    public ResponseEntity<List<ResponseRegisterPaymentVO>> registerPayment
+    public ResponseEntity<ResponseRegisterPaymentVO> registerPayment
             (@RequestBody RequestRegisterPaymentVO requestRegisterPaymentVO) {
-        List<IssueCouponDTO> issueCouponDTOList = requestRegisterPaymentVO.getIssueCouponVOList().stream()
-                .map(issueCouponMapper::fromRequestRegisterIssueCouponPaymentVOToDTO)
-                .toList();
+        IssueCouponDTO issueCouponDTO = issueCouponMapper.fromRequestRegisterIssueCouponPaymentVOToDTO(requestRegisterPaymentVO.getIssueCouponVO());
+        MemberDTO memberDTO = memberMapper.fromRequestRegisterMemberPaymentVOToMemberDTO(requestRegisterPaymentVO.getMemberVO());
 
-        MemberDTO memberDTO = memberMapper
-                .fromRequestRegisterMemberPaymentVOToMemberDTO(requestRegisterPaymentVO.getMemberVO());
+        LectureDTO lectureDTO = lectureMapper.fromRequestRegisterLecturePaymentVOToDTO(requestRegisterPaymentVO.getLectureVO());
 
-        List<LectureDTO> lectureDTOList = requestRegisterPaymentVO.getLectureVOList().stream()
-                .map(lectureMapper::fromRequestRegisterLecturePaymentVOToDTO)
-                .toList();
-
-        List<LectureDTO> lectures = lectureFacade.discountLecturePrice(lectureDTOList, issueCouponDTOList);
-
-        List<PaymentDTO> payments = paymentService.lecturePayment(memberDTO, lectures, issueCouponDTOList);
-
-        List<ResponseRegisterPaymentVO> responseList = payments.stream()
-                .map(paymentMapper::fromPaymentDTOtoResponseRegisterPaymentVO)
-                .toList();
-
-        return ResponseEntity.ok(responseList);
+        if (issueCouponDTO != null) {
+            lectureDTO = lectureFacade.discountLecturePrice(lectureDTO, issueCouponDTO);
+            PaymentDTO payment = paymentService.lectureAdaptedPayment(memberDTO, lectureDTO, issueCouponDTO);
+            ResponseRegisterPaymentVO response = paymentMapper.fromPaymentDTOtoResponseRegisterPaymentVO(payment);
+            return ResponseEntity.ok(response);
+        } else {
+            PaymentDTO payment = paymentService.lectureUnAdaptedPayment(memberDTO, lectureDTO);
+            ResponseRegisterPaymentVO response = paymentMapper.fromPaymentDTOtoResponseRegisterPaymentVO(payment);
+            return ResponseEntity.ok(response);
+        }
     }
-
 
     @Operation(summary = "필터별 결제 내역 조회")
     @GetMapping("/filter")
