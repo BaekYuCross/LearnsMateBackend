@@ -64,7 +64,7 @@ public class CouponController {
 
     @Operation(summary = "강사 - 쿠폰 등록")
     @PostMapping("/tutor/register")
-    public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode) {
+    public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, String lectureCode) {
         CouponDTO couponDTO = couponFacade.tutorRegisterCoupon(request, tutor, couponCategory, lectureCode);
         return ResponseEntity.status(HttpStatus.CREATED).body(couponMapper.fromDTOToRegisterResponseVO(couponDTO));
     }

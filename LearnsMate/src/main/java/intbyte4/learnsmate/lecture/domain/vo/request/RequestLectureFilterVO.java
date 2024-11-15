@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestLectureFilterVO {
-    private Long lectureCode; // 강의 코드
+    private String lectureCode; // 강의 코드
     private String lectureTitle; // 강의명
     private Long tutorCode; // 강사 코드
     private String tutorName; // 강사명

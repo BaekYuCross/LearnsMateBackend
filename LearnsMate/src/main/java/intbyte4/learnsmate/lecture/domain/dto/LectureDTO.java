@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LectureDTO {
-    private Long lectureCode;
+    private String lectureCode;
     private String lectureTitle;
     private Boolean lectureConfirmStatus;
     private LocalDateTime createdAt;

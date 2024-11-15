@@ -27,8 +27,8 @@ public class PaymentFilterRequestVO {
     @JsonProperty("end_created_at")
     private LocalDateTime endCreatedAt;
 
-    @JsonProperty("leture_code")
-    private Long lectureCode; // 강의코드
+    @JsonProperty("lecture_code")
+    private String lectureCode; // 강의코드
 
     @JsonProperty("lecture_title")
     private String lectureTitle; // 강의명

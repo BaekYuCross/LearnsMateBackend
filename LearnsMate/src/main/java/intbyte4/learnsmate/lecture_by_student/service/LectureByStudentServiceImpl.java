@@ -47,14 +47,14 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
 
     // 강의별 학생코드 개수 조회 (ownStatus 가 true인것만)
     @Override
-    public long countStudentsByLectureAndOwnStatus(Long lectureCode) {
+    public long countStudentsByLectureAndOwnStatus(String lectureCode) {
         // 강의 코드에 해당하는 환불되지 않은 수강생의 개수를 조회
         return lectureByStudentRepository.countByLectureAndOwnStatus(lectureCode);
     }
 
     // 강의 코드에 해당하는 결제 금액을 합산
     @Override
-    public int calculateTotalRevenue(Long lectureCode) {
+    public int calculateTotalRevenue(String lectureCode) {
         return lectureByStudentRepository.calculateTotalRevenueByLecture(lectureCode);
     }
 

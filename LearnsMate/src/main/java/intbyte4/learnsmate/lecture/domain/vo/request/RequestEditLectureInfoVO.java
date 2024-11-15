@@ -15,12 +15,9 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestEditLectureInfoVO {
     private String lectureTitle;
-    private Boolean lectureConfirmStatus;
     private LocalDateTime updatedAt;
     private String lectureImage;
     private Integer lecturePrice;
-    private Boolean lectureStatus;
-    private Integer lectureClickCount;
     private LectureLevelEnum lectureLevel;
 
     private String newVideoTitle;

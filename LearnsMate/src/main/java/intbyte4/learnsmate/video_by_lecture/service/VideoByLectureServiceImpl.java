@@ -35,7 +35,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
 
     // 강의코드별 모든 강의별 동영상 조회
     @Override
-    public List<VideoByLectureDTO> findVideoByLectureByLectureCode(Long lectureCode) {
+    public List<VideoByLectureDTO> findVideoByLectureByLectureCode(String lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
 
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
@@ -55,8 +55,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
 
     // 강의별 동영상 등록
     @Override
-    public void registerVideoByLecture(Long lectureCode, VideoByLectureDTO videoByLectureDTO) {
-
+    public void registerVideoByLecture(String lectureCode, VideoByLectureDTO videoByLectureDTO) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
 
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
@@ -65,7 +64,7 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
         Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         VideoByLecture videoByLecture = VideoByLecture.builder()
-                .lecture(lecture) // 강의 설정
+                .lecture(lecture)
                 .videoTitle(videoByLectureDTO.getVideoTitle())
                 .videoLink(videoByLectureDTO.getVideoLink())
                 .build();
@@ -77,16 +76,13 @@ public class VideoByLectureServiceImpl implements VideoByLectureService {
 
     // 동영상 제목과 링크 수정 메서드
     @Override
-    public VideoByLectureDTO updateVideoByLecture(VideoByLectureDTO videoByLectureDTO) {
-        VideoByLecture videoByLecture = videoByLectureRepository.findById(videoByLectureDTO.getLectureCode())
+    public void updateVideoByLecture(VideoByLectureDTO videoByLectureDTO) {
+        VideoByLecture videoByLecture = videoByLectureRepository.findById(videoByLectureDTO.getVideoCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.VIDEO_BY_LECTURE_NOT_FOUND));
 
         videoByLecture.toUpdate(videoByLectureDTO);
 
         VideoByLecture updatedVideoByLecture = videoByLectureRepository.save(videoByLecture);
-        return videoByLectureMapper.toDTO(updatedVideoByLecture);
+        videoByLectureMapper.toDTO(updatedVideoByLecture);
     }
-
-
-
 }

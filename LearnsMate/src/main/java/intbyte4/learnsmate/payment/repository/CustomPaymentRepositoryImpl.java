@@ -112,7 +112,7 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
         return QPayment.payment.createdAt.between(startCreatedAt, endCreatedAt);
     }
 
-    private BooleanExpression eqLectureCode(Long lectureCode) {
+    private BooleanExpression eqLectureCode(String lectureCode) {
         return lectureCode == null ? null : QPayment.payment.lectureByStudent.lecture.lectureCode.eq(lectureCode);
     }
 

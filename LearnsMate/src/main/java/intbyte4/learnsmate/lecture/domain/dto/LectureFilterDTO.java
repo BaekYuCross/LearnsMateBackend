@@ -5,13 +5,14 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Builder
-@ToString
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@Builder
 public class LectureFilterDTO {
-    private Long lectureCode; // 강의 코드
+    private String lectureCode; // 강의 코드
     private String lectureTitle; // 강의명
     private Long tutorCode; // 강사 코드
     private String tutorName; // 강사명

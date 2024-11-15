@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseFindLectureVO {
-    private Long lectureCode; // 강의코드
+    private String lectureCode; // 강의코드
     private String lectureTitle; // 강의명
     private Boolean lectureConfirmStatus; // 강의 계약 상태
     private LocalDateTime createdAt; // 강의 생성일

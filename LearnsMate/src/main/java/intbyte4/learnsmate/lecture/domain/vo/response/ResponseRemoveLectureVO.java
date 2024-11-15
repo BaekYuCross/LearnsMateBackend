@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseRemoveLectureVO {
-    private Long lectureCode;
+    private String lectureCode;
     private String lectureTitle;
     private Boolean lectureConfirmStatus;
     private LocalDateTime createdAt;

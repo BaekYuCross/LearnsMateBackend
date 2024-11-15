@@ -18,6 +18,6 @@ public class CouponByLectureFindResponseVO {
     private Long couponCode;
 
     @JsonProperty("lecture_code")
-    private Long lectureCode;
+    private String lectureCode;
 
 }

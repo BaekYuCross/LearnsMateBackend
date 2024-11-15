@@ -16,18 +16,18 @@ public interface LectureByStudentRepository extends JpaRepository<LectureByStude
     List<LectureByStudent> findByStudentAndOwnStatus(Member student, boolean ownStatus);
 
     @Query("SELECT l.lectureByStudentCode FROM lecture_by_student l WHERE l.lecture.lectureCode = :lectureCode")
-    List<Long> findLectureByStudentCodesByLectureCode(@Param("lectureCode") Long lectureCode);
+    List<Long> findLectureByStudentCodesByLectureCode(@Param("lectureCode") String lectureCode);
 
     // 강의 코드와 ownStatus가 true인 수강생의 개수를 조회하는 쿼리
     @Query("SELECT COUNT(ls) FROM lecture_by_student ls " +
             "WHERE ls.lecture.lectureCode = :lectureCode AND ls.ownStatus = true")
-    long countByLectureAndOwnStatus(@Param("lectureCode") Long lectureCode);
+    long countByLectureAndOwnStatus(@Param("lectureCode") String lectureCode);
 
     // 강의 코드로 학생별 강의에 대한 결제 금액을 합산하는 쿼리
     @Query("SELECT SUM(p.paymentPrice) FROM payment p " +
             "JOIN p.lectureByStudent ls " +
             "WHERE ls.lecture.lectureCode = :lectureCode AND ls.ownStatus = true")
-    int calculateTotalRevenueByLecture(@Param("lectureCode") Long lectureCode);
+    int calculateTotalRevenueByLecture(@Param("lectureCode") String lectureCode);
 
     LectureByStudent findByLecture(Lecture lecture);
 
