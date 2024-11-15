@@ -40,10 +40,7 @@ public class BlacklistService {
 
     // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
     public List<BlacklistDTO> findAllBlacklistByMemberType(MemberType memberType) {
-
-        List<BlacklistDTO> blacklistDTOList = blacklistRepository.findAllBlacklistByMemberType(memberType);
-
-        return blacklistDTOList;
+        return blacklistRepository.findAllBlacklistByMemberType(memberType);
     }
 
     // 1. 멤버 타입에 따라 신고내역 횟수 뒤져서 찾기 reportService.findCount
@@ -72,8 +69,8 @@ public class BlacklistService {
 
         // 2. ReportDTO의 comment_code 내역 가져오기 -> comment table
         List<CommentDTO> commentDTOList = reportDTOlist.stream()
-                .map(reportDTO -> commentService.findComentByCommentCode(reportDTO.getCommentCode()))
-                .collect(Collectors.toList());
+                .map(reportDTO -> commentService.findCommentByCommentCode(reportDTO.getCommentCode()))
+                .toList();
 
         // 3. List<BlacklistReportCommentDTO> 생성 및 데이터 추가
         List<BlacklistReportCommentDTO> blacklistReportCommentDTOList = new ArrayList<>();
@@ -111,10 +108,8 @@ public class BlacklistService {
     public List<BlacklistDTO> filterBlacklistMember(BlacklistFilterRequestDTO dto){
         List<Blacklist> blacklistList = blacklistRepository.searchBy(dto);
 
-        List<BlacklistDTO> blacklistDTOList = blacklistList.stream()
+        return blacklistList.stream()
                 .map(blacklistMapper::fromBlacklistToBlacklistDTO)
                 .collect(Collectors.toList());
-
-        return blacklistDTOList;
     }
 }
