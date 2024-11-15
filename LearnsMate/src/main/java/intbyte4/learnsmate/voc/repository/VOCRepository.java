@@ -20,4 +20,6 @@ public interface VOCRepository extends JpaRepository<VOC, Long>, VOCRepositoryCu
             "WHERE v.member.memberCode = :memberCode " +
             "AND v.vocAnswerStatus = true")
     List<VOC> findAnsweredVOCByMember(@Param("memberCode") Long memberCode);
+
+    long countByVocCategory_VocCategoryCode(Integer vocCategoryCode);
 }
