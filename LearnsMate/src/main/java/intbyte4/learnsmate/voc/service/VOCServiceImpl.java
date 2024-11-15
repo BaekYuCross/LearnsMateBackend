@@ -7,12 +7,16 @@ import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.repository.VOCRepository;
+import intbyte4.learnsmate.voc_category.domain.dto.VocCategoryDTO;
+import intbyte4.learnsmate.voc_category.service.VocCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,6 +26,7 @@ public class VOCServiceImpl implements VOCService {
 
     private final VOCRepository vocRepository;
     private final VOCMapper vocMapper;
+    private final VocCategoryService vocCategoryService;
 
     @Override
     public List<VOCDTO> findAllByVOC() {
@@ -85,5 +90,20 @@ public class VOCServiceImpl implements VOCService {
 
         log.info("필터링된 VOC 수: {}", vocDTOList.size());
         return vocDTOList;
+    }
+
+    @Override
+    public Map<Integer, Long> countVOCByCategory(){
+        List<VocCategoryDTO> vocCategoryDTOList = vocCategoryService.findAll();
+
+        Map<Integer, Long> categoryCountMap = new HashMap<>();
+
+        vocCategoryDTOList.forEach(category -> {
+            int categoryCode = category.getVocCategoryCode();
+            long count = vocRepository.countByVocCategory_VocCategoryCode(categoryCode);
+            categoryCountMap.put(categoryCode, count);
+        });
+
+        return categoryCountMap;
     }
 }
