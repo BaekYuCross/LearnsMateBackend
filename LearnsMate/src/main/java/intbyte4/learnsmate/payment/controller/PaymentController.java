@@ -57,11 +57,9 @@ public class PaymentController {
 
     @Operation(summary = "결제 내역 등록")
     @PostMapping("/register")
-    public ResponseEntity<ResponseRegisterPaymentVO> registerPayment
-            (@RequestBody RequestRegisterPaymentVO requestRegisterPaymentVO) {
+    public ResponseEntity<ResponseRegisterPaymentVO> registerPayment(@RequestBody RequestRegisterPaymentVO requestRegisterPaymentVO) {
         IssueCouponDTO issueCouponDTO = issueCouponMapper.fromRequestRegisterIssueCouponPaymentVOToDTO(requestRegisterPaymentVO.getIssueCouponVO());
         MemberDTO memberDTO = memberMapper.fromRequestRegisterMemberPaymentVOToMemberDTO(requestRegisterPaymentVO.getMemberVO());
-
         LectureDTO lectureDTO = lectureMapper.fromRequestRegisterLecturePaymentVOToDTO(requestRegisterPaymentVO.getLectureVO());
 
         if (issueCouponDTO != null) {
