@@ -13,14 +13,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
-@RequestMapping("/contractprocess")
+@RequestMapping("/contract-process")
 @Slf4j
 @RequiredArgsConstructor
 public class ContractProcessController {
 
     private final ContractProcessService contractProcessService;
     private final ContractProcessMapper contractProcessMapper;
+
+    @Operation(summary = "계약과정 전체 조회")
+    @GetMapping("list")
+    public ResponseEntity<List<ResponseFindContractProcessVO>> listContractProcess() {
+        List<ContractProcessDTO> contractProcessDTOList = contractProcessService.findAll();
+        List<ResponseFindContractProcessVO> response = new ArrayList<>();
+        for (ContractProcessDTO contractProcessDTO : contractProcessDTOList) {
+            ResponseFindContractProcessVO responseVO = contractProcessMapper.fromDtoToResponseVO(contractProcessDTO);
+            response.add(responseVO);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @Operation(summary = "계약과정코드로 계약과정 단건 조회")
     @GetMapping("/{contractProcessCode}")
@@ -31,19 +46,16 @@ public class ContractProcessController {
 
     @Operation(summary = "강의별 계약과정 조회")
     @GetMapping("/lecture/{lectureCode}")
-    public ResponseEntity<ResponseFindContractProcessVO> getApprovalProcessByLectureCode(
-            @PathVariable("lectureCode") Long lectureCode) {
+    public ResponseEntity<ResponseFindContractProcessVO> getApprovalProcessByLectureCode(@PathVariable("lectureCode") String lectureCode) {
         ContractProcessDTO contractProcessDTO = contractProcessService.getApprovalProcessByLectureCode(lectureCode);
         return ResponseEntity.status(HttpStatus.OK).body(contractProcessMapper.fromDtoToResponseVO(contractProcessDTO));
     }
 
-
     @Operation(summary = "강의별 계약과정 등록")
-    @PutMapping("/lecture/{lectureCode}")
+    @PostMapping("/lecture-approve/{lectureCode}")
     public ResponseEntity<ResponseRegisterContractProcessVO> createContractProcessByLecture(
-            @PathVariable("lectureCode") Long lectureCode, @RequestBody RequestRegisterContractProcessVO requestVO) {
+            @PathVariable("lectureCode") String lectureCode, @RequestBody RequestRegisterContractProcessVO requestVO) {
         ContractProcessDTO contractProcessDTO = contractProcessService.createContractProcess(lectureCode,contractProcessMapper.fromRegisterRequestVOtoDto(requestVO));
         return  ResponseEntity.status(HttpStatus.CREATED).body(contractProcessMapper.fromDtoToRegisterResponseVO(contractProcessDTO));
     }
-
 }
