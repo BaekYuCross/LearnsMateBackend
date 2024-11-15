@@ -25,7 +25,6 @@ import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
-import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCategoryListDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -38,9 +37,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,7 +113,7 @@ public class LectureFacade {
     }
 
     @Transactional
-    public LectureDTO removeLecture(Long lectureCode) {
+    public LectureDTO removeLecture(String lectureCode) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
         lecture.toDelete();
@@ -133,15 +134,11 @@ public class LectureFacade {
         lectureByStudentRepository.saveAll(lectureByStudents);
     }
 
-
     @Transactional
     public LectureDTO registerLecture(LectureDTO lectureDTO, List<Integer> lectureCategoryCodeList, List<VideoByLectureDTO> videoByLectureDTOList) {
-
-        // 강의를 담당하는 튜터 정보 조회 및 변환
         MemberDTO memberDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(memberDTO);
 
-        // 강의 엔티티 생성 및 저장
         Lecture lecture = Lecture.builder()
                 .lectureTitle(lectureDTO.getLectureTitle())
                 .lectureConfirmStatus(false)
@@ -155,39 +152,42 @@ public class LectureFacade {
                 .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
                 .build();
 
+        setLectureCode(lecture, lectureCategoryCodeList);
         lectureRepository.save(lecture);
 
-        // 강의별 카테고리 등록
-        OneLectureCategoryListDTO oneLectureCategoryListDTO
-                = new OneLectureCategoryListDTO(lecture.getLectureCode(), lectureCategoryCodeList);
-        lectureCategoryByLectureService.saveLectureCategoryByLecture(oneLectureCategoryListDTO);
+        for (Integer lectureCategoryCode : lectureCategoryCodeList) {
+            lectureCategoryByLectureService.saveLectureCategoryByLecture(lecture.getLectureCode(), lectureCategoryCode);
+        }
 
-        Long lectureCode = lecture.getLectureCode();
+        videoByLectureDTOList.forEach(videoDTO -> videoByLectureService.registerVideoByLecture(lecture.getLectureCode(), videoDTO));
 
-        videoByLectureDTOList.forEach(videoDTO -> {
-            videoByLectureService.registerVideoByLecture(lectureCode, videoDTO);
-        });
-
-        // 강의 정보 DTO로 변환하여 반환
         return lectureMapper.toDTO(lecture);
     }
 
+    private void setLectureCode(Lecture lecture, List<Integer> lectureCategoryCodeList) {
+        String lectureCodePrefix;
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String randomUUID = UUID.randomUUID().toString().substring(0, 8);
 
-    // 강의 모두 조회
+        if (lectureCategoryCodeList.contains(7)) lectureCodePrefix = "L007";
+        else if (lectureCategoryCodeList.size() > 1) lectureCodePrefix = "Lmul";
+        else lectureCodePrefix = "L" + String.format("%03d", lectureCategoryCodeList.get(0));
+
+        lecture.setLectureCode(lectureCodePrefix + "-" + date + "-" + randomUUID);
+    }
+
+
     public List<LectureDetailDTO> getAllLecture() {
         List<LectureDTO> lectureList = lectureService.getAllLecture();
 
-        if (lectureList.isEmpty()) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
+        if (lectureList.isEmpty()) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
 
         return lectureList.stream()
                 .map(this::buildLectureDetailDTO)
                 .collect(Collectors.toList());
     }
 
-    // 강의 단건 조회
-    public LectureDetailDTO getLectureById(Long lectureCode) {
+    public LectureDetailDTO getLectureById(String lectureCode) {
         LectureDTO lecture = lectureService.getLectureById(lectureCode);
         if (lecture == null) {
             throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
@@ -225,12 +225,9 @@ public class LectureFacade {
     public LectureDTO updateLecture(LectureDTO lectureDTO, String newVideoTitle, String newVideoLink, List<Integer> lectureCategoryCodeList) {
         Lecture lecture = lectureRepository.findById(lectureDTO.getLectureCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
-
-        // 강의 정보 업데이트
         lecture.toUpdate(lectureDTO);
         lectureRepository.save(lecture);
 
-        // 비디오 정보 업데이트
         List<VideoByLectureDTO> videoByLectureDTOs = videoByLectureService.findVideoByLectureByLectureCode(lectureDTO.getLectureCode());
         for (VideoByLectureDTO videoDTO : videoByLectureDTOs) {
             VideoByLectureDTO updatedVideoDTO = VideoByLectureDTO.builder()
@@ -238,20 +235,17 @@ public class LectureFacade {
                     .videoTitle(newVideoTitle)
                     .videoLink(newVideoLink)
                     .build();
-
             videoByLectureService.updateVideoByLecture(updatedVideoDTO);
         }
 
-        // 강의 카테고리 수정
-        if (lectureCategoryCodeList != null && !lectureCategoryCodeList.isEmpty()) {
-            OneLectureCategoryListDTO categoryDTO = new OneLectureCategoryListDTO();
-            categoryDTO.setLectureCode(lectureDTO.getLectureCode());
-            categoryDTO.setLectureCategoryCodeList(lectureCategoryCodeList);
-            lectureCategoryByLectureService.updateLectureCategoryByLecture(categoryDTO);
+        if (!lectureCategoryCodeList.isEmpty()) {
+            lectureCategoryByLectureService.deleteByLectureCode(lecture.getLectureCode());
+
+            for (Integer lectureCategoryCode : lectureCategoryCodeList) {
+                lectureCategoryByLectureService.saveLectureCategoryByLecture(lecture.getLectureCode(), lectureCategoryCode);
+            }
         }
 
         return lectureMapper.toDTO(lecture);
     }
-
-
 }

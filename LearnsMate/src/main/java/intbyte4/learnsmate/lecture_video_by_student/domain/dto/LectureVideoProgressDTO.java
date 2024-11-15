@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LectureVideoProgressDTO {
-    private Long lectureCode;  // 강의 코드
+    private String lectureCode;  // 강의 코드
     private String lectureTitle;  // 강의제목
     private long totalVideos;  // 총 동영상 수
     private long completedVideos;  // 완료된 동영상 수

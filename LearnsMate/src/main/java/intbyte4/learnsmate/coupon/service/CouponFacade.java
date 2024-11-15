@@ -26,7 +26,7 @@ public class CouponFacade {
     private final LectureMapper lectureMapper;
 
     @Transactional
-    public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, Long lectureCode) {
+    public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, String lectureCode) {
         CouponEntity newCouponEntity = couponMapper.newCouponEntity(request, tutor, couponCategory);
 
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);

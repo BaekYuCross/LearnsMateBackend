@@ -32,9 +32,9 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 단건 조회")
-    @GetMapping("/{commentcode}")
-    public ResponseEntity<ResponseFindCommentVO> findCommentByCommentCode(@PathVariable("commentcode") Long commentCode) {
-        CommentDTO commentDTO = commentService.findComentByCommentCode(commentCode);
+    @GetMapping("/{commentCode}")
+    public ResponseEntity<ResponseFindCommentVO> findCommentByCommentCode(@PathVariable("commentCode") Long commentCode) {
+        CommentDTO commentDTO = commentService.findCommentByCommentCode(commentCode);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(commentMapper.fromCommentDTOToResponseFindCommentVO(commentDTO));
@@ -43,7 +43,7 @@ public class CommentController {
 
     @Operation(summary = "강의별 댓글 조회")
     @GetMapping("/lecture/{lectureCode}")
-    public ResponseEntity<List<ResponseFindCommentVO>> findCommentByLectureCode(@PathVariable("lectureCode") Long lectureCode ) {
+    public ResponseEntity<List<ResponseFindCommentVO>> findCommentByLectureCode(@PathVariable("lectureCode") String lectureCode ) {
         List<CommentDTO> commentDTOList = commentService.findCommentByLectureCode(lectureCode);
 
         return ResponseEntity.status(HttpStatus.OK).body(commentDTOList.stream()

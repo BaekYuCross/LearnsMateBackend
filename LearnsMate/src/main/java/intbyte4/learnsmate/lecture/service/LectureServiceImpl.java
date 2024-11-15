@@ -4,6 +4,7 @@ package intbyte4.learnsmate.lecture.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
@@ -16,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +31,6 @@ public class LectureServiceImpl implements LectureService {
     private final MemberService memberService;
     private final MemberMapper memberMapper;
 
-    // 전체 강의 조회
     @Override
     public List<LectureDTO> getAllLecture() {
         List<Lecture> lectureList = lectureRepository.findAll();
@@ -40,37 +42,25 @@ public class LectureServiceImpl implements LectureService {
                 .collect(Collectors.toList());
     }
 
-    // 강의 단건 조회
     @Override
-    public LectureDTO getLectureById(Long lectureCode) {
+    public LectureDTO getLectureById(String lectureCode) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
         return lectureMapper.toDTO(lecture);
     }
 
-    // 유저별 조회에서 count++ lectureClickCount int 올리기
     @Override
-    public LectureDTO getLecturesByStudentCode(Long studentCode) {
-        // 학생 정보 조회
-        MemberDTO studentDTO = memberService.findMemberByMemberCode(studentCode, MemberType.STUDENT);
-        Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
+    public void incrementClickCount(String lectureCode) {
+        LectureDTO lectureDTO = getLectureById(lectureCode);
+        lectureDTO.setLectureClickCount(lectureDTO.getLectureClickCount() + 1);
 
-        // 학생이 조회하려는 강의를 가져옴
-        LectureDTO lectureDTO = getLectureById(studentCode);
+        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
-        // 해당 강의의 클릭 수 증가
-        Lecture lecture = lectureMapper.toEntity(lectureDTO,student);
-        lecture.incrementClickCount();  // 클릭 수를 증가시키는 메서드 추가 필요
-
-        // 강의 정보 업데이트
         lectureRepository.save(lecture);
-
-        // 업데이트된 강의를 DTO로 변환하여 반환
-        return lectureMapper.toDTO(lecture);
     }
 
-
-    // 강사별 강의 모두 조회
     @Override
     public List<LectureDTO> getLecturesByTutorCode(Long tutorCode) {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(tutorCode, MemberType.TUTOR);
@@ -93,15 +83,30 @@ public class LectureServiceImpl implements LectureService {
 //        return lectureRepository.findAll(spec);
 //    }
 
-
-    // 강의별 계약과정이 강의 코드가 7개 라면 강의컬럼의 승인여부 true로 변환
     @Override
     @Transactional
-    public LectureDTO updateLectureConfirmStatus(Long lectureCode) {
+    public void updateLectureConfirmStatus(String lectureCode) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_NOT_FOUND));
         lecture.toAcceptConfirmStatus();
         lectureRepository.save(lecture);
-        return lectureMapper.toDTO(lecture);
+        lectureMapper.toDTO(lecture);
+    }
+
+    @Override
+    public List<MonthlyLectureCountDTO> getMonthlyLectureCounts() {
+        List<Lecture> lectures = lectureRepository.findAll();
+
+        Map<String, Long> groupedByMonth = lectures.stream()
+                .collect(Collectors.groupingBy(
+                        lecture -> lecture.getCreatedAt().getYear() + "-" +
+                                String.format("%02d", lecture.getCreatedAt().getMonthValue()),
+                        Collectors.counting()
+                ));
+
+        return groupedByMonth.entrySet().stream()
+                .map(entry -> new MonthlyLectureCountDTO(entry.getKey(), entry.getValue().intValue()))
+                .sorted(Comparator.comparing(MonthlyLectureCountDTO::getDate))
+                .collect(Collectors.toList());
     }
 }

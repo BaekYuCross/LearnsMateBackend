@@ -12,6 +12,6 @@ import lombok.*;
 public class LectureCategoryByLectureDTO {
 
     private Long lectureCategoryByLectureCode;
-    private Long lectureCode;
+    private String lectureCode;
     private Integer lectureCategoryCode;
 }

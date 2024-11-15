@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -38,8 +40,6 @@ public class ContractProcessServiceImpl implements ContractProcessService {
     private final LectureService lectureService;
     private final LectureMapper lectureMapper;
 
-
-    // 단건 조회
     @Override
     public ContractProcessDTO getContractProcess(Long contractProcessCode) {
         ContractProcess contractProcess = contractProcessRepository.findById(contractProcessCode)
@@ -47,13 +47,11 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         return contractProcessMapper.toDTO(contractProcess);
     }
 
-
-    // 강의별 승인과정 절차 조회
     @Override
-    public ContractProcessDTO getApprovalProcessByLectureCode(Long lectureCode) {
+    public ContractProcessDTO getApprovalProcessByLectureCode(String lectureCode) {
         LectureDTO lecturedto = lectureService.getLectureById(lectureCode);
 
-        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lecturedto.getLectureCode(), MemberType.TUTOR);
+        MemberDTO tutorDTO = memberService.findMemberByMemberCode(lecturedto.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
 
         Lecture lecture = lectureMapper.toEntity(lecturedto, tutor);
@@ -67,12 +65,9 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         return contractProcessMapper.toDTO(contractProcess);
     }
 
-
-
-    // 계약과정 등록
     @Transactional
     @Override
-    public ContractProcessDTO createContractProcess(Long lectureCode, ContractProcessDTO contractProcessDTO) {
+    public ContractProcessDTO createContractProcess(String lectureCode, ContractProcessDTO contractProcessDTO) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
@@ -82,12 +77,10 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         AdminDTO adminDTO = adminService.findByAdminCode(contractProcessDTO.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
 
-        // 강의별 계약과정 ApprovalProcess이 같은 강의 코드와 같은 ApprovalProcess의 값이 존재하는지 확인
         ContractProcess existingContractProcess = contractProcessRepository
                 .findByLectureAndApprovalProcess(lecture, contractProcessDTO.getApprovalProcess())
                 .orElse(null);
 
-        // 이미 존재하는 계약과정이 있으면 예외 처리
         if (existingContractProcess != null) {
             throw new CommonException(StatusEnum.EXISTING_CONTRACT_PROCESS);
         }
@@ -102,10 +95,9 @@ public class ContractProcessServiceImpl implements ContractProcessService {
 
         contractProcessRepository.save(contractProcess);
 
-        long contractProcessCount = contractProcessRepository.countByLecture(lecture);
+        int contractProcessCount = contractProcessRepository.countByLecture(lecture);
         LectureDTO lecturedto = lectureMapper.toDTO(lecture);
 
-        // 계약과정이 7개일 경우 강의 승인 상태 변경
         if (contractProcessCount == 7) {
             lectureService.updateLectureConfirmStatus(lecturedto.getLectureCode());
         }
@@ -113,5 +105,13 @@ public class ContractProcessServiceImpl implements ContractProcessService {
         return contractProcessMapper.toDTO(contractProcess);
     }
 
-
+    @Override
+    public List<ContractProcessDTO> findAll() {
+        List<ContractProcess> contractProcessList = contractProcessRepository.findAll();
+        List<ContractProcessDTO> contractProcessDTOList = new ArrayList<>();
+        for (ContractProcess contractProcess : contractProcessList) {
+            contractProcessDTOList.add(contractProcessMapper.toDTO(contractProcess));
+        }
+        return contractProcessDTOList;
+    }
 }

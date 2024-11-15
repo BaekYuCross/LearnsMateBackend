@@ -78,12 +78,9 @@ public class LectureMapper {
     public LectureDTO fromRequestVOtoDto(RequestEditLectureInfoVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
-                .lectureConfirmStatus(vo.getLectureConfirmStatus())
                 .updatedAt(LocalDateTime.now())
                 .lectureImage(vo.getLectureImage())
                 .lecturePrice(vo.getLecturePrice())
-                .lectureStatus(vo.getLectureStatus())
-                .lectureClickCount(vo.getLectureClickCount())
                 .lectureLevel(String.valueOf(vo.getLectureLevel()))
                 .build();
     }

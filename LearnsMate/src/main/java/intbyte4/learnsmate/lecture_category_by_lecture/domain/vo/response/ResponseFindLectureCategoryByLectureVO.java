@@ -12,6 +12,6 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseFindLectureCategoryByLectureVO {
     private Long lectureCategoryByLectureCode;
-    private Long lectureCode;
+    private String lectureCode;
     private Integer lectureCategoryCode;
 }

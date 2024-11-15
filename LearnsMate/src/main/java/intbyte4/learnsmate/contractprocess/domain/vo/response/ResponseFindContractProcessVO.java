@@ -18,6 +18,6 @@ public class ResponseFindContractProcessVO {
     private Integer approvalProcess;
     private LocalDateTime createdAt;
     private String note;
-    private Long lectureCode;
+    private String lectureCode;
     private Long adminCode;
 }

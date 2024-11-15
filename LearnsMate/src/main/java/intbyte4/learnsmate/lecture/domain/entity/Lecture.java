@@ -19,7 +19,7 @@ public class Lecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lecture_code", nullable = false)
-    private Long lectureCode;
+    private String lectureCode;
 
     @Column(name = "lecture_title", nullable = false)
     private String lectureTitle;
@@ -54,7 +54,6 @@ public class Lecture {
     @Column(name = "lecture_level", nullable = false)
     private LectureLevelEnum lectureLevel;
 
-
     public void toUpdate(LectureDTO lectureDTO) {
         this.lectureTitle = lectureDTO.getLectureTitle();
         this.lectureConfirmStatus = lectureDTO.getLectureConfirmStatus();
@@ -76,8 +75,7 @@ public class Lecture {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void incrementClickCount() {
-        this.lectureClickCount++;
+    public void setLectureCode(String lectureCode) {
+        this.lectureCode = lectureCode;
     }
-
 }

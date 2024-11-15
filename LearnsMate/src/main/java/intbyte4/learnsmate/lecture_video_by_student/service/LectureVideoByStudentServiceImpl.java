@@ -43,14 +43,14 @@ public class LectureVideoByStudentServiceImpl implements LectureVideoByStudentSe
 
         for (LectureByStudentDTO lectureByStudentDTO : lecturesByStudent) {
             // 각 강의의 강의 코드
-            Long lectureCode = lectureByStudentDTO.getLectureByStudentCode();
+            String lectureCode = lectureByStudentDTO.getLecture().getLectureCode();
 
             // 강의에 속한 동영상 총 개수 조회
-            long totalVideos = lectureVideoByStudentRepository.countByLectureCode(lectureCode);
+            int totalVideos = lectureVideoByStudentRepository.countByLectureCode(lectureCode);
             String lectureTitle = lectureByStudentDTO.getLecture().getLectureTitle();
 
             // 완료된 동영상 수 조회 (lectureStatus가 true인 것만 카운트)
-            long completedVideos = lectureVideoByStudentRepository.countCompletedVideos(lectureCode);
+            int completedVideos = lectureVideoByStudentRepository.countCompletedVideos(lectureCode);
 
             // 진척도 계산 (완료된 동영상 수 / 총 동영상 수)
             double progress = totalVideos > 0 ? (double) completedVideos / totalVideos * 100 : 0;
