@@ -1,7 +1,5 @@
 package intbyte4.learnsmate.lecture_category_by_lecture.mapper;
 
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCategoryByLecture;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.vo.response.ResponseFindLectureCategoryByLectureVO;
