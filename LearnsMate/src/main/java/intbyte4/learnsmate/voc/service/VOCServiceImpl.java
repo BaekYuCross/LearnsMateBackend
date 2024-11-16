@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,15 +94,20 @@ public class VOCServiceImpl implements VOCService {
     }
 
     @Override
-    public Map<Integer, Long> countVOCByCategory(){
+    public Map<Integer, Long> countVOCByCategory(LocalDateTime startDate, LocalDateTime endDate){
         List<VocCategoryDTO> vocCategoryDTOList = vocCategoryService.findAll();
 
         Map<Integer, Long> categoryCountMap = new HashMap<>();
 
         vocCategoryDTOList.forEach(category -> {
-            int categoryCode = category.getVocCategoryCode();
-            long count = vocRepository.countByVocCategory_VocCategoryCode(categoryCode);
-            categoryCountMap.put(categoryCode, count);
+            int vocCategoryCode = category.getVocCategoryCode();
+            long count;
+            if(startDate != null && endDate != null) {
+                count = vocRepository.countByVocCategoryCodeAndDateRange(vocCategoryCode, startDate, endDate);
+            } else {
+                count = vocRepository.countByVocCategory_VocCategoryCode(vocCategoryCode);
+            }
+            categoryCountMap.put(vocCategoryCode, count);
         });
 
         return categoryCountMap;
