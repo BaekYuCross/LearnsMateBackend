@@ -101,7 +101,12 @@ public class VOCServiceImpl implements VOCService {
 
         vocCategoryDTOList.forEach(category -> {
             int vocCategoryCode = category.getVocCategoryCode();
-            long count = vocRepository.countByVocCategoryCodeAndDateRange(vocCategoryCode, startDate, endDate);
+            long count;
+            if(startDate != null && endDate != null) {
+                count = vocRepository.countByVocCategoryCodeAndDateRange(vocCategoryCode, startDate, endDate);
+            } else {
+                count = vocRepository.countByVocCategory_VocCategoryCode(vocCategoryCode);
+            }
             categoryCountMap.put(vocCategoryCode, count);
         });
 
