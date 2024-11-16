@@ -3,6 +3,7 @@ package intbyte4.learnsmate.voc.service;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -19,5 +20,5 @@ public interface VOCService {
 
     List<VOCDTO> filterVOC(VOCDTO vocDTO, MemberDTO memberDTO);
 
-    Map<Integer, Long> countVOCByCategory();
+    Map<Integer, Long> countVOCByCategory(LocalDateTime startDate, LocalDateTime endDate);
 }
