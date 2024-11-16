@@ -12,6 +12,7 @@ import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
+import intbyte4.learnsmate.coupon_category.domain.dto.CouponCategoryEnum;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,11 +67,38 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory) {
-        CouponEntity newCoupon = getCoupon(request, admin, couponCategory);
-        couponRepository.save(newCoupon);
+    public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin) {
 
+        CouponCategoryEnum categoryEnum = getCouponCategoryEnumByName(request.getCouponCategoryName());
+
+        CouponCategory couponCategory = CouponCategory.builder()
+                .couponCategoryCode(categoryEnum.getCategoryCode())
+                .couponCategoryName(categoryEnum.getCategoryName())
+                .build();
+
+        CouponEntity newCoupon = CouponEntity.builder()
+                .couponName(request.getCouponName())
+                .couponContents(request.getCouponContents())
+                .couponDiscountRate(request.getCouponDiscountRate())
+                .couponStartDate(request.getCouponStartDate())
+                .couponExpireDate(request.getCouponExpireDate())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .couponFlag(true)
+                .activeState(true)
+                .couponCategory(couponCategory)
+                .admin(admin)
+                .build();
+
+        couponRepository.save(newCoupon);
         return couponMapper.toDTO(newCoupon);
+    }
+
+    private CouponCategoryEnum getCouponCategoryEnumByName(String categoryName) {
+        return Arrays.stream(CouponCategoryEnum.values())
+                .filter(category -> category.getCategoryName().equals(categoryName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리 이름이 존재하지 않습니다: " + categoryName));
     }
 
     @Override
