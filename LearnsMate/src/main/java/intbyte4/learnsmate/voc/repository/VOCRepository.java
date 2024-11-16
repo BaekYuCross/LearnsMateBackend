@@ -26,4 +26,6 @@ public interface VOCRepository extends JpaRepository<VOC, Long>, VOCRepositoryCu
     long countByVocCategoryCodeAndDateRange(@Param("vocCategoryCode") Integer vocCategoryCode,
                                             @Param("startDate") LocalDateTime startDate,
                                             @Param("endDate") LocalDateTime endDate);
+
+    long countByVocCategory_VocCategoryCode(Integer vocCategoryCode);
 }
