@@ -3,6 +3,7 @@ package intbyte4.learnsmate.voc.controller;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.domain.vo.reqeust.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
@@ -80,10 +81,12 @@ public class VOCController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "직원 - VOC 카테고리 별 개수 조회")
+    @Operation(summary = "직원 - 기간 별 VOC 카테고리 별 개수 조회")
     @GetMapping("/count-by-category")
-    public ResponseEntity<List<ResponseCountByCategoryVO>> countVOCByCategory() {
-        Map<Integer, Long> categoryCountMap = vocService.countVOCByCategory();
+    public ResponseEntity<List<ResponseCountByCategoryVO>> countVOCByCategory
+            (@RequestBody RequestCountByCategoryVO requestVO) {
+        Map<Integer, Long> categoryCountMap = vocService.countVOCByCategory
+                (requestVO.getStartDate(), requestVO.getEndDate());
         List<ResponseCountByCategoryVO> response = categoryCountMap.entrySet().stream()
                 .map(entry -> ResponseCountByCategoryVO.builder()
                         .vocCategoryCode(entry.getKey())
