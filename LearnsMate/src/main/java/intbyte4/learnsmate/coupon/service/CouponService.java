@@ -21,7 +21,7 @@ public interface CouponService {
 
     List<CouponDTO> getCouponsByFilters(CouponFilterRequestVO request);
 
-    CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory);
+    CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin);
 
     CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin);
 
