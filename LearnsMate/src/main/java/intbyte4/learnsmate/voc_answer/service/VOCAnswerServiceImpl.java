@@ -6,7 +6,8 @@ import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
@@ -16,8 +17,9 @@ import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.mapper.VOCAnswerMapper;
 import intbyte4.learnsmate.voc_answer.repository.VOCAnswerRepository;
-import intbyte4.learnsmate.voc_category.domain.VocCategory;
-import intbyte4.learnsmate.voc_category.service.VocCategoryService;
+import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
+import intbyte4.learnsmate.voc_category.mapper.VocCategoryMapper;
+import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +38,11 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     private final AdminService adminService;
     private final VOCService vocService;
     private final VOCMapper vocMapper;
-    private final VocCategoryService vocCategoryService;
+    private final VOCCategoryService vocCategoryService;
     private final MemberService memberService;
     private final AdminMapper adminMapper;
+    private final VocCategoryMapper vocCategoryMapper;
+    private final MemberMapper memberMapper;
 
     @Override
     @Transactional
@@ -90,9 +94,9 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         }
         log.info(vocDTO.toString());
 
-        VocCategory vocCategory = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
-        Member member = memberService.findByStudentCode(vocDTO.getMemberCode());
-        return vocMapper.toEntity(vocDTO, vocCategory, member);
+        VOCCategoryDTO vocCategoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
+        MemberDTO memberDTO = memberService.findByStudentCode(vocDTO.getMemberCode());
+        return vocMapper.toEntity(vocDTO, vocCategoryMapper.toEntity(vocCategoryDTO), memberMapper.fromMemberDTOtoMember(memberDTO));
     }
 
     public Admin validAdmin(AdminService adminService, Long adminCode, Logger log) {
