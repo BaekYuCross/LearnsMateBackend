@@ -18,7 +18,7 @@ import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.mapper.VOCAnswerMapper;
 import intbyte4.learnsmate.voc_answer.repository.VOCAnswerRepository;
 import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
-import intbyte4.learnsmate.voc_category.mapper.VocCategoryMapper;
+import intbyte4.learnsmate.voc_category.mapper.VOCCategoryMapper;
 import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     private final VOCCategoryService vocCategoryService;
     private final MemberService memberService;
     private final AdminMapper adminMapper;
-    private final VocCategoryMapper vocCategoryMapper;
+    private final VOCCategoryMapper vocCategoryMapper;
     private final MemberMapper memberMapper;
 
     @Override
