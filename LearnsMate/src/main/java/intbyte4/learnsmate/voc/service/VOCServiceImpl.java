@@ -7,8 +7,8 @@ import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.repository.VOCRepository;
-import intbyte4.learnsmate.voc_category.domain.dto.VocCategoryDTO;
-import intbyte4.learnsmate.voc_category.service.VocCategoryService;
+import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
+import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class VOCServiceImpl implements VOCService {
 
     private final VOCRepository vocRepository;
     private final VOCMapper vocMapper;
-    private final VocCategoryService vocCategoryService;
+    private final VOCCategoryService vocCategoryService;
 
     @Override
     public List<VOCDTO> findAllByVOC() {
@@ -95,11 +95,11 @@ public class VOCServiceImpl implements VOCService {
 
     @Override
     public Map<Integer, Long> countVOCByCategory(LocalDateTime startDate, LocalDateTime endDate){
-        List<VocCategoryDTO> vocCategoryDTOList = vocCategoryService.findAll();
+        List<VOCCategoryDTO> VOCCategoryDTOList = vocCategoryService.findAll();
 
         Map<Integer, Long> categoryCountMap = new HashMap<>();
 
-        vocCategoryDTOList.forEach(category -> {
+        VOCCategoryDTOList.forEach(category -> {
             int vocCategoryCode = category.getVocCategoryCode();
             long count;
             if(startDate != null && endDate != null) {
