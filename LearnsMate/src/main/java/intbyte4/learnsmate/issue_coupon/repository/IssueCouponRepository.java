@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.issue_coupon.repository;
 
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
+import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -42,4 +43,21 @@ public interface IssueCouponRepository extends JpaRepository<IssueCoupon, Long> 
             @Param("studentCode") Long studentCode,
             @Param("currentDate") LocalDateTime currentDate);
 
+    @Query("SELECT new intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO(" +
+            "ic.couponIssuanceCode, " +
+            "c.couponName, " +
+            "c.couponContents, " +
+            "c.couponCategory, " +
+            "s.memberCode, " +
+            "s.memberName, " +
+            "ic.couponUseStatus, " +
+            "c.couponDiscountRate, " +
+            "c.couponStartDate, " +
+            "c.couponExpireDate, " +
+            "ic.couponUseDate, " +
+            "ic.couponIssueDate) " +
+            "FROM issueCoupon ic " +
+            "JOIN ic.coupon c " +
+            "JOIN ic.student s")
+    List<AllIssuedCouponDTO> findAllIssuedCoupons();
 }
