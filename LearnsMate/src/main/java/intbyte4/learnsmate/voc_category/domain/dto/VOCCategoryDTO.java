@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 @Builder
-public class VocCategoryDTO {
+public class VOCCategoryDTO {
     private Integer vocCategoryCode;
     private String vocCategoryName;
 }
