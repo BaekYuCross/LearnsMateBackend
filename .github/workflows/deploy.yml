@@ -71,7 +71,7 @@ jobs:
 
           token:
             expiration_time: 43200000
-            secret: \${token.secret}
+            secret: \${TOKEN_SECRET}
           EOL
 
       - name: Set application.yml with Secrets
@@ -87,7 +87,7 @@ jobs:
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          token.secret: ${{ secrets.JWT_SECRET }}
+          TOKEN_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
