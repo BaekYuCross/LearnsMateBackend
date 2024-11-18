@@ -6,6 +6,5 @@ import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterReque
 import java.util.List;
 
 public interface CustomIssueCouponRepository {
-
-    List<AllIssuedCouponDTO> findIssuedCouponsByFilters (IssueCouponFilterRequestVO request);
+    List<AllIssuedCouponDTO> findIssuedCouponsByFilters(IssueCouponFilterRequestVO request);
 }

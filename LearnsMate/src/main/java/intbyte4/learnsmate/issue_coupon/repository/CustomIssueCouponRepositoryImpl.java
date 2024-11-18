@@ -8,6 +8,8 @@ import intbyte4.learnsmate.issue_coupon.domain.QIssueCoupon;
 import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
 import jakarta.persistence.EntityManager;
+import intbyte4.learnsmate.coupon.domain.entity.QCouponEntity;
+import intbyte4.learnsmate.member.domain.entity.QMember;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,6 +29,8 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
     @Override
     public List<AllIssuedCouponDTO> findIssuedCouponsByFilters (IssueCouponFilterRequestVO request) {
         QIssueCoupon issueCoupon = QIssueCoupon.issueCoupon;
+        QMember member = QMember.member;
+        QCouponEntity couponEntity = QCouponEntity.couponEntity;
 
         BooleanBuilder builder = new BooleanBuilder()
                 .and(eqCouponIssuanceCode(request))

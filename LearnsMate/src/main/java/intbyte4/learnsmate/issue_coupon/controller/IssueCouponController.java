@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.issue_coupon.controller;
 
 import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
+import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponFacade;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
@@ -67,5 +68,12 @@ public class IssueCouponController {
     public ResponseEntity<List<AllIssuedCouponDTO>> findAllIssuedCoupons() {
         List<AllIssuedCouponDTO> issuedCoupons = issueCouponService.getAllIssuedCoupons();
         return ResponseEntity.ok(issuedCoupons);
+    }
+
+    @Operation(summary = "발급된 쿠폰 필터링 조회")
+    @GetMapping("/filter")
+    public ResponseEntity<List<AllIssuedCouponDTO>> findIssuedCouponsByFilters(@RequestBody IssueCouponFilterRequestVO request) {
+        List<AllIssuedCouponDTO> filteredCoupons = issueCouponService.getFilteredIssuedCoupons(request);
+        return new ResponseEntity<>(filteredCoupons, HttpStatus.OK);
     }
 }

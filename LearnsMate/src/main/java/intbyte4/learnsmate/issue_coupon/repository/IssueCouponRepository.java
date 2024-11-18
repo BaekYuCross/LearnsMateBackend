@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("issueCouponRepository")
-public interface IssueCouponRepository extends JpaRepository<IssueCoupon, Long> {
+@Repository
+public interface IssueCouponRepository extends JpaRepository<IssueCoupon, Long>, CustomIssueCouponRepository {
 
     @Query("SELECT ic FROM issueCoupon ic " +
             "WHERE ic.student.memberCode = :studentCode " +
