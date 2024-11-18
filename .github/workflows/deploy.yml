@@ -32,6 +32,16 @@ jobs:
       - name: Install envsubst
         run: sudo apt-get install -y gettext
 
+      - name: Generate Secret Key
+        id: generate-secret
+        run: |
+          key=$(openssl rand -base64 64)
+          echo "Generated Key: $key"
+          echo "SECRET_KEY=$key" >> $GITHUB_ENV
+
+      - name: Load Secret Key from GitHub Secrets
+        run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+
       - name: Create application.yml.template
         working-directory: LearnsMate
         run: |
