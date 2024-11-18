@@ -115,17 +115,6 @@ jobs:
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
-      - name: Configure Elastic Beanstalk Environment Variables
-        run: |
-          aws elasticbeanstalk update-environment \
-            --application-name "intbyte-env" \
-            --environment-name "Intbyte-env" \
-            --option-settings Namespace=aws:elasticbeanstalk:application:environment,OptionName=token.secret,Value=${{ secrets.JWT_SECRET }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-northeast-2
-
       - name: Deploy to Beanstalk1
         uses: einaregilsson/beanstalk-deploy@v22
         with:
