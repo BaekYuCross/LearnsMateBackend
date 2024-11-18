@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.voc.domain;
 
 import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.voc_category.domain.VocCategory;
+import intbyte4.learnsmate.voc_category.domain.VOCCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,7 +39,7 @@ public class VOC {
 
     @ManyToOne
     @JoinColumn(name = "voc_category_code", nullable = false)
-    private VocCategory vocCategory;
+    private VOCCategory vocCategory;
 
     @ManyToOne
     @JoinColumn(name = "member_code", nullable = false)

@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @Builder
-public class VocCategory {
+public class VOCCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -44,10 +44,10 @@ public class MemberService {
         return memberDTOList;
     }
 
-    public Member findByStudentCode(Long memberCode) {
+    public MemberDTO findByStudentCode(Long memberCode) {
         Member student = memberRepository.findById(memberCode).orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
         if (!student.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.RESTRICTED);
-        return student;
+        return memberMapper.fromMembertoMemberDTO(student);
     }
 
     // 멤버 회원정보 수정 메서드
