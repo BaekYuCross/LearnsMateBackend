@@ -6,7 +6,7 @@ import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.vo.reqeust.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
-import intbyte4.learnsmate.voc.mapper.VOCMapper;
+import intbyte4.learnsmate.voc.service.VOCFacade;
 import intbyte4.learnsmate.voc.service.VOCService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +27,12 @@ import java.util.stream.Collectors;
 public class VOCController {
 
     private final VOCService vocService;
-    private final VOCMapper vocMapper;
+    private final VOCFacade vocFacade;
 
     @Operation(summary = "직원 - VOC 전체 조회")
     @GetMapping("/list")
     public ResponseEntity<List<ResponseFindVOCVO>> listVOC() {
-        List<VOCDTO> vocDTOList = vocService.findAllByVOC();
-        List<ResponseFindVOCVO> response = new ArrayList<>();
-        for (VOCDTO vocDTO : vocDTOList) {
-            ResponseFindVOCVO vocVO = vocMapper.fromDTOToResponseVO(vocDTO);
-            response.add(vocVO);
-        }
+        List<ResponseFindVOCVO> response = vocFacade.findAllVOCs();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -46,8 +41,7 @@ public class VOCController {
     public ResponseEntity<?> getVOC(@PathVariable("vocCode") Long vocCode) {
         log.info("조회 요청된 VOC 코드 : {}", vocCode);
         try {
-            VOCDTO vocdto = vocService.findByVOCCode(vocCode);
-            ResponseFindVOCVO response = vocMapper.fromDTOToResponseVO(vocdto);
+            ResponseFindVOCVO response = vocFacade.findVOC(vocCode);
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {
@@ -64,10 +58,12 @@ public class VOCController {
     public ResponseEntity<List<ResponseFindVOCVO>> listUnansweredVOC(@PathVariable("memberCode") Long memberCode) {
         log.info("특정 유저 미답변 VOC 조회 요청: userCode = {}", memberCode);
         List<VOCDTO> vocDTOList = vocService.findUnansweredVOCByMember(memberCode);
-        List<ResponseFindVOCVO> response = vocDTOList.stream()
-                .map(vocMapper::fromDTOToResponseVO)
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+        for (VOCDTO vocdto : vocDTOList) {
+            ResponseFindVOCVO response = vocFacade.findVOC(vocdto.getVocCode());
+            responseList.add(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
     @Operation(summary = "직원 - 특정 유저 답변 VOC 리스트 조회")
@@ -75,18 +71,18 @@ public class VOCController {
     public ResponseEntity<List<ResponseFindVOCVO>> listAnsweredVOC(@PathVariable("memberCode") Long memberCode) {
         log.info("특정 유저 답변 VOC 조회 요청: userCode = {}", memberCode);
         List<VOCDTO> vocDTOList = vocService.findAnsweredVOCByMember(memberCode);
-        List<ResponseFindVOCVO> response = vocDTOList.stream()
-                .map(vocMapper::fromDTOToResponseVO)
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+        for (VOCDTO vocdto : vocDTOList) {
+            ResponseFindVOCVO response = vocFacade.findVOC(vocdto.getVocCode());
+            responseList.add(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
     @Operation(summary = "직원 - 기간 별 VOC 카테고리 별 개수 조회")
     @GetMapping("/count-by-category")
-    public ResponseEntity<List<ResponseCountByCategoryVO>> countVOCByCategory
-            (@RequestBody RequestCountByCategoryVO requestVO) {
-        Map<Integer, Long> categoryCountMap = vocService.countVOCByCategory
-                (requestVO.getStartDate(), requestVO.getEndDate());
+    public ResponseEntity<List<ResponseCountByCategoryVO>> countVOCByCategory(@RequestBody RequestCountByCategoryVO requestVO) {
+        Map<Integer, Long> categoryCountMap = vocService.countVOCByCategory(requestVO.getStartDate(), requestVO.getEndDate());
         List<ResponseCountByCategoryVO> response = categoryCountMap.entrySet().stream()
                 .map(entry -> ResponseCountByCategoryVO.builder()
                         .vocCategoryCode(entry.getKey())

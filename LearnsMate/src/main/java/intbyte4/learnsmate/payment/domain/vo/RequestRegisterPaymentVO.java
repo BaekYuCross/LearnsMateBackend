@@ -18,10 +18,5 @@ public class RequestRegisterPaymentVO {
     private RequestRegisterIssueCouponPaymentVO issueCouponVO;
     private RequestRegisterMemberPaymentVO memberVO;
     private RequestRegisterLecturePaymentVO LectureVO;
-
-    private Long paymentCode;
     private Integer paymentPrice;
-    private LocalDateTime createdAt;
-    private Long lectureByStudentCode;
-    private String couponIssuanceCode;
 }

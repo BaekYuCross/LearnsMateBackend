@@ -94,7 +94,8 @@ public class LectureFacade {
         result.lectureDTO().setLecturePrice(result.lectureDTO().getLecturePrice() * (1 - couponDTO.getCouponDiscountRate() / 100));
         result.issueCouponDTO().setCouponUseStatus(true);
 
-        Member student = memberService.findByStudentCode(result.issueCouponDTO.getStudentCode());
+        MemberDTO studentDTO = memberService.findByStudentCode(result.issueCouponDTO.getStudentCode());
+        Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
         issueCouponService.updateCouponUseStatus(result.issueCouponDTO(), student, couponEntity);
     }
 

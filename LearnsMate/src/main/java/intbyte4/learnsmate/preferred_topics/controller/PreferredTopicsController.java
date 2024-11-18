@@ -1,16 +1,20 @@
 package intbyte4.learnsmate.preferred_topics.controller;
 
+import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicStatsConvertDTO;
 import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicsDTO;
 import intbyte4.learnsmate.preferred_topics.domain.vo.request.RequestSavePreferredHistoryVO;
+import intbyte4.learnsmate.preferred_topics.domain.vo.response.ResponseFindMonthlyStatsVO;
 import intbyte4.learnsmate.preferred_topics.domain.vo.response.ResponseFindPreferredTopicsVO;
 import intbyte4.learnsmate.preferred_topics.mapper.PreferredTopicsMapper;
 import intbyte4.learnsmate.preferred_topics.service.PreferredTopicsService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -69,5 +73,17 @@ public class PreferredTopicsController {
         preferredTopicsService.savePreferredTopics(dtoList);
 
         return ResponseEntity.status(HttpStatus.OK).body("선호 주제 등록 성공");
+    }
+
+    @GetMapping("/monthly-stats")
+    public ResponseEntity<?> getMonthlyCategoryStats(
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate
+    ){
+        List<PreferredTopicStatsConvertDTO> dtoList = preferredTopicsService.getMonthlyCategoryStats(startDate, endDate);
+
+        List<ResponseFindMonthlyStatsVO> voList = preferredTopicsMapper.fromPreferredTopicStatsConvertDTOtoVO(dtoList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(voList);
     }
 }

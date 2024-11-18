@@ -2,7 +2,9 @@ package intbyte4.learnsmate.issue_coupon.service;
 
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +19,15 @@ public class IssueCouponFacade {
 
     private final MemberService memberService;
     private final IssueCouponService issueCouponService;
+    private final MemberMapper memberMapper;
 
     @Transactional
     public List<IssueCouponDTO> issueCouponsToStudents(IssueCouponRegisterRequestVO request) {
         List<IssueCouponDTO> issuedCoupons = new ArrayList<>();
 
         for (Long studentCode : request.getStudentCodes()) {
-            Member student = memberService.findByStudentCode(studentCode);
+            MemberDTO studentDTO = memberService.findByStudentCode(studentCode);
+            Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
             issuedCoupons.addAll(issueCouponsToStudent(student, request.getCouponCodes()));
         }
 
