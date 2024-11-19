@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -56,8 +57,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             RequestLoginVO creds = new ObjectMapper().readValue(request.getInputStream(), RequestLoginVO.class);
 
             return getAuthenticationManager().authenticate(
-                    new UsernamePasswordAuthenticationToken(creds.getUserCode(), creds.getUserPassword(), new ArrayList<>())
-            );
+                    new UsernamePasswordAuthenticationToken(
+                             creds.getAdminCode(), // 사용자 사번
+                            creds.getAdminPassword(), // 사용자 비밀번호
+                            new ArrayList<>()
+                    ));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -70,47 +74,34 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // 로그인 성공 후 security가 관리하는 principal 객체를 로그로 출력
         log.info("로그인 성공하고 security가 관리하는 principal 객체(authResult): {}", authResult);
 
-        // 로그인 후 인증된 Authentication 객체를 사용하여 JWT 토큰 생성 준비 -> JWT 생성 시 사용할 시크릿 키를 로그로 출력
-        log.info("시크릿 키: " + env.getProperty("token.secret"));
-
-        // JWT의 payload에 담을 정보들을 수집 (id, 권한들, 만료 시간 등) -> 인증된 사용자의 관리자 코드(사번 등) 가져오기
-        Long adminCode = ((Admin)authResult.getPrincipal()).getAdminCode();
-
-        // CustomUserDetails로 인증 객체를 캐스팅하여 사용자 정보를 가져옴
-        CustomUserDetails userDetails = null;
-
-        if (authResult.getPrincipal() instanceof CustomUserDetails) {  // 인증 객체가 CustomUserDetails인 경우
-            userDetails = (CustomUserDetails) authResult.getPrincipal();  // 인증 객체를 CustomUserDetails로 캐스팅
-            log.info("userDetails: {}", userDetails);  // userDetails 정보 출력
-            log.info("Authentication: {}", authResult);  // Authentication 객체 출력
-            // 이후 작업 계속
-        } else {
-            // 인증 객체가 CustomUserDetails가 아닐 경우 예외 처리
-            throw new IllegalArgumentException("인증 객체가 CustomUserDetails가 아닙니다.");
+        // Principal 객체 확인 및 캐스팅
+        if (!(authResult.getPrincipal() instanceof CustomUserDetails)) {
+            throw new IllegalArgumentException("Authentication 객체가 CustomUserDetails 타입이 아닙니다.");
         }
 
-        // 사용자 정보를 JWT에 담기 위한 준비
-        String userCode = userDetails.getUsername(); // 사번 (username으로 저장된 사번)
-        String userEmail = userDetails.getUserDTO().getAdminEmail(); // 이메일
-        String userName = userDetails.getUserDTO().getAdminName(); // 사용자 이름
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
 
-        // 로그로 인증된 회원 정보 출력
-        log.info("인증된 회원의 userCode: " + userCode);
-        log.info("인증된 회원의 email: " + userEmail);
-        log.info("인증된 회원의 userNickname: " + userName);
+        // 사용자 정보 가져오기
+        String userCode = userDetails.getUsername(); // username이 userCode로 설정
+        String userEmail = userDetails.getUserDTO().getAdminEmail(); // 이메일
+        String userName = userDetails.getUserDTO().getAdminName(); // 이름
+
+        log.info("인증된 사용자 정보 - userCode: {}, email: {}, userName: {}", userCode, userEmail, userName);
 
         // 인증된 사용자의 권한을 가져와 List<String>으로 변환
-        List<String> roles = authResult.getAuthorities().stream()  // 권한 리스트를 스트림으로 처리
-                .map(role -> role.getAuthority())  // 권한의 이름을 가져옴
-                .collect(Collectors.toList());  // List로 변환
+        List<String> roles = authResult.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
         log.info("roles: {}", roles.toString());  // 권한 목록 출력
 
         // JWT 생성: JwtTokenDTO에 사용자 정보를 담고, roles와 함께 JWT 토큰을 생성
-        JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);  // JwtTokenDTO에 사번, 이메일, 이름을 담음
+        JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
         String token = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
 
         // 생성된 JWT 토큰을 Authorization 헤더에 추가하여 응답 -> 생성된 JWT 토큰을 Authorization 헤더에 담아 응답으로 전송
-        response.addHeader(HttpHeaders.AUTHORIZATION, token);
+        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+
+        log.info("JWT 생성 완료. Authorization 헤더에 추가됨.");
     }
 
 
