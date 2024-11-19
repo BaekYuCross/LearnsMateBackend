@@ -3,14 +3,14 @@ package intbyte4.learnsmate.admin.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.repository.AdminRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminServiceImpl implements AdminService {
 
     private final AdminRepository adminRepository;
@@ -42,11 +43,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        Admin admin = adminRepository.findByAdminName(username);
-
-        if (admin == null) throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
-
+        Admin admin = adminRepository.findById(Long.parseLong(username))
+                .orElseThrow(() -> new CommonException(StatusEnum.ADMIN_NOT_FOUND));
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
@@ -62,7 +60,9 @@ public class AdminServiceImpl implements AdminService {
         if (!admin.getAdminStatus()) throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         // 고객의 학생과 강사도 가져와서 예외처리랑 역할 분배 해주기
 
-        return new User(admin.getAdminEmail(), admin.getAdminPassword(), true, true, true, true, grantedAuthorities);
+        AdminDTO adminDTO = adminMapper.toDTO(admin);
+
+        return new CustomUserDetails(adminDTO, grantedAuthorities, true, true, true, true);
     }
 }
 

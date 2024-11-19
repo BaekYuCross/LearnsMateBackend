@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestLoginVO {
 
-    private Long userCode;
-    private String userEmail;
-    private String userPassword;
-
+    private String adminCode;
+    private String adminPassword;
 }
