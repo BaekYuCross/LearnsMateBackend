@@ -83,7 +83,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign-template/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
-
+                                .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
                                 .anyRequest().authenticated()
                 )
                 // UserDetails를 상속받는 Service 계층 + BCrypt 암호화
