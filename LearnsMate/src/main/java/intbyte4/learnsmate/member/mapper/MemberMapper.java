@@ -8,8 +8,7 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterStudentVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterTutorVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMembertVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
@@ -185,25 +184,7 @@ public class MemberMapper{
                 .build();
     }
 
-    public MemberFilterRequestDTO fromRequestFilterStudentVOtoMemberFilterRequestDTO(RequestFilterStudentVO request) {
-        return MemberFilterRequestDTO.builder()
-                .memberCode(request.getMemberCode())
-                .memberName(request.getMemberName())
-                .memberType(request.getMemberType())
-                .memberEmail(request.getMemberEmail())
-                .memberPhone(request.getMemberPhone())
-                .memberAddress(request.getMemberAddress())
-                .memberStartAge(request.getMemberStartAge())
-                .memberEndAge(request.getMemberEndAge())
-                .birthStartDate(request.getBirthStartDate())
-                .birthEndDate(request.getBirthEndDate())
-                .memberFlag(request.getMemberFlag())
-                .memberDormantFlag(request.getMemberDormantFlag())
-                .createdStartDate(request.getCreatedStartDate())
-                .createdEndDate(request.getCreatedEndDate())
-                .build();
-    }
-    public MemberFilterRequestDTO fromRequestFiltertutorVOtoMemberFilterRequestDTO(RequestFilterTutorVO request) {
+    public MemberFilterRequestDTO fromRequestFilterVOtoMemberFilterRequestDTO(RequestFilterMembertVO request) {
         return MemberFilterRequestDTO.builder()
                 .memberCode(request.getMemberCode())
                 .memberName(request.getMemberName())

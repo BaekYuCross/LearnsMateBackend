@@ -10,6 +10,7 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.repository.MemberRepository;
 import intbyte4.learnsmate.member.repository.MemberRepositoryCustom;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -73,10 +75,10 @@ public class MemberService {
     public MemberDTO findMemberByMemberCode(Long memberCode, MemberType memberType) {
         Member member = memberRepository.findByMemberFlagTrueAndMemberCodeAndMemberType(memberCode, memberType);
 
-        if(memberType.equals(MemberType.STUDENT)){ // 학생을 찾는 경우
-            if(member.getMemberType().equals(MemberType.STUDENT)){ throw new CommonException(StatusEnum.RESTRICTED); }
-        }else if(memberType.equals(MemberType.TUTOR)){ // 강사를 찾는 경우
-            if(member.getMemberType().equals(MemberType.TUTOR)){ throw new CommonException(StatusEnum.RESTRICTED); }
+        if(memberType.equals(MemberType.STUDENT) && member.getMemberType().equals(MemberType.TUTOR)){ // 학생을 찾는데 강사인 경우
+             throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
+        }else if(memberType.equals(MemberType.TUTOR) && member.getMemberType().equals(MemberType.STUDENT)){ // 강사를 찾는 경우
+             throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
         }
 
         return memberMapper.fromMembertoMemberDTO(member);
