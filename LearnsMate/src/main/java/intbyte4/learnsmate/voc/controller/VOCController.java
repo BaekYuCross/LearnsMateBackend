@@ -33,12 +33,13 @@ public class VOCController {
     @GetMapping("/list")
     public ResponseEntity<List<ResponseFindVOCVO>> listVOC() {
         List<ResponseFindVOCVO> response = vocFacade.findAllVOCs();
+        log.info(response.get(0).toString());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "직원 - VOC 단 건 조회")
     @GetMapping("/{vocCode}")
-    public ResponseEntity<?> getVOC(@PathVariable("vocCode") Long vocCode) {
+    public ResponseEntity<?> getVOC(@PathVariable("vocCode") String vocCode) {
         log.info("조회 요청된 VOC 코드 : {}", vocCode);
         try {
             ResponseFindVOCVO response = vocFacade.findVOC(vocCode);

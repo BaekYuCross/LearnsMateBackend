@@ -15,6 +15,6 @@ public class VOCAnswerDTO {
     private String vocAnswerContent;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long vocCode;
+    private String vocCode;
     private Long adminCode;
 }
