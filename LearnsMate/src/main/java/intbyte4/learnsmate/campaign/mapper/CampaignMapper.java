@@ -3,6 +3,7 @@ package intbyte4.learnsmate.campaign.mapper;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
@@ -107,7 +108,7 @@ public class CampaignMapper {
                 .build();
     }
 
-    public List<ResponseFindCampaignVO> fromDtoListToFindCampaignVO(List<CampaignDTO> dtoList) {
+    public List<ResponseFindCampaignVO> fromDtoListToFindCampaignVO(List<FindAllCampaignDTO> dtoList) {
         return dtoList.stream().map(dto -> ResponseFindCampaignVO.builder()
                 .campaignCode(dto.getCampaignCode())
                 .campaignTitle(dto.getCampaignTitle())
@@ -117,6 +118,7 @@ public class CampaignMapper {
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
                 .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
                 .build()).collect(Collectors.toList());
     }
 
@@ -140,5 +142,19 @@ public class CampaignMapper {
                 .updatedAt(dto.getUpdatedAt())
                 .adminCode(dto.getAdminCode())
                 .build()).collect(Collectors.toList());
+    }
+
+    public FindAllCampaignDTO toFindAllCampaignDTO(CampaignDTO campaignDTO, String adminName) {
+        return FindAllCampaignDTO.builder()
+                .campaignCode(campaignDTO.getCampaignCode())
+                .campaignTitle(campaignDTO.getCampaignTitle())
+                .campaignContents(campaignDTO.getCampaignContents())
+                .campaignType(campaignDTO.getCampaignType())
+                .campaignSendDate(campaignDTO.getCampaignSendDate())
+                .createdAt(campaignDTO.getCreatedAt())
+                .updatedAt(campaignDTO.getUpdatedAt())
+                .adminCode(campaignDTO.getAdminCode())
+                .adminName(adminName)
+                .build();
     }
 }
