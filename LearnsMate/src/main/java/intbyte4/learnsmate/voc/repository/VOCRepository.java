@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface VOCRepository extends JpaRepository<VOC, Long>, VOCRepositoryCustom {
+public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepositoryCustom {
 
     @Query("SELECT v FROM Voc v " +
             "WHERE v.member.memberCode = :memberCode " +

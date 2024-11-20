@@ -35,8 +35,8 @@ public class VOCFacade {
             MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
             VOCCategoryDTO categoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
 
-            VOCAnswerDTO vocAnswerDTO = vocAnswerService.findById(vocDTO.getVocCode());
-            AdminDTO adminDTO = adminService.findByAdminCode(vocAnswerDTO.getAdminCode());
+            VOCAnswerDTO vocAnswerDTO = vocAnswerService.findByVOCCode(vocDTO.getVocCode());
+            AdminDTO adminDTO = vocAnswerDTO != null ? adminService.findByAdminCode(vocAnswerDTO.getAdminCode()) : null;
 
             ResponseFindVOCVO responseVO = vocMapper.fromDTOToResponseVO(vocDTO, memberDTO, categoryDTO, adminDTO);
 
@@ -46,11 +46,12 @@ public class VOCFacade {
         return responseList;
     }
 
-    public ResponseFindVOCVO findVOC(Long vocCode) {
+
+    public ResponseFindVOCVO findVOC(String vocCode) {
         VOCDTO vocDTO = vocService.findByVOCCode(vocCode);
         MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
         VOCCategoryDTO categoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
-        VOCAnswerDTO vocAnswerDTO = vocAnswerService.findById(vocDTO.getVocCode());
+        VOCAnswerDTO vocAnswerDTO = vocAnswerService.findByVOCCode(vocDTO.getVocCode());
         AdminDTO adminDTO = adminService.findByAdminCode(vocAnswerDTO.getAdminCode());
 
         return vocMapper.fromDTOToResponseVO(vocDTO, memberDTO, categoryDTO, adminDTO);

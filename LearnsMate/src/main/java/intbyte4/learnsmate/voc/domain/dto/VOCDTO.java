@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 public class VOCDTO {
-    private Long vocCode;
+    private String vocCode;
     private String vocContent;
     private Boolean vocAnswerStatus;
     private String vocAnswerSatisfaction;

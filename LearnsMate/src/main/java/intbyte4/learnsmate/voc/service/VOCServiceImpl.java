@@ -42,7 +42,7 @@ public class VOCServiceImpl implements VOCService {
     }
 
     @Override
-    public VOCDTO findByVOCCode(Long vocCode) {
+    public VOCDTO findByVOCCode(String vocCode) {
         log.info("VOC 단 건 조회 중: {}", vocCode);
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
@@ -51,7 +51,7 @@ public class VOCServiceImpl implements VOCService {
     }
 
     @Override
-    public void updateVOCAnswerStatus(Long vocCode, boolean vocAnswerStatus) {
+    public void updateVOCAnswerStatus(String vocCode, boolean vocAnswerStatus) {
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
         voc.setVocAnswerStatus(vocAnswerStatus);

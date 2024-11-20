@@ -10,9 +10,9 @@ import java.util.Map;
 public interface VOCService {
     List<VOCDTO> findAllByVOC();
 
-    VOCDTO findByVOCCode(Long vocDTO);
+    VOCDTO findByVOCCode(String vocDTO);
 
-    void updateVOCAnswerStatus(Long vocCode, boolean vocAnswerStatus);
+    void updateVOCAnswerStatus(String vocCode, boolean vocAnswerStatus);
 
     List<VOCDTO> findUnansweredVOCByMember(Long memberCode);
 
