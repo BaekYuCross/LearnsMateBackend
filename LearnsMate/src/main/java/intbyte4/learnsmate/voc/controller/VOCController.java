@@ -1,11 +1,14 @@
 package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestCountByCategoryVO;
+import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
+import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.service.VOCFacade;
 import intbyte4.learnsmate.voc.service.VOCService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,13 +31,13 @@ public class VOCController {
 
     private final VOCService vocService;
     private final VOCFacade vocFacade;
+    private final VOCMapper vocMapper;
 
-    @Operation(summary = "직원 - VOC 전체 조회")
+    @Operation(summary = "직원 - VOC 페이지 조회")
     @GetMapping("/list")
-    public ResponseEntity<List<ResponseFindVOCVO>> listVOC() {
-        List<ResponseFindVOCVO> response = vocFacade.findAllVOCs();
-        log.info(response.get(0).toString());
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+        VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPage(page, size);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "직원 - VOC 단 건 조회")
@@ -96,16 +99,12 @@ public class VOCController {
 
     @Operation(summary = "VOC 필터링")
     @PostMapping("/filter")
-    public ResponseEntity<List<VOCDTO>> filterVOC(@RequestBody VOCDTO vocDTO, MemberDTO memberDTO) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
         log.info("VOC 필터링 요청 수신");
         try {
-            List<VOCDTO> filteredVOCList = vocService.filterVOC(vocDTO, memberDTO);
-
-            log.info("VOC 필터링 성공, 필터링된 데이터 수: {}", filteredVOCList.size());
-            return ResponseEntity.ok(filteredVOCList);
-        } catch (CommonException e) {
-            log.error("VOC 필터링 실패: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            VOCFilterRequestDTO dto = vocMapper.fromFilterVOtoFilterDTO(request);
+            VOCPageResponse<ResponseFindVOCVO> response = vocFacade.filterVOCsByPage(dto, page, size);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("예상치 못한 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
