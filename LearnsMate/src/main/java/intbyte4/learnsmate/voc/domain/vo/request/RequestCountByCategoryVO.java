@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.voc.domain.vo.reqeust;
+package intbyte4.learnsmate.voc.domain.vo.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
