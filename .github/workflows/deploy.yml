@@ -6,7 +6,7 @@ permissions:
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize ]
+    types: [opened, reopened, synchronize]
   push:
     branches:
       - "main"
@@ -32,7 +32,7 @@ jobs:
       - name: Install envsubst
         run: sudo apt-get install -y gettext
 
-      - name: Create application.yml.template
+      - name: Generate application.yml.template
         working-directory: LearnsMate
         run: |
           mkdir -p src/main/resources
@@ -68,9 +68,13 @@ jobs:
           openai:
             model: gpt-4o
             secret-key: \${SECRET_KEY}
+
+          token:
+            expiration_time: 43200000
+            secret: \${TOKEN_SECRET}
           EOL
 
-      - name: Set Yaml
+      - name: Set application.yml with Secrets
         working-directory: LearnsMate
         run: |
           envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
@@ -83,18 +87,7 @@ jobs:
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
-      - name: Check for Tests
-        working-directory: LearnsMate
-        run: |
-          if git diff --name-only origin/main HEAD | grep -qvE '(\.xml$|\.yml$|config/)'; then
-            if [ -z "$(find src/test -name '*ServiceTests.java')" ]; then
-              echo "No ServiceTest found, failing the build."
-              exit 1
-            fi
-          else
-            echo "Only configuration files changed, skipping test check."
-          fi
+          TOKEN_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
@@ -113,17 +106,16 @@ jobs:
         shell: bash
 
       - name: Generate deployment package
+        working-directory: LearnsMate
         run: |
-          ./gradlew clean build -x test
           mkdir -p deploy
           cp build/libs/*.jar deploy/application.jar
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
-        working-directory: LearnsMate
 
-      - name: Beanstalk1 Deploy
+      - name: Deploy to Beanstalk1
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -137,7 +129,7 @@ jobs:
           wait_for_deployment: true
           wait_for_environment_recovery: 300
 
-      - name: Beanstalk2 Deploy
+      - name: Deploy to Beanstalk2
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}

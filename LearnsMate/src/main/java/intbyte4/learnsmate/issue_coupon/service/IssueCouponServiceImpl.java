@@ -5,7 +5,9 @@ import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
+import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
 import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
 import intbyte4.learnsmate.issue_coupon.repository.IssueCouponRepository;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -14,13 +16,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Qualifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service("issueCouponService")
+@Service
 @RequiredArgsConstructor
 public class IssueCouponServiceImpl implements IssueCouponService {
 
@@ -92,4 +95,16 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         IssueCoupon issueCoupon = issueCouponMapper.toEntity(issueCouponDTO, member, couponEntity);
         issueCouponRepository.save(issueCoupon);
     }
+
+    @Override
+    public List<AllIssuedCouponDTO> getAllIssuedCoupons() {
+        return issueCouponRepository.findAllIssuedCoupons();
+    }
+
+    @Override
+    public List<AllIssuedCouponDTO> getFilteredIssuedCoupons(IssueCouponFilterRequestVO request) {
+        List<AllIssuedCouponDTO> dtos = issueCouponRepository.findIssuedCouponsByFilters(request);
+        return dtos;
+    }
 }
+
