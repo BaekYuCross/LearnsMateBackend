@@ -30,8 +30,6 @@ public class AdminServiceImpl implements AdminService {
 
     private final AdminRepository adminRepository;
     private final AdminMapper adminMapper;
-    private final MemberMapper memberMapper;
-    private final MemberService memberService;
 
     @Override
     public AdminDTO findByAdminCode(Long adminCode) {
