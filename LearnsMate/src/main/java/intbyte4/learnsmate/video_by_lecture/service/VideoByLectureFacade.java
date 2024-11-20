@@ -14,6 +14,7 @@ import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.repository.VideoByLectureRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VideoByLectureFacade {
 
     private final VideoByLectureRepository videoByLectureRepository;
