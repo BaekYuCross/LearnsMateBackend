@@ -5,6 +5,7 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
@@ -180,12 +181,16 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<CampaignDTO> findAllCampaignList() {
-        List<Campaign> campaign = campaignRepository.findAll();
-        List<CampaignDTO> campaignDTOList = new ArrayList<>();
-        campaign.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));
+    public List<FindAllCampaignDTO> findAllCampaignList() {
+        List<Campaign> campaigns = campaignRepository.findAll();
+        List<FindAllCampaignDTO> findAllCampaignDTOList = new ArrayList<>();
+        for (Campaign campaign : campaigns) {
+            CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
+            findAllCampaignDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
+        }
 
-        return campaignDTOList;
+        return findAllCampaignDTOList;
     }
 
     @Override
