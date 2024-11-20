@@ -26,12 +26,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .and(eqMemberType(request.getMemberType()))
                 .and(likeEmail(request.getMemberEmail()))
                 .and(likeName(request.getMemberName()))
-                .and(eqAge(request.getMemberAge()))
+                .and(betweenAge(request.getMemberStartAge(), request.getMemberEndAge())) // 나이 범위
                 .and(likePhone(request.getMemberPhone()))
                 .and(likeAddress(request.getMemberAddress()))
-                .and(betweenBirth(request.getBirthStartDate(), request.getBirthEndDate()))      // 생년월일 범위
-                .and(betweenCreatedAt(request.getCreatedStartDate(), request.getCreatedEndDate())) // 생성일 범위
-                .and(betweenUpdatedAt(request.getUpdatedStartDate(), request.getUpdatedEndDate())); // 수정일 범위
+                .and(eqMemberFlag(request.getMemberFlag())) // 멤버 플래그
+                .and(eqMemberDormantFlag(request.getMemberDormantFlag())) // 휴면 멤버 플래그
+                .and(betweenBirth(request.getBirthStartDate(), request.getBirthEndDate())) // 생년월일 범위
+                .and(betweenCreatedAt(request.getCreatedStartDate(), request.getCreatedEndDate())); // 생성일 범위
 
         return queryFactory
                 .selectFrom(member)
@@ -59,9 +60,12 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return name == null ? null : QMember.member.memberName.containsIgnoreCase(name);
     }
 
-    // 나이 검색 조건
-    private BooleanExpression eqAge(Integer age) {
-        return age == null ? null : QMember.member.memberAge.eq(age);
+    // 나이 범위 검색 조건
+    private BooleanExpression betweenAge(Integer startAge, Integer endAge) {
+        if (startAge == null && endAge == null) return null;
+        if (startAge == null) return QMember.member.memberAge.loe(endAge);
+        if (endAge == null) return QMember.member.memberAge.goe(startAge);
+        return QMember.member.memberAge.between(startAge, endAge);
     }
 
     // 연락처 검색 조건
@@ -72,6 +76,16 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     // 주소 검색 조건
     private BooleanExpression likeAddress(String address) {
         return address == null ? null : QMember.member.memberAddress.containsIgnoreCase(address);
+    }
+
+    // 멤버 플래그 검색 조건
+    private BooleanExpression eqMemberFlag(Boolean memberFlag) {
+        return memberFlag == null ? null : QMember.member.memberFlag.eq(memberFlag);
+    }
+
+    // 휴면 멤버 플래그 검색 조건
+    private BooleanExpression eqMemberDormantFlag(Boolean memberDormantFlag) {
+        return memberDormantFlag == null ? null : QMember.member.memberDormantStatus.eq(memberDormantFlag);
     }
 
     // 생년월일 범위 검색 조건
@@ -88,13 +102,5 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         if (startDate == null) return QMember.member.createdAt.loe(endDate);
         if (endDate == null) return QMember.member.createdAt.goe(startDate);
         return QMember.member.createdAt.between(startDate, endDate);
-    }
-
-    // 수정일 범위 검색 조건
-    private BooleanExpression betweenUpdatedAt(LocalDateTime startDate, LocalDateTime endDate) {
-        if (startDate == null && endDate == null) return null;
-        if (startDate == null) return QMember.member.updatedAt.loe(endDate);
-        if (endDate == null) return QMember.member.updatedAt.goe(startDate);
-        return QMember.member.updatedAt.between(startDate, endDate);
     }
 }

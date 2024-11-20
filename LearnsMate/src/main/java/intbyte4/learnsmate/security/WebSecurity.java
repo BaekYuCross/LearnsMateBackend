@@ -80,6 +80,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/voc/filter", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc/count-by-category", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
                                 .anyRequest().authenticated()
                 )
