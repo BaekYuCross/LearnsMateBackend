@@ -38,9 +38,9 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public List<CouponDTO> findAllCoupons() {
 
-        List<CouponEntity> couponEntities = couponRepository.findAll();
+        List<CouponEntity> couponEntities = couponRepository.findAllByCouponFlagTrue();
         List<CouponDTO> couponDTOList = new ArrayList<>();
-        couponEntities.forEach(dto -> couponDTOList.add(couponMapper.toDTO(dto)));
+        couponEntities.forEach(entity -> couponDTOList.add(couponMapper.toDTO(entity)));
 
         return couponDTOList;
     }
