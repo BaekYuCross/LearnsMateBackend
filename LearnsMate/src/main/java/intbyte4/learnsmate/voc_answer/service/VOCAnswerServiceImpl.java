@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service("vocAnswerService")
@@ -84,6 +85,15 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     public VOCAnswerDTO findById(Long vocAnswerCode) {
         VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerCode).orElseThrow(() -> new CommonException(StatusEnum.VOC_ANSWER_NOT_FOUND));
         return vocAnswerMapper.fromEntityToDTO(vocAnswer);
+    }
+
+    @Override
+    public VOCAnswerDTO findByVOCCode(String vocCode) {
+        Optional<VOCAnswer> optionalVocAnswer = vocAnswerRepository.findByVoc_VocCode(vocCode);
+
+        return optionalVocAnswer
+                .map(vocAnswerMapper::fromEntityToDTO)
+                .orElse(null);
     }
 
     private VOC getVOC(VOCAnswerDTO vocAnswerDTO) {

@@ -21,7 +21,6 @@ public class VOCCategoryServiceImpl implements VOCCategoryService {
 
     @Override
     public VOCCategoryDTO findByVocCategoryCode(Integer vocCategoryCode) {
-        log.info("vocCategory 조회 중: {}", vocCategoryCode);
         VOCCategory vocCategory = vocCategoryRepository.findById(vocCategoryCode).orElseThrow(() -> new RuntimeException("vocCategoryCode not found"));
         return vocCategoryMapper.toDTO(vocCategory);
     }

@@ -16,6 +16,7 @@ public class VOCMapper {
         return VOCDTO.builder()
                 .vocCode(voc.getVocCode())
                 .vocContent(voc.getVocContent())
+                .createdAt(voc.getCreatedAt())
                 .vocAnswerStatus(voc.getVocAnswerStatus())
                 .vocAnswerSatisfaction(voc.getVocAnswerSatisfaction())
                 .vocCategoryCode(voc.getVocCategory().getVocCategoryCode())
@@ -23,7 +24,7 @@ public class VOCMapper {
                 .build();
     }
 
-    public ResponseFindVOCVO fromDTOToResponseVO(VOCDTO vocDTO,  MemberDTO memberDTO, VOCCategoryDTO categoryDTO, AdminDTO adminDTO) {
+    public ResponseFindVOCVO fromDTOToResponseVO(VOCDTO vocDTO, MemberDTO memberDTO, VOCCategoryDTO categoryDTO, AdminDTO adminDTO) {
         return ResponseFindVOCVO.builder()
                 .vocCode(vocDTO.getVocCode())
                 .vocContent(vocDTO.getVocContent())
@@ -31,17 +32,19 @@ public class VOCMapper {
                 .memberType(String.valueOf(memberDTO.getMemberType()))
                 .memberName(memberDTO.getMemberName())
                 .memberCode(memberDTO.getMemberCode())
-                .adminName(adminDTO.getAdminName())
+                .adminName(adminDTO != null ? adminDTO.getAdminName() : "-")
                 .createdAt(vocDTO.getCreatedAt())
                 .vocAnswerStatus(vocDTO.getVocAnswerStatus())
                 .vocAnswerSatisfaction(vocDTO.getVocAnswerSatisfaction())
                 .build();
     }
 
+
     public VOC toEntity(VOCDTO vocDTO, VOCCategory vocCategory, Member member) {
         return VOC.builder()
                 .vocCode(vocDTO.getVocCode())
                 .vocContent(vocDTO.getVocContent())
+                .createdAt(vocDTO.getCreatedAt())
                 .vocAnswerStatus(vocDTO.getVocAnswerStatus())
                 .vocAnswerSatisfaction(vocDTO.getVocAnswerSatisfaction())
                 .createdAt(vocDTO.getCreatedAt())
