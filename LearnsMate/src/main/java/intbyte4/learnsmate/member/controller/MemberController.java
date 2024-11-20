@@ -17,6 +17,7 @@ import intbyte4.learnsmate.member.service.MemberFacade;
 import intbyte4.learnsmate.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -120,13 +122,17 @@ public class MemberController {
     }
 
     @Operation(summary = "직원 - 학생 필터링 검색")
-    @GetMapping("/filter/student")
+    @PostMapping("/filter/student")
     public ResponseEntity<List<ResponseFindMemberVO>> findStudentByFilter(@RequestBody RequestFilterStudentVO request) {
 
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterStudentVOtoMemberFilterRequestDTO(request);
 
+        log.info("직원 필터링 요청 조건은: {}", dto);
+
         List<MemberDTO> memberDTOList = memberService.filterStudent(dto);
+
+        log.info("직원 필터링 결과는 : {}", memberDTOList.toString());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberDTOList.stream()

@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.contractprocess.domain.entity;
+package intbyte4.learnsmate.contract_status.domain.entity;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
@@ -8,22 +8,22 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 
-@Entity(name = "contract_process")
-@Table(name = "contract_process")
+@Entity(name = "contract_status")
+@Table(name = "contract_status")
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Getter
 @Builder
-public class ContractProcess {
+public class ContractStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contract_process_code", nullable = false)
-    private Long contractProcessCode;
+    @Column(name = "contract_status_code", nullable = false)
+    private Long contractStatusCode;
 
-    @Column(name = "approval_process", nullable = false)
-    private Integer approvalProcess;
+    @Column(name = "approval_status", nullable = false)
+    private Integer approvalStatus;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
