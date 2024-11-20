@@ -31,9 +31,6 @@ public class VOC {
     @Column(name = "voc_answer_satisfaction")
     private String vocAnswerSatisfaction;
 
-    @Column(name = "voc_analysis", nullable = false)
-    private String vocAnalysis;
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

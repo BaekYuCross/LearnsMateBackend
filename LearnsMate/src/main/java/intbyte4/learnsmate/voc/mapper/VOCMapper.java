@@ -18,7 +18,6 @@ public class VOCMapper {
                 .vocContent(voc.getVocContent())
                 .vocAnswerStatus(voc.getVocAnswerStatus())
                 .vocAnswerSatisfaction(voc.getVocAnswerSatisfaction())
-                .vocAnalysis(voc.getVocAnalysis())
                 .vocCategoryCode(voc.getVocCategory().getVocCategoryCode())
                 .memberCode(voc.getMember().getMemberCode())
                 .build();
@@ -45,7 +44,6 @@ public class VOCMapper {
                 .vocContent(vocDTO.getVocContent())
                 .vocAnswerStatus(vocDTO.getVocAnswerStatus())
                 .vocAnswerSatisfaction(vocDTO.getVocAnswerSatisfaction())
-                .vocAnalysis(vocDTO.getVocAnalysis())
                 .createdAt(vocDTO.getCreatedAt())
                 .vocCategory(vocCategory)
                 .member(member)

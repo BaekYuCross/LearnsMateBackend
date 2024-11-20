@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.contractprocess.domain.dto;
+package intbyte4.learnsmate.contract_status.domain.dto;
 
 import lombok.*;
 
@@ -11,10 +11,9 @@ import java.time.LocalDateTime;
 @ToString
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class ContractProcessDTO {
-
-    private Long contractProcessCode;
-    private Integer approvalProcess;
+public class ContractStatusDTO {
+    private Long contractStatusCode;
+    private Integer approvalStatus;
     private LocalDateTime createdAt;
     private String note;
     private String lectureCode;

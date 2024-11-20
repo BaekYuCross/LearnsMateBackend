@@ -3,7 +3,7 @@ package intbyte4.learnsmate.voc.controller;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
-import intbyte4.learnsmate.voc.domain.vo.reqeust.RequestCountByCategoryVO;
+import intbyte4.learnsmate.voc.domain.vo.request.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc.service.VOCFacade;
