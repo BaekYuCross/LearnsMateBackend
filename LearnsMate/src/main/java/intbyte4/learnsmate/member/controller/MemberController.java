@@ -127,6 +127,8 @@ public class MemberController {
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
+        dto.setMemberType(MemberType.STUDENT);
+
         List<MemberDTO> memberDTOList = memberService.filterStudent(dto);
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -141,6 +143,8 @@ public class MemberController {
 
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
+
+        dto.setMemberType(MemberType.TUTOR);
 
         List<MemberDTO> memberDTOList = memberService.filterTutor(dto);
 
