@@ -33,8 +33,8 @@ public class CouponMapper {
                 .couponStartDate(entity.getCouponStartDate())
                 .couponExpireDate(entity.getCouponExpireDate())
                 .couponCategoryCode(entity.getCouponCategory().getCouponCategoryCode())
-                .adminCode(entity.getAdmin().getAdminCode())
-                .tutorCode(entity.getTutor().getMemberCode())
+                .adminCode(entity.getAdmin() != null ? entity.getAdmin().getAdminCode() : null)
+                .tutorCode(entity.getTutor() != null ? entity.getTutor().getMemberCode() : null)
                 .build();
     }
 
