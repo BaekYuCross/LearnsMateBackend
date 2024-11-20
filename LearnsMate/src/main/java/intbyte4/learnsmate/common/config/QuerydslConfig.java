@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.config;
+package intbyte4.learnsmate.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

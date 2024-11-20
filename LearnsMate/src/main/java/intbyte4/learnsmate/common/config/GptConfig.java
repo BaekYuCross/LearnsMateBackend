@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.config;
+package intbyte4.learnsmate.common.config;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
