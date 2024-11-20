@@ -2,6 +2,7 @@ package intbyte4.learnsmate.member.domain.vo.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,12 +16,24 @@ import java.time.LocalDateTime;
 public class RequestFilterTutorVO {
 
     private Long memberCode;
-    private String memberName;           // 이름
-    private String memberPhone;          // 연락처
-    private String memberEmail;          // 이메일
-    private String memberAddress;        // 주소
-    private Integer memberAge;           // 나이
-    private LocalDateTime birthStartDate; // 생년월일 시작 범위
-    private LocalDateTime birthEndDate;   // 생년월일 종료 범위
-    private String memberStatus;         // 계정 상태
+    private String memberName;
+    private MemberType memberType;
+    private String memberEmail;
+    private String memberPhone;
+    private String memberAddress;
+
+    // 나이 범위
+    private Integer memberStartAge;
+    private Integer memberEndAge;
+
+    // 생년월일 범위
+    private LocalDateTime birthStartDate;
+    private LocalDateTime birthEndDate;
+
+    private Boolean memberFlag;
+    private Boolean memberDormantFlag;
+
+    // 생성일 범위
+    private LocalDateTime createdStartDate;
+    private LocalDateTime createdEndDate;
 }

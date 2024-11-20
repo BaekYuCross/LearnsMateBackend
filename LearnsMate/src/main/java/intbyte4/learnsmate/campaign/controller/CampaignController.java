@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
 import intbyte4.learnsmate.campaign.domain.vo.request.*;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
@@ -86,9 +87,9 @@ public class CampaignController {
     @Operation(summary = "직원 - 캠페인 전체 조회")
     @GetMapping("/campaigns")
     public ResponseEntity<List<ResponseFindCampaignVO>> getAllCampaigns() {
-        List<CampaignDTO> campaignDTOList = campaignService.findAllCampaignList();
+        List<FindAllCampaignDTO> findAllCampaignDTOList = campaignService.findAllCampaignList();
         List<ResponseFindCampaignVO> responseFindCampaignVOList = campaignMapper
-                .fromDtoListToFindCampaignVO(campaignDTOList);
+                .fromDtoListToFindCampaignVO(findAllCampaignDTOList);
 
         return new ResponseEntity<>(responseFindCampaignVOList, HttpStatus.OK);
     }
