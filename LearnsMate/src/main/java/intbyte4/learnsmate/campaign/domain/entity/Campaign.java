@@ -26,6 +26,7 @@ public class Campaign {
     private String campaignContents;
 
     @Column(name = "campaign_type")
+    @Enumerated(EnumType.STRING)
     private CampaignTypeEnum campaignType;
 
     @Column(name = "campaign_send_date")
