@@ -14,7 +14,6 @@ public class CouponCategoryServiceImpl implements CouponCategoryService {
 
     @Override
     public CouponCategory findByCouponCategoryCode(Integer couponCategoryCode) {
-        log.info("vocCategory 조회 중: {}", couponCategoryCode);
         return couponCategoryRepository.findById(couponCategoryCode).orElseThrow(() -> new RuntimeException("couponCategoryCode not found"));
     }
 }

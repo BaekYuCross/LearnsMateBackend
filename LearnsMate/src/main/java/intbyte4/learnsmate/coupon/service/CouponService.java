@@ -2,6 +2,7 @@ package intbyte4.learnsmate.coupon.service;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
@@ -18,8 +19,6 @@ public interface CouponService {
     CouponDTO findCouponDTOByCouponCode(Long couponCode);
 
     CouponEntity findByCouponCode(Long couponCode);
-
-    List<CouponDTO> getCouponsByFilters(CouponFilterRequestVO request);
 
     CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin);
 
@@ -39,4 +38,6 @@ public interface CouponService {
 
     @Transactional
     void saveCoupon(CouponEntity couponEntity);
+
+    List<CouponEntity> filterCoupons(CouponFilterDTO dto);
 }
