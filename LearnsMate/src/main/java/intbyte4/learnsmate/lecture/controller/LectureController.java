@@ -1,25 +1,25 @@
 package intbyte4.learnsmate.lecture.controller;
 
 import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
+import intbyte4.learnsmate.lecture.domain.vo.response.*;
+import intbyte4.learnsmate.lecture.pagination.CursorPaginationResponse;
 import intbyte4.learnsmate.lecture.service.LectureFacade;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,21 +44,25 @@ public class LectureController {
         }
     }
 
-    @Operation(summary = "강의 정보 전체 조회")
-    @GetMapping
-    public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
-        List<LectureDetailDTO> lectureDTOs = lectureFacade.getAllLecture();
-        List<ResponseFindLectureVO> lectureVOs = lectureDTOs.stream()
+    @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 조회")
+    @GetMapping("/list")
+    public ResponseEntity<CursorPaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
+            @RequestParam(defaultValue = "15") int pageSize) {
+
+        CursorPaginationResponse<LectureDetailDTO> lectureResponse = lectureFacade.getLecturesWithPagination(cursor, pageSize);
+        List<ResponseFindLectureVO> lectureVOs = lectureResponse.getData().stream()
                 .map(lectureMapper::fromDtoToResponseVO)
                 .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(lectureVOs);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new CursorPaginationResponse<>(lectureVOs, lectureResponse.getNextCursor()));
     }
 
-    @Operation(summary = "강의 단건 조회")
+    @Operation(summary = "강의 단 건 조회 + 클릭수 -> 실제 결제까지의 비율 조회")
     @GetMapping("/{lectureCode}")
-    public ResponseEntity<ResponseFindLectureVO> getLecture(@PathVariable("lectureCode") String lectureCode) {
-        LectureDetailDTO lectureDTO = lectureFacade.getLectureById(lectureCode);
-        return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
+    public ResponseEntity<ResponseFindLectureDetailVO> getLecture(@PathVariable("lectureCode") String lectureCode) {
+        ResponseFindLectureDetailVO lectureDetail = lectureFacade.getLectureById(lectureCode);
+        return ResponseEntity.status(HttpStatus.OK).body(lectureDetail);
     }
 
     @Operation(summary = "강의와 강의별 동영상 등록 요청")
