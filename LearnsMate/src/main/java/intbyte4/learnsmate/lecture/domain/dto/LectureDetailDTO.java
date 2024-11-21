@@ -22,7 +22,7 @@ public class LectureDetailDTO {
     private Long tutorCode;
     private String tutorName;
     private Boolean lectureStatus;
-    private String lectureCategory;
+    private String lectureCategoryName;
     private Integer lectureClickCount;
     private String lectureLevel;
     private int totalStudents;
