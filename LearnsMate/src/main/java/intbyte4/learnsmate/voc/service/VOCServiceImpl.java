@@ -3,6 +3,7 @@ package intbyte4.learnsmate.voc.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.voc.domain.VOC;
+import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
@@ -107,5 +108,15 @@ public class VOCServiceImpl implements VOCService {
     public Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable) {
         Page<VOC> vocPage = vocRepository.searchByWithPaging(dto, pageable);
         return vocPage.map(vocMapper::fromEntityToDTO);
+    }
+
+    @Override
+    public List<VOCCategoryCountDTO> getCategoryCounts() {
+        return vocRepository.countVocByCategory();
+    }
+
+    @Override
+    public List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        return vocRepository.countVocByCategoryWithinDateRange(startDate, endDate);
     }
 }

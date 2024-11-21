@@ -1,11 +1,13 @@
 package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
+import intbyte4.learnsmate.voc.domain.vo.request.VOCCategoryRatioFilterRequest;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
@@ -109,5 +111,19 @@ public class VOCController {
             log.error("예상치 못한 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @Operation(summary = "전체 VOC 카테고리별 건수 조회")
+    @GetMapping("/category-count")
+    public ResponseEntity<List<VOCCategoryCountDTO>> getCategoryCounts() {
+        List<VOCCategoryCountDTO> categoryCounts = vocFacade.getCategoryCounts();
+        return ResponseEntity.ok(categoryCounts);
+    }
+
+    @Operation(summary = "특정 기간 VOC 카테고리별 건수 조회")
+    @PostMapping("/category-count/filter")
+    public ResponseEntity<List<VOCCategoryCountDTO>> getFilteredCategoryCounts(@RequestBody VOCCategoryRatioFilterRequest request) {
+        List<VOCCategoryCountDTO> filteredCategoryCounts = vocFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
+        return ResponseEntity.ok(filteredCategoryCounts);
     }
 }

@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.voc.service;
 
+import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import org.springframework.data.domain.Page;
@@ -25,4 +26,8 @@ public interface VOCService {
     Page<VOCDTO> findAllByVOCWithPaging(Pageable of);
 
     Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable);
+
+    List<VOCCategoryCountDTO> getCategoryCounts();
+
+    List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate);
 }
