@@ -5,6 +5,8 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
+import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc_category.domain.VOCCategory;
 import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
@@ -50,6 +52,19 @@ public class VOCMapper {
                 .createdAt(vocDTO.getCreatedAt())
                 .vocCategory(vocCategory)
                 .member(member)
+                .build();
+    }
+
+    public VOCFilterRequestDTO fromFilterVOtoFilterDTO(RequestFilterVOCVO request) {
+        return VOCFilterRequestDTO.builder()
+                .vocCode(request.getVocCode())
+                .vocContent(request.getVocContent())
+                .vocCategoryCode(request.getVocCategoryCode())
+                .memberType(request.getMemberType())
+                .vocAnswerStatus(request.getVocAnswerStatus())
+                .vocAnswerSatisfaction(Boolean.FALSE.equals(request.getVocAnswerStatus()) ? null : request.getVocAnswerSatisfaction())
+                .startCreateDate(request.getStartCreateDate())
+                .startEndDate(request.getStartEndDate())
                 .build();
     }
 }
