@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.voc.repository;
 
 import intbyte4.learnsmate.voc.domain.VOC;
+import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +29,20 @@ public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepository
                                             @Param("endDate") LocalDateTime endDate);
 
     long countByVocCategory_VocCategoryCode(Integer vocCategoryCode);
+
+    @Query("SELECT new intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO(vc.vocCategoryCode, vc.vocCategoryName, COUNT(v)) " +
+            "FROM Voc v " +
+            "JOIN v.vocCategory vc  " +
+            "GROUP BY vc.vocCategoryCode, vc.vocCategoryName")
+    List<VOCCategoryCountDTO> countVocByCategory();
+
+    @Query("SELECT new intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO(vc.vocCategoryCode, vc.vocCategoryName, COUNT(v)) " +
+            "FROM Voc v " +
+            "JOIN v.vocCategory vc " +
+            "WHERE v.createdAt BETWEEN :startDate AND :endDate " +
+            "GROUP BY vc.vocCategoryCode, vc.vocCategoryName")
+    List<VOCCategoryCountDTO> countVocByCategoryWithinDateRange(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
 }

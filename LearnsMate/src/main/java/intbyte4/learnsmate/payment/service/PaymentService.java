@@ -10,15 +10,15 @@ import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import java.util.List;
 
 public interface PaymentService {
-    // 직원이 전체 결제 내역을 조회
     List<PaymentDTO> getAllPayments();
 
     List<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request);
 
-    // 직원이 특정 결제 내역을 단건 상세 조회
     PaymentDTO getPaymentDetails(Long paymentCode);
 
     PaymentDTO lectureAdaptedPayment(MemberDTO memberDTO, LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO);
 
     PaymentDTO lectureUnAdaptedPayment(MemberDTO memberDTO, LectureDTO lectureDTO);
+
+    int getPurchaseCountByLectureCode(String lectureCode);
 }
