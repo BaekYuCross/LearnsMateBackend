@@ -30,4 +30,12 @@ public class LectureCategoryByLectureMapper {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public LectureCategoryByLectureDTO toDTO(LectureCategoryByLecture lectureCategoryByLecture) {
+        return LectureCategoryByLectureDTO.builder()
+                .lectureCategoryByLectureCode(lectureCategoryByLecture.getLectureCategoryByLectureCode())
+                .lectureCategoryCode(lectureCategoryByLecture.getLectureCategory().getLectureCategoryCode())
+                .lectureCode(lectureCategoryByLecture.getLecture().getLectureCode())
+                .build();
+    }
 }

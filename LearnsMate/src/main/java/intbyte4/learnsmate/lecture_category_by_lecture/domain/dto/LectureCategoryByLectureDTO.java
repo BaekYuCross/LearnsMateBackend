@@ -10,7 +10,6 @@ import lombok.*;
 @Builder
 @ToString
 public class LectureCategoryByLectureDTO {
-
     private Long lectureCategoryByLectureCode;
     private String lectureCode;
     private Integer lectureCategoryCode;
