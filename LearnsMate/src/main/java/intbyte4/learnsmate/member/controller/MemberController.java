@@ -1,19 +1,18 @@
 package intbyte4.learnsmate.member.controller;
 
-import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
-import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
-import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
+import intbyte4.learnsmate.member.domain.dto.*;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMembertVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.service.MemberFacade;
 import intbyte4.learnsmate.member.service.MemberService;
+import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
+import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,30 +35,23 @@ public class MemberController {
 
     // 1. 모든 학생 조회(member_flag가 true인 사람 + member_type이 STUDENT)
     @GetMapping("/students")
-    public ResponseEntity<List<ResponseFindMemberVO>> findAllStudent() {
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
 
-        List<MemberDTO> memberDTOList = memberService.findAllMemberByMemberType(MemberType.STUDENT);
-
-        // DTO 리스트를 VO 리스트로 변환
-        List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
+        MemberPageResponse<ResponseFindMemberVO> response
+                = memberService.findAllMemberByMemberType(page, size, MemberType.STUDENT);
+        return ResponseEntity.ok(response);
     }
 
     // 1-2. 모든 강사 조회(member_flag가 true + member_type이 TUTOR)
     @GetMapping("/tutors")
-    public ResponseEntity<List<ResponseFindMemberVO>> findAllTutor() {
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutor(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
 
-        List<MemberDTO> memberDTOList = memberService.findAllMemberByMemberType(MemberType.TUTOR);
+        MemberPageResponse<ResponseFindMemberVO> response
+                = memberService.findAllMemberByMemberType(page, size, MemberType.TUTOR);
 
-        // DTO 리스트를 VO 리스트로 변환
-        List<ResponseFindMemberVO> responseVOList = memberDTOList.stream()
-                .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseVOList);
+        return ResponseEntity.ok(response);
     }
 
     // 2-1. 학생 단건 조회(member flag가 true + member_type이 STUDENT)
@@ -122,31 +114,35 @@ public class MemberController {
 
     @Operation(summary = "직원 - 학생 필터링 검색")
     @PostMapping("/filter/student")
-    public ResponseEntity<List<ResponseFindMemberVO>> findStudentByFilter(@RequestBody RequestFilterMembertVO request) {
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findStudentByFilter(
+            @RequestBody RequestFilterMembertVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
 
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
-        List<MemberDTO> memberDTOList = memberService.filterStudent(dto);
+        dto.setMemberType(MemberType.STUDENT);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(memberDTOList.stream()
-                        .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
-                        .collect(Collectors.toList()));
+        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterStudent(dto, page, size);
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "직원 - 강사 필터링 검색")
     @PostMapping("/filter/tutor")
-    public ResponseEntity<?> findTutorByFilter(@RequestBody RequestFilterMembertVO request) {
+    public ResponseEntity<?> findTutorByFilter(
+            @RequestBody RequestFilterMembertVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
 
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
-        List<MemberDTO> memberDTOList = memberService.filterTutor(dto);
+        dto.setMemberType(MemberType.TUTOR);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(memberDTOList.stream()
-                        .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
-                        .collect(Collectors.toList()));
+        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterTutor(dto, page, size);
+
+        return ResponseEntity.ok(response);
     }
 }
