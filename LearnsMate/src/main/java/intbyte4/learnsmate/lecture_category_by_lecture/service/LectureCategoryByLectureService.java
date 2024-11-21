@@ -8,6 +8,7 @@ import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
@@ -78,5 +79,11 @@ public class LectureCategoryByLectureService {
     @Transactional
     public void deleteByLectureCode(String lectureCode) {
         lectureCategoryByLectureRepository.deleteAllByLectureCode(lectureCode);
+    }
+
+    public String findLectureCategoryNameByLectureCode(String lectureCode) {
+        LectureCategoryByLectureDTO dto = lectureCategoryByLectureRepository.findLectureCategoryDetailsByLectureCode(lectureCode);
+        LectureCategoryEnum categoryName = lectureCategoryService.findLectureCategoryNameByCode(dto.getLectureCategoryCode());
+        return categoryName.name();
     }
 }

@@ -1,6 +1,5 @@
 package intbyte4.learnsmate.lecture_category_by_lecture.repository;
 
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCategoryByLecture;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +22,10 @@ public interface LectureCategoryByLectureRepository extends JpaRepository<Lectur
     @Query("DELETE FROM lectureCategoryByLecture lcl " +
             "WHERE lcl.lecture.lectureCode = :lectureCode")
     void deleteAllByLectureCode(@Param("lectureCode") String lectureCode);
+
+    @Query("SELECT new intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO(" +
+            "lcl.lectureCategoryByLectureCode, lcl.lecture.lectureCode, lcl.lectureCategory.lectureCategoryCode) " +
+            "FROM lectureCategoryByLecture lcl " +
+            "WHERE lcl.lecture.lectureCode = :lectureCode")
+    LectureCategoryByLectureDTO findLectureCategoryDetailsByLectureCode(@Param("lectureCode") String lectureCode);
 }
