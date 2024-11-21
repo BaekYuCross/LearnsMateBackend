@@ -20,7 +20,9 @@ import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureDetailVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
+import intbyte4.learnsmate.lecture.pagination.CursorPaginationResponse;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
@@ -31,6 +33,7 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
+import intbyte4.learnsmate.payment.service.PaymentService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
 import jakarta.transaction.Transactional;
@@ -63,6 +66,7 @@ public class LectureFacade {
     private final AdminService adminService;
     private final AdminMapper adminMapper;
     private final IssueCouponService issueCouponService;
+    private final PaymentService paymentService;
 
     @Transactional
     public LectureDTO discountLecturePrice(LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO) {
@@ -108,6 +112,17 @@ public class LectureFacade {
         AdminDTO adminDTO = adminService.findByAdminCode(couponDTOInfo.getAdminCode());
 
         return new Result(lectureDTO, tutor, lecture, issueCouponDTO, couponDTOInfo, couponCategory, adminDTO);
+    }
+
+    public CursorPaginationResponse<LectureDetailDTO> getLecturesWithPagination(LocalDateTime cursor, int pageSize) {
+        List<LectureDTO> lectureDTOs = lectureService.getLecturesWithPagination(cursor, pageSize);
+        List<LectureDetailDTO> lectureDetailDTOs = lectureDTOs.stream()
+                .map(this::buildLectureDetailDTO)
+                .collect(Collectors.toList());
+
+        LocalDateTime nextCursor = lectureDTOs.isEmpty() ? null : lectureDTOs.get(lectureDTOs.size() - 1).getCreatedAt();
+
+        return new CursorPaginationResponse<>(lectureDetailDTOs, nextCursor);
     }
 
     private record Result(LectureDTO lectureDTO, Member tutor, Lecture lecture, IssueCouponDTO issueCouponDTO, CouponDTO couponDTOInfo, CouponCategory couponCategory, AdminDTO adminDTO) {
@@ -177,23 +192,38 @@ public class LectureFacade {
         lecture.setLectureCode(lectureCodePrefix + "-" + date + "-" + randomUUID);
     }
 
-
-    public List<LectureDetailDTO> getAllLecture() {
-        List<LectureDTO> lectureList = lectureService.getAllLecture();
-
-        if (lectureList.isEmpty()) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-
-        return lectureList.stream()
-                .map(this::buildLectureDetailDTO)
-                .collect(Collectors.toList());
-    }
-
-    public LectureDetailDTO getLectureById(String lectureCode) {
-        LectureDTO lecture = lectureService.getLectureById(lectureCode);
-        if (lecture == null) {
+    public ResponseFindLectureDetailVO getLectureById(String lectureCode) {
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+        if (lectureDTO == null) {
             throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
         }
-        return buildLectureDetailDTO(lecture);
+
+        int purchaseCount = paymentService.getPurchaseCountByLectureCode(lectureCode);
+        double purchaseConversionRate = calculateConversionRate(lectureDTO.getLectureClickCount(), purchaseCount);
+        String lectureCategoryName = lectureCategoryByLectureService.findLectureCategoryNameByLectureCode(lectureCode);
+
+        return ResponseFindLectureDetailVO.builder()
+                .lectureCode(lectureDTO.getLectureCode())
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .tutorCode(lectureDTO.getTutorCode())
+                .lectureCategoryName(lectureCategoryName)
+                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
+                .createdAt(lectureDTO.getCreatedAt())
+                .lecturePrice(lectureDTO.getLecturePrice())
+                .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
+                .lectureStatus(lectureDTO.getLectureStatus())
+                .lectureImage(lectureDTO.getLectureImage())
+                .lectureClickCount(lectureDTO.getLectureClickCount())
+                .purchaseCount(purchaseCount)
+                .purchaseConversionRate(purchaseConversionRate)
+                .build();
+    }
+
+    private double calculateConversionRate(int clickCount, int purchaseCount) {
+        if (clickCount == 0) {
+            return 0.0;
+        }
+        return (double) purchaseCount / clickCount * 100;
     }
 
     private LectureDetailDTO buildLectureDetailDTO(LectureDTO lecture) {
