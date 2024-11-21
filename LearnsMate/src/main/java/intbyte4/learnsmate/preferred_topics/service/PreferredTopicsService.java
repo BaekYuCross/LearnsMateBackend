@@ -98,4 +98,8 @@ public class PreferredTopicsService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public List<Long> findStudentsWithSimilarPreferredTopics(Long studentCode) {
+        return preferredTopicsRepository.findStudentsWithSimilarPreferredTopics(studentCode);
+    }
 }
