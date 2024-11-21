@@ -17,7 +17,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public CustomCouponRepositoryImpl (EntityManager entityManager) {
+    public CustomCouponRepositoryImpl(EntityManager entityManager) {
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
@@ -25,18 +25,18 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
     public List<CouponEntity> findCouponsByFilters(CouponFilterRequestVO request) {
         QCouponEntity coupon = QCouponEntity.couponEntity;
 
-        // 동적 조건 조합
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(likeCouponName(request.getCouponName()))
-                .and(likeCouponContents(request.getCouponContents()))
-                .and(eqCouponFlag(request.getCouponFlag()))
-                .and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()))
-                .and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()))
-                .and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()))
-                .and(betweenCouponStartDate(request.getStartCouponStartDate(), request.getEndCouponStartDate()))
-                .and(eqCouponCategoryCode(request.getCouponCategoryCode()))
-                .and(eqAdminCode(request.getAdminCode()))
-                .and(eqTutorCode(request.getTutorCode()));
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(likeCouponName(request.getCouponName()));
+        builder.and(likeCouponContents(request.getCouponContents()));
+        builder.and(eqActiveState(request.getActiveState()));
+        builder.and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()));
+        builder.and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()));
+        builder.and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()));
+        builder.and(betweenCouponStartDate(request.getStartCouponStartDate(), request.getEndCouponStartDate()));
+        builder.and(eqCouponCategoryName(request.getCouponCategoryName()));
+        builder.and(eqAdminName(request.getAdminName()));
+        builder.and(eqTutorName(request.getTutorName()));
 
         return queryFactory
                 .selectFrom(coupon)
@@ -44,17 +44,16 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
                 .fetch();
     }
 
-    // 조건별 메서드
     private BooleanExpression likeCouponName(String couponName) {
-        return couponName == null ? null : QCouponEntity.couponEntity.couponName.likeIgnoreCase("%" + couponName + "%");
+        return couponName == null || couponName.isBlank() ? null : QCouponEntity.couponEntity.couponName.likeIgnoreCase("%" + couponName + "%");
     }
 
     private BooleanExpression likeCouponContents(String couponContents) {
-        return couponContents == null ? null : QCouponEntity.couponEntity.couponContents.likeIgnoreCase("%" + couponContents + "%");
+        return couponContents == null || couponContents.isBlank() ? null : QCouponEntity.couponEntity.couponContents.likeIgnoreCase("%" + couponContents + "%");
     }
 
-    private BooleanExpression eqCouponFlag(Boolean couponFlag) {
-        return couponFlag == null ? null : QCouponEntity.couponEntity.couponFlag.eq(couponFlag);
+    private BooleanExpression eqActiveState(Boolean activeState) {
+        return activeState == null ? null : QCouponEntity.couponEntity.couponFlag.eq(activeState);
     }
 
     private BooleanExpression betweenDiscountRate(Integer minDiscountRate, Integer maxDiscountRate) {
@@ -94,12 +93,12 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
             return null;
         }
 
-        if (endCreatedAt == null) {
-            return QCouponEntity.couponEntity.createdAt.loe(startCreatedAt);
+        if (startCreatedAt == null) {
+            return QCouponEntity.couponEntity.createdAt.loe(endCreatedAt);
         }
 
-        if (startCreatedAt == null) {
-            return QCouponEntity.couponEntity.createdAt.goe(endCreatedAt);
+        if (endCreatedAt == null) {
+            return QCouponEntity.couponEntity.createdAt.goe(startCreatedAt);
         }
 
         return QCouponEntity.couponEntity.createdAt.between(startCreatedAt, endCreatedAt);
@@ -121,17 +120,18 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         return QCouponEntity.couponEntity.couponStartDate.between(startCouponStartDate, endCouponStartDate);
     }
 
-    private BooleanExpression eqCouponCategoryCode(Integer couponCategoryCode) {
-
-        return couponCategoryCode == null ? null : QCouponEntity.couponEntity.couponCategory.couponCategoryCode.eq(couponCategoryCode);
+    private BooleanExpression eqCouponCategoryName(String couponCategoryName) {
+        return couponCategoryName == null || couponCategoryName.isBlank() ? null :
+                QCouponEntity.couponEntity.couponCategory.couponCategoryName.equalsIgnoreCase(couponCategoryName);
     }
 
-    private BooleanExpression eqAdminCode(Long adminCode) {
-        return adminCode == null ? null : QCouponEntity.couponEntity.admin.adminCode.eq(adminCode);
+    private BooleanExpression eqAdminName(String adminName) {
+        return adminName == null || adminName.isBlank() ? null :
+                QCouponEntity.couponEntity.admin.adminName.equalsIgnoreCase(adminName);
     }
 
-    private BooleanExpression eqTutorCode (Long tutorCode) {
-        return tutorCode == null ? null : QCouponEntity.couponEntity.tutor.memberCode.eq(tutorCode);
+    private BooleanExpression eqTutorName(String tutorName) {
+        return tutorName == null || tutorName.isBlank() ? null :
+                QCouponEntity.couponEntity.tutor.memberName.equalsIgnoreCase(tutorName);
     }
 }
-
