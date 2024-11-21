@@ -2,10 +2,9 @@ package intbyte4.learnsmate.lecture.controller;
 
 import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
 import intbyte4.learnsmate.lecture.domain.vo.response.*;
-import intbyte4.learnsmate.lecture.pagination.CursorPaginationResponse;
+import intbyte4.learnsmate.lecture.pagination.LectureCursorPaginationResponse;
 import intbyte4.learnsmate.lecture.service.LectureFacade;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -46,16 +45,29 @@ public class LectureController {
 
     @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 조회")
     @GetMapping("/list")
-    public ResponseEntity<CursorPaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
-            @RequestParam(defaultValue = "15") int pageSize) {
+    public ResponseEntity<LectureCursorPaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor, @RequestParam(defaultValue = "15") int pageSize, @RequestParam(defaultValue = "0") int page) {
+        if (cursor == null) {
+            List<LectureDTO> lectureDTOs = lectureFacade.getLecturesWithPaginationByOffset(page, pageSize);
+            boolean hasNext = lectureDTOs.size() == pageSize;
 
-        CursorPaginationResponse<LectureDetailDTO> lectureResponse = lectureFacade.getLecturesWithPagination(cursor, pageSize);
-        List<ResponseFindLectureVO> lectureVOs = lectureResponse.getData().stream()
-                .map(lectureMapper::fromDtoToResponseVO)
+            List<ResponseFindLectureVO> responseList = lectureDTOs.stream()
+                    .map(lectureFacade::convertToResponseFindLectureVO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    LectureCursorPaginationResponse.ofOffset(responseList, page, pageSize, hasNext)
+            );
+        }
+
+        LectureCursorPaginationResponse<LectureDTO> lectureResponse = lectureFacade.getLecturesWithPagination(cursor, pageSize);
+
+        List<ResponseFindLectureVO> responseList = lectureResponse.getData().stream()
+                .map(lectureFacade::convertToResponseFindLectureVO)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK).body(new CursorPaginationResponse<>(lectureVOs, lectureResponse.getNextCursor()));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                LectureCursorPaginationResponse.ofCursor(responseList, lectureResponse.getNextCursor())
+        );
     }
 
     @Operation(summary = "강의 단 건 조회 + 클릭수 -> 실제 결제까지의 비율 조회")
