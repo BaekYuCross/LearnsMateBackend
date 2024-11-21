@@ -3,7 +3,7 @@ package intbyte4.learnsmate.member.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
-import intbyte4.learnsmate.member.domain.dto.MemberPageResponse;
+import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;

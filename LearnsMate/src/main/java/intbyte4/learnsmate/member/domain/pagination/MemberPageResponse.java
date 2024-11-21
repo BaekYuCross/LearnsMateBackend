@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.member.domain.dto;
+package intbyte4.learnsmate.member.domain.pagination;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
