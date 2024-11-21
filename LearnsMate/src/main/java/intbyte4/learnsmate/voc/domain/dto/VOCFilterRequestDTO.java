@@ -10,12 +10,13 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Builder
-public class VOCDTO {
+public class VOCFilterRequestDTO {
     private String vocCode;
     private String vocContent;
+    private Integer vocCategoryCode;
+    private String memberType;
     private Boolean vocAnswerStatus;
     private String vocAnswerSatisfaction;
-    private LocalDateTime createdAt;
-    private int vocCategoryCode;
-    private Long memberCode;
+    private LocalDateTime startCreateDate;
+    private LocalDateTime startEndDate;
 }

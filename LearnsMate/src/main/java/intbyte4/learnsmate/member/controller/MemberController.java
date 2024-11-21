@@ -4,8 +4,7 @@ import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterStudentVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterTutorVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMembertVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -123,16 +122,12 @@ public class MemberController {
 
     @Operation(summary = "직원 - 학생 필터링 검색")
     @PostMapping("/filter/student")
-    public ResponseEntity<List<ResponseFindMemberVO>> findStudentByFilter(@RequestBody RequestFilterStudentVO request) {
+    public ResponseEntity<List<ResponseFindMemberVO>> findStudentByFilter(@RequestBody RequestFilterMembertVO request) {
 
         MemberFilterRequestDTO dto =
-                memberMapper.fromRequestFilterStudentVOtoMemberFilterRequestDTO(request);
-
-        log.info("직원 필터링 요청 조건은: {}", dto);
+                memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
         List<MemberDTO> memberDTOList = memberService.filterStudent(dto);
-
-        log.info("직원 필터링 결과는 : {}", memberDTOList.toString());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(memberDTOList.stream()
@@ -141,11 +136,11 @@ public class MemberController {
     }
 
     @Operation(summary = "직원 - 강사 필터링 검색")
-    @GetMapping("/filter/tutor")
-    public ResponseEntity<?> findTutorByFilter(@RequestBody RequestFilterTutorVO request) {
+    @PostMapping("/filter/tutor")
+    public ResponseEntity<?> findTutorByFilter(@RequestBody RequestFilterMembertVO request) {
 
         MemberFilterRequestDTO dto =
-                memberMapper.fromRequestFiltertutorVOtoMemberFilterRequestDTO(request);
+                memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
         List<MemberDTO> memberDTOList = memberService.filterTutor(dto);
 

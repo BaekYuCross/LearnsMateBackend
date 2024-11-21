@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ResponseFindVOCVO {
     @JsonProperty("voc_code")
-    private Long vocCode;
+    private String vocCode;
     @JsonProperty("voc_content")
     private String vocContent;
     @JsonProperty("voc_category_name")

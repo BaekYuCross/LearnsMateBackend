@@ -2,15 +2,17 @@ package intbyte4.learnsmate.voc.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.repository.VOCRepository;
 import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
 import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -42,7 +44,7 @@ public class VOCServiceImpl implements VOCService {
     }
 
     @Override
-    public VOCDTO findByVOCCode(Long vocCode) {
+    public VOCDTO findByVOCCode(String vocCode) {
         log.info("VOC 단 건 조회 중: {}", vocCode);
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
@@ -51,7 +53,7 @@ public class VOCServiceImpl implements VOCService {
     }
 
     @Override
-    public void updateVOCAnswerStatus(Long vocCode, boolean vocAnswerStatus) {
+    public void updateVOCAnswerStatus(String vocCode, boolean vocAnswerStatus) {
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
         voc.setVocAnswerStatus(vocAnswerStatus);
@@ -76,24 +78,6 @@ public class VOCServiceImpl implements VOCService {
     }
 
     @Override
-    public List<VOCDTO> filterVOC(VOCDTO vocDTO, MemberDTO memberDTO) {
-        log.info("VOC 필터링 요청: {}", vocDTO);
-        List<VOC> filteredVOCList = vocRepository.searchBy(vocDTO, memberDTO);
-
-        if (filteredVOCList.isEmpty()) {
-            log.info("필터 조건에 맞는 VOC가 없습니다.");
-            throw new CommonException(StatusEnum.VOC_NOT_FOUND);
-        }
-
-        List<VOCDTO> vocDTOList = filteredVOCList.stream()
-                .map(vocMapper::fromEntityToDTO)
-                .collect(Collectors.toList());
-
-        log.info("필터링된 VOC 수: {}", vocDTOList.size());
-        return vocDTOList;
-    }
-
-    @Override
     public Map<Integer, Long> countVOCByCategory(LocalDateTime startDate, LocalDateTime endDate){
         List<VOCCategoryDTO> VOCCategoryDTOList = vocCategoryService.findAll();
 
@@ -111,5 +95,17 @@ public class VOCServiceImpl implements VOCService {
         });
 
         return categoryCountMap;
+    }
+
+    @Override
+    public Page<VOCDTO> findAllByVOCWithPaging(Pageable pageable) {
+        Page<VOC> vocPage = vocRepository.findAll(pageable);
+        return vocPage.map(vocMapper::fromEntityToDTO);
+    }
+
+    @Override
+    public Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable) {
+        Page<VOC> vocPage = vocRepository.searchByWithPaging(dto, pageable);
+        return vocPage.map(vocMapper::fromEntityToDTO);
     }
 }

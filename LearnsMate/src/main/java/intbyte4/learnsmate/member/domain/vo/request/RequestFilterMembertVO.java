@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RequestFilterTutorVO {
+public class RequestFilterMembertVO {
 
     private Long memberCode;
     private String memberName;

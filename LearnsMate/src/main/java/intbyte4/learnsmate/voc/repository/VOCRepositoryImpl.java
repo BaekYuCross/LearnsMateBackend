@@ -2,14 +2,20 @@ package intbyte4.learnsmate.voc.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.voc.domain.QVOC;
 import intbyte4.learnsmate.voc.domain.VOC;
-import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 public class VOCRepositoryImpl implements VOCRepositoryCustom {
 
@@ -17,21 +23,84 @@ public class VOCRepositoryImpl implements VOCRepositoryCustom {
     private final QVOC qVOC = QVOC.vOC;
 
     @Override
-    public List<VOC> searchBy(VOCDTO request, MemberDTO memberDTO) {
+    public List<VOC> searchBy(VOCFilterRequestDTO dto) {
         return queryFactory
                 .selectFrom(qVOC)
                 .where(
-                        eqMemberCode(request.getMemberCode()),
-                        searchByContents(request.getVocContent()),
-                        searchByType(request.getVocCategoryCode()),
-                        searchByMemberType(memberDTO),
-                        searchByAnswerStatus(request.getVocAnswerStatus())
+                        eqVOCCode(dto.getVocCode()),
+                        searchByContents(dto.getVocContent()),
+                        searchByType(dto.getVocCategoryCode()),
+                        searchByMemberType(dto.getMemberType()),
+                        searchByAnswerStatus(dto.getVocAnswerStatus()),
+                        searchByAnswerSatisfaction(dto.getVocAnswerSatisfaction()),
+                        searchByCreatedAt(dto.getStartCreateDate(), dto.getStartEndDate())
                 )
                 .fetch();
     }
 
-    private BooleanExpression eqMemberCode(Long memberCode) {
-        return memberCode == null ? null : qVOC.member.memberCode.eq(memberCode);
+    @Override
+    public Page<VOC> searchByWithPaging(VOCFilterRequestDTO dto, Pageable pageable) {
+        List<VOC> content = queryFactory
+                .selectFrom(qVOC)
+                .where(
+                        eqVOCCode(dto.getVocCode()),
+                        searchByContents(dto.getVocContent()),
+                        searchByType(dto.getVocCategoryCode()),
+                        searchByMemberType(dto.getMemberType()),
+                        searchByAnswerStatus(dto.getVocAnswerStatus()),
+                        searchByAnswerSatisfaction(dto.getVocAnswerSatisfaction()),
+                        searchByCreatedAt(dto.getStartCreateDate(), dto.getStartEndDate())
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = queryFactory
+                .select(qVOC.count())
+                .from(qVOC)
+                .where(
+                        eqVOCCode(dto.getVocCode()),
+                        searchByContents(dto.getVocContent()),
+                        searchByType(dto.getVocCategoryCode()),
+                        searchByMemberType(dto.getMemberType()),
+                        searchByAnswerStatus(dto.getVocAnswerStatus()),
+                        searchByAnswerSatisfaction(dto.getVocAnswerSatisfaction()),
+                        searchByCreatedAt(dto.getStartCreateDate(), dto.getStartEndDate())
+                )
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    private BooleanExpression searchByCreatedAt(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate == null && endDate == null) {
+            return null;
+        }
+        if (startDate != null && endDate != null) {
+            return qVOC.createdAt.between(startDate, endDate);
+        } else if (startDate != null) {
+            return qVOC.createdAt.goe(startDate);
+        } else {
+            return qVOC.createdAt.loe(endDate);
+        }
+    }
+
+    private BooleanExpression searchByAnswerSatisfaction(String vocAnswerSatisfaction) {
+        if (vocAnswerSatisfaction == null || vocAnswerSatisfaction.isBlank()) {
+            return null;
+        }
+        return qVOC.vocAnswerSatisfaction.eq(vocAnswerSatisfaction);
+    }
+
+    private BooleanExpression eqVOCCode(String vocCode) {
+        if (vocCode == null || vocCode.isBlank()) {
+            return null;
+        }
+        try {
+            return qVOC.vocCode.eq(vocCode);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private BooleanExpression searchByContents(String vocContents) {
@@ -56,13 +125,22 @@ public class VOCRepositoryImpl implements VOCRepositoryCustom {
         return categoryCode == null ? null : qVOC.vocCategory.vocCategoryCode.eq(categoryCode);
     }
 
-    private BooleanExpression searchByMemberType(MemberDTO memberDTO) {
-        return (memberDTO != null && memberDTO.getMemberType() != null)
-                ? qVOC.member.memberType.eq(memberDTO.getMemberType())
-                : null;
+    private BooleanExpression searchByMemberType(String memberType) {
+        if (memberType == null || memberType.isBlank()) {
+            return null;
+        }
+        try {
+            return qVOC.member.memberType.eq(MemberType.valueOf(memberType));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private BooleanExpression searchByAnswerStatus(Boolean answerStatus) {
-        return answerStatus == null ? null : qVOC.vocAnswerStatus.eq(answerStatus);
+        if (answerStatus == null) {
+            return null;
+        }
+        log.info("Filtering answerStatus: {}", answerStatus);
+        return qVOC.vocAnswerStatus.eq(answerStatus);
     }
 }

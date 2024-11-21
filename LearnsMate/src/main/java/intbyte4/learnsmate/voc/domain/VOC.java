@@ -20,7 +20,7 @@ public class VOC {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "voc_code", nullable = false, unique = true)
-    private Long vocCode;
+    private String vocCode;
 
     @Column(name = "voc_content", nullable = false)
     private String vocContent;
