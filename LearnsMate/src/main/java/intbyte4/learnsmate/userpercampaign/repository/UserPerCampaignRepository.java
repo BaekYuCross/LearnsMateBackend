@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserPerCampaignRepository extends JpaRepository<UserPerCampaign, Long> {
+public interface UserPerCampaignRepository extends JpaRepository<UserPerCampaign, Integer> {
     List<UserPerCampaign> findByCampaign(Campaign campaign);
 }
