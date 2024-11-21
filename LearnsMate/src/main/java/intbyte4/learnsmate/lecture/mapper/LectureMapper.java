@@ -51,30 +51,20 @@ public class LectureMapper {
                 .build();
     }
 
-
-    // DTO -> VO 변환
-    // DTO -> VO 변환
     public ResponseFindLectureVO fromDtoToResponseVO(LectureDetailDTO dto) {
         return ResponseFindLectureVO.builder()
                 .lectureCode(dto.getLectureCode())
                 .lectureTitle(dto.getLectureTitle())
                 .lectureConfirmStatus(dto.getLectureConfirmStatus())
                 .createdAt(dto.getCreatedAt())
-                .lectureImage(dto.getLectureImage())
                 .lecturePrice(dto.getLecturePrice())
                 .tutorCode(dto.getTutorCode())
                 .tutorName(dto.getTutorName())
                 .lectureStatus(dto.getLectureStatus())
-                .lectureCategory(dto.getLectureCategory())
-                .lectureClickCount(dto.getLectureClickCount())
                 .lectureLevel(LectureLevelEnum.valueOf(dto.getLectureLevel()))
-                .totalStudents(dto.getTotalStudents())
-                .totalRevenue(dto.getTotalRevenue())
-                .lectureVideos(dto.getLectureVideos())
                 .build();
     }
 
-    // VO -> DTO 변환
     public LectureDTO fromRequestVOtoDto(RequestEditLectureInfoVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
@@ -85,7 +75,6 @@ public class LectureMapper {
                 .build();
     }
 
-    // VO -> DTO 변환
     public LectureDTO fromRegisterRequestVOtoDto(RequestRegisterLectureVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
@@ -100,7 +89,6 @@ public class LectureMapper {
                 .tutorCode(vo.getTutorCode())
                 .build();
     }
-
 
     public ResponseEditLectureInfoVO fromDtoToEditResponseVO(LectureDTO updatedLecture) {
         return ResponseEditLectureInfoVO.builder()
@@ -145,6 +133,7 @@ public class LectureMapper {
                 .lectureLevel(LectureLevelEnum.valueOf(removedLecture.getLectureLevel()))
                 .build();
     }
+
     public LectureDTO fromRequestRegisterLecturePaymentVOToDTO(RequestRegisterLecturePaymentVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
