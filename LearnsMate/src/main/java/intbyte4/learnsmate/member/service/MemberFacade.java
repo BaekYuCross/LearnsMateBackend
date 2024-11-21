@@ -4,14 +4,17 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
-import intbyte4.learnsmate.lecture.service.LectureService;
+import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
 import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentService;
 import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.CategoryCountDTO;
 import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.repository.MemberRepository;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
@@ -20,10 +23,14 @@ import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.service.VOCService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +38,12 @@ import java.util.Map;
 public class MemberFacade {
 
     private final MemberRepository memberRepository;
-    private final MemberService memberService;
-    private final LectureService lectureService;
     private final IssueCouponService issueCouponService;
     private final VOCService vocService;
     private final MemberMapper memberMapper;
     private final LectureVideoByStudentService lectureVideoByStudentService;
     private final VideoByLectureFacade videoByLectureFacade;
+    private final LectureCategoryByLectureService lectureCategoryByLectureService;
 
     // 멤버 단일 조회시에 사용되는 서비스
     // memberCode로 학생 조회
@@ -95,4 +101,59 @@ public class MemberFacade {
 
         return dto;
     }
+
+    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberType(int page, int size, MemberType memberType) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<Member> memberPage = memberRepository.findByMemberFlagTrueAndMemberType(memberType, pageable);
+
+        List<ResponseFindMemberVO> responseVOList = memberPage.getContent().stream()
+                .map(memberMapper::fromMemberToResponseFindMemberVO)
+                .collect(Collectors.toList());
+
+        return new MemberPageResponse<>(
+                responseVOList,
+                memberPage.getTotalElements(),
+                memberPage.getTotalPages(),
+                memberPage.getNumber(),
+                memberPage.getSize()
+        );
+    }
+
+    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByCursor(LocalDateTime cursor, int size, MemberType memberType) {
+        PageRequest pageable = PageRequest.of(0, size);
+        List<Member> members = memberRepository.findMembersByCursorAndMemberType(cursor, memberType, pageable);
+
+        List<ResponseFindMemberVO> responseVOList = members.stream()
+                .map(memberMapper::fromMemberToResponseFindMemberVO)
+                .collect(Collectors.toList());
+
+        return new MemberPageResponse<>(
+                responseVOList,
+                responseVOList.size(),
+                1,
+                0,
+                size
+        );
+    }
+
+    public List<CategoryCountDTO> getCategoryCounts() {
+        return lectureCategoryByLectureService.countLecturesByCategory();
+    }
+
+    public List<CategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureCategoryByLectureService.countLecturesByCategoryWithinDateRange(startDate, endDate);
+    }
+
+    public Map<String, Double> calculateCategoryPercentage(List<CategoryCountDTO> categoryCounts) {
+        long total = categoryCounts.stream()
+                .mapToLong(CategoryCountDTO::getCount)
+                .sum();
+
+        return categoryCounts.stream()
+                .collect(Collectors.toMap(
+                        CategoryCountDTO::getLectureCategoryName,
+                        dto -> (double) dto.getCount() / total * 100
+                ));
+    }
+
 }
