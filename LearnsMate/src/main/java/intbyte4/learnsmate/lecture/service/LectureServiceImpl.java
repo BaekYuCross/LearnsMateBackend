@@ -91,13 +91,4 @@ public class LectureServiceImpl implements LectureService {
                 .map(result -> new MonthlyLectureCountDTO((String) result[0], ((Number) result[1]).intValue()))
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public List<LectureDTO> getLecturesWithPagination(LocalDateTime cursor, int pageSize) {
-        Pageable pageable = PageRequest.of(0, pageSize);
-        List<Lecture> lectures = lectureRepository.findLecturesByCursor(cursor, pageable);
-        return lectures.stream()
-                .map(lectureMapper::toDTO)
-                .collect(Collectors.toList());
-    }
 }

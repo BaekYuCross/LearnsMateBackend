@@ -17,12 +17,12 @@ import intbyte4.learnsmate.coupon_category.service.CouponCategoryServiceImpl;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureDetailVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
-import intbyte4.learnsmate.lecture.pagination.CursorPaginationResponse;
+import intbyte4.learnsmate.lecture.pagination.LectureCursorPaginationResponse;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
@@ -38,6 +38,8 @@ import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -53,7 +55,6 @@ public class LectureFacade {
     private final LectureRepository lectureRepository;
     private final LectureMapper lectureMapper;
     private final CouponService couponService;
-    private final LectureByStudentService lectureByStudentService;
     private final LectureByStudentRepository lectureByStudentRepository;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
@@ -114,15 +115,63 @@ public class LectureFacade {
         return new Result(lectureDTO, tutor, lecture, issueCouponDTO, couponDTOInfo, couponCategory, adminDTO);
     }
 
-    public CursorPaginationResponse<LectureDetailDTO> getLecturesWithPagination(LocalDateTime cursor, int pageSize) {
-        List<LectureDTO> lectureDTOs = lectureService.getLecturesWithPagination(cursor, pageSize);
-        List<LectureDetailDTO> lectureDetailDTOs = lectureDTOs.stream()
-                .map(this::buildLectureDetailDTO)
+    public LectureCursorPaginationResponse<LectureDTO> getLecturesWithPagination(LocalDateTime cursor, int pageSize) {
+        Pageable pageable = PageRequest.of(0, pageSize);
+        List<Lecture> lectures = lectureRepository.findLecturesByCursor(cursor, pageable);
+
+        List<LectureDTO> lectureDTOs = lectures.stream()
+                .map(this::buildLectureDTOWithDetails)
                 .collect(Collectors.toList());
 
         LocalDateTime nextCursor = lectureDTOs.isEmpty() ? null : lectureDTOs.get(lectureDTOs.size() - 1).getCreatedAt();
 
-        return new CursorPaginationResponse<>(lectureDetailDTOs, nextCursor);
+        return LectureCursorPaginationResponse.<LectureDTO>builder()
+                .data(lectureDTOs)
+                .nextCursor(nextCursor)
+                .build();
+    }
+
+    private LectureDTO buildLectureDTOWithDetails(Lecture lecture) {
+        return LectureDTO.builder()
+                .lectureCode(lecture.getLectureCode())
+                .lectureTitle(lecture.getLectureTitle())
+                .lectureConfirmStatus(lecture.getLectureConfirmStatus())
+                .createdAt(lecture.getCreatedAt())
+                .updatedAt(lecture.getUpdatedAt())
+                .lectureImage(lecture.getLectureImage())
+                .lecturePrice(lecture.getLecturePrice())
+                .tutorCode(memberService.findById(lecture.getTutor().getMemberCode()).getMemberCode())
+                .lectureStatus(lecture.getLectureStatus())
+                .lectureClickCount(lecture.getLectureClickCount())
+                .lectureLevel(String.valueOf(lecture.getLectureLevel()))
+                .build();
+    }
+
+    public List<LectureDTO> getLecturesWithPaginationByOffset(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        List<Lecture> lectures = lectureRepository.findLecturesByOffset(pageable);
+        return lectures.stream()
+                .map(this::buildLectureDTOWithDetails)
+                .collect(Collectors.toList());
+    }
+
+    public ResponseFindLectureVO convertToResponseFindLectureVO(LectureDTO lectureDTO) {
+        String lectureCategoryName = lectureCategoryByLectureService.findLectureCategoryNameByLectureCode(lectureDTO.getLectureCode());
+        MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
+        String tutorName = memberDTO.getMemberName();
+
+        return ResponseFindLectureVO.builder()
+                .lectureCode(lectureDTO.getLectureCode())
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .tutorCode(lectureDTO.getTutorCode())
+                .tutorName(tutorName)
+                .lectureCategoryName(lectureCategoryName)
+                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
+                .createdAt(lectureDTO.getCreatedAt())
+                .lecturePrice(lectureDTO.getLecturePrice())
+                .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
+                .lectureStatus(lectureDTO.getLectureStatus())
+                .build();
     }
 
     private record Result(LectureDTO lectureDTO, Member tutor, Lecture lecture, IssueCouponDTO issueCouponDTO, CouponDTO couponDTOInfo, CouponCategory couponCategory, AdminDTO adminDTO) {
@@ -224,32 +273,6 @@ public class LectureFacade {
             return 0.0;
         }
         return (double) purchaseCount / clickCount * 100;
-    }
-
-    private LectureDetailDTO buildLectureDetailDTO(LectureDTO lecture) {
-        MemberDTO tutor = memberService.findMemberByMemberCode(lecture.getTutorCode(), MemberType.TUTOR);
-        long totalStudents = lectureByStudentService.countStudentsByLectureAndOwnStatus(lecture.getLectureCode());
-        int totalRevenue = lectureByStudentService.calculateTotalRevenue(lecture.getLectureCode());
-        List<VideoByLectureDTO> lectureVideos = videoByLectureService.findVideoByLectureByLectureCode(lecture.getLectureCode());
-        List<String> lectureCategories = lectureCategoryByLectureService.findCategoryNamesByLectureCode(lecture.getLectureCode());
-
-        return LectureDetailDTO.builder()
-                .lectureCode(lecture.getLectureCode())
-                .lectureTitle(lecture.getLectureTitle())
-                .lectureConfirmStatus(lecture.getLectureConfirmStatus())
-                .createdAt(lecture.getCreatedAt())
-                .lectureImage(lecture.getLectureImage())
-                .lecturePrice(lecture.getLecturePrice())
-                .tutorCode(tutor.getMemberCode())
-                .tutorName(tutor.getMemberName())
-                .lectureStatus(lecture.getLectureStatus())
-                .lectureCategory(String.join(", ", lectureCategories))
-                .lectureClickCount(lecture.getLectureClickCount())
-                .lectureLevel(lecture.getLectureLevel())
-                .totalStudents((int) totalStudents)
-                .totalRevenue(totalRevenue)
-                .lectureVideos(lectureVideos)
-                .build();
     }
 
     @Transactional
