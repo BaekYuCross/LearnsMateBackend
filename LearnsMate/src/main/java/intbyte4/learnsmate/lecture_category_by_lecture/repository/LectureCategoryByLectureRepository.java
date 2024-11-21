@@ -37,14 +37,16 @@ public interface LectureCategoryByLectureRepository extends JpaRepository<Lectur
             "GROUP BY lc.lectureCategoryCode")
     List<CategoryCountDTO> countLecturesByCategory();
 
-    @Query("SELECT lc.lectureCategory.lectureCategoryCode, COUNT(p) " +
+    @Query("SELECT new intbyte4.learnsmate.member.domain.dto.CategoryCountDTO(" +
+            "lc.lectureCategory.lectureCategoryCode, lc.lectureCategory.lectureCategoryName, COUNT(p)) " +
             "FROM lectureCategoryByLecture lc " +
             "JOIN lc.lecture l " +
-            "JOIN lecture_by_student lbs ON l.lectureCode = lbs.lecture " +
+            "JOIN lecture_by_student lbs ON l.lectureCode = lbs.lecture.lectureCode " +
             "JOIN payment p ON p.lectureByStudent = lbs " +
             "WHERE p.createdAt BETWEEN :startDate AND :endDate " +
             "AND lbs.ownStatus = true " +
             "GROUP BY lc.lectureCategory.lectureCategoryCode")
     List<CategoryCountDTO> countLecturesByCategoryWithinDateRange(
             @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);}
+            @Param("endDate") LocalDateTime endDate);
+}
