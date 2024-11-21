@@ -127,10 +127,10 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentDTO;
     }
 
-    // 직원이 프론트엔드에서 화면에 그래프로 띄워주기 위해 예상 매출액(?)과 할인 매출액을 받아오는 코드
-
-    // 직원이 프론트엔드에서 화면에 그래프로 띄워주기 위해 기간 별 매출액을 받아오는 코드
-
+    @Override
+    public int getPurchaseCountByLectureCode(String lectureCode) {
+        return paymentRepository.countPaymentsByLectureCode(lectureCode);
+    }
 
     private Result getResult(MemberDTO memberDTO, LectureDTO lectureDTO) {
         Member student = memberMapper.fromMemberDTOtoMember(memberDTO);
