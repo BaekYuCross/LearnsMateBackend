@@ -16,6 +16,7 @@ import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCate
 import intbyte4.learnsmate.lecture_category_by_lecture.mapper.LectureCategoryByLectureMapper;
 import intbyte4.learnsmate.lecture_category_by_lecture.repository.LectureCategoryByLectureRepository;
 
+import intbyte4.learnsmate.member.domain.dto.CategoryCountDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -24,7 +25,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -85,5 +88,13 @@ public class LectureCategoryByLectureService {
         LectureCategoryByLectureDTO dto = lectureCategoryByLectureRepository.findLectureCategoryDetailsByLectureCode(lectureCode);
         LectureCategoryEnum categoryName = lectureCategoryService.findLectureCategoryNameByCode(dto.getLectureCategoryCode());
         return categoryName.name();
+    }
+
+    public List<CategoryCountDTO> countLecturesByCategory() {
+        return lectureCategoryByLectureRepository.countLecturesByCategory();
+    }
+
+    public List<CategoryCountDTO> countLecturesByCategoryWithinDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureCategoryByLectureRepository.countLecturesByCategoryWithinDateRange(startDate, endDate);
     }
 }
