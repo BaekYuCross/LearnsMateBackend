@@ -16,8 +16,12 @@ import java.util.List;
 public interface LectureRepository extends JpaRepository<Lecture, String> , JpaSpecificationExecutor<Lecture> {
     List<Lecture> findAllByTutor(Member tutor);
 
+    @Query("SELECT l FROM lecture l ORDER BY l.createdAt DESC")
+    List<Lecture> findLecturesByOffset(Pageable pageable);
+
     @Query("SELECT l FROM lecture l WHERE (:cursor IS NULL OR l.createdAt < :cursor) ORDER BY l.createdAt DESC")
     List<Lecture> findLecturesByCursor(@Param("cursor") LocalDateTime cursor, Pageable pageable);
+
 
     @Query("SELECT CONCAT(YEAR(l.createdAt), '-', LPAD(CAST(MONTH(l.createdAt) AS string), 2, '0')) AS monthYear, COUNT(l) " +
             "FROM lecture l " +

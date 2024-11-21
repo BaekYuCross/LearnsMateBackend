@@ -51,20 +51,6 @@ public class LectureMapper {
                 .build();
     }
 
-    public ResponseFindLectureVO fromDtoToResponseVO(LectureDetailDTO dto) {
-        return ResponseFindLectureVO.builder()
-                .lectureCode(dto.getLectureCode())
-                .lectureTitle(dto.getLectureTitle())
-                .lectureConfirmStatus(dto.getLectureConfirmStatus())
-                .createdAt(dto.getCreatedAt())
-                .lecturePrice(dto.getLecturePrice())
-                .tutorCode(dto.getTutorCode())
-                .tutorName(dto.getTutorName())
-                .lectureStatus(dto.getLectureStatus())
-                .lectureLevel(LectureLevelEnum.valueOf(dto.getLectureLevel()))
-                .build();
-    }
-
     public LectureDTO fromRequestVOtoDto(RequestEditLectureInfoVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
@@ -147,5 +133,4 @@ public class LectureMapper {
                 .lectureLevel(String.valueOf(vo.getLectureLevel()))
                 .build();
     }
-
 }
