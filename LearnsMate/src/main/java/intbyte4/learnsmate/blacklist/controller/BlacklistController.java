@@ -10,9 +10,6 @@ import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTuto
 import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.service.BlacklistService;
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.MemberPageResponse;
-import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
-import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -110,7 +106,7 @@ public class BlacklistController {
 
         ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO> response
                 = (ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>)
-                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.STUDENT);
+                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.TUTOR);
 
         return ResponseEntity.ok(response);
     }
@@ -162,7 +158,6 @@ public class BlacklistController {
         blacklistDTO.setBlackReason(request.getBlackReason());
 
         blacklistService.addMemberToBlacklist(blacklistDTO);
-
         return ResponseEntity.status(HttpStatus.OK).body("블랙리스트 등록 성공");
     }
 
