@@ -14,12 +14,13 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,17 +31,6 @@ public class LectureServiceImpl implements LectureService {
     private final LectureMapper lectureMapper;
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-
-    @Override
-    public List<LectureDTO> getAllLecture() {
-        List<Lecture> lectureList = lectureRepository.findAll();
-        if (lectureList.isEmpty()) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
-        return lectureList.stream()
-                .map(lectureMapper::toDTO)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public LectureDTO getLectureById(String lectureCode) {
@@ -95,18 +85,19 @@ public class LectureServiceImpl implements LectureService {
 
     @Override
     public List<MonthlyLectureCountDTO> getMonthlyLectureCounts() {
-        List<Lecture> lectures = lectureRepository.findAll();
+        List<Object[]> results = lectureRepository.findMonthlyLectureCounts();
 
-        Map<String, Long> groupedByMonth = lectures.stream()
-                .collect(Collectors.groupingBy(
-                        lecture -> lecture.getCreatedAt().getYear() + "-" +
-                                String.format("%02d", lecture.getCreatedAt().getMonthValue()),
-                        Collectors.counting()
-                ));
+        return results.stream()
+                .map(result -> new MonthlyLectureCountDTO((String) result[0], ((Number) result[1]).intValue()))
+                .collect(Collectors.toList());
+    }
 
-        return groupedByMonth.entrySet().stream()
-                .map(entry -> new MonthlyLectureCountDTO(entry.getKey(), entry.getValue().intValue()))
-                .sorted(Comparator.comparing(MonthlyLectureCountDTO::getDate))
+    @Override
+    public List<LectureDTO> getLecturesWithPagination(LocalDateTime cursor, int pageSize) {
+        Pageable pageable = PageRequest.of(0, pageSize);
+        List<Lecture> lectures = lectureRepository.findLecturesByCursor(cursor, pageable);
+        return lectures.stream()
+                .map(lectureMapper::toDTO)
                 .collect(Collectors.toList());
     }
 }

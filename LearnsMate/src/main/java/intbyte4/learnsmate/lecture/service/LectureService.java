@@ -3,11 +3,10 @@ package intbyte4.learnsmate.lecture.service;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
 
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface LectureService {
-    List<LectureDTO> getAllLecture();
 
     LectureDTO getLectureById(String lectureCode);
 
@@ -18,4 +17,6 @@ public interface LectureService {
     void updateLectureConfirmStatus(String lectureCode);
 
     List<MonthlyLectureCountDTO> getMonthlyLectureCounts();
+
+    List<LectureDTO> getLecturesWithPagination(LocalDateTime cursor, int pageSize);
 }
