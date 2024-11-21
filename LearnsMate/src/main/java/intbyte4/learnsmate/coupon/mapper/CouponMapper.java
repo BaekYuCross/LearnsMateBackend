@@ -4,8 +4,10 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignCouponVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponEditRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponEditRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.*;
@@ -85,39 +87,6 @@ public class CouponMapper {
                 .build();
     }
 
-    public List<CouponFindResponseVO> fromDTOListToCouponFindVO(List<CouponDTO> couponDTOList) {
-        return couponDTOList.stream().map(dto -> CouponFindResponseVO.builder()
-                .couponCode(dto.getCouponCode())
-                .couponName(dto.getCouponName())
-                .couponContents(dto.getCouponContents())
-                .couponDiscountRate(dto.getCouponDiscountRate())
-                .createdAt(dto.getCreatedAt())
-                .updatedAt(dto.getUpdatedAt())
-                .couponStartDate(dto.getCouponStartDate())
-                .couponExpireDate(dto.getCouponExpireDate())
-                .activeState(dto.getActiveState())
-                .couponCategoryCode(dto.getCouponCategoryCode())
-                .adminCode(dto.getAdminCode())
-                .tutorCode(dto.getTutorCode())
-                .build()).collect(Collectors.toList());
-    }
-
-    public CouponFindResponseVO fromDTOToFindResponseVO(CouponDTO couponDTO) {
-        return CouponFindResponseVO.builder()
-                .couponCode(couponDTO.getCouponCode())
-                .couponName(couponDTO.getCouponName())
-                .couponContents(couponDTO.getCouponContents())
-                .couponDiscountRate(couponDTO.getCouponDiscountRate())
-                .createdAt(couponDTO.getCreatedAt())
-                .updatedAt(couponDTO.getUpdatedAt())
-                .couponStartDate(couponDTO.getCouponStartDate())
-                .couponExpireDate(couponDTO.getCouponExpireDate())
-                .couponCategoryCode(couponDTO.getCouponCategoryCode())
-                .adminCode(couponDTO.getAdminCode())
-                .tutorCode(couponDTO.getTutorCode())
-                .build();
-    }
-
     public CouponDTO fromRequestFindCampaignCouponVOToCouponDTO(RequestFindCampaignCouponVO request) {
         return CouponDTO.builder()
                 .couponCode(request.getCouponCode())
@@ -133,22 +102,6 @@ public class CouponMapper {
                 .adminCode(request.getAdminCode())
                 .tutorCode(request.getTutorCode())
                 .build();
-    }
-
-    public List<CouponFilterResponseVO> fromDTOToCouponFilterResponseVO(List<CouponDTO> couponDTOList) {
-        return couponDTOList.stream().map(dto -> CouponFilterResponseVO.builder()
-                .couponCode(dto.getCouponCode())
-                .couponName(dto.getCouponName())
-                .couponContents(dto.getCouponContents())
-                .couponDiscountRate(dto.getCouponDiscountRate())
-                .createdAt(dto.getCreatedAt())
-                .updatedAt(dto.getUpdatedAt())
-                .couponStartDate(dto.getCouponStartDate())
-                .couponExpireDate(dto.getCouponExpireDate())
-                .couponCategoryCode(dto.getCouponCategoryCode())
-                .adminCode(dto.getAdminCode())
-                .tutorCode(dto.getTutorCode())
-                .build()).collect(Collectors.toList());
     }
 
     public CouponDTO fromRequestEditCampaignCouponVOToCouponDTO(RequestEditCampaignCouponVO request) {
@@ -234,6 +187,44 @@ public class CouponMapper {
                 .couponFlag(updatedCoupon.getCouponFlag())
                 .couponCategoryCode(updatedCoupon.getCouponCategory().getCouponCategoryCode())
                 .adminCode(updatedCoupon.getAdmin().getAdminCode())
+                .build();
+    }
+
+    public CouponFilterDTO fromFilterVOtoFilterDTO(CouponFilterRequestVO request) {
+        return CouponFilterDTO.builder()
+                .couponName(request.getCouponName())
+                .couponContents(request.getCouponContents())
+                .activeState(request.getActiveState())
+                .startExpireDate(request.getStartExpireDate())
+                .endExpireDate(request.getEndExpireDate())
+                .startCouponStartDate(request.getStartCouponStartDate())
+                .endCouponStartDate(request.getEndCouponStartDate())
+                .startCreatedAt(request.getStartCreatedAt())
+                .endCreatedAt(request.getEndCreatedAt())
+                .maxDiscountRate(request.getMaxDiscountRate())
+                .minDiscountRate(request.getMinDiscountRate())
+                .couponCategoryName(request.getCouponCategoryName())
+                .adminName(request.getAdminName())
+                .tutorName(request.getTutorName())
+                .build();
+    }
+
+    public CouponFilterRequestVO fromFilterDTOToFilterVO(CouponFilterDTO dto) {
+        return CouponFilterRequestVO.builder()
+                .couponName(dto.getCouponName())
+                .couponContents(dto.getCouponContents())
+                .activeState(dto.getActiveState())
+                .startExpireDate(dto.getStartExpireDate())
+                .endExpireDate(dto.getEndExpireDate())
+                .startCouponStartDate(dto.getStartCouponStartDate())
+                .endCouponStartDate(dto.getEndCouponStartDate())
+                .startCreatedAt(dto.getStartCreatedAt())
+                .endCreatedAt(dto.getEndCreatedAt())
+                .maxDiscountRate(dto.getMaxDiscountRate())
+                .minDiscountRate(dto.getMinDiscountRate())
+                .couponCategoryName(dto.getCouponCategoryName())
+                .adminName(dto.getAdminName())
+                .tutorName(dto.getTutorName())
                 .build();
     }
 }

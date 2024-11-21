@@ -6,6 +6,7 @@ import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
+import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
@@ -55,14 +56,6 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public CouponEntity findByCouponCode(Long couponCode) {
         return couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
-    }
-
-    @Override
-    public List<CouponDTO> getCouponsByFilters(CouponFilterRequestVO request) {
-        List<CouponEntity> entities = couponRepository.findCouponsByFilters(request);
-        return entities.stream()
-                .map(couponMapper::toDTO)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -211,6 +204,11 @@ public class CouponServiceImpl implements CouponService {
         couponRepository.save(couponEntity);
     }
 
+    @Override
+    public List<CouponEntity> filterCoupons(CouponFilterDTO dto) {
+        return couponRepository.findCouponsByFilters(couponMapper.fromFilterDTOToFilterVO(dto));
+    }
+
     public void validAdmin(AdminService adminService, Long adminCode, Logger log) {
         AdminDTO adminDTO = adminService.findByAdminCode(adminCode);
         if (adminDTO == null) {
@@ -226,19 +224,5 @@ public class CouponServiceImpl implements CouponService {
             throw new CommonException(StatusEnum.RESTRICTED);
         }
         log.info(tutor.toString());
-    }
-
-    private static CouponEntity getCoupon(AdminCouponRegisterRequestVO request, Admin admin, CouponCategory couponCategory) {
-        return CouponEntity.builder()
-                .couponName(request.getCouponName())
-                .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .couponStartDate(LocalDateTime.now())
-                .couponExpireDate(request.getCouponExpireDate())
-                .couponFlag(true)
-                .couponCategory(couponCategory)
-                .admin(admin)
-                .build();
     }
 }
