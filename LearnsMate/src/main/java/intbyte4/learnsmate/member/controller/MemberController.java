@@ -11,6 +11,8 @@ import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.service.MemberFacade;
 import intbyte4.learnsmate.member.service.MemberService;
+import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
+import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -112,35 +114,35 @@ public class MemberController {
 
     @Operation(summary = "직원 - 학생 필터링 검색")
     @PostMapping("/filter/student")
-    public ResponseEntity<List<ResponseFindMemberVO>> findStudentByFilter(@RequestBody RequestFilterMembertVO request) {
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findStudentByFilter(
+            @RequestBody RequestFilterMembertVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
 
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
         dto.setMemberType(MemberType.STUDENT);
 
-        List<MemberDTO> memberDTOList = memberService.filterStudent(dto);
+        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterStudent(dto, page, size);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(memberDTOList.stream()
-                        .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
-                        .collect(Collectors.toList()));
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "직원 - 강사 필터링 검색")
     @PostMapping("/filter/tutor")
-    public ResponseEntity<?> findTutorByFilter(@RequestBody RequestFilterMembertVO request) {
+    public ResponseEntity<?> findTutorByFilter(
+            @RequestBody RequestFilterMembertVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
 
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
         dto.setMemberType(MemberType.TUTOR);
 
-        List<MemberDTO> memberDTOList = memberService.filterTutor(dto);
+        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterTutor(dto, page, size);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(memberDTOList.stream()
-                        .map(memberMapper::fromMemberDTOtoResponseFindMemberVO)
-                        .collect(Collectors.toList()));
+        return ResponseEntity.ok(response);
     }
 }
