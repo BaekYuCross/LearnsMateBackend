@@ -2,6 +2,7 @@ package intbyte4.learnsmate.blacklist.controller;
 
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
+import intbyte4.learnsmate.blacklist.domain.dto.BlacklistPageResponse;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
 import intbyte4.learnsmate.blacklist.domain.vo.request.RequestFilterBlacklistMemberVO;
 import intbyte4.learnsmate.blacklist.domain.vo.request.RequestSaveBlacklistVO;
@@ -12,6 +13,8 @@ import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTuto
 import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.service.BlacklistService;
 import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberPageResponse;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -33,37 +36,25 @@ public class BlacklistController {
     // 1. 모든 학생 블랙리스트 조회
     @Operation(summary = "직원 - 학생 블랙리스트 전체 조회")
     @GetMapping("/student")
-    public ResponseEntity<List<ResponseFindBlacklistVO>> findAllStudentBlacklist() {
+    public ResponseEntity<BlacklistPageResponse<ResponseFindBlacklistVO>> findAllStudentBlacklist(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size
+    ) {
+        BlacklistPageResponse<ResponseFindBlacklistVO> response
+                = blacklistService.findAllBlacklistByMemberType(page, size, MemberType.STUDENT);
 
-        // service에서 dto 반환
-        List<BlacklistDTO> blacklistDTOList = blacklistService.findAllBlacklistByMemberType(MemberType.STUDENT);
-
-        List<ResponseFindBlacklistVO> response = new ArrayList<>();
-
-        // dto -> ResponseFindBlacklistVO로 전환해주기
-        for(BlacklistDTO blacklistDTO : blacklistDTOList) {
-            response.add(blacklistMapper.fromBlacklistDTOToResponseFindReportVO(blacklistDTO));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 2. 모든 강사 블랙리스트 조회
     @Operation(summary = "직원 - 강사 블랙리스트 전체 조회")
     @GetMapping("/tutor")
-    public ResponseEntity<List<ResponseFindBlacklistVO>> findAllTutorBlacklist() {
+    public ResponseEntity<BlacklistPageResponse<ResponseFindBlacklistVO>> findAllTutorBlacklist(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size
+    ) {
+        BlacklistPageResponse<ResponseFindBlacklistVO> response
+                = blacklistService.findAllBlacklistByMemberType(page, size, MemberType.TUTOR);
 
-        // service에서 dto 반환
-        List<BlacklistDTO> blacklistDTOList = blacklistService.findAllBlacklistByMemberType(MemberType.TUTOR);
-
-        List<ResponseFindBlacklistVO> response = new ArrayList<>();
-
-        // dto -> ResponseFindBlacklistVO로 전환해주기
-        for(BlacklistDTO blacklistDTO : blacklistDTOList) {
-            response.add(blacklistMapper.fromBlacklistDTOToResponseFindReportVO(blacklistDTO));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 3. 학생 블랙리스트 단건 조회

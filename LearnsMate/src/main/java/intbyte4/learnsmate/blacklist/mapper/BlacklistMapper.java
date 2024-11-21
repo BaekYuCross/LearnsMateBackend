@@ -90,4 +90,15 @@ public class BlacklistMapper {
                 .build();
     }
 
+    public ResponseFindBlacklistVO fromBlacklistDTOtoResponseFindBlacklistVO(BlacklistDTO dto) {
+        return ResponseFindBlacklistVO.builder()
+                .blackCode(dto.getBlackCode())
+                .memberCode(dto.getMemberCode())
+                .memberName(dto.getMemberName())
+                .memberEmail(dto.getMemberEmail())
+                .blackReason(dto.getBlackReason())
+                .createdAt(dto.getCreatedAt())
+                .adminCode(dto.getAdminCode())
+                .build();
+    }
 }

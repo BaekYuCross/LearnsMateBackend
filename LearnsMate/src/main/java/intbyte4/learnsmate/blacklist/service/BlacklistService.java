@@ -5,8 +5,10 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
+import intbyte4.learnsmate.blacklist.domain.dto.BlacklistPageResponse;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
 import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.repository.BlacklistRepository;
 import intbyte4.learnsmate.comment.domain.dto.CommentDTO;
@@ -20,6 +22,8 @@ import intbyte4.learnsmate.report.domain.dto.ReportDTO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,8 +43,27 @@ public class BlacklistService {
     private final AdminMapper adminMapper;
 
     // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
-    public List<BlacklistDTO> findAllBlacklistByMemberType(MemberType memberType) {
-        return blacklistRepository.findAllBlacklistByMemberType(memberType);
+    public BlacklistPageResponse<ResponseFindBlacklistVO> findAllBlacklistByMemberType(int page, int size, MemberType memberType) {
+
+        // Pageable 객체 생성
+        PageRequest pageable = PageRequest.of(page, size);
+
+        // 페이징 처리된 데이터 조회
+        Page<BlacklistDTO> blacklistPage = blacklistRepository.findAllBlacklistByMemberType(memberType, pageable);
+
+        // DTO -> VO 변환
+        List<ResponseFindBlacklistVO> responseList = blacklistPage.getContent().stream()
+                .map(blacklistMapper::fromBlacklistDTOtoResponseFindBlacklistVO)
+                .collect(Collectors.toList());
+
+        // 페이지 응답 생성
+        return new BlacklistPageResponse<>(
+                responseList,
+                blacklistPage.getTotalElements(),
+                blacklistPage.getTotalPages(),
+                blacklistPage.getNumber(),
+                blacklistPage.getSize()
+        );
     }
 
     // 1. 멤버 타입에 따라 신고내역 횟수 뒤져서 찾기 reportService.findCount
