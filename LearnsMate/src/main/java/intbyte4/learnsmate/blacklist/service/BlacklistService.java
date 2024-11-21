@@ -3,12 +3,12 @@ package intbyte4.learnsmate.blacklist.service;
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistPageResponse;
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
+import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.admin.service.AdminServiceImpl;
+import intbyte4.learnsmate.blacklist.domain.dto.*;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
+import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedStudentBlacklistVO;
 import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.repository.BlacklistRepository;
 import intbyte4.learnsmate.comment.domain.dto.CommentDTO;
@@ -23,7 +23,9 @@ import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class BlacklistService {
     private final CommentService commentService;
     private final MemberMapper memberMapper;
     private final AdminMapper adminMapper;
+    private final AdminService adminService;
 
     // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
     public BlacklistPageResponse<ResponseFindBlacklistVO> findAllBlacklistByMemberType(int page, int size, MemberType memberType) {
@@ -69,19 +72,36 @@ public class BlacklistService {
     // 1. 멤버 타입에 따라 신고내역 횟수 뒤져서 찾기 reportService.findCount
     // (피신고자 코드의 횟수만 가져오면 됨. -> 피신고자 멤버코드, 신고 횟수)
     // 2. Member table에서 가져오기(true인 놈들)
-    public List<ReportedMemberDTO> findAllReservedBlacklistByMemberType(MemberType memberType) {
+    public ReservedBlacklistPageResponse<?> findAllReservedBlacklistByMemberType(
+            int page, int size, MemberType memberType)
+    {
 
-        // 모든 멤버 가져옴.
-        List<ReportedMemberDTO> reportedMoreThanFiveMemberList = reportService.findReportCountByMemberCode();
+        Pageable pageable = PageRequest.of(page, size);
 
-        // 멤버 타입이 동일한거만 가져오기 -> 원래는 sql로 처리해야하지만 많지 않을것이기 때문에 백엔드에서 처리해도 무방하다 생각
-        // + flag가 true인 사람 가져오기
-        List<ReportedMemberDTO> filteredList = reportedMoreThanFiveMemberList.stream()
+        // 모든 멤버 가져옴 (페이지네이션 포함)
+        Page<ReportedMemberDTO> reportedMemberPage = reportService.findReportCountByMemberCode(pageable);
+
+        // 멤버 타입이 동일하고 flag가 true인 사람만 필터링
+        List<ReportedMemberDTO> filteredList = reportedMemberPage.stream()
                 .filter(dto -> dto.getReportedMember().getMemberType().equals(memberType)
-                                && dto.getReportedMember().getMemberFlag())
-                .collect(Collectors.toList());
+                        && dto.getReportedMember().getMemberFlag())
+                .toList();
 
-        return filteredList;
+        // Page로 다시 변환
+        Page<ReportedMemberDTO> filteredPage = new PageImpl<>(filteredList, pageable, filteredList.size());
+
+        // DTO -> VO 변환
+        List<ResponseFindReservedStudentBlacklistVO> content = filteredPage.getContent().stream()
+                .map(blacklistMapper::fromReportedMemberDTOToResponseFindReservedStudentBlacklistVO)
+                .toList();
+
+        return new ReservedBlacklistPageResponse<>(
+                content,
+                filteredPage.getTotalElements(),
+                filteredPage.getTotalPages(),
+                page,
+                size
+        );
     }
 
     // 블랙리스트에서 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
@@ -113,7 +133,8 @@ public class BlacklistService {
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
 
         // 2. admin을 찾아와야 하는데 나중에 token으로 처리 할듯?
-        AdminDTO adminDTO = new AdminDTO();
+        AdminDTO adminDTO = adminService.findByAdminCode(202004002L);
+//        AdminDTO adminDTO = new AdminDTO();
         Admin admin = adminMapper.toEntity(adminDTO);
 
         // 3. BlacklistDTO 생성 -> 이유만 있으면 됨. -> 이유도 넘겨받아야함. -> dto 자체를 넘겨받으면 해결

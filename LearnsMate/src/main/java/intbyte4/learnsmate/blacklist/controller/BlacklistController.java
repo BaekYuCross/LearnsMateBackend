@@ -1,9 +1,6 @@
 package intbyte4.learnsmate.blacklist.controller;
 
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistPageResponse;
-import intbyte4.learnsmate.blacklist.domain.dto.BlacklistReportCommentDTO;
+import intbyte4.learnsmate.blacklist.domain.dto.*;
 import intbyte4.learnsmate.blacklist.domain.vo.request.RequestFilterBlacklistMemberVO;
 import intbyte4.learnsmate.blacklist.domain.vo.request.RequestSaveBlacklistVO;
 import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindBlacklistVO;
@@ -18,6 +15,7 @@ import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/blacklist")
@@ -90,40 +89,30 @@ public class BlacklistController {
     // 직원 - 예비 블랙리스트 전체 조회(학생)
     @Operation(summary = "직원 - 학생 예비 블랙리스트 전체 조회")
     @GetMapping("/student/reserved")
-    public ResponseEntity<List<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist() {
-        // dto로 받아와야하는데 어떤 dto로 받아올까?
-        // 학생코드, 학생명, 누적 신고 횟수 이렇게가 필요함. -> dto 하나 만들자.
-        List<ReportedMemberDTO> reservedBlacklistDTOList
-                = blacklistService.findAllReservedBlacklistByMemberType(MemberType.STUDENT);
+    public ResponseEntity<ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size
+    ) {
 
-        // ReportedMemberDTO -> ResponseFindReservedStudentBlacklistVO
-        List<ResponseFindReservedStudentBlacklistVO> response = new ArrayList<>();
-        for(ReportedMemberDTO reservedBlacklistDTO : reservedBlacklistDTOList) {
-            response.add(
-                    blacklistMapper.fromReportedMemberDTOToResponseFindReservedStudentBlacklistVO(reservedBlacklistDTO)
-            );
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO> response
+                = (ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>)
+                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.STUDENT);
+
+        return ResponseEntity.ok(response);
     }
 
     // 직원 - 예비 블랙리스트 전체 조회(강사)
     @Operation(summary = "직원 - 강사 예비 블랙리스트 전체 조회")
     @GetMapping("/tutor/reserved")
-    public ResponseEntity<List<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(){
-        // dto로 받아와야하는데 어떤 dto로 받아올까?
-        // 강사코드, 강사명, 누적 신고 횟수 이렇게가 필요함. -> dto 하나 만들자.
-        List<ReportedMemberDTO> reservedBlacklistDTOList
-                = blacklistService.findAllReservedBlacklistByMemberType(MemberType.TUTOR);
+    public ResponseEntity<ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ){
 
-        // ReportedMemberDTO -> ResponseFindReservedTutorBlacklistVO
-        List<ResponseFindReservedTutorBlacklistVO> response = new ArrayList<>();
+        ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO> response
+                = (ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>)
+                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.STUDENT);
 
-        for(ReportedMemberDTO reservedBlacklistDTO : reservedBlacklistDTOList) {
-            response.add(
-                    blacklistMapper.fromReportedMemberDTOToResponseFindReservedTutorBlacklistVO(reservedBlacklistDTO)
-            );
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 학생 예비 블랙리스트 단건 조회
@@ -165,6 +154,9 @@ public class BlacklistController {
             @PathVariable("membercode") Long memberCode,
             @RequestBody RequestSaveBlacklistVO request
     ){
+
+        log.info("MemberCode: {}", memberCode);
+        log.info("Request Body: {}", request);
         BlacklistDTO blacklistDTO = new BlacklistDTO();
         blacklistDTO.setMemberCode(memberCode);
         blacklistDTO.setBlackReason(request.getBlackReason());
