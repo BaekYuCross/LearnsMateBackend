@@ -3,6 +3,8 @@ package intbyte4.learnsmate.member.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
+import intbyte4.learnsmate.member.domain.dto.MemberPageResponse;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -11,6 +13,8 @@ import intbyte4.learnsmate.member.repository.MemberRepository;
 import intbyte4.learnsmate.member.repository.MemberRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,16 +38,26 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public List<MemberDTO> findAllMemberByMemberType(MemberType memberType) {
+    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberType(int page, int size, MemberType memberType) {
 
-        List<Member> allMember = memberRepository.findByMemberFlagTrueAndMemberType(memberType);
+        // Pageable 객체 생성
+        PageRequest pageable = PageRequest.of(page, size);
+        // 페이징 처리된 데이터 조회
+        Page<Member> memberPage = memberRepository.findByMemberFlagTrueAndMemberType(memberType, pageable);
 
-        List<MemberDTO> memberDTOList = new ArrayList<>();
-        for (Member member : allMember) {
-            memberDTOList.add(memberMapper.fromMembertoMemberDTO(member));
-        }
+        // Member -> ResponseFindMemberVO 변환
+        List<ResponseFindMemberVO> responseVOList = memberPage.getContent().stream()
+                .map(memberMapper::fromMemberToResponseFindMemberVO)
+                .collect(Collectors.toList());
 
-        return memberDTOList;
+        // MemberPageResponse 반환
+        return new MemberPageResponse<>(
+                responseVOList,
+                memberPage.getTotalElements(),
+                memberPage.getTotalPages(),
+                memberPage.getNumber(),
+                memberPage.getSize()
+        );
     }
 
     public MemberDTO findByStudentCode(Long memberCode) {

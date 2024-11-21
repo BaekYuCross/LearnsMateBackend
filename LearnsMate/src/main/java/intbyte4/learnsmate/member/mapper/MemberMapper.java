@@ -2,6 +2,7 @@ package intbyte4.learnsmate.member.mapper;
 
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignStudentVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -17,6 +18,7 @@ import intbyte4.learnsmate.payment.domain.vo.RequestRegisterMemberPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class MemberMapper{
@@ -200,6 +202,24 @@ public class MemberMapper{
                 .memberDormantFlag(request.getMemberDormantFlag())
                 .createdStartDate(request.getCreatedStartDate())
                 .createdEndDate(request.getCreatedEndDate())
+                .build();
+    }
+
+    public ResponseFindMemberVO fromMemberToResponseFindMemberVO(Member member) {
+        return ResponseFindMemberVO.builder()
+                .memberCode(member.getMemberCode())
+                .memberType(member.getMemberType())
+                .memberEmail(member.getMemberEmail())
+                .memberPassword(member.getMemberPassword())
+                .memberName(member.getMemberName())
+                .memberAge(member.getMemberAge())
+                .memberPhone(member.getMemberPhone())
+                .memberAddress(member.getMemberAddress())
+                .memberBirth(member.getMemberBirth())
+                .memberFlag(member.getMemberFlag())
+                .memberDormantStatus(member.getMemberDormantStatus())
+                .createdAt(member.getCreatedAt())
+                .updatedAt(member.getUpdatedAt())
                 .build();
     }
 }
