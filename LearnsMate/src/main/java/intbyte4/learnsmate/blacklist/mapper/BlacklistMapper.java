@@ -99,6 +99,7 @@ public class BlacklistMapper {
                 .blackReason(dto.getBlackReason())
                 .createdAt(dto.getCreatedAt())
                 .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
                 .build();
     }
 }
