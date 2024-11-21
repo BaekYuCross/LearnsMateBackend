@@ -14,7 +14,11 @@ import java.util.List;
 @Getter
 @Setter
 public class RequestRegisterCampaignVO {
+
+    @JsonProperty("student_list")
     private List<RequestFindCampaignStudentVO> studentList;
+
+    @JsonProperty("coupon_list")
     private List<RequestFindCampaignCouponVO> couponList;
 
     @JsonProperty("campaign_code")
