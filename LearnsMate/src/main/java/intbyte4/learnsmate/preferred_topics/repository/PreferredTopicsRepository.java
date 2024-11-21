@@ -28,4 +28,13 @@ public interface PreferredTopicsRepository extends JpaRepository<PreferredTopics
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    // 특정 학생과 동일한 lectureCategory를 선호하는 다른 학생들의 memberCode를 조회
+    @Query("SELECT pt.member " +
+            "FROM preferredTopics pt " +
+            "WHERE pt.lectureCategory IN (SELECT p.lectureCategory " +
+            "FROM preferredTopics p " +
+            "WHERE p.member = :studentCode) " +
+            "AND pt.member != :studentCode")
+    List<Long> findStudentsWithSimilarPreferredTopics(@Param("studentCode") Long studentCode);
 }
