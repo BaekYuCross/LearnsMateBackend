@@ -33,24 +33,14 @@ public class VOCServiceImpl implements VOCService {
     private final VOCCategoryService vocCategoryService;
 
     @Override
-    public List<VOCDTO> findAllByVOC() {
-        log.info("VOC 전체 조회 중");
-        List<VOC> vocList = vocRepository.findAll();
-        List<VOCDTO> VOCDTOList = new ArrayList<>();
-
-        for (VOC voc : vocList) {
-            VOCDTOList.add(vocMapper.fromEntityToDTO(voc));
-        }
-        return VOCDTOList;
-    }
-
-    @Override
     public VOCDTO findByVOCCode(String vocCode) {
         log.info("VOC 단 건 조회 중: {}", vocCode);
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
 
-        return vocMapper.fromEntityToDTO(voc);
+        VOCDTO vocDTO = vocMapper.fromEntityToDTO(voc);
+        log.info("매핑된 VOCDTO: {}", vocDTO);
+        return vocDTO;
     }
 
     @Override
