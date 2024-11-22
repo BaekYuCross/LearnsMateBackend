@@ -37,7 +37,7 @@ public class VOCController {
 
     @Operation(summary = "직원 - VOC 페이지 조회")
     @GetMapping("/list")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
         VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPage(page, size);
         return ResponseEntity.ok(response);
     }
