@@ -96,4 +96,38 @@ public class VOCFacade {
     public List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate) {
         return vocService.getFilteredCategoryCounts(startDate, endDate);
     }
+
+    public List<ResponseFindVOCVO> findAllVOCsByFilter(VOCFilterRequestDTO dto) {
+        List<VOCDTO> vocList = vocService.findAllByFilter(dto); // 페이징 없이 전체 데이터 조회
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+
+        for (VOCDTO vocDTO : vocList) {
+            MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
+            VOCCategoryDTO categoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
+            VOCAnswerDTO vocAnswerDTO = vocAnswerService.findByVOCCode(vocDTO.getVocCode());
+            AdminDTO adminDTO = vocAnswerDTO != null ? adminService.findByAdminCode(vocAnswerDTO.getAdminCode()) : null;
+
+            ResponseFindVOCVO responseVO = vocMapper.fromDTOToResponseVO(vocDTO, memberDTO, categoryDTO, adminDTO);
+            responseList.add(responseVO);
+        }
+
+        return responseList;
+    }
+
+    public List<ResponseFindVOCVO> findAllVOCs() {
+        List<VOCDTO> vocList = vocService.findAllVOCs();
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+
+        for (VOCDTO vocDTO : vocList) {
+            MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
+            VOCCategoryDTO categoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
+            VOCAnswerDTO vocAnswerDTO = vocAnswerService.findByVOCCode(vocDTO.getVocCode());
+            AdminDTO adminDTO = vocAnswerDTO != null ? adminService.findByAdminCode(vocAnswerDTO.getAdminCode()) : null;
+
+            ResponseFindVOCVO responseVO = vocMapper.fromDTOToResponseVO(vocDTO, memberDTO, categoryDTO, adminDTO);
+            responseList.add(responseVO);
+        }
+
+        return responseList;
+    }
 }

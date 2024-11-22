@@ -30,4 +30,8 @@ public interface VOCService {
     List<VOCCategoryCountDTO> getCategoryCounts();
 
     List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<VOCDTO> findAllByFilter(VOCFilterRequestDTO dto);
+
+    List<VOCDTO> findAllVOCs();
 }
