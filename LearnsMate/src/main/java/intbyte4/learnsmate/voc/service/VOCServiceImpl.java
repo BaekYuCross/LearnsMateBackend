@@ -119,4 +119,20 @@ public class VOCServiceImpl implements VOCService {
     public List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate) {
         return vocRepository.countVocByCategoryWithinDateRange(startDate, endDate);
     }
+
+    @Override
+    public List<VOCDTO> findAllByFilter(VOCFilterRequestDTO dto) {
+        List<VOC> vocList = vocRepository.findAllByFilter(dto);
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VOCDTO> findAllVOCs() {
+        List<VOC> vocList = vocRepository.findAll();
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+    }
 }
