@@ -1,6 +1,8 @@
 package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.CampaignFilterDTO;
+import intbyte4.learnsmate.campaign.domain.dto.CampaignPageResponse;
 import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
 import intbyte4.learnsmate.campaign.domain.vo.request.*;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
@@ -106,17 +108,17 @@ public class CampaignController {
     }
 
     @Operation(summary = "직원 - 조건 별 캠페인 조회")
-    @GetMapping("/filter")
-    public ResponseEntity<List<ResponseFindCampaignByConditionVO>> filterCampaigns
-            (@RequestBody RequestFindCampaignByConditionVO requestCampaignList
-                    , LocalDateTime startDate
-                    , LocalDateTime endDate){
-        CampaignDTO campaignDTO = campaignMapper.fromFindCampaignByConditionVOtoDTO(requestCampaignList);
-        List<CampaignDTO> campaignDTOList = campaignService.findCampaignListByCondition(campaignDTO, startDate, endDate);
+    @PostMapping("/filter")
+    public ResponseEntity<CampaignPageResponse<ResponseFindCampaignByConditionVO>> filterCampaigns
+            (@RequestBody RequestFindCampaignByConditionVO request,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "15") int size){
+        CampaignFilterDTO dto =
+                campaignMapper.fromFindCampaignByConditionVOtoFilterDTO(request);
 
-        List<ResponseFindCampaignByConditionVO> responseFindCampaignByConditionVOList = campaignMapper
-                .fromDtoListToFindCampaignByConditionVO(campaignDTOList);
+        CampaignPageResponse<ResponseFindCampaignByConditionVO> response = campaignService
+                .findCampaignListByCondition(dto, page, size);
 
-        return new ResponseEntity<>(responseFindCampaignByConditionVOList, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 }

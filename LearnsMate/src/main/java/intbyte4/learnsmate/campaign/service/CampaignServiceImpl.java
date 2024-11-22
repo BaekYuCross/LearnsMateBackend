@@ -5,9 +5,12 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.CampaignFilterDTO;
+import intbyte4.learnsmate.campaign.domain.dto.CampaignPageResponse;
 import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 
@@ -23,15 +26,21 @@ import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.userpercampaign.domain.dto.UserPerCampaignDTO;
 import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
     private final CampaignRepositoryCustom campaignRepositoryCustom;
@@ -49,14 +58,13 @@ public class CampaignServiceImpl implements CampaignService {
             , List<CouponDTO> requestCouponList) {
 
         LocalDateTime sendTime;
-
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
-
         if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
             sendTime = LocalDateTime.now();
         } else {
             sendTime = requestCampaign.getCampaignSendDate();
+            log.info("예약 시간 {}", sendTime);
         };
 
         Campaign campaign = Campaign.builder()
@@ -70,13 +78,14 @@ public class CampaignServiceImpl implements CampaignService {
                 .admin(admin)
                 .build();
 
-        campaignRepository.save(campaign);
+        Campaign savedCampaign = campaignRepository.save(campaign);
+        CampaignDTO savedCampaignDTO = campaignMapper.toDTO(savedCampaign);
 
         requestStudentList.forEach(memberDTO -> {
             MemberDTO foundStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
                     , memberDTO.getMemberType());
             if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
-            userPerCampaignService.registerUserPerCampaign(foundStudent, requestCampaign);
+            userPerCampaignService.registerUserPerCampaign(foundStudent, savedCampaignDTO);
         });
 
         requestCouponList.forEach(couponDTO -> {
@@ -85,7 +94,7 @@ public class CampaignServiceImpl implements CampaignService {
             else if (foundCoupon.getTutorCode() != null) {
                 throw new CommonException(StatusEnum.COUPON_CANNOT_BE_SENT_BY_TUTOR);
             }
-            couponByCampaignService.registerCouponByCampaign(foundCoupon, requestCampaign);
+            couponByCampaignService.registerCouponByCampaign(foundCoupon, savedCampaignDTO);
         });
 
         return campaignMapper.toDTO(campaign);
@@ -201,15 +210,24 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<CampaignDTO> findCampaignListByCondition
-            (CampaignDTO request, LocalDateTime startDate, LocalDateTime endDate) {
+    public CampaignPageResponse<ResponseFindCampaignByConditionVO> findCampaignListByCondition
+            (CampaignFilterDTO request, int page, int size) {
 
-        List<Campaign> campaign = campaignRepositoryCustom
-                .searchBy(request, startDate, endDate);
+        Pageable pageable = PageRequest.of(page, size);
 
-        List<CampaignDTO> campaignDTOList = new ArrayList<>();
-        campaign.forEach(entity -> campaignDTOList.add(campaignMapper.toDTO(entity)));
+        // 필터 조건과 페이징 처리된 데이터 조회
+        Page<Campaign> campaignPage = campaignRepository.searchBy(request, pageable);
 
-        return campaignDTOList;
+        List<ResponseFindCampaignByConditionVO> campaignDTOList = campaignPage.getContent().stream()
+                .map(campaignMapper::fromCampaignToResponseFindCampaignByConditionVO)
+                .collect(Collectors.toList());
+
+        return new CampaignPageResponse<>(
+                campaignDTOList,               // 데이터 리스트
+                campaignPage.getTotalElements(), // 전체 데이터 수
+                campaignPage.getTotalPages(),    // 전체 페이지 수
+                campaignPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
+                campaignPage.getSize()           // 페이지 크기
+        );
     }
 }

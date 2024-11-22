@@ -1,8 +1,10 @@
 package intbyte4.learnsmate.campaign.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -30,9 +32,12 @@ public class Campaign {
     private CampaignTypeEnum campaignType;
 
     @Column(name = "campaign_send_date")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime campaignSendDate;
 
+
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")

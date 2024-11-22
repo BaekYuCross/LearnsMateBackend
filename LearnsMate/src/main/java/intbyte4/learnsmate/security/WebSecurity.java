@@ -81,6 +81,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/voc/count-by-category", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/campaign/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign-template/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "POST")).permitAll()
