@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface VOCService {
-    List<VOCDTO> findAllByVOC();
-
     VOCDTO findByVOCCode(String vocDTO);
 
     void updateVOCAnswerStatus(String vocCode, boolean vocAnswerStatus);
