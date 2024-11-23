@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.lecture_category_by_lecture.repository;
 
+import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCategoryByLecture;
 import intbyte4.learnsmate.member.domain.dto.CategoryCountDTO;
@@ -49,4 +50,6 @@ public interface LectureCategoryByLectureRepository extends JpaRepository<Lectur
     List<CategoryCountDTO> countLecturesByCategoryWithinDateRange(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
+
+    LectureCategoryByLectureDTO findByLecture_LectureCode(String lectureCode);
 }
