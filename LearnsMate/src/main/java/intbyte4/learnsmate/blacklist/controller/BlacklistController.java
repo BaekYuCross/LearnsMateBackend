@@ -164,12 +164,13 @@ public class BlacklistController {
     }
 
     @Operation(summary = "학생 - 블랙리스트 필터링 기능 추가")
-    @GetMapping("/filter/student")
+    @PostMapping("/filter/student")
     public ResponseEntity<BlacklistPageResponse<ResponseFindBlacklistVO>> filterBlackStudent(
             @RequestBody RequestFilterBlacklistMemberVO vo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size
     ){
+        log.info(vo.toString());
         BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
         dto.setMemberType(MemberType.STUDENT);
 
@@ -179,12 +180,13 @@ public class BlacklistController {
     }
 
     @Operation(summary = "강사 - 블랙리스트 필터링 기능 추가")
-    @GetMapping("/filter/tutor")
+    @PostMapping("/filter/tutor")
     public ResponseEntity<?> filterBlackTutor(
             @RequestBody RequestFilterBlacklistMemberVO vo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size
     ){
+        log.info(vo.toString());
         BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
         dto.setMemberType(MemberType.TUTOR);
 

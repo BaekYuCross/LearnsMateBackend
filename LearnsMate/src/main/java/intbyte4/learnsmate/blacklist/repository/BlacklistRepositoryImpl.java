@@ -23,13 +23,22 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
     @Override
     public Page<Blacklist> searchBy(BlacklistFilterRequestDTO request, Pageable pageable) {
         QBlacklist blacklist = QBlacklist.blacklist;
-
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(eqMemberCode(request.getMemberCode()))
-                .and(likeMemberName(request.getMemberName()))
-                .and(likeMemberEmail(request.getMemberEmail())
-                .and(eqMemberType(request.getMemberType())));
-
+        BooleanBuilder builder = new BooleanBuilder();
+        if (eqBlackCode(request.getBlackCode()) != null) {
+            builder.and(eqBlackCode(request.getBlackCode()));
+        }
+        if (eqMemberCode(request.getMemberCode()) != null) {
+            builder.and(eqMemberCode(request.getMemberCode()));
+        }
+        if (likeMemberName(request.getMemberName()) != null) {
+            builder.and(likeMemberName(request.getMemberName()));
+        }
+        if (likeMemberEmail(request.getMemberEmail()) != null) {
+            builder.and(likeMemberEmail(request.getMemberEmail()));
+        }
+        if (eqMemberType(request.getMemberType()) != null) {
+            builder.and(eqMemberType(request.getMemberType()));
+        }
 
         // Query 생성
         JPAQuery<Blacklist> query = queryFactory
@@ -44,6 +53,10 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
                 .fetch();
 
         return new PageImpl<>(blacklists, pageable, total);
+    }
+
+    private BooleanExpression eqBlackCode(Long blackCode){
+        return blackCode == null ? null : QBlacklist.blacklist.blackCode.eq(blackCode);
     }
 
     // memberCode 검색 조건

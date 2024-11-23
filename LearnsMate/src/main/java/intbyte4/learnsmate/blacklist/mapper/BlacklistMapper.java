@@ -85,6 +85,7 @@ public class BlacklistMapper {
 
     public BlacklistFilterRequestDTO fromFilterMemberVOtoFilterMemberDTO(RequestFilterBlacklistMemberVO vo) {
         return BlacklistFilterRequestDTO.builder()
+                .blackCode(vo.getBlackCode())
                 .memberCode(vo.getMemberCode())
                 .memberName(vo.getMemberName())
                 .memberEmail(vo.getMemberEmail())
