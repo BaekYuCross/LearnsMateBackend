@@ -51,5 +51,5 @@ public interface LectureCategoryByLectureRepository extends JpaRepository<Lectur
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    LectureCategoryByLectureDTO findByLecture_LectureCode(String lectureCode);
+    LectureCategoryByLecture findByLecture_LectureCode(String lectureCode);
 }

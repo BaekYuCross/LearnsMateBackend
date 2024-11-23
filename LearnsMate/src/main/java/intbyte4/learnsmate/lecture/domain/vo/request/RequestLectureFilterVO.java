@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +25,6 @@ public class RequestLectureFilterVO {
     private Boolean lectureStatus; // 강의 상태
     private Integer minPrice; // 최소 금액
     private Integer maxPrice; // 최대 금액
-    private LocalDateTime startCreatedAt; // 강의 생성일 시작
-    private LocalDateTime endCreatedAt; // 강의 생성일 끝
+    private LocalDate startCreatedAt; // 강의 생성일 시작
+    private LocalDate endCreatedAt; // 강의 생성일 끝
 }

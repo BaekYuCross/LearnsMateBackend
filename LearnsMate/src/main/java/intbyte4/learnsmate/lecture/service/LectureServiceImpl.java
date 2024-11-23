@@ -16,7 +16,9 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,7 +89,9 @@ public class LectureServiceImpl implements LectureService {
     }
 
     @Override
-    public Page<ResponseFindLectureVO> filterLectureWithPaging(LectureFilterDTO filterDTO, PageRequest pageable) {
-        return lectureRepository.searchByWithPaging(filterDTO, pageable);
+    public Page<LectureDTO> filterLectureWithPaging(LectureFilterDTO filterDTO, Pageable pageable) {
+        Page<ResponseFindLectureVO> lecturePage = lectureRepository.searchByWithPaging(filterDTO, pageable);
+
+        return lecturePage.map(lectureMapper::convertToLectureDTO);
     }
 }

@@ -2,7 +2,7 @@ package intbyte4.learnsmate.lecture.domain.dto;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,7 +21,7 @@ public class LectureFilterDTO {
     private Boolean lectureStatus; // 강의 상태
     private Integer minPrice; // 금액
     private Integer maxPrice; // 금액
-    private LocalDateTime startCreatedAt; // 강의 생성일
-    private LocalDateTime endCreatedAt; // 강의 생성일
+    private LocalDate startCreatedAt; // 강의 생성일
+    private LocalDate endCreatedAt; // 강의 생성일
 }
 

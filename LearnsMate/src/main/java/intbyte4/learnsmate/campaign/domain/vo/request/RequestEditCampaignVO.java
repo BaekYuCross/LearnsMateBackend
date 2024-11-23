@@ -14,8 +14,18 @@ import java.util.List;
 @Getter
 @Setter
 public class RequestEditCampaignVO {
+
+    @JsonProperty("members")
     private List<RequestEditCampaignStudentVO> studentList;
+
+    @JsonProperty("coupons")
     private List<RequestEditCampaignCouponVO> couponList;
+
+    @JsonProperty("admin_code")
+    private Long adminCode;
+
+    @JsonProperty("campaign_code")
+    private Long campaignCode;
 
     @JsonProperty("campaign_title")
     private String campaignTitle;
@@ -23,10 +33,16 @@ public class RequestEditCampaignVO {
     @JsonProperty("campaign_contents")
     private String campaignContents;
 
+    @JsonProperty("campaign_type")
+    private String campaignType;
+
     @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;
 
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
+
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
 
 }

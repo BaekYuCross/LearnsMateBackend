@@ -99,6 +99,7 @@ public class LectureCategoryByLectureService {
     }
 
     public LectureCategoryByLectureDTO findLectureCategoryByLectureCode(String lectureCode) {
-        return lectureCategoryByLectureRepository.findByLecture_LectureCode(lectureCode);
+        LectureCategoryByLecture lectureCategoryByLecture = lectureCategoryByLectureRepository.findByLecture_LectureCode(lectureCode);
+        return lectureCategoryByLectureMapper.toDTO(lectureCategoryByLecture);
     }
 }

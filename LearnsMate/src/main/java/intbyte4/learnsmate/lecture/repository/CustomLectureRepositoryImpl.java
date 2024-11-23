@@ -14,10 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     }
 
     @Override
-    public Page<ResponseFindLectureVO> searchByWithPaging(LectureFilterDTO filterDTO, PageRequest pageable) {
+    public Page<ResponseFindLectureVO> searchByWithPaging(LectureFilterDTO filterDTO, Pageable pageable) {
         BooleanBuilder builder = createFilterConditions(filterDTO);
 
         Long total = queryFactory
@@ -62,25 +63,27 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
                 .fetchOne();
 
         List<ResponseFindLectureVO> content = queryFactory
-                .select(Projections.constructor(ResponseFindLectureVO.class,
-                        lecture.lectureCode,
-                        lecture.lectureTitle,
-                        lecture.tutor.memberCode,
-                        lecture.tutor.memberName,
-                        lectureCategory.lectureCategoryName.stringValue(),
-                        lecture.lectureLevel.stringValue(),
-                        lecture.createdAt,
-                        lecture.lecturePrice,
-                        lecture.lectureConfirmStatus,
-                        lecture.lectureStatus
-                ))
+                .select(Projections.fields(ResponseFindLectureVO.class,
+                                lecture.lectureCode.as("lectureCode"),
+                                lecture.lectureTitle.as("lectureTitle"),
+                                lecture.tutor.memberCode.as("tutorCode"),
+                                lecture.tutor.memberName.as("tutorName"),
+                                lectureCategory.lectureCategoryName.stringValue().as("lectureCategoryName"),
+                                lecture.lectureLevel.stringValue().as("lectureLevel"),
+                                lecture.createdAt.as("createdAt"),
+                                lecture.lecturePrice.as("lecturePrice"),
+                                lecture.lectureConfirmStatus.as("lectureConfirmStatus"),
+                                lecture.lectureStatus.as("lectureStatus")
+                        )
+                )
                 .from(lecture)
                 .leftJoin(lecture.tutor)
                 .leftJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
                 .leftJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
                 .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
-
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
@@ -148,17 +151,19 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
         return lecture.lecturePrice.between(minPrice, maxPrice);
     }
 
-    private BooleanExpression betweenCreatedAt(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
-        if (startCreatedAt == null && endCreatedAt == null) {
+    private BooleanExpression betweenCreatedAt(LocalDate startCreatedAt, LocalDate endCreatedAt) {
+        LocalDateTime startDateTime = (startCreatedAt != null) ? startCreatedAt.atStartOfDay() : null;
+        LocalDateTime endDateTime = (endCreatedAt != null) ? endCreatedAt.atTime(23, 59, 59) : null;
+
+        if (startDateTime == null && endDateTime == null) {
             return null;
         }
-        if (startCreatedAt == null) {
-            return lecture.createdAt.loe(endCreatedAt);
+        if (startDateTime == null) {
+            return lecture.createdAt.loe(endDateTime);
         }
-        if (endCreatedAt == null) {
-            return lecture.createdAt.goe(startCreatedAt);
+        if (endDateTime == null) {
+            return lecture.createdAt.goe(startDateTime);
         }
-        return lecture.createdAt.between(startCreatedAt, endCreatedAt);
+        return lecture.createdAt.between(startDateTime, endDateTime);
     }
-
 }
