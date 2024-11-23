@@ -14,4 +14,12 @@ public interface CouponByLectureService {
     List<CouponByLectureDTO> findCouponByLecture(Long tutorCode);
 
     CouponByLectureDTO findByCouponAndLecture(Lecture lecture, CouponEntity coupon);
+
+    List<String> getLectureCodesByCouponCode(Long couponCode);
+
+    List<String> getLectureNamesByCouponCode(Long couponCode);
+
+    List<String> getTutorNamesByCouponCode(Long couponCode);
+
+    List<Integer> getLecturePricesByCouponCode(Long couponCode);
 }
