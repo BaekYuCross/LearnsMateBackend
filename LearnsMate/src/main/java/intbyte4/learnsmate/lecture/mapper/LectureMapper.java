@@ -170,4 +170,20 @@ public class LectureMapper {
                 .lecturePrice(lectureDTO.getLecturePrice())
                 .build();
     }
+
+    public LectureDTO convertToLectureDTO(ResponseFindLectureVO vo) {
+        return LectureDTO.builder()
+                .lectureCode(vo.getLectureCode())
+                .lectureTitle(vo.getLectureTitle())
+                .lectureConfirmStatus(vo.getLectureConfirmStatus())
+                .createdAt(vo.getCreatedAt())
+                .updatedAt(null)
+                .lectureImage(null)
+                .lecturePrice(vo.getLecturePrice())
+                .tutorCode(vo.getTutorCode())
+                .lectureStatus(vo.getLectureStatus())
+                .lectureClickCount(0)
+                .lectureLevel(vo.getLectureLevel())
+                .build();
+    }
 }

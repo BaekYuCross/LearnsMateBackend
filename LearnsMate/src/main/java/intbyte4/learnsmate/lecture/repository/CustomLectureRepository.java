@@ -13,5 +13,5 @@ import java.util.List;
 public interface CustomLectureRepository {
     List<Lecture> findAllByFilter(LectureFilterDTO dto);
 
-    Page<ResponseFindLectureVO> searchByWithPaging(LectureFilterDTO filterDTO, PageRequest pageable);
+    Page<ResponseFindLectureVO> searchByWithPaging(LectureFilterDTO filterDTO, Pageable pageable);
 }
