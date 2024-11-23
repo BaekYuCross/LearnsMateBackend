@@ -14,6 +14,7 @@ import intbyte4.learnsmate.userpercampaign.domain.dto.UserPerCampaignDTO;
 import intbyte4.learnsmate.userpercampaign.domain.entity.UserPerCampaign;
 import intbyte4.learnsmate.userpercampaign.mapper.UserPerCampaignMapper;
 import intbyte4.learnsmate.userpercampaign.repository.UserPerCampaignRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -70,5 +71,11 @@ public class UserPerCampaignServiceImpl implements UserPerCampaignService{
                 .build();
 
         userPerCampaignRepository.delete(getUserPerCampaignCode);
+    }
+
+    @Transactional
+    @Override
+    public void removeByCampaignCode(Long campaignCode) {
+        userPerCampaignRepository.deleteByCampaign_CampaignCode(campaignCode);
     }
 }

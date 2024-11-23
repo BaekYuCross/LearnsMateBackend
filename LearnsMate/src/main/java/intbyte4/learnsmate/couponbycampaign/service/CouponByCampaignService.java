@@ -11,4 +11,5 @@ public interface CouponByCampaignService {
     void registerCouponByCampaign(CouponDTO coupon, CampaignDTO campaign);
     List<CouponByCampaignDTO> findByCampaignCode(Campaign updatedCampaign);
     void removeCouponByCampaign(Long couponByCampaignCode);
+    void removeByCampaignCode(Long campaignCode);
 }
