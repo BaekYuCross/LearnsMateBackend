@@ -101,7 +101,7 @@ public class VOCController {
 
     @Operation(summary = "VOC 필터링")
     @PostMapping("/filter")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
         log.info("VOC 필터링 요청 수신");
         try {
             VOCFilterRequestDTO dto = vocMapper.fromFilterVOtoFilterDTO(request);

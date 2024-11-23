@@ -97,4 +97,8 @@ public class LectureCategoryByLectureService {
     public List<CategoryCountDTO> countLecturesByCategoryWithinDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return lectureCategoryByLectureRepository.countLecturesByCategoryWithinDateRange(startDate, endDate);
     }
+
+    public LectureCategoryByLectureDTO findLectureCategoryByLectureCode(String lectureCode) {
+        return lectureCategoryByLectureRepository.findByLecture_LectureCode(lectureCode);
+    }
 }

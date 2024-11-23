@@ -88,6 +88,10 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc-answer/register", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc-answer/edit/**", "PATCH")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/lecture/**", "PATCH")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/lecture/**", "POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/lecture/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/lecture/excel/**", "POST")).permitAll()
                                 .anyRequest().authenticated()
                 )
                 // UserDetails를 상속받는 Service 계층 + BCrypt 암호화

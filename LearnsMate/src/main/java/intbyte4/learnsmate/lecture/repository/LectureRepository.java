@@ -1,7 +1,10 @@
 package intbyte4.learnsmate.lecture.repository;
 
+import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface LectureRepository extends JpaRepository<Lecture, String> , JpaSpecificationExecutor<Lecture> {
+public interface LectureRepository extends JpaRepository<Lecture, String> , JpaSpecificationExecutor<Lecture>, CustomLectureRepository {
     List<Lecture> findAllByTutor(Member tutor);
 
     @Query("SELECT l FROM lecture l ORDER BY l.createdAt DESC")
