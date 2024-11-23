@@ -4,6 +4,7 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
 import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentService;
@@ -17,6 +18,8 @@ import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.repository.MemberRepository;
+import intbyte4.learnsmate.payment.service.PaymentService;
+import intbyte4.learnsmate.preferred_topics.service.PreferredTopicsService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureFacade;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
@@ -25,9 +28,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,41 +49,50 @@ public class MemberFacade {
     private final LectureVideoByStudentService lectureVideoByStudentService;
     private final VideoByLectureFacade videoByLectureFacade;
     private final LectureCategoryByLectureService lectureCategoryByLectureService;
+    private final PaymentService paymentService;
+    private final PreferredTopicsService preferredTopicsService;
 
     // 멤버 단일 조회시에 사용되는 서비스
     // memberCode로 학생 조회
     public FindSingleStudentDTO findStudentByStudentCode(Long studentCode) {
-        Member member = memberRepository.findById(studentCode)
-                .orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
+        Member member = memberRepository.findById(studentCode).orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
+        if (!member.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
 
-        if(!member.getMemberType().equals(MemberType.STUDENT))
-            throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
-
-        // 0. 학생 개인정보
         MemberDTO studentDTO = memberMapper.fromMembertoMemberDTO(member);
 
-        // 1. 학생의 강의
-        List<LectureVideoProgressDTO> LectureVideoProgressDTOList = lectureVideoByStudentService.getVideoProgressByStudent(studentCode);
+        List<LectureVideoProgressDTO> lectureVideoProgressDTOList = lectureVideoByStudentService.getVideoProgressByStudent(studentCode);
 
-        // 2. 학생이 보유 or 사용한 쿠폰
         Map<String, List<IssueCouponDTO>> studentCoupons = issueCouponService.findAllStudentCoupons(studentCode);
         List<IssueCouponDTO> unusedCouponList = studentCoupons.get("unusedCoupons");
         List<IssueCouponDTO> usedCouponList = studentCoupons.get("usedCoupons");
 
-        // 3. 학생이 남긴 voc
         List<VOCDTO> unansweredVOCByMemberList = vocService.findUnansweredVOCByMember(studentCode);
         List<VOCDTO> answeredVOCByMemberList = vocService.findAnsweredVOCByMember(studentCode);
 
-        FindSingleStudentDTO dto = new FindSingleStudentDTO(
+        // 강의 추천 로직 추가
+        String latestLectureCode = paymentService.findLatestLectureCodeByStudent(studentCode);
+
+        List<Long> similarStudents = preferredTopicsService.findStudentsWithSimilarPreferredTopics(studentCode);
+
+        List<String> recommendedLectureCodes = Collections.emptyList();
+        if (!similarStudents.isEmpty()) {
+            Pageable pageable = PageRequest.of(0, 3); // 상위 3개만 가져오기
+            List<Object[]> recommendedLectures = paymentService.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
+
+            recommendedLectureCodes = recommendedLectures.stream()
+                    .map(record -> (String) record[0])
+                    .collect(Collectors.toList());
+        }
+
+        return new FindSingleStudentDTO(
                 studentDTO,
-                LectureVideoProgressDTOList,
+                lectureVideoProgressDTOList,
                 unusedCouponList,
                 usedCouponList,
                 unansweredVOCByMemberList,
-                answeredVOCByMemberList
+                answeredVOCByMemberList,
+                recommendedLectureCodes
         );
-
-        return dto;
     }
 
     public FindSingleTutorDTO findTutorByTutorCode(Long tutorCode) {
@@ -144,7 +158,7 @@ public class MemberFacade {
         return lectureCategoryByLectureService.countLecturesByCategoryWithinDateRange(startDate, endDate);
     }
 
-    public Map<String, Double> calculateCategoryPercentage(List<CategoryCountDTO> categoryCounts) {
+    public Map<LectureCategoryEnum, Double> calculateCategoryPercentage(List<CategoryCountDTO> categoryCounts) {
         long total = categoryCounts.stream()
                 .mapToLong(CategoryCountDTO::getCount)
                 .sum();
@@ -155,5 +169,4 @@ public class MemberFacade {
                         dto -> (double) dto.getCount() / total * 100
                 ));
     }
-
 }

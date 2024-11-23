@@ -33,6 +33,7 @@ import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -130,6 +131,17 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public int getPurchaseCountByLectureCode(String lectureCode) {
         return paymentRepository.countPaymentsByLectureCode(lectureCode);
+    }
+
+    @Override
+    public String findLatestLectureCodeByStudent(Long studentCode) {
+        return paymentRepository.findLatestLectureCodeByStudent(studentCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
+    }
+
+    @Override
+    public List<Object[]> findRecommendedLectures(List<Long> similarStudents, String latestLectureCode, Long studentCode, Pageable pageable) {
+        return paymentRepository.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
     }
 
     private Result getResult(MemberDTO memberDTO, LectureDTO lectureDTO) {

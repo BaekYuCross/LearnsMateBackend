@@ -34,4 +34,7 @@ public class ResponseFindCampaignByConditionVO {
 
     @JsonProperty("admin_code")
     private Long adminCode;
+
+    @JsonProperty("admin_name")
+    private String adminName;
 }

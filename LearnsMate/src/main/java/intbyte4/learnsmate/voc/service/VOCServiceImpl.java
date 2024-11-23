@@ -33,24 +33,14 @@ public class VOCServiceImpl implements VOCService {
     private final VOCCategoryService vocCategoryService;
 
     @Override
-    public List<VOCDTO> findAllByVOC() {
-        log.info("VOC 전체 조회 중");
-        List<VOC> vocList = vocRepository.findAll();
-        List<VOCDTO> VOCDTOList = new ArrayList<>();
-
-        for (VOC voc : vocList) {
-            VOCDTOList.add(vocMapper.fromEntityToDTO(voc));
-        }
-        return VOCDTOList;
-    }
-
-    @Override
     public VOCDTO findByVOCCode(String vocCode) {
         log.info("VOC 단 건 조회 중: {}", vocCode);
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
 
-        return vocMapper.fromEntityToDTO(voc);
+        VOCDTO vocDTO = vocMapper.fromEntityToDTO(voc);
+        log.info("매핑된 VOCDTO: {}", vocDTO);
+        return vocDTO;
     }
 
     @Override
@@ -118,5 +108,21 @@ public class VOCServiceImpl implements VOCService {
     @Override
     public List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate) {
         return vocRepository.countVocByCategoryWithinDateRange(startDate, endDate);
+    }
+
+    @Override
+    public List<VOCDTO> findAllByFilter(VOCFilterRequestDTO dto) {
+        List<VOC> vocList = vocRepository.findAllByFilter(dto);
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VOCDTO> findAllVOCs() {
+        List<VOC> vocList = vocRepository.findAll();
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
     }
 }

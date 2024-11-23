@@ -9,8 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestRegisterVOCAnswerVO {
-    @JsonProperty("voc_answer_code")
-    private Long vocAnswerCode;
     @JsonProperty("voc_answer_content")
     private String vocAnswerContent;
     @JsonProperty("voc_code")

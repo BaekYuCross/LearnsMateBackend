@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.controller;
 
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.member.domain.dto.*;
 import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
 import intbyte4.learnsmate.member.domain.vo.request.CategoryRatioFilterRequest;
@@ -143,18 +144,17 @@ public class MemberController {
 
     @Operation(summary = "총 기간 카테고리 별 강의를 가진 학생 수 비율 조회")
     @GetMapping("/category-ratio")
-    public ResponseEntity<Map<String, Double>> getCategoryRatio() {
+    public ResponseEntity<Map<LectureCategoryEnum, Double>> getCategoryRatio() {
         List<CategoryCountDTO> categoryCounts = memberFacade.getCategoryCounts();
-        Map<String, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
+        Map<LectureCategoryEnum, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
         return ResponseEntity.ok(categoryPercentageMap);
     }
 
     @Operation(summary = "특정 기간 카테고리 별 강의를 가진 학생 수 비율 조회")
     @PostMapping("/category-ratio/filter")
-    public ResponseEntity<Map<String, Double>> getFilteredCategoryRatioWithPercentage(@RequestBody CategoryRatioFilterRequest request) {
+    public ResponseEntity<Map<LectureCategoryEnum, Double>> getFilteredCategoryRatioWithPercentage(@RequestBody CategoryRatioFilterRequest request) {
         List<CategoryCountDTO> categoryCounts = memberFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
-        Map<String, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
+        Map<LectureCategoryEnum, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
         return ResponseEntity.ok(categoryPercentageMap);
     }
-
 }

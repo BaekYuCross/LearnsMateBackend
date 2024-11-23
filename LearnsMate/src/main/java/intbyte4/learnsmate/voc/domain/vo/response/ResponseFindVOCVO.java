@@ -32,4 +32,8 @@ public class ResponseFindVOCVO {
     private Boolean vocAnswerStatus;
     @JsonProperty("voc_answer_satisfaction")
     private String vocAnswerSatisfaction;
+    @JsonProperty("voc_answer_code")
+    private Long vocAnswerCode;
+    @JsonProperty("voc_answer_content")
+    private String vocAnswerContent;
 }

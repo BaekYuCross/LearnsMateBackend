@@ -14,7 +14,6 @@ import java.util.List;
 @Builder
 @ToString
 public class FindSingleStudentDTO {
-
     MemberDTO memberDTO;
 
     List<LectureVideoProgressDTO> LectureVideoProgressDTOList;
@@ -24,4 +23,6 @@ public class FindSingleStudentDTO {
 
     List<VOCDTO> unansweredVOCByMemberList;
     List<VOCDTO> answeredVOCByMemberList;
+
+    List<String> recommendedLectureCodes;
 }

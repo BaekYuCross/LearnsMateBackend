@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface VOCService {
-    List<VOCDTO> findAllByVOC();
-
     VOCDTO findByVOCCode(String vocDTO);
 
     void updateVOCAnswerStatus(String vocCode, boolean vocAnswerStatus);
@@ -30,4 +28,8 @@ public interface VOCService {
     List<VOCCategoryCountDTO> getCategoryCounts();
 
     List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<VOCDTO> findAllByFilter(VOCFilterRequestDTO dto);
+
+    List<VOCDTO> findAllVOCs();
 }
