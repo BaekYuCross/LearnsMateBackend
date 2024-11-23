@@ -18,6 +18,7 @@ import intbyte4.learnsmate.couponbycampaign.domain.dto.CouponByCampaignDTO;
 import intbyte4.learnsmate.couponbycampaign.domain.entity.CouponByCampaign;
 import intbyte4.learnsmate.couponbycampaign.mapper.CouponByCampaignMapper;
 import intbyte4.learnsmate.couponbycampaign.repository.CouponByCampaignRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -76,5 +77,11 @@ public class CouponByCampaignServiceImpl implements CouponByCampaignService{
                 .build();
 
         couponByCampaignRepository.delete(getCouponByCampaignCode);
+    }
+
+    @Transactional
+    @Override
+    public void removeByCampaignCode(Long campaignCode) {
+        couponByCampaignRepository.deleteByCampaign_CampaignCode(campaignCode);
     }
 }
