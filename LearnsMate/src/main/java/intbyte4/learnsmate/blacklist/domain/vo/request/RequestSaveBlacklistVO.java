@@ -11,5 +11,5 @@ import lombok.*;
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestSaveBlacklistVO {
-    private String BlackReason;
+    private String blackReason;
 }

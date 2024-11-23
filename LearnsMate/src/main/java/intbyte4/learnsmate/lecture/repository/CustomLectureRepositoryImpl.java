@@ -5,156 +5,160 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
-import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.QLecture;
-import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.QLectureCategoryByLecture;
-import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory.lectureCategory;
-
+@Slf4j
 @Repository
+@RequiredArgsConstructor
 public class CustomLectureRepositoryImpl implements CustomLectureRepository {
-
     private final JPAQueryFactory queryFactory;
+    private final QLecture lecture = QLecture.lecture;
+    private final QLectureCategory lectureCategory = QLectureCategory.lectureCategory;
+    private final QLectureCategoryByLecture lectureCategoryByLecture = QLectureCategoryByLecture.lectureCategoryByLecture;
 
-    public CustomLectureRepositoryImpl(EntityManager entityManager) {
-        this.queryFactory = new JPAQueryFactory(entityManager);
+    @Override
+    public List<Lecture> findAllByFilter(LectureFilterDTO dto) {
+        log.info("Finding all Lectures with filter: {}", dto);
+
+        BooleanBuilder builder = createFilterConditions(dto);
+
+        List<Lecture> results = queryFactory
+                .selectFrom(lecture)
+                .leftJoin(lecture.tutor).fetchJoin()
+                .leftJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
+                .leftJoin(lectureCategoryByLecture.lectureCategory, lectureCategory).fetchJoin()
+                .where(builder)
+                .orderBy(lecture.createdAt.desc())
+                .fetch();
+
+        log.info("Found {} results after filtering", results.size());
+        return results;
     }
 
     @Override
-    public List<LectureFilterDTO> findLecturesByFilters(RequestLectureFilterVO request) {
-        QLecture lecture = QLecture.lecture;
-        QLectureCategory lectureCategory = QLectureCategory.lectureCategory;
-        QLectureCategoryByLecture lectureCategoryByLecture = QLectureCategoryByLecture.lectureCategoryByLecture;
+    public Page<ResponseFindLectureVO> searchByWithPaging(LectureFilterDTO filterDTO, PageRequest pageable) {
+        BooleanBuilder builder = createFilterConditions(filterDTO);
 
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(eqLectureCode(request))
-                .and(likeLectureTitle(request))
-                .and(eqTutorCode(request))
-                .and(eqTutorName(request))
-                .and(eqLectureCategoryName(request))
-                .and(eqLectureLevel(request))
-                .and(eqLectureConfirmStatus(request))
-                .and(eqLectureStatus(request))
-                .and(betweenLecturePrice(request))
-                .and(betweenCreatedAt(request));
+        Long total = queryFactory
+                .select(lecture.countDistinct())
+                .from(lecture)
+                .leftJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
+                .leftJoin(lectureCategory).on(lectureCategoryByLecture.lectureCategory.eq(lectureCategory))
+                .where(builder)
+                .fetchOne();
 
-        return queryFactory
-                .select(Projections.constructor(
-                        LectureFilterDTO.class,
+        List<ResponseFindLectureVO> content = queryFactory
+                .select(Projections.constructor(ResponseFindLectureVO.class,
                         lecture.lectureCode,
                         lecture.lectureTitle,
                         lecture.tutor.memberCode,
                         lecture.tutor.memberName,
-                        lectureCategory.lectureCategoryName,
-                        lecture.lectureLevel,
-                        lecture.lectureConfirmStatus,
-                        lecture.lectureStatus,
+                        lectureCategory.lectureCategoryName.stringValue(),
+                        lecture.lectureLevel.stringValue(),
+                        lecture.createdAt,
                         lecture.lecturePrice,
-                        lecture.createdAt
+                        lecture.lectureConfirmStatus,
+                        lecture.lectureStatus
                 ))
                 .from(lecture)
-                .join(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
-                .join(lectureCategoryByLecture.lectureCategory, lectureCategory)
+                .leftJoin(lecture.tutor)
+                .leftJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
+                .leftJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
                 .where(builder)
                 .fetch();
+
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
-    private BooleanExpression eqLectureCode(RequestLectureFilterVO request) {
 
-        if (request.getLectureCode() == null) {
+    private BooleanBuilder createFilterConditions(LectureFilterDTO filterDTO) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(eqLectureCode(filterDTO.getLectureCode()))
+                .and(likeLectureTitle(filterDTO.getLectureTitle()))
+                .and(eqTutorCode(filterDTO.getTutorCode()))
+                .and(eqTutorName(filterDTO.getTutorName()))
+                .and(eqLectureCategoryName(filterDTO.getLectureCategoryName()))
+                .and(eqLectureLevel(filterDTO.getLectureLevel()))
+                .and(eqLectureConfirmStatus(filterDTO.getLectureConfirmStatus()))
+                .and(eqLectureStatus(filterDTO.getLectureStatus()))
+                .and(betweenLecturePrice(filterDTO.getMinPrice(), filterDTO.getMaxPrice()))
+                .and(betweenCreatedAt(filterDTO.getStartCreatedAt(), filterDTO.getEndCreatedAt()));
+
+        return builder;
+    }
+
+    private BooleanExpression eqLectureCode(String lectureCode) {
+        return StringUtils.hasText(lectureCode) ? lecture.lectureCode.eq(lectureCode) : null;
+    }
+
+    private BooleanExpression likeLectureTitle(String title) {
+        return StringUtils.hasText(title) ? lecture.lectureTitle.likeIgnoreCase("%" + title + "%") : null;
+    }
+
+    private BooleanExpression eqTutorCode(Long tutorCode) {
+        return tutorCode != null ? lecture.tutor.memberCode.eq(tutorCode) : null;
+    }
+
+    private BooleanExpression eqTutorName(String tutorName) {
+        return StringUtils.hasText(tutorName) ? lecture.tutor.memberName.eq(tutorName) : null;
+    }
+
+    private BooleanExpression eqLectureCategoryName(String categoryName) {
+        return StringUtils.hasText(categoryName) ? lectureCategory.lectureCategoryName.stringValue().eq(categoryName.toUpperCase()) : null;
+    }
+
+    private BooleanExpression eqLectureLevel(String level) {
+        return StringUtils.hasText(level) ? lecture.lectureLevel.stringValue().eq(level.toUpperCase()) : null;
+    }
+
+    private BooleanExpression eqLectureConfirmStatus(Boolean status) {
+        return status != null ? lecture.lectureConfirmStatus.eq(status) : null;
+    }
+
+    private BooleanExpression eqLectureStatus(Boolean status) {
+        return status != null ? lecture.lectureStatus.eq(status) : null;
+    }
+
+    private BooleanExpression betweenLecturePrice(Integer minPrice, Integer maxPrice) {
+        if (minPrice == null && maxPrice == null) {
             return null;
         }
-        return QLecture.lecture.lectureCode.eq(request.getLectureCode());
+        if (minPrice == null) {
+            return lecture.lecturePrice.loe(maxPrice);
+        }
+        if (maxPrice == null) {
+            return lecture.lecturePrice.goe(minPrice);
+        }
+        return lecture.lecturePrice.between(minPrice, maxPrice);
     }
 
-    private BooleanExpression likeLectureTitle(RequestLectureFilterVO request) {
-
-        if (request.getLectureTitle() == null) {
+    private BooleanExpression betweenCreatedAt(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
+        if (startCreatedAt == null && endCreatedAt == null) {
             return null;
         }
-        return QLecture.lecture.lectureTitle.likeIgnoreCase("%" + request.getLectureTitle() + "%");
+        if (startCreatedAt == null) {
+            return lecture.createdAt.loe(endCreatedAt);
+        }
+        if (endCreatedAt == null) {
+            return lecture.createdAt.goe(startCreatedAt);
+        }
+        return lecture.createdAt.between(startCreatedAt, endCreatedAt);
     }
 
-    private BooleanExpression eqTutorCode(RequestLectureFilterVO request) {
-
-        if (request.getTutorCode() == null) {
-            return null;
-        }
-        return QLecture.lecture.tutor.memberCode.eq(request.getTutorCode());
-    }
-
-    private BooleanExpression eqTutorName(RequestLectureFilterVO request) {
-
-        if (request.getTutorName() == null) {
-            return null;
-        }
-        return QLecture.lecture.tutor.memberName.eq(request.getTutorName());
-    }
-
-    private BooleanExpression eqLectureCategoryName(RequestLectureFilterVO request) {
-
-        if (request.getLectureCategoryName() == null) {
-            return null;
-        }
-        return lectureCategory.lectureCategoryName.eq(LectureCategoryEnum.valueOf(request.getLectureCategoryName()));
-    }
-
-    private BooleanExpression eqLectureLevel(RequestLectureFilterVO request) {
-
-        if (request.getLectureLevel() == null) {
-            return null;
-        }
-        return QLecture.lecture.lectureLevel.eq(LectureLevelEnum.valueOf(request.getLectureLevel()));
-    }
-
-    private BooleanExpression eqLectureConfirmStatus(RequestLectureFilterVO request) {
-
-        if (request.getLectureConfirmStatus() == null) {
-            return null;
-        }
-        return QLecture.lecture.lectureConfirmStatus.eq(request.getLectureConfirmStatus());
-    }
-
-    private BooleanExpression eqLectureStatus(RequestLectureFilterVO request) {
-
-        if (request.getLectureStatus() == null) {
-            return null;
-        }
-        return QLecture.lecture.lectureStatus.eq(request.getLectureStatus());
-    }
-
-    private BooleanExpression betweenLecturePrice(RequestLectureFilterVO request) {
-
-        if (request.getMinPrice() == null && request.getMaxPrice() == null) {
-            return null;
-        }
-        if (request.getMinPrice() == null) {
-            return QLecture.lecture.lecturePrice.loe(request.getMaxPrice());
-        }
-        if (request.getMaxPrice() == null) {
-            return QLecture.lecture.lecturePrice.gt(request.getMinPrice());
-        }
-        return QLecture.lecture.lecturePrice.between(request.getMinPrice(), request.getMaxPrice());
-    }
-
-    private BooleanExpression betweenCreatedAt(RequestLectureFilterVO request) {
-
-        if (request.getStartCreatedAt() == null && request.getEndCreatedAt() == null) {
-            return null;
-        }
-        if (request.getEndCreatedAt() == null) {
-            return QLecture.lecture.createdAt.gt(request.getStartCreatedAt());
-        }
-        if (request.getStartCreatedAt() == null) {
-            return QLecture.lecture.createdAt.lt(request.getEndCreatedAt());
-        }
-        return QLecture.lecture.createdAt.between(request.getStartCreatedAt(), request.getEndCreatedAt());
-    }
 }

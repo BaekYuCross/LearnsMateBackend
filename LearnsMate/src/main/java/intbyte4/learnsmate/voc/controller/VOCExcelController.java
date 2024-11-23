@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/voc/excel")
 @Slf4j
@@ -20,10 +18,23 @@ public class VOCExcelController {
 
     @PostMapping("/download")
     @Operation(summary = "VOC 엑셀 다운로드", description = "VOC 목록을 엑셀 파일로 다운로드합니다.")
-    public void downloadVOCExcel(HttpServletResponse response, @RequestBody(required = false) VOCFilterRequestDTO filterDTO, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) throws IOException {
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=\"voc_data.xlsx\"");
+    public void downloadVOCExcel(HttpServletResponse response, @RequestBody(required = false) VOCFilterRequestDTO filterDTO) {
+        try {
+            log.info("Excel download request received");
 
-        vocExcelService.exportVOCToExcel(response.getOutputStream(), filterDTO, page, size);
+            if (filterDTO != null) {
+                log.info("Filter DTO parsed: {}", filterDTO);
+                log.info("Answer status type: {}", filterDTO.getVocAnswerStatus() != null ?
+                        filterDTO.getVocAnswerStatus().getClass().getName() : "null");
+            }
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=\"voc_data.xlsx\"");
+
+            vocExcelService.exportVOCToExcel(response.getOutputStream(), filterDTO);
+        } catch (Exception e) {
+            log.error("Error during excel download:", e);
+            throw new RuntimeException("Excel download failed", e);
+        }
     }
 }
+

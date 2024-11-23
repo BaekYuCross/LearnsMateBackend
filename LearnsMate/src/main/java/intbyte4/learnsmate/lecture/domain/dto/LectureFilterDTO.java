@@ -1,6 +1,5 @@
 package intbyte4.learnsmate.lecture.domain.dto;
 
-import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,10 +15,13 @@ public class LectureFilterDTO {
     private String lectureTitle; // 강의명
     private Long tutorCode; // 강사 코드
     private String tutorName; // 강사명
-    private String lectureCategory; // 강의 카테고리
-    private LectureLevelEnum lectureLevel; // 강의 난이도
+    private String lectureCategoryName;
+    private String lectureLevel;
     private Boolean lectureConfirmStatus; // 강의 계약 상태
     private Boolean lectureStatus; // 강의 상태
-    private Integer price; // 금액
-    private LocalDateTime createdAt; // 강의 생성일
+    private Integer minPrice; // 금액
+    private Integer maxPrice; // 금액
+    private LocalDateTime startCreatedAt; // 강의 생성일
+    private LocalDateTime endCreatedAt; // 강의 생성일
 }
+

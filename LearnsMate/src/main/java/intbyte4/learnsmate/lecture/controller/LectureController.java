@@ -1,6 +1,9 @@
 package intbyte4.learnsmate.lecture.controller;
 
+import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.*;
 import intbyte4.learnsmate.lecture.pagination.LectureCursorPaginationResponse;
 import intbyte4.learnsmate.lecture.service.LectureFacade;
@@ -13,6 +16,8 @@ import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,17 +50,16 @@ public class LectureController {
 
     @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 조회")
     @GetMapping("/list")
-    public ResponseEntity<LectureCursorPaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor, @RequestParam(defaultValue = "15") int pageSize, @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<LectureCursorPaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "0") int page) {
         if (cursor == null) {
-            List<LectureDTO> lectureDTOs = lectureFacade.getLecturesWithPaginationByOffset(page, pageSize);
-            boolean hasNext = lectureDTOs.size() == pageSize;
+            LecturePageInfo pageInfo = lectureFacade.getLecturesWithPaginationByOffset(page, pageSize);
+            boolean hasNext = pageInfo.getLectures().size() == pageSize;
 
-            List<ResponseFindLectureVO> responseList = lectureDTOs.stream()
+            List<ResponseFindLectureVO> responseList = pageInfo.getLectures().stream()
                     .map(lectureFacade::convertToResponseFindLectureVO)
                     .collect(Collectors.toList());
 
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    LectureCursorPaginationResponse.ofOffset(responseList, page, pageSize, hasNext)
+            return ResponseEntity.status(HttpStatus.OK).body(LectureCursorPaginationResponse.ofOffset(responseList, page, pageSize, hasNext, pageInfo.getTotalElements())
             );
         }
 
@@ -65,9 +69,7 @@ public class LectureController {
                 .map(lectureFacade::convertToResponseFindLectureVO)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK).body(
-                LectureCursorPaginationResponse.ofCursor(responseList, lectureResponse.getNextCursor())
-        );
+        return ResponseEntity.status(HttpStatus.OK).body(LectureCursorPaginationResponse.ofCursor(responseList, lectureResponse.getNextCursor(), lectureResponse.getTotalElements()));
     }
 
     @Operation(summary = "강의 단 건 조회 + 클릭수 -> 실제 결제까지의 비율 조회")
@@ -113,5 +115,18 @@ public class LectureController {
     public ResponseEntity<List<MonthlyLectureCountDTO>> getMonthlyLectureCounts() {
         List<MonthlyLectureCountDTO> lectureCounts = lectureService.getMonthlyLectureCounts();
         return ResponseEntity.ok(lectureCounts);
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<Page<ResponseFindLectureVO>> filterLectures(@RequestBody RequestLectureFilterVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+        try {
+            LectureFilterDTO filterDTO = lectureMapper.toFilterDTO(request);
+            log.info("filterDTO: " + filterDTO.toString());
+            Page<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("강의 필터링 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

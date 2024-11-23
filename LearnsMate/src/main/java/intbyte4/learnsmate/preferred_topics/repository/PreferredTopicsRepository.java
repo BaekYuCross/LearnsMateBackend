@@ -30,11 +30,11 @@ public interface PreferredTopicsRepository extends JpaRepository<PreferredTopics
     );
 
     // 특정 학생과 동일한 lectureCategory를 선호하는 다른 학생들의 memberCode를 조회
-    @Query("SELECT pt.member " +
+    @Query("SELECT pt.member.memberCode " +
             "FROM preferredTopics pt " +
             "WHERE pt.lectureCategory IN (SELECT p.lectureCategory " +
             "FROM preferredTopics p " +
-            "WHERE p.member = :studentCode) " +
-            "AND pt.member != :studentCode")
+            "WHERE p.member.memberCode = :studentCode) " +
+            "AND pt.member.memberCode != :studentCode")
     List<Long> findStudentsWithSimilarPreferredTopics(@Param("studentCode") Long studentCode);
 }

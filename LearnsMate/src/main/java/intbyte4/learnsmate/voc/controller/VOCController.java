@@ -37,7 +37,7 @@ public class VOCController {
 
     @Operation(summary = "직원 - VOC 페이지 조회")
     @GetMapping("/list")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
         VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPage(page, size);
         return ResponseEntity.ok(response);
     }
@@ -48,10 +48,10 @@ public class VOCController {
         log.info("조회 요청된 VOC 코드 : {}", vocCode);
         try {
             ResponseFindVOCVO response = vocFacade.findVOC(vocCode);
-            log.info("캠페인 템플릿 조회 성공: {}", response);
+            log.info("VOC 단 건 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {
-            log.error("캠페인 템플릿 조회 오류: {}", e.getMessage());
+            log.error("VOC 단 건 조회 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("예상치 못한 오류", e);
@@ -101,7 +101,7 @@ public class VOCController {
 
     @Operation(summary = "VOC 필터링")
     @PostMapping("/filter")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
         log.info("VOC 필터링 요청 수신");
         try {
             VOCFilterRequestDTO dto = vocMapper.fromFilterVOtoFilterDTO(request);

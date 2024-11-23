@@ -17,8 +17,10 @@ import intbyte4.learnsmate.coupon_category.service.CouponCategoryServiceImpl;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.vo.response.LecturePageInfo;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureDetailVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -26,7 +28,9 @@ import intbyte4.learnsmate.lecture.pagination.LectureCursorPaginationResponse;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
-import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
+import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
+import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
+import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -38,11 +42,11 @@ import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.time.LocalDateTime;
@@ -60,6 +64,7 @@ public class LectureFacade {
     private final MemberMapper memberMapper;
     private final VideoByLectureService videoByLectureService;
     private final LectureService lectureService;
+    private final LectureCategoryService lectureCategoryService;
     private final LectureCategoryByLectureService lectureCategoryByLectureService;
     private final CouponByLectureService couponByLectureService;
     private final CouponMapper couponMapper;
@@ -147,12 +152,16 @@ public class LectureFacade {
                 .build();
     }
 
-    public List<LectureDTO> getLecturesWithPaginationByOffset(int page, int pageSize) {
+    public LecturePageInfo getLecturesWithPaginationByOffset(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
         List<Lecture> lectures = lectureRepository.findLecturesByOffset(pageable);
-        return lectures.stream()
+        long totalElements = lectureRepository.count();  // 전체 개수 조회
+
+        List<LectureDTO> lectureDTOs = lectures.stream()
                 .map(this::buildLectureDTOWithDetails)
                 .collect(Collectors.toList());
+
+        return new LecturePageInfo(lectureDTOs, totalElements);
     }
 
     public ResponseFindLectureVO convertToResponseFindLectureVO(LectureDTO lectureDTO) {
@@ -166,13 +175,18 @@ public class LectureFacade {
                 .tutorCode(lectureDTO.getTutorCode())
                 .tutorName(tutorName)
                 .lectureCategoryName(lectureCategoryName)
-                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
+                .lectureLevel(lectureDTO.getLectureLevel())
                 .createdAt(lectureDTO.getCreatedAt())
                 .lecturePrice(lectureDTO.getLecturePrice())
                 .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
                 .lectureStatus(lectureDTO.getLectureStatus())
                 .build();
     }
+
+    public Page<ResponseFindLectureVO> filterLecturesByPage(LectureFilterDTO filterDTO, int page, int size) {
+        return lectureService.filterLectureWithPaging(filterDTO, PageRequest.of(page, size));
+    }
+
 
     private record Result(LectureDTO lectureDTO, Member tutor, Lecture lecture, IssueCouponDTO issueCouponDTO, CouponDTO couponDTOInfo, CouponCategory couponCategory, AdminDTO adminDTO) {
     }
@@ -301,5 +315,45 @@ public class LectureFacade {
         }
 
         return lectureMapper.toDTO(lecture);
+    }
+
+    public List<ResponseFindLectureVO> findAllLecturesByFilter(LectureFilterDTO filterDTO) {
+        List<Lecture> lectures = lectureRepository.findAllByFilter(filterDTO);
+        List<ResponseFindLectureVO> responseList = new ArrayList<>();
+
+        for (Lecture lecture : lectures) {
+            LectureDTO lectureDTO = lectureMapper.toDTO(lecture);
+            MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());
+            LectureCategoryByLectureDTO lectureCategoryByLectureDTO =
+                    lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+            LectureCategoryDTO lectureCategoryDTO =
+                    lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLectureDTO.getLectureCategoryCode());
+
+            ResponseFindLectureVO responseVO =
+                    lectureMapper.fromDTOToResponseVOAll(lectureDTO, tutorDTO, lectureCategoryDTO);
+            responseList.add(responseVO);
+        }
+
+        return responseList;
+    }
+
+    public List<ResponseFindLectureVO> findAllLectures() {
+        List<Lecture> lectures = lectureRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<ResponseFindLectureVO> responseList = new ArrayList<>();
+
+        for (Lecture lecture : lectures) {
+            LectureDTO lectureDTO = lectureMapper.toDTO(lecture);
+            MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());
+            LectureCategoryByLectureDTO lectureCategoryByLectureDTO =
+                    lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+            LectureCategoryDTO lectureCategoryDTO =
+                    lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLectureDTO.getLectureCategoryCode());
+
+            ResponseFindLectureVO responseVO =
+                    lectureMapper.fromDTOToResponseVOAll(lectureDTO, tutorDTO, lectureCategoryDTO);
+            responseList.add(responseVO);
+        }
+
+        return responseList;
     }
 }
