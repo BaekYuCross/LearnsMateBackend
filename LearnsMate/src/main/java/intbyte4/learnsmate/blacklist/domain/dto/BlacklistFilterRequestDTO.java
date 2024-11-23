@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 @ToString
 public class BlacklistFilterRequestDTO {
+    private Long blackCode;
     private Long memberCode;
     private String memberName;
     private String memberEmail;

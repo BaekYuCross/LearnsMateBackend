@@ -1,10 +1,9 @@
 package intbyte4.learnsmate.member.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,10 +24,14 @@ public class MemberDTO {
     private Integer memberAge;
     private String memberPhone;
     private String memberAddress;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime memberBirth;
     private Boolean memberFlag;
     private Boolean memberDormantStatus;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
 }

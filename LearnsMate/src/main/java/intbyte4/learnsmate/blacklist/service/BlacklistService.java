@@ -159,11 +159,22 @@ public class BlacklistService {
     }
 
     // 블랙리스트 필터링 메서드
-    public List<BlacklistDTO> filterBlacklistMember(BlacklistFilterRequestDTO dto){
-        List<Blacklist> blacklistList = blacklistRepository.searchBy(dto);
+    public BlacklistPageResponse<ResponseFindBlacklistVO> filterBlacklistMember(BlacklistFilterRequestDTO dto, int page, int size){
 
-        return blacklistList.stream()
-                .map(blacklistMapper::fromBlacklistToBlacklistDTO)
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Blacklist> blacklistPage = blacklistRepository.searchBy(dto, pageable);
+
+        List<ResponseFindBlacklistVO> blacklistVOList = blacklistPage.getContent().stream()
+                .map(blacklistMapper::fromBlacklistToResponseFindBlacklistVO)
                 .collect(Collectors.toList());
+
+        return new BlacklistPageResponse<>(
+                blacklistVOList,
+                blacklistPage.getTotalElements(),
+                blacklistPage.getTotalPages(),
+                blacklistPage.getNumber() + 1,
+                blacklistPage.getSize()
+        );
     }
 }
