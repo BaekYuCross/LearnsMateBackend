@@ -16,7 +16,7 @@ public class AllIssuedCouponDTO {
     private String couponIssuanceCode;
     private String couponName;
     private String couponContents;
-    private CouponCategory couponCategory;
+    private Integer couponCategoryCode;
     private Long studentCode;
     private String studentName;
     private Boolean couponUseStatus;

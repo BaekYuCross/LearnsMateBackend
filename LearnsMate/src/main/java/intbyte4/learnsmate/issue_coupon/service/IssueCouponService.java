@@ -12,6 +12,8 @@ import java.util.Map;
 
 public interface IssueCouponService {
 
+    List<IssueCouponDTO> findAllIssuedCoupons();
+
     @Transactional
     IssueCouponDTO createAndSaveIssueCoupon(Member student, Long couponCode);
 
@@ -23,8 +25,6 @@ public interface IssueCouponService {
     Map<String, List<IssueCouponDTO>> findAllStudentCoupons(Long studentCode);
 
     void updateCouponUseStatus(IssueCouponDTO issueCouponDTO, Member member, CouponEntity couponEntity);
-
-    List<AllIssuedCouponDTO> getAllIssuedCoupons();
 
     List<AllIssuedCouponDTO> getFilteredIssuedCoupons(IssueCouponFilterRequestVO request);
 

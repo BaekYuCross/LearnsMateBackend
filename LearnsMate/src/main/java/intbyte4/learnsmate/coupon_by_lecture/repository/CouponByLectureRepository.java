@@ -23,4 +23,18 @@ public interface CouponByLectureRepository extends JpaRepository<CouponByLecture
     List<CouponByLecture> findByTutorCode(@Param("tutorCode") Long tutorCode);
 
     CouponByLecture findByLectureAndCoupon(Lecture lecture, CouponEntity coupon);
+
+    @Query("SELECT cbl.lecture.lectureCode FROM couponByLecture cbl WHERE cbl.coupon.couponCode = :couponCode")
+    List<String> findLectureCodesByCouponCode(Long couponCode);
+
+    @Query("SELECT l.lectureTitle FROM couponByLecture cbl JOIN cbl.lecture l WHERE cbl.coupon.couponCode = :couponCode")
+    List<String> findLectureNamesByCouponCode(@Param("couponCode") Long couponCode);
+
+    @Query("SELECT l.tutor.memberName FROM couponByLecture cbl JOIN cbl.lecture l WHERE cbl.coupon.couponCode = :couponCode")
+    List<String> findTutorNamesByCouponCode(@Param("couponCode") Long couponCode);
+
+    @Query("SELECT l.lecturePrice FROM couponByLecture cbl JOIN cbl.lecture l WHERE cbl.coupon.couponCode = :couponCode")
+    List<Integer> findLecturePricesByCouponCode(@Param("couponCode") Long couponCode);
+
+
 }

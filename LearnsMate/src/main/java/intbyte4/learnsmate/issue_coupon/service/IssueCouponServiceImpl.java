@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Qualifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,15 @@ public class IssueCouponServiceImpl implements IssueCouponService {
     private final IssueCouponRepository issueCouponRepository;
     private final IssueCouponMapper issueCouponMapper;
     private final CouponService couponService;
+
+    @Override
+    public List<IssueCouponDTO> findAllIssuedCoupons() {
+        List<IssueCoupon> issueCoupons = issueCouponRepository.findAll();
+        List<IssueCouponDTO> iussuedCouponDTOList = new ArrayList<>();
+        issueCoupons.forEach(entity -> iussuedCouponDTOList.add(issueCouponMapper.toDTO(entity)));
+
+        return iussuedCouponDTOList;
+    }
 
     @Override
     @Transactional
@@ -94,11 +103,6 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         issueCouponDTO.setCouponUseStatus(true);
         IssueCoupon issueCoupon = issueCouponMapper.toEntity(issueCouponDTO, member, couponEntity);
         issueCouponRepository.save(issueCoupon);
-    }
-
-    @Override
-    public List<AllIssuedCouponDTO> getAllIssuedCoupons() {
-        return issueCouponRepository.findAllIssuedCoupons();
     }
 
     @Override
