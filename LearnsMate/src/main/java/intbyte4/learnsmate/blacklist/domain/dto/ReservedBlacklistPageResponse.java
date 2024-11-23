@@ -1,14 +1,13 @@
-package intbyte4.learnsmate.member.domain.pagination;
+package intbyte4.learnsmate.blacklist.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class MemberPageResponse<T> {
+public class ReservedBlacklistPageResponse<T> {
     private List<T> content;
     private long totalElements;
     private int totalPages;

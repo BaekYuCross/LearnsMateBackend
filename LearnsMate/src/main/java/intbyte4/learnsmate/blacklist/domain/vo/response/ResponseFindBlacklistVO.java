@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.blacklist.domain.vo.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
@@ -18,6 +19,7 @@ public class ResponseFindBlacklistVO {
     private String memberEmail;
     private String blackReason;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     private Long adminCode;
