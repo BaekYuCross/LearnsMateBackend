@@ -1,5 +1,7 @@
 package intbyte4.learnsmate.member.domain.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @ToString
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberDTO {
     private Long memberCode;
     private MemberType memberType;
