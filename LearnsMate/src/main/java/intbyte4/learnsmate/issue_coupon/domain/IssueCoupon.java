@@ -19,7 +19,6 @@ import java.util.UUID;
 @ToString
 @Getter
 @Builder
-@Where(clause = "member_type = 'STUDENT'")
 public class IssueCoupon {
 
     @Id
