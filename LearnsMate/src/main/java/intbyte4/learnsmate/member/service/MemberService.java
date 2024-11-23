@@ -85,7 +85,7 @@ public class MemberService {
 
     // memberCode, memberType -> memberDTO로 반환 메서드
     public MemberDTO findMemberByMemberCode(Long memberCode, MemberType memberType) {
-        Member member = memberRepository.findByMemberFlagTrueAndMemberCodeAndMemberType(memberCode, memberType);
+        Member member = memberRepository.findByMemberCodeAndMemberType(memberCode, memberType);
 
         if(memberType.equals(MemberType.STUDENT) && member.getMemberType().equals(MemberType.TUTOR)){ // 학생을 찾는데 강사인 경우
              throw new CommonException(StatusEnum.ENUM_NOT_MATCH);

@@ -14,10 +14,4 @@ public class MemberPageResponse<T> {
     private int totalPages;
     private int currentPage;
     private int size;
-    private Long nextCursor;  // LocalDateTime에서 Long으로 변경
-
-    // 기존 생성자도 유지 (nextCursor 없는 버전)
-    public MemberPageResponse(List<T> content, long totalElements, int totalPages, int currentPage, int size) {
-        this(content, totalElements, totalPages, currentPage, size, null);
-    }
 }

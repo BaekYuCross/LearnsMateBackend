@@ -115,6 +115,7 @@ public class MemberFacade {
 
         return dto;
     }
+
     public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberType(
             int page, int size, MemberType memberType) {
         PageRequest pageable = PageRequest.of(page, size);
@@ -124,55 +125,12 @@ public class MemberFacade {
                 .map(memberMapper::fromMemberToResponseFindMemberVO)
                 .collect(Collectors.toList());
 
-        // nextCursor 설정
-        Long nextCursor = null;
-        if (!memberPage.getContent().isEmpty()) {
-            nextCursor = memberPage.getContent()
-                    .get(memberPage.getContent().size() - 1)
-                    .getMemberCode();
-        }
-        log.info("{}: ", nextCursor);
-
         return new MemberPageResponse<>(
                 responseVOList,
                 memberPage.getTotalElements(),
                 memberPage.getTotalPages(),
                 memberPage.getNumber(),
-                memberPage.getSize(),
-                nextCursor
-        );
-    }
-
-    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberCodeCursor(
-            Long memberCodeCursor, int size, MemberType memberType) {
-        PageRequest pageable = PageRequest.of(0, size);
-
-        // 커서 기준으로 데이터 조회
-        List<Member> members = memberRepository.findByMemberCodeLessThanAndMemberType(
-                memberCodeCursor, memberType, pageable);
-        log.info("members: {}", members);
-
-        // 응답 데이터 매핑
-        List<ResponseFindMemberVO> responseVOList = members.stream()
-                .map(memberMapper::fromMemberToResponseFindMemberVO)
-                .collect(Collectors.toList());
-
-        // 다음 커서 설정
-        Long nextCursor = responseVOList.isEmpty() ? null : members.get(members.size() - 1).getMemberCode();
-
-        log.info("next는: {}", nextCursor);
-
-        // memberType에 따른 전체 수 조회
-        long totalElements = memberRepository.countByMemberType(memberType);
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-
-        return new MemberPageResponse<>(
-                responseVOList,
-                totalElements,
-                totalPages,
-                0,  // 커서 기반에서는 의미없음
-                size,
-                nextCursor
+                memberPage.getSize()
         );
     }
 

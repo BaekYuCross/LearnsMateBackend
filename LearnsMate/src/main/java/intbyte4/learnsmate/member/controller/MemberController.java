@@ -39,23 +39,18 @@ public class MemberController {
     @Operation(summary = "직원 - 학생 전체 조회")
     @GetMapping("/students")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(
-            @RequestParam(required = false) Long memberCodeCursor,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
-        MemberPageResponse<ResponseFindMemberVO> memberPageResponse;
+        MemberPageResponse<ResponseFindMemberVO> response = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
 
-        if (memberCodeCursor == null) {
-            memberPageResponse = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
-        } else {
-            memberPageResponse = memberFacade.findAllMemberByMemberCodeCursor(memberCodeCursor, size, MemberType.STUDENT);
-        }
-
-        return ResponseEntity.ok(memberPageResponse);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "직원 - 강사 전체 조회")
     @GetMapping("/tutors")
-    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutor(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutor(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
         MemberPageResponse<ResponseFindMemberVO> response = memberService.findAllMemberByMemberType(page, size, MemberType.TUTOR);
 
         return ResponseEntity.ok(response);
@@ -121,6 +116,7 @@ public class MemberController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
+        log.info("vo는 :{}", request );
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
