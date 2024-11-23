@@ -25,12 +25,11 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, CustomP
             @Param("currentYear") int currentYear,
             @Param("previousYear") int previousYear);
 
-    // 특정 학생이 가장 최근에 결제한 강의 코드를 조회
     @Query("SELECT p.lectureByStudent.lecture.lectureCode " +
             "FROM payment p " +
             "WHERE p.lectureByStudent.student.memberCode = :studentCode " +
             "ORDER BY p.createdAt DESC")
-    Optional<String> findLatestLectureCodeByStudent(@Param("studentCode") Long studentCode);
+    List<String> findLectureCodesByStudent(@Param("studentCode") Long studentCode, Pageable pageable);
 
     // 선호 주제가 같은 학생들이 결제한 강의 중, 특정 강의 이후의 강의 데이터를 그룹화하여 추천
     // 특정 강의는 제외, 해당 강의 이후의 결제만 포함, 강의별로 그룹화, 결제 빈도에 따라 내림차순 정렬

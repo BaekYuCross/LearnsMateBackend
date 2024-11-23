@@ -12,6 +12,8 @@ import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.repository.BlacklistRepository;
 import intbyte4.learnsmate.comment.domain.dto.CommentDTO;
 import intbyte4.learnsmate.comment.service.CommentService;
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -104,7 +106,16 @@ public class BlacklistService {
     }
 
     // 블랙리스트에서 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
-    public List<BlacklistReportCommentDTO> findBlacklistReportComment(Long memberCode) {
+    public List<BlacklistReportCommentDTO> findBlacklistReportComment(Long blacklistCode, Long mCode) {
+        Long memberCode = null;
+        if(mCode == null && blacklistCode != null){
+            memberCode = blacklistRepository.findById(blacklistCode).get().getMember().getMemberCode();
+        }else if(blacklistCode == null && mCode != null){
+            memberCode = mCode;
+        }
+
+        if(memberCode == null)
+            throw new CommonException(StatusEnum.USER_NOT_FOUND);
 
         // 1. Report table에서 memberCode와 reportedMemberCode 가 같은거 가져오기
         List<ReportDTO> reportDTOlist = reportService.findAllReportByMemberCode(memberCode);
@@ -132,7 +143,7 @@ public class BlacklistService {
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
 
         // 2. admin을 찾아와야 하는데 나중에 token으로 처리 할듯?
-        AdminDTO adminDTO = adminService.findByAdminCode(202004002L);
+        AdminDTO adminDTO = adminService.findByAdminCode(202001001L);
 //        AdminDTO adminDTO = new AdminDTO();
         Admin admin = adminMapper.toEntity(adminDTO);
 

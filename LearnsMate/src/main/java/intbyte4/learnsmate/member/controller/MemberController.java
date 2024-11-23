@@ -38,11 +38,17 @@ public class MemberController {
 
     @Operation(summary = "직원 - 학생 전체 조회")
     @GetMapping("/students")
-    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(
+            @RequestParam(required = false) Long memberCodeCursor,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
         MemberPageResponse<ResponseFindMemberVO> memberPageResponse;
 
-        if (cursor == null) memberPageResponse = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
-        else memberPageResponse = memberFacade.findAllMemberByCursor(cursor, size, MemberType.STUDENT);
+        if (memberCodeCursor == null) {
+            memberPageResponse = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
+        } else {
+            memberPageResponse = memberFacade.findAllMemberByMemberCodeCursor(memberCodeCursor, size, MemberType.STUDENT);
+        }
 
         return ResponseEntity.ok(memberPageResponse);
     }

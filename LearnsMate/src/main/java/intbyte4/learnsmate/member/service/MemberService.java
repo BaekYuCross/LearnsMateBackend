@@ -41,7 +41,7 @@ public class MemberService {
         // Pageable 객체 생성
         PageRequest pageable = PageRequest.of(page, size);
         // 페이징 처리된 데이터 조회
-        Page<Member> memberPage = memberRepository.findByMemberFlagTrueAndMemberType(memberType, pageable);
+        Page<Member> memberPage = memberRepository.findByMemberType(memberType, pageable);
 
         // Member -> ResponseFindMemberVO 변환
         List<ResponseFindMemberVO> responseVOList = memberPage.getContent().stream()
