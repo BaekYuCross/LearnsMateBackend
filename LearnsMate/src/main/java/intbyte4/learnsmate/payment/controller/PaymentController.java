@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.payment.controller;
 
+import intbyte4.learnsmate.payment.domain.dto.PaymentMonthlyRevenueDTO;
 import intbyte4.learnsmate.payment.service.PaymentFacade;
 import intbyte4.learnsmate.lecture.service.LectureFacade;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,15 +39,11 @@ public class PaymentController {
     private final IssueCouponMapper issueCouponMapper;
     private final MemberMapper memberMapper;
 
-
-    @Operation(summary = "전체 결제 내역 조회")
+    @Operation(summary = "결제 내역 및 월별 매출 데이터 조회 (전년도 데이터까지)")
     @GetMapping
-    public ResponseEntity<List<ResponseFindPaymentVO>> getAllPayments() {
-        List<PaymentDetailDTO> payments = paymentFacade.getAllPayments();
-        List<ResponseFindPaymentVO> paymentVOs = payments.stream()
-                .map(paymentMapper::fromDtoToResponseVO)
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(paymentVOs);
+    public ResponseEntity<PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>> getPayments(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+        PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> response = paymentFacade.getPaymentsWithGraph(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "특정 결제 내역 조회")

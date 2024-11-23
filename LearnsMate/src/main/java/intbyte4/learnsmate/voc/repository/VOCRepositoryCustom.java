@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface VOCRepositoryCustom {
-    List<VOC> searchBy(VOCFilterRequestDTO dto);
-
     Page<VOC> searchByWithPaging(VOCFilterRequestDTO dto, Pageable pageable);
+
+    List<VOC> findAllByFilter(VOCFilterRequestDTO dto);
 }

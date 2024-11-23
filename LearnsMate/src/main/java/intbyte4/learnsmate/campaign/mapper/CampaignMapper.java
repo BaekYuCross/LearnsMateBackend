@@ -3,6 +3,7 @@ package intbyte4.learnsmate.campaign.mapper;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.CampaignFilterDTO;
 import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
@@ -62,14 +63,14 @@ public class CampaignMapper {
 
     public CampaignDTO fromFindCampaignByConditionVOtoDTO(RequestFindCampaignByConditionVO vo){
         return CampaignDTO.builder()
-                .campaignCode(vo.getCampaignCode())
+//                .campaignCode(vo.getCampaignCode())
                 .campaignTitle(vo.getCampaignTitle())
-                .campaignContents(vo.getCampaignContents())
+//                .campaignContents(vo.getCampaignContents())
                 .campaignType(String.valueOf(vo.getCampaignType()))
-                .campaignSendDate(vo.getCampaignSendDate())
-                .createdAt(vo.getCreatedAt())
-                .updatedAt(vo.getUpdatedAt())
-                .adminCode(vo.getAdminCode())
+//                .campaignSendDate(vo.getCampaignSendDate())
+//                .createdAt(vo.getCreatedAt())
+//                .updatedAt(vo.getUpdatedAt())
+//                .adminCode(vo.getAdminCode())
                 .build();
     }
 
@@ -155,6 +156,36 @@ public class CampaignMapper {
                 .updatedAt(campaignDTO.getUpdatedAt())
                 .adminCode(campaignDTO.getAdminCode())
                 .adminName(adminName)
+                .build();
+    }
+
+    public CampaignFilterDTO fromFindCampaignByConditionVOtoFilterDTO(RequestFindCampaignByConditionVO request) {
+        return CampaignFilterDTO.builder()
+//                .campaignCode(request.getCampaignCode())
+                .campaignTitle(request.getCampaignTitle())
+//                .campaignContents(request.getCampaignContents())
+                .campaignType(request.getCampaignType())
+//                .campaignSendDate(request.getCampaignSendDate())
+                .campaignStartPostDate(request.getCampaignStartPostDate())
+                .campaignEndPostDate(request.getCampaignEndPostDate())
+                .campaignStatus(request.getCampaignStatus())
+//                .createdAt(request.getCreatedAt())
+//                .updatedAt(request.getUpdatedAt())
+//                .adminCode(request.getAdminCode())
+                .build();
+    }
+
+    public ResponseFindCampaignByConditionVO fromCampaignToResponseFindCampaignByConditionVO(Campaign vo) {
+        return ResponseFindCampaignByConditionVO.builder()
+                .campaignCode(vo.getCampaignCode())
+                .campaignTitle(vo.getCampaignTitle())
+                .campaignContents(vo.getCampaignContents())
+                .campaignType(vo.getCampaignType().getType())
+                .campaignSendDate(vo.getCampaignSendDate())
+                .createdAt(vo.getCreatedAt())
+                .updatedAt(vo.getUpdatedAt())
+                .adminCode(vo.getAdmin().getAdminCode())
+                .adminName(vo.getAdmin().getAdminName())
                 .build();
     }
 }

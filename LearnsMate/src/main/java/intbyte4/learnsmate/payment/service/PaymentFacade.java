@@ -13,12 +13,21 @@ import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentMonthlyRevenueDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
+import intbyte4.learnsmate.payment.domain.vo.PaymentPageResponse;
+import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
+import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,16 +39,39 @@ public class PaymentFacade {
     private final LectureCategoryByLectureService lectureCategoryByLectureService;
     private final PaymentRepository paymentRepository;
     private final IssueCouponService issueCouponService;
+    private final PaymentMapper paymentMapper;
 
-    public List<PaymentDetailDTO> getAllPayments() {
-        List<Payment> payments = paymentRepository.findAll();
-        if (payments.isEmpty()) {
-            throw new CommonException(StatusEnum.PAYMENT_NOT_FOUND);
-        }
+    public PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> getPaymentsWithGraph(int page, int size) {
+        List<PaymentDetailDTO> payments = getPaymentsWithPagination(page, size);
+
+        Map<Integer, List<PaymentMonthlyRevenueDTO>> graphData = (page == 0) ? getMonthlyRevenueComparison() : null;
+
+        List<ResponseFindPaymentVO> paymentVOs = payments.stream()
+                .map(paymentMapper::fromDtoToResponseVO)
+                .collect(Collectors.toList());
+
+        boolean hasNext = payments.size() == size;
+
+        return new PaymentPageResponse<>(paymentVOs, graphData, hasNext);
+    }
+
+    private List<PaymentDetailDTO> getPaymentsWithPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Payment> payments = paymentRepository.findAll(pageable);
 
         return payments.stream()
                 .map(this::getPaymentDetailDTO)
                 .collect(Collectors.toList());
+    }
+
+    private Map<Integer, List<PaymentMonthlyRevenueDTO>> getMonthlyRevenueComparison() {
+        int currentYear = LocalDateTime.now().getYear();
+        int previousYear = currentYear - 1;
+
+        List<PaymentMonthlyRevenueDTO> revenues = paymentRepository.findMonthlyRevenueWithComparison(currentYear, previousYear);
+
+        return revenues.stream()
+                .collect(Collectors.groupingBy(PaymentMonthlyRevenueDTO::getYear));
     }
 
     public PaymentDetailDTO getPaymentDetails(Long paymentCode) {

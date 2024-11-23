@@ -23,5 +23,4 @@ public class LectureDTO {
     private Boolean lectureStatus;
     private Integer lectureClickCount;
     private String lectureLevel;
-
 }

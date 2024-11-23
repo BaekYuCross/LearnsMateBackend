@@ -16,12 +16,6 @@ public class ResponseRegisterVOCAnswerVO {
     private Long vocAnswerCode;
     @JsonProperty("voc_answer_content")
     private String vocAnswerContent;
-    @JsonProperty("created_at")
-    private LocalDateTime createdAt;
-    @JsonProperty("updated_at")
-    private LocalDateTime updatedAt;
-    @JsonProperty("voc_code")
-    private String vocCode;
     @JsonProperty("admin_code")
     private Long adminCode;
 }

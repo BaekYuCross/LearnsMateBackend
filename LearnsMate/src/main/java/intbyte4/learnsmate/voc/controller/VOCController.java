@@ -1,11 +1,13 @@
 package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
+import intbyte4.learnsmate.voc.domain.vo.request.VOCCategoryRatioFilterRequest;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
@@ -35,7 +37,7 @@ public class VOCController {
 
     @Operation(summary = "직원 - VOC 페이지 조회")
     @GetMapping("/list")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
         VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPage(page, size);
         return ResponseEntity.ok(response);
     }
@@ -46,10 +48,10 @@ public class VOCController {
         log.info("조회 요청된 VOC 코드 : {}", vocCode);
         try {
             ResponseFindVOCVO response = vocFacade.findVOC(vocCode);
-            log.info("캠페인 템플릿 조회 성공: {}", response);
+            log.info("VOC 단 건 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {
-            log.error("캠페인 템플릿 조회 오류: {}", e.getMessage());
+            log.error("VOC 단 건 조회 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("예상치 못한 오류", e);
@@ -109,5 +111,19 @@ public class VOCController {
             log.error("예상치 못한 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @Operation(summary = "전체 VOC 카테고리별 건수 조회")
+    @GetMapping("/category-count")
+    public ResponseEntity<List<VOCCategoryCountDTO>> getCategoryCounts() {
+        List<VOCCategoryCountDTO> categoryCounts = vocFacade.getCategoryCounts();
+        return ResponseEntity.ok(categoryCounts);
+    }
+
+    @Operation(summary = "특정 기간 VOC 카테고리별 건수 조회")
+    @PostMapping("/category-count/filter")
+    public ResponseEntity<List<VOCCategoryCountDTO>> getFilteredCategoryCounts(@RequestBody VOCCategoryRatioFilterRequest request) {
+        List<VOCCategoryCountDTO> filteredCategoryCounts = vocFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
+        return ResponseEntity.ok(filteredCategoryCounts);
     }
 }
