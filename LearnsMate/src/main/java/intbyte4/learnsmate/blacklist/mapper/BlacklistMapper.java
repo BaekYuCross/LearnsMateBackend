@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.blacklist.mapper;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
@@ -100,6 +101,19 @@ public class BlacklistMapper {
                 .createdAt(dto.getCreatedAt())
                 .adminCode(dto.getAdminCode())
                 .adminName(dto.getAdminName())
+                .build();
+    }
+
+    public ResponseFindBlacklistVO fromBlacklistToResponseFindBlacklistVO(Blacklist blacklist) {
+        return ResponseFindBlacklistVO.builder()
+                .blackCode(blacklist.getBlackCode())
+                .memberCode(blacklist.getMember().getMemberCode())
+                .memberName(blacklist.getMember().getMemberName())
+                .memberEmail(blacklist.getMember().getMemberEmail())
+                .blackReason(blacklist.getBlackReason())
+                .createdAt(blacklist.getCreatedAt())
+                .adminCode(blacklist.getAdmin().getAdminCode())
+                .adminName(blacklist.getAdmin().getAdminName())
                 .build();
     }
 }

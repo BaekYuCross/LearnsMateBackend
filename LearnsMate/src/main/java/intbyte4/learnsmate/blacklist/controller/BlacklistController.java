@@ -10,6 +10,8 @@ import intbyte4.learnsmate.blacklist.domain.vo.response.ResponseFindReservedTuto
 import intbyte4.learnsmate.blacklist.mapper.BlacklistMapper;
 import intbyte4.learnsmate.blacklist.service.BlacklistService;
 import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -163,23 +165,31 @@ public class BlacklistController {
 
     @Operation(summary = "학생 - 블랙리스트 필터링 기능 추가")
     @GetMapping("/filter/student")
-    public ResponseEntity<?> filterBlackStudent(@RequestBody RequestFilterBlacklistMemberVO vo){
+    public ResponseEntity<BlacklistPageResponse<ResponseFindBlacklistVO>> filterBlackStudent(
+            @RequestBody RequestFilterBlacklistMemberVO vo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ){
         BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
         dto.setMemberType(MemberType.STUDENT);
 
-        List<BlacklistDTO> blacklistDTOList = blacklistService.filterBlacklistMember(dto);
+        BlacklistPageResponse<ResponseFindBlacklistVO> response = blacklistService.filterBlacklistMember(dto, page, size);
 
-        return ResponseEntity.status(HttpStatus.OK).body(blacklistDTOList);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "강사 - 블랙리스트 필터링 기능 추가")
     @GetMapping("/filter/tutor")
-    public ResponseEntity<?> filterBlackTutor(@RequestBody RequestFilterBlacklistMemberVO vo){
+    public ResponseEntity<?> filterBlackTutor(
+            @RequestBody RequestFilterBlacklistMemberVO vo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ){
         BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
         dto.setMemberType(MemberType.TUTOR);
 
-        List<BlacklistDTO> blacklistDTOList = blacklistService.filterBlacklistMember(dto);
+        BlacklistPageResponse<ResponseFindBlacklistVO> response = blacklistService.filterBlacklistMember(dto, page, size);
 
-        return ResponseEntity.status(HttpStatus.OK).body(blacklistDTOList);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

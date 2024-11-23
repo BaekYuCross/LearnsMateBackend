@@ -2,12 +2,16 @@ package intbyte4.learnsmate.blacklist.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
 import intbyte4.learnsmate.blacklist.domain.entity.QBlacklist;
 import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,7 +21,7 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Blacklist> searchBy(BlacklistFilterRequestDTO request) {
+    public Page<Blacklist> searchBy(BlacklistFilterRequestDTO request, Pageable pageable) {
         QBlacklist blacklist = QBlacklist.blacklist;
 
         BooleanBuilder builder = new BooleanBuilder()
@@ -26,10 +30,20 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
                 .and(likeMemberEmail(request.getMemberEmail())
                 .and(eqMemberType(request.getMemberType())));
 
-        return queryFactory
+
+        // Query 생성
+        JPAQuery<Blacklist> query = queryFactory
                 .selectFrom(blacklist)
-                .where(builder)
+                .where(builder);
+
+        long total = query.fetchCount();
+
+        List<Blacklist> blacklists = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(blacklists, pageable, total);
     }
 
     // memberCode 검색 조건
