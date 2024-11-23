@@ -116,9 +116,10 @@ public class MemberFacade {
         return dto;
     }
 
-    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberType(int page, int size, MemberType memberType) {
+    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberType(
+            int page, int size, MemberType memberType) {
         PageRequest pageable = PageRequest.of(page, size);
-        Page<Member> memberPage = memberRepository.findByMemberFlagTrueAndMemberType(memberType, pageable);
+        Page<Member> memberPage = memberRepository.findByMemberType(memberType, pageable);
 
         List<ResponseFindMemberVO> responseVOList = memberPage.getContent().stream()
                 .map(memberMapper::fromMemberToResponseFindMemberVO)
@@ -130,23 +131,6 @@ public class MemberFacade {
                 memberPage.getTotalPages(),
                 memberPage.getNumber(),
                 memberPage.getSize()
-        );
-    }
-
-    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByCursor(LocalDateTime cursor, int size, MemberType memberType) {
-        PageRequest pageable = PageRequest.of(0, size);
-        List<Member> members = memberRepository.findMembersByCursorAndMemberType(cursor, memberType, pageable);
-
-        List<ResponseFindMemberVO> responseVOList = members.stream()
-                .map(memberMapper::fromMemberToResponseFindMemberVO)
-                .collect(Collectors.toList());
-
-        return new MemberPageResponse<>(
-                responseVOList,
-                responseVOList.size(),
-                1,
-                0,
-                size
         );
     }
 

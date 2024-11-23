@@ -2,14 +2,13 @@ package intbyte4.learnsmate.member.mapper;
 
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignStudentVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignStudentVO;
-import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMembertVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMemberVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
@@ -18,7 +17,6 @@ import intbyte4.learnsmate.payment.domain.vo.RequestRegisterMemberPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 public class MemberMapper{
@@ -186,7 +184,7 @@ public class MemberMapper{
                 .build();
     }
 
-    public MemberFilterRequestDTO fromRequestFilterVOtoMemberFilterRequestDTO(RequestFilterMembertVO request) {
+    public MemberFilterRequestDTO fromRequestFilterVOtoMemberFilterRequestDTO(RequestFilterMemberVO request) {
         return MemberFilterRequestDTO.builder()
                 .memberCode(request.getMemberCode())
                 .memberName(request.getMemberName())

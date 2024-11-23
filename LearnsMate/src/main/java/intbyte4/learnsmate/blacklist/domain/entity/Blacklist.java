@@ -19,7 +19,7 @@ public class Blacklist {
 
     @Id
     @Column(name = "black_code", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long blackCode;
 
     @Column(name = "black_reason", nullable = false)
