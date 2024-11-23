@@ -5,7 +5,7 @@ import intbyte4.learnsmate.member.domain.dto.*;
 import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
 import intbyte4.learnsmate.member.domain.vo.request.CategoryRatioFilterRequest;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMembertVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -17,12 +17,10 @@ import intbyte4.learnsmate.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +110,7 @@ public class MemberController {
     @Operation(summary = "직원 - 학생 필터링 검색")
     @PostMapping("/filter/student")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findStudentByFilter(
-            @RequestBody RequestFilterMembertVO request,
+            @RequestBody RequestFilterMemberVO request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
@@ -130,7 +128,7 @@ public class MemberController {
     @Operation(summary = "직원 - 강사 필터링 검색")
     @PostMapping("/filter/tutor")
     public ResponseEntity<?> findTutorByFilter(
-            @RequestBody RequestFilterMembertVO request,
+            @RequestBody RequestFilterMemberVO request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
