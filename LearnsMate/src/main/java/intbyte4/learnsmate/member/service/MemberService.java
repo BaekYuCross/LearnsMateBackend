@@ -149,4 +149,20 @@ public class MemberService {
                 memberPage.getSize()           // 페이지 크기
         );
     }
+
+    public List<MemberDTO> findAllByFilterWithExcel(MemberFilterRequestDTO filterDTO){
+        List<Member> memberList = memberRepository.searchByWithoutPaging(filterDTO);
+
+        return memberList.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MemberDTO> findAllByMemberTypeWithExcel(MemberType memberType){
+        List<Member> memberList = memberRepository.findAllByMemberTypeWithExcel(memberType);
+
+        return memberList.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .collect(Collectors.toList());
+    }
 }
