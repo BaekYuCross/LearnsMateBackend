@@ -3,6 +3,7 @@ package intbyte4.learnsmate.lecture.domain.dto;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,17 +12,18 @@ import java.time.LocalDate;
 @ToString
 @Builder
 public class LectureFilterDTO {
-    private String lectureCode; // 강의 코드
-    private String lectureTitle; // 강의명
-    private Long tutorCode; // 강사 코드
-    private String tutorName; // 강사명
+    private String lectureCode;
+    private String lectureTitle;
+    private Long tutorCode;
+    private String tutorName;
     private String lectureCategoryName;
     private String lectureLevel;
-    private Boolean lectureConfirmStatus; // 강의 계약 상태
-    private Boolean lectureStatus; // 강의 상태
-    private Integer minPrice; // 금액
-    private Integer maxPrice; // 금액
-    private LocalDate startCreatedAt; // 강의 생성일
-    private LocalDate endCreatedAt; // 강의 생성일
+    private Boolean lectureConfirmStatus;
+    private Boolean lectureStatus;
+    private Integer minPrice;
+    private Integer maxPrice;
+    private LocalDate startCreatedAt;
+    private LocalDate endCreatedAt;
+    private List<String> selectedColumns;
 }
 
