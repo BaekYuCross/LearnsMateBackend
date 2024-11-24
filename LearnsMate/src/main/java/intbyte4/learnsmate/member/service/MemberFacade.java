@@ -81,6 +81,7 @@ public class MemberFacade {
         String latestLectureCode = paymentService.findLatestLectureCodeByStudent(studentCode);
 
         List<Long> similarStudents = preferredTopicsService.findStudentsWithSimilarPreferredTopics(studentCode);
+        log.info("비슷한 학생들은: {}", similarStudents);
 
         // 4. 강의 정보
         List<String> recommendedLectureCodes = Collections.emptyList();
@@ -96,6 +97,8 @@ public class MemberFacade {
         for (String lectureCode : recommendedLectureCodes) {
             recommendedLectureList.add(lectureService.getLectureById(lectureCode));
         }
+
+        log.info("추천 강의 리스트는: {}", recommendedLectureList);
 
         return new FindSingleStudentDTO(
                 studentDTO,
