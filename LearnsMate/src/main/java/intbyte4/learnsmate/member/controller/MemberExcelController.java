@@ -3,7 +3,6 @@ package intbyte4.learnsmate.member.controller;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.service.MemberExcelService;
-import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.FileOutputStream;
 
 @RestController
 @RequestMapping("/member/excel")
@@ -37,11 +34,7 @@ public class MemberExcelController {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setHeader("Content-Disposition", "attachment; filename=\"student_data.xlsx\"");
 
-            // 메서드 호출 부분을 수정
-            FileOutputStream fileOut = new FileOutputStream("members.xlsx");
-
-            memberExcelService.exportMemberToExcel(fileOut, filterDTO, MemberType.STUDENT);
-            fileOut.close();
+            memberExcelService.exportMemberToExcel(response.getOutputStream(), filterDTO, MemberType.STUDENT);
             log.info("Excel file successfully written to response output stream.");
         } catch (Exception e) {
             log.error("Error during excel download:", e);

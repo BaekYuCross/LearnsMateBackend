@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +29,11 @@ public class MemberExcelService {
     private final MemberMapper memberMapper;
 
     private static final Map<String, String> COLUMNS = new LinkedHashMap<>() {{
-        put("memberCode", "학생 코드");
-        put("memberName", "학생 이름");
-        put("memberEmail", "학생 이메일");
+        put("memberCode", "회원 코드");
+        put("memberName", "회원 이름");
+        put("memberEmail", "회원 이메일");
         put("memberPhone", "연락처");
-        put("memberAddress", "학생 주소");
+        put("memberAddress", "회원 주소");
         put("memberAge", "나이");
         put("memberBirth", "생년월일");
         put("memberFlag", "계정상태");
@@ -93,10 +95,12 @@ public class MemberExcelService {
 
     private void writeData(Sheet sheet, List<ResponseFindMemberVO> memberList, CellStyle dateStyle) {
         int rowNum = 1;
+        log.info("write Data(memberList.size()): {}",memberList.size());
         for (ResponseFindMemberVO member : memberList) {
             Row row = sheet.createRow(rowNum++);
             int columnIndex = 0;
             for (String key : COLUMNS.keySet()) {
+
                 Cell cell = row.createCell(columnIndex++);
                 setValueByColumnKey(cell, key, member, dateStyle);
             }
@@ -105,26 +109,35 @@ public class MemberExcelService {
 
     private void setValueByColumnKey(Cell cell, String key, ResponseFindMemberVO member, CellStyle dateStyle) {
         switch (key) {
-            case "memberCode" -> cell.setCellValue(member.getMemberCode());
-            case "memberName" -> cell.setCellValue(member.getMemberName());
-            case "memberEmail" -> cell.setCellValue(member.getMemberEmail());
-            case "memberPhone" -> cell.setCellValue(member.getMemberPhone());
-            case "memberAddress" -> cell.setCellValue(member.getMemberAddress());
-            case "memberAge" -> cell.setCellValue(member.getMemberAge());
+            case "memberCode" -> cell.setCellValue(member.getMemberCode() != null ? member.getMemberCode() : 0L);
+            case "memberName" -> cell.setCellValue(member.getMemberName() != null ? member.getMemberName() : "");
+            case "memberEmail" -> cell.setCellValue(member.getMemberEmail() != null ? member.getMemberEmail() : "");
+            case "memberPhone" -> cell.setCellValue(member.getMemberPhone() != null ? member.getMemberPhone() : "");
+            case "memberAddress" -> cell.setCellValue(member.getMemberAddress() != null ? member.getMemberAddress() : "");
+            case "memberAge" -> cell.setCellValue(member.getMemberAge() != null ? member.getMemberAge() : 0);
             case "memberBirth" -> {
                 if (member.getMemberBirth() != null) {
-                    cell.setCellValue(member.getMemberBirth());
-                    cell.setCellStyle(dateStyle);
+                    // LocalDateTime -> java.util.Date 변환
+                    Date date = Date.from(member.getMemberBirth().atZone(ZoneId.systemDefault()).toInstant());
+                    cell.setCellValue(date); // 날짜를 셀에 입력
+                    cell.setCellStyle(dateStyle); // 날짜 스타일 적용
+                } else {
+                    cell.setCellValue(""); // null일 경우 빈 값 처리
                 }
             }
-            case "memberFlag" -> cell.setCellValue(member.getMemberFlag() ? "활성" : "비활성");
+            case "memberFlag" -> cell.setCellValue(member.getMemberFlag() != null && member.getMemberFlag() ? "활성" : "비활성");
             case "createdAt" -> {
                 if (member.getCreatedAt() != null) {
-                    cell.setCellValue(member.getCreatedAt());
-                    cell.setCellStyle(dateStyle);
+                    // LocalDateTime -> java.util.Date 변환
+                    Date date = Date.from(member.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant());
+                    cell.setCellValue(date); // 날짜를 셀에 입력
+                    cell.setCellStyle(dateStyle); // 날짜 스타일 적용
+                } else {
+                    cell.setCellValue(""); // null일 경우 빈 값 처리
                 }
             }
-            case "memberDormantStatus" -> cell.setCellValue(member.getMemberDormantStatus() ? "휴면" : "활성");
+            case "memberDormantStatus" -> cell.setCellValue(member.getMemberDormantStatus() != null && member.getMemberDormantStatus() ? "휴면" : "활성");
+            default -> cell.setCellValue("");
         }
     }
 
