@@ -1,13 +1,10 @@
 package intbyte4.learnsmate.lecture.controller;
 
-import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
-import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
-import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureFilterDTO;
+import intbyte4.learnsmate.lecture.domain.dto.*;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.*;
 import intbyte4.learnsmate.lecture.pagination.LecturePaginationResponse;
 import intbyte4.learnsmate.lecture.service.LectureFacade;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -55,6 +52,12 @@ public class LectureController {
     public ResponseEntity<ResponseFindLectureDetailVO> getLecture(@PathVariable("lectureCode") String lectureCode) {
         ResponseFindLectureDetailVO lectureDetail = lectureFacade.getLectureById(lectureCode);
         return ResponseEntity.status(HttpStatus.OK).body(lectureDetail);
+    }
+
+    @PostMapping("/{lectureCode}/stats/filter")
+    public ResponseEntity<LectureStatsVO> getLectureStatsWithFilter(@PathVariable("lectureCode") String lectureCode, @RequestBody LectureStatsFilterDTO filterDTO) {
+        LectureStatsVO stats = lectureFacade.getLectureStatsWithFilter(lectureCode, filterDTO);
+        return ResponseEntity.ok(stats);
     }
 
     @Operation(summary = "강의와 강의별 동영상 등록 요청")
