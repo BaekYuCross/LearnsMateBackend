@@ -5,6 +5,7 @@ import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
+import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -16,12 +17,11 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -93,5 +93,28 @@ public class LectureServiceImpl implements LectureService {
         Page<ResponseFindLectureVO> lecturePage = lectureRepository.searchByWithPaging(filterDTO, pageable);
 
         return lecturePage.map(lectureMapper::convertToLectureDTO);
+    }
+
+    @Override
+    public List<MonthlyLectureCountDTO> getFilteredMonthlyLectureCounts(MonthlyLectureFilterDTO filterDTO) {
+        List<Object[]> results = lectureRepository.findFilteredMonthlyLectureCounts(
+                filterDTO.getStartYear(),
+                filterDTO.getStartMonth(),
+                filterDTO.getEndYear(),
+                filterDTO.getEndMonth()
+        );
+        return results.stream()
+                .map(result -> new MonthlyLectureCountDTO((String) result[0], ((Number) result[1]).intValue()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer getTotalClickCountBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureRepository.sumClickCountBetweenDates(startDate, endDate);
+    }
+
+    @Override
+    public Integer getClickCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureRepository.getClickCountByLectureCodeBetweenDates(lectureCode, startDate, endDate);
     }
 }

@@ -8,6 +8,7 @@ import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PaymentService {
@@ -26,4 +27,8 @@ public interface PaymentService {
     String findLatestLectureCodeByStudent(Long studentCode);
 
     List<Object[]> findRecommendedLectures(List<Long> similarStudents, String latestLectureCode, Long studentCode, Pageable pageable);
+
+    Integer getTotalStudentCountBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    Integer getStudentCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate);
 }
