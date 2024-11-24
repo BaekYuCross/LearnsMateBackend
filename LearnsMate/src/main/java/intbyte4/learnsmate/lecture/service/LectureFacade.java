@@ -18,8 +18,10 @@ import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureStatsFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.vo.response.LectureStatsVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureDetailVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -45,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,6 +184,33 @@ public class LectureFacade {
                 lectures.getNumber(),
                 lectures.getSize()
         );
+    }
+
+    public LectureStatsVO getLectureStatsWithFilter(String lectureCode, LectureStatsFilterDTO filter) {
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+        if (lectureDTO == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+
+        LocalDateTime startDate = LocalDateTime.of(filter.getStartYear(), filter.getStartMonth(), 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(filter.getEndYear(), filter.getEndMonth(), filter.getEndMonth() == 12 ? 31 : YearMonth.of(filter.getEndYear(), filter.getEndMonth()).lengthOfMonth(), 23, 59, 59);
+
+        Integer totalStudentCount = paymentService.getTotalStudentCountBetween(startDate, endDate);
+        Integer totalClickCount = lectureService.getTotalClickCountBetween(startDate, endDate);
+        Double totalConversionRate = calculateConversionRate(totalClickCount, totalStudentCount, lectureCode);
+
+        Integer studentCount = paymentService.getStudentCountByLectureCodeBetween(lectureCode, startDate, endDate);
+        Integer clickCount = lectureService.getClickCountByLectureCodeBetween(lectureCode, startDate, endDate);
+        Double conversionRate = calculateConversionRate(clickCount, studentCount, lectureCode);
+
+        return LectureStatsVO.builder()
+                .totalStudentCount(totalStudentCount)
+                .totalLectureClickCount(totalClickCount)
+                .totalConversionRate(totalConversionRate)
+                .lectureCode(lectureCode)
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .studentCount(studentCount)
+                .lectureClickCount(clickCount)
+                .conversionRate(conversionRate)
+                .build();
     }
 
     private record Result(LectureDTO lectureDTO, Member tutor, Lecture lecture, IssueCouponDTO issueCouponDTO, CouponDTO couponDTOInfo, CouponCategory couponCategory, AdminDTO adminDTO) {

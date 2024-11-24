@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -32,4 +33,13 @@ public interface LectureRepository extends JpaRepository<Lecture, String> , JpaS
             "GROUP BY YEAR(l.createdAt), MONTH(l.createdAt) " +
             "ORDER BY YEAR(l.createdAt), MONTH(l.createdAt)")
     List<Object[]> findFilteredMonthlyLectureCounts(@Param("startYear") Integer startYear, @Param("startMonth") Integer startMonth, @Param("endYear") Integer endYear, @Param("endMonth") Integer endMonth);
+
+    @Query("SELECT COALESCE(SUM(l.lectureClickCount), 0) FROM lecture l " +
+            "WHERE l.createdAt BETWEEN :startDate AND :endDate")
+    Integer sumClickCountBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT COALESCE(l.lectureClickCount, 0) FROM lecture l " +
+            "WHERE l.lectureCode = :lectureCode " +
+            "AND l.createdAt BETWEEN :startDate AND :endDate")
+    Integer getClickCountByLectureCodeBetweenDates(@Param("lectureCode") String lectureCode, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

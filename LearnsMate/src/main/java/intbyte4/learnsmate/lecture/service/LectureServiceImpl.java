@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,5 +106,15 @@ public class LectureServiceImpl implements LectureService {
         return results.stream()
                 .map(result -> new MonthlyLectureCountDTO((String) result[0], ((Number) result[1]).intValue()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer getTotalClickCountBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureRepository.sumClickCountBetweenDates(startDate, endDate);
+    }
+
+    @Override
+    public Integer getClickCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureRepository.getClickCountByLectureCodeBetweenDates(lectureCode, startDate, endDate);
     }
 }
