@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,12 @@ public class LectureExcelService {
             Sheet sheet = workbook.createSheet("Lecture Data");
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dateStyle = createDateStyle(workbook);
-            createHeader(sheet, headerStyle);
+
+            List<String> selectedColumns = filterDTO != null && filterDTO.getSelectedColumns() != null
+                    ? filterDTO.getSelectedColumns()
+                    : new ArrayList<>(COLUMNS.keySet());
+
+            createHeader(sheet, headerStyle, selectedColumns);
 
             List<ResponseFindLectureVO> lectureList;
             if (filterDTO != null) {
@@ -51,9 +57,9 @@ public class LectureExcelService {
             }
             log.info("Found {} Lectures to export", lectureList.size());
 
-            writeData(sheet, lectureList, dateStyle);
+            writeData(sheet, lectureList, dateStyle, selectedColumns);
 
-            for (int i = 0; i < COLUMNS.size(); i++) {
+            for (int i = 0; i < selectedColumns.size(); i++) {
                 sheet.autoSizeColumn(i);
             }
             workbook.write(outputStream);
@@ -63,22 +69,22 @@ public class LectureExcelService {
         }
     }
 
-    private void createHeader(Sheet sheet, CellStyle headerStyle) {
+    private void createHeader(Sheet sheet, CellStyle headerStyle, List<String> selectedColumns) {
         Row headerRow = sheet.createRow(0);
         int columnIndex = 0;
-        for (String headerValue : COLUMNS.values()) {
+        for (String columnKey : selectedColumns) {
             Cell cell = headerRow.createCell(columnIndex++);
-            cell.setCellValue(headerValue);
+            cell.setCellValue(COLUMNS.get(columnKey));
             cell.setCellStyle(headerStyle);
         }
     }
 
-    private void writeData(Sheet sheet, List<ResponseFindLectureVO> lectureList, CellStyle dateStyle) {
+    private void writeData(Sheet sheet, List<ResponseFindLectureVO> lectureList, CellStyle dateStyle, List<String> selectedColumns) {
         int rowNum = 1;
         for (ResponseFindLectureVO lecture : lectureList) {
             Row row = sheet.createRow(rowNum++);
             int columnIndex = 0;
-            for (String key : COLUMNS.keySet()) {
+            for (String key : selectedColumns) {
                 Cell cell = row.createCell(columnIndex++);
                 setValueByColumnKey(cell, key, lecture, dateStyle);
             }

@@ -41,7 +41,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
                 .selectFrom(lecture)
                 .leftJoin(lecture.tutor).fetchJoin()
                 .leftJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
-                .leftJoin(lectureCategoryByLecture.lectureCategory, lectureCategory).fetchJoin()
+                .leftJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
                 .where(builder)
                 .orderBy(lecture.createdAt.desc())
                 .fetch();
@@ -64,25 +64,22 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
 
         List<ResponseFindLectureVO> content = queryFactory
                 .select(Projections.fields(ResponseFindLectureVO.class,
-                                lecture.lectureCode.as("lectureCode"),
-                                lecture.lectureTitle.as("lectureTitle"),
-                                lecture.tutor.memberCode.as("tutorCode"),
-                                lecture.tutor.memberName.as("tutorName"),
-                                lectureCategory.lectureCategoryName.stringValue().as("lectureCategoryName"),
-                                lecture.lectureLevel.stringValue().as("lectureLevel"),
-                                lecture.createdAt.as("createdAt"),
-                                lecture.lecturePrice.as("lecturePrice"),
-                                lecture.lectureConfirmStatus.as("lectureConfirmStatus"),
-                                lecture.lectureStatus.as("lectureStatus")
-                        )
-                )
+                        lecture.lectureCode.as("lectureCode"),
+                        lecture.lectureTitle.as("lectureTitle"),
+                        lectureCategory.lectureCategoryName.stringValue().as("lectureCategoryName"),
+                        lecture.lectureLevel.stringValue().as("lectureLevel"),
+                        lecture.tutor.memberCode.as("tutorCode"),
+                        lecture.tutor.memberName.as("tutorName"),
+                        lecture.lecturePrice.as("lecturePrice"),
+                        lecture.createdAt.as("createdAt"),
+                        lecture.lectureConfirmStatus.as("lectureConfirmStatus"),
+                        lecture.lectureStatus.as("lectureStatus")
+                ))
                 .from(lecture)
                 .leftJoin(lecture.tutor)
                 .leftJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
                 .leftJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
                 .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
