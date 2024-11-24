@@ -32,10 +32,9 @@ public class ResponseFindLectureDetailVO {
     private String lectureImage;
     private String lectureContent;
     private Integer lectureClickCount;
-    private int totalStudents;
-    private int totalRevenue;
     private List<VideoByLectureDTO> lectureVideos;
+    private List<String> formattedVideoTitles;
 
     private Integer purchaseCount;
-    private Double purchaseConversionRate;
+    private Integer purchaseConversionRate;
 }

@@ -150,6 +150,16 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
     }
 
+    @Override
+    public Integer getTotalStudentCountBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsBetweenDates(startDate, endDate);
+    }
+
+    @Override
+    public Integer getStudentCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsByLectureCodeBetweenDates(lectureCode, startDate, endDate);
+    }
+
     private Result getResult(MemberDTO memberDTO, LectureDTO lectureDTO) {
         Member student = memberMapper.fromMemberDTOtoMember(memberDTO);
         MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());

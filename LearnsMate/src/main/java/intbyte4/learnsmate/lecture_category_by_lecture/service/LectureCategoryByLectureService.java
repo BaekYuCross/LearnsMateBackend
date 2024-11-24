@@ -8,7 +8,6 @@ import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
@@ -23,12 +22,13 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LectureCategoryByLectureService {
@@ -85,9 +85,12 @@ public class LectureCategoryByLectureService {
     }
 
     public String findLectureCategoryNameByLectureCode(String lectureCode) {
-        LectureCategoryByLectureDTO dto = lectureCategoryByLectureRepository.findLectureCategoryDetailsByLectureCode(lectureCode);
-        LectureCategoryEnum categoryName = lectureCategoryService.findLectureCategoryNameByCode(dto.getLectureCategoryCode());
-        return categoryName.name();
+        try {
+            return lectureCategoryByLectureRepository.findLectureCategoryName(lectureCode);
+        } catch (Exception e) {
+            log.error("Error finding lecture category name for lectureCode: {}", lectureCode, e);
+            throw new CommonException(StatusEnum.LECTURE_CATEGORY_NOT_FOUND);
+        }
     }
 
     public List<CategoryCountDTO> countLecturesByCategory() {
