@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.campaign.domain.dto;
 
+import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class FindAllCampaignDTO {
+public class FindAllCampaignsDTO {
+    // 캠페인 정보
     private Long campaignCode;
     private String campaignTitle;
     private String campaignContents;
@@ -18,6 +20,9 @@ public class FindAllCampaignDTO {
     private LocalDateTime campaignSendDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // 로그인한 직원 정보
     private Long adminCode;
     private String adminName;
+
 }

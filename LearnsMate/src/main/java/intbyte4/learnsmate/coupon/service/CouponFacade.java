@@ -100,6 +100,37 @@ public class CouponFacade {
     }
 
     @Transactional
+    public List<CouponFindResponseVO> findAdminRegisterCoupons () {
+        List<CouponDTO> couponDTOList = couponService.findAllCoupons();
+        List<CouponFindResponseVO> couponFindResponseVOList = new ArrayList<>();
+        for (CouponDTO couponDTO : couponDTOList) {
+            if (couponDTO.getAdminCode() != null) {
+                AdminDTO adminDTO = adminService.findByAdminCode(couponDTO.getAdminCode());
+                CouponCategory couponCategory = couponCategoryService.findByCouponCategoryCode(couponDTO.getCouponCategoryCode());
+                CouponFindResponseVO response = CouponFindResponseVO.builder()
+                        .couponCode(couponDTO.getCouponCode())
+                        .couponName(couponDTO.getCouponName())
+                        .couponContents(couponDTO.getCouponContents())
+                        .couponDiscountRate(couponDTO.getCouponDiscountRate())
+                        .couponCategoryName(couponCategory.getCouponCategoryName())
+                        .activeState(couponDTO.getActiveState())
+                        .couponStartDate(couponDTO.getCouponStartDate())
+                        .couponExpireDate(couponDTO.getCouponExpireDate())
+                        .createdAt(couponDTO.getCreatedAt())
+                        .updatedAt(couponDTO.getUpdatedAt())
+                        .adminName(adminDTO.getAdminName())
+                        .tutorName(null)
+                        .build();
+
+                couponFindResponseVOList.add(response);
+            }
+        }
+        return couponFindResponseVOList;
+    }
+
+
+
+    @Transactional
     public CouponFindResponseVO findCoupon(Long couponCode) {
         CouponEntity coupon = couponService.findByCouponCode(couponCode);
         if (coupon.getAdmin().getAdminCode() != null) {

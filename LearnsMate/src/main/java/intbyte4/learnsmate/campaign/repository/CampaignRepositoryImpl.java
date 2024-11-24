@@ -28,8 +28,7 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
                 .where(searchByType(campaignFilterDTO)
                         .and(searchByTitle(campaignFilterDTO))
                         .and(searchByPeriod(campaignFilterDTO))
-                        .and(searchBySentStatus(campaignFilterDTO))
-                        .and(searchByScheduledStatus(campaignFilterDTO))
+                        .and(searchBySendDateStatus(campaignFilterDTO))
                 );
 
         long total = query.fetchCount();
@@ -89,21 +88,29 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
     }
 
 
-    public BooleanBuilder searchBySentStatus(CampaignFilterDTO campaignFilterDTO) {
+    public BooleanBuilder searchBySendDateStatus(CampaignFilterDTO campaignFilterDTO) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (campaignFilterDTO.getCampaignSendDate() == null) return booleanBuilder;
 
-        booleanBuilder.and(qCampaign.campaignSendDate.loe(LocalDateTime.now()));
+        // 시작 발송 날짜 조건
+        if (campaignFilterDTO.getCampaignStartPostDate() != null) {
+            booleanBuilder.and(qCampaign.campaignSendDate.goe(campaignFilterDTO.getCampaignStartPostDate()));
+        }
+
+        // 종료 발송 날짜 조건
+        if (campaignFilterDTO.getCampaignEndPostDate() != null) {
+            booleanBuilder.and(qCampaign.campaignSendDate.loe(campaignFilterDTO.getCampaignEndPostDate()));
+        }
+
+        // 발송 상태에 따른 조건
+        if ("completed".equalsIgnoreCase(campaignFilterDTO.getCampaignStatus())) {
+            // 발송 완료: 현재 시간 이전
+            booleanBuilder.and(qCampaign.campaignSendDate.loe(LocalDateTime.now()));
+        } else if ("scheduled".equalsIgnoreCase(campaignFilterDTO.getCampaignStatus())) {
+            // 발송 예정: 현재 시간 이후
+            booleanBuilder.and(qCampaign.campaignSendDate.goe(LocalDateTime.now()));
+        }
 
         return booleanBuilder;
     }
 
-    public BooleanBuilder searchByScheduledStatus(CampaignFilterDTO campaignFilterDTO) {
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (campaignFilterDTO.getCampaignSendDate() == null) return booleanBuilder;
-
-        booleanBuilder.and(qCampaign.campaignSendDate.goe(LocalDateTime.now()));
-
-        return booleanBuilder;
-    }
 }

@@ -2,12 +2,16 @@ package intbyte4.learnsmate.blacklist.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
 import intbyte4.learnsmate.blacklist.domain.entity.Blacklist;
 import intbyte4.learnsmate.blacklist.domain.entity.QBlacklist;
 import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,19 +21,42 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Blacklist> searchBy(BlacklistFilterRequestDTO request) {
+    public Page<Blacklist> searchBy(BlacklistFilterRequestDTO request, Pageable pageable) {
         QBlacklist blacklist = QBlacklist.blacklist;
+        BooleanBuilder builder = new BooleanBuilder();
+        if (eqBlackCode(request.getBlackCode()) != null) {
+            builder.and(eqBlackCode(request.getBlackCode()));
+        }
+        if (eqMemberCode(request.getMemberCode()) != null) {
+            builder.and(eqMemberCode(request.getMemberCode()));
+        }
+        if (likeMemberName(request.getMemberName()) != null) {
+            builder.and(likeMemberName(request.getMemberName()));
+        }
+        if (likeMemberEmail(request.getMemberEmail()) != null) {
+            builder.and(likeMemberEmail(request.getMemberEmail()));
+        }
+        if (eqMemberType(request.getMemberType()) != null) {
+            builder.and(eqMemberType(request.getMemberType()));
+        }
 
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(eqMemberCode(request.getMemberCode()))
-                .and(likeMemberName(request.getMemberName()))
-                .and(likeMemberEmail(request.getMemberEmail())
-                .and(eqMemberType(request.getMemberType())));
-
-        return queryFactory
+        // Query 생성
+        JPAQuery<Blacklist> query = queryFactory
                 .selectFrom(blacklist)
-                .where(builder)
+                .where(builder);
+
+        long total = query.fetchCount();
+
+        List<Blacklist> blacklists = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(blacklists, pageable, total);
+    }
+
+    private BooleanExpression eqBlackCode(Long blackCode){
+        return blackCode == null ? null : QBlacklist.blacklist.blackCode.eq(blackCode);
     }
 
     // memberCode 검색 조건

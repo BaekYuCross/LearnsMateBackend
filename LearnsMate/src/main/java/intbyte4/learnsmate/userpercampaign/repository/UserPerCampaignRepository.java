@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface UserPerCampaignRepository extends JpaRepository<UserPerCampaign, Integer> {
     List<UserPerCampaign> findByCampaign(Campaign campaign);
+
+    void deleteByCampaign_CampaignCode(Long campaignCode);
 }

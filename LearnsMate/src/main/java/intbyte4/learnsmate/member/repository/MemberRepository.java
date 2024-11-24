@@ -21,8 +21,5 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     // 기존 offset 기반 쿼리
     Page<Member> findByMemberType(MemberType memberType, Pageable pageable);
 
-    @Query("SELECT m FROM member m WHERE m.memberType = :memberType AND (:cursor IS NULL OR m.createdAt < :cursor) ORDER BY m.createdAt DESC")
-    List<Member> findMembersByCursorAndMemberType(@Param("cursor") LocalDateTime cursor, @Param("memberType") MemberType memberType, Pageable pageable);
-
     Member findByMemberCodeAndMemberType(Long memberCode, MemberType memberType);
 }

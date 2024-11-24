@@ -4,6 +4,8 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
@@ -32,6 +34,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,7 @@ public class MemberFacade {
     private final LectureCategoryByLectureService lectureCategoryByLectureService;
     private final PaymentService paymentService;
     private final PreferredTopicsService preferredTopicsService;
+    private final LectureService lectureService;
 
     // 멤버 단일 조회시에 사용되는 서비스
     // memberCode로 학생 조회
@@ -58,14 +62,18 @@ public class MemberFacade {
         Member member = memberRepository.findById(studentCode).orElseThrow(() -> new CommonException(StatusEnum.STUDENT_NOT_FOUND));
         if (!member.getMemberType().equals(MemberType.STUDENT)) throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
 
+        // 0. 멤버 개인정보
         MemberDTO studentDTO = memberMapper.fromMembertoMemberDTO(member);
 
+        // 1. 회원 보유중인 강의 정보
         List<LectureVideoProgressDTO> lectureVideoProgressDTOList = lectureVideoByStudentService.getVideoProgressByStudent(studentCode);
 
+        // 2. 회원 쿠폰정보
         Map<String, List<IssueCouponDTO>> studentCoupons = issueCouponService.findAllStudentCoupons(studentCode);
         List<IssueCouponDTO> unusedCouponList = studentCoupons.get("unusedCoupons");
         List<IssueCouponDTO> usedCouponList = studentCoupons.get("usedCoupons");
 
+        // 3. 회원 voc 정보
         List<VOCDTO> unansweredVOCByMemberList = vocService.findUnansweredVOCByMember(studentCode);
         List<VOCDTO> answeredVOCByMemberList = vocService.findAnsweredVOCByMember(studentCode);
 
@@ -74,6 +82,7 @@ public class MemberFacade {
 
         List<Long> similarStudents = preferredTopicsService.findStudentsWithSimilarPreferredTopics(studentCode);
 
+        // 4. 강의 정보
         List<String> recommendedLectureCodes = Collections.emptyList();
         if (!similarStudents.isEmpty()) {
             Pageable pageable = PageRequest.of(0, 3); // 상위 3개만 가져오기
@@ -83,6 +92,10 @@ public class MemberFacade {
                     .map(record -> (String) record[0])
                     .collect(Collectors.toList());
         }
+        List<LectureDTO> recommendedLectureList = new ArrayList<>();
+        for (String lectureCode : recommendedLectureCodes) {
+            recommendedLectureList.add(lectureService.getLectureById(lectureCode));
+        }
 
         return new FindSingleStudentDTO(
                 studentDTO,
@@ -91,7 +104,7 @@ public class MemberFacade {
                 usedCouponList,
                 unansweredVOCByMemberList,
                 answeredVOCByMemberList,
-                recommendedLectureCodes
+                recommendedLectureList
         );
     }
 
