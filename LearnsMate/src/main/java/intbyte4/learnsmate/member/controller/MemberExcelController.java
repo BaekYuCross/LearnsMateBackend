@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.FileOutputStream;
+
 @RestController
 @RequestMapping("/member/excel")
 @Slf4j
@@ -34,7 +37,12 @@ public class MemberExcelController {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setHeader("Content-Disposition", "attachment; filename=\"student_data.xlsx\"");
 
-            memberExcelService.exportMemberToExcel(response.getOutputStream(), filterDTO, MemberType.STUDENT);
+            // 메서드 호출 부분을 수정
+            FileOutputStream fileOut = new FileOutputStream("members.xlsx");
+
+            memberExcelService.exportMemberToExcel(fileOut, filterDTO, MemberType.STUDENT);
+            fileOut.close();
+            log.info("Excel file successfully written to response output stream.");
         } catch (Exception e) {
             log.error("Error during excel download:", e);
             throw new RuntimeException("Excel download failed", e);
