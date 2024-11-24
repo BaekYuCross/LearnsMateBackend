@@ -25,5 +25,5 @@ public class FindSingleStudentDTO {
     List<VOCDTO> unansweredVOCByMemberList;
     List<VOCDTO> answeredVOCByMemberList;
 
-    List<LectureDTO> recommendedLectureCodes;
+    List<LectureDTO> recommendedLectureList;
 }

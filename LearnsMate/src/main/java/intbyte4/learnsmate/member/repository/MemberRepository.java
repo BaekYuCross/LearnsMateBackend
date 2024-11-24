@@ -22,4 +22,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     Page<Member> findByMemberType(MemberType memberType, Pageable pageable);
 
     Member findByMemberCodeAndMemberType(Long memberCode, MemberType memberType);
+
+    @Query("SELECT m FROM member m WHERE m.memberType = :memberType ORDER BY m.createdAt DESC")
+    List<Member> findAllByMemberTypeWithExcel(@Param("memberType") MemberType memberType);
 }

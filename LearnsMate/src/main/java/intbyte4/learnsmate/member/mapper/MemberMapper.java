@@ -156,6 +156,7 @@ public class MemberMapper{
                 .usedCouponsList(dto.getUsedCouponsList())
                 .unansweredVOCByMemberList(dto.getUnansweredVOCByMemberList())
                 .answeredVOCByMemberList(dto.getAnsweredVOCByMemberList())
+                .recommendedLectureList(dto.getRecommendedLectureList())
                 .build();
     }
 
