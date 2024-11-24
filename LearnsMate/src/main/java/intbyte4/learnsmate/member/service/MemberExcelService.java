@@ -1,5 +1,7 @@
 package intbyte4.learnsmate.member.service;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
@@ -39,7 +41,15 @@ public class MemberExcelService {
 
     public void exportMemberToExcel(OutputStream outputStream, MemberFilterRequestDTO filterDTO, MemberType memberType) {
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("학생 목록");
+            Sheet sheet;
+            // MemberType에 따라 시트 이름을 설정
+            if (memberType.equals(MemberType.STUDENT)) {
+                sheet = workbook.createSheet("학생 목록");
+            } else if (memberType.equals(MemberType.TUTOR)) {
+                sheet = workbook.createSheet("강사 목록");
+            } else {
+                throw new CommonException(StatusEnum.MISSING_REQUEST_PARAMETER);
+            }
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dateStyle = createDateStyle(workbook);
             createHeader(sheet, headerStyle);
