@@ -5,7 +5,7 @@ import intbyte4.learnsmate.campaign.domain.vo.request.*;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByFilterVO;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.service.CampaignService;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -109,15 +109,15 @@ public class CampaignController {
 
     @Operation(summary = "직원 - 조건 별 캠페인 조회")
     @PostMapping("/filter")
-    public ResponseEntity<CampaignPageResponse<ResponseFindCampaignByConditionVO>> filterCampaigns
-            (@RequestBody RequestFindCampaignByConditionVO request,
+    public ResponseEntity<CampaignPageResponse<ResponseFindCampaignByFilterVO>> filterCampaigns
+            (@RequestBody RequestFindCampaignByFilterVO request,
              @RequestParam(defaultValue = "0") int page,
              @RequestParam(defaultValue = "15") int size){
         CampaignFilterDTO dto =
                 campaignMapper.fromFindCampaignByConditionVOtoFilterDTO(request);
         log.info("반환된 조건 별 캠페인 : {}", dto);
-        CampaignPageResponse<ResponseFindCampaignByConditionVO> response = campaignService
-                .findCampaignListByCondition(dto, page, size);
+        CampaignPageResponse<ResponseFindCampaignByFilterVO> response = campaignService
+                .findCampaignListByFilter(dto, page, size);
 
         return ResponseEntity.ok(response);
     }
