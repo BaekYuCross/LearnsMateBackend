@@ -1,9 +1,6 @@
 package intbyte4.learnsmate.campaign_template.controller;
 
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateFilterDTO;
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplatePageResponse;
-import intbyte4.learnsmate.campaign_template.domain.dto.FindAllCampaignTemplatesDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.*;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestEditTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestRegisterTemplateVO;
@@ -115,8 +112,8 @@ public class CampaignTemplateController {
     public ResponseEntity<?> getTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
         log.info("템플릿 조회 요청된 템플릿 코드 : {}", campaignTemplateCode);
         try {
-            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
-            ResponseFindTemplateVO response = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
+            FindCampaignTemplateDTO findCampaignTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
+            ResponseFindTemplateVO response = campaignTemplateMapper.fromFindCampaignTemplateDtoToFindResponseVO(findCampaignTemplateDTO);
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {
