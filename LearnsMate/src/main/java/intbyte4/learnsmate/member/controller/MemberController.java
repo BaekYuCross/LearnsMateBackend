@@ -1,16 +1,12 @@
 package intbyte4.learnsmate.member.controller;
 
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.member.domain.dto.*;
 import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
-import intbyte4.learnsmate.member.domain.vo.request.CategoryRatioFilterRequest;
-import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMemberVO;
+import intbyte4.learnsmate.member.domain.vo.request.*;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.service.MemberFacade;
 import intbyte4.learnsmate.member.service.MemberService;
@@ -22,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/member")
@@ -75,7 +70,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(vo);
     }
 
-    @Operation(summary = "직원 - 회원 등록")
+    @Operation(summary = "회원 - 회원 가입")
     @PostMapping
     public ResponseEntity<String> saveMember(@RequestBody RequestSaveMemberVO request) {
         MemberDTO memberDTO = memberMapper.fromRequestSaveMemberVOtoMemberDTO(request);
@@ -85,7 +80,20 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");
     }
 
-    @Operation(summary = "직원 - 회원 수정")
+    @Operation(summary = "회원 - 로그인")
+    @PostMapping("/login")
+    public ResponseEntity<?> memberLogin(@RequestBody RequestLoginVO request){
+        MemberDTO memberDTO = MemberDTO.builder()
+                .memberEmail(request.getMemberEmail())
+                .memberPassword(request.getMemberPassword())
+                .build();
+
+        memberService.loginMember(memberDTO);
+
+        return ResponseEntity.ok("로그인 성공");
+    }
+
+    @Operation(summary = "회원 - 회원 수정")
     @PatchMapping("/{memberCode}")
     public ResponseEntity<String> editMember(@PathVariable("memberCode") Long memberCode, @RequestBody RequestEditMemberVO request) {
         MemberDTO memberDTO = memberMapper.fromRequestEditMemberVOToMemberDTO(request);
@@ -96,7 +104,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body("수정 성공");
     }
 
-    @Operation(summary = "직원 - 회원 삭제")
+    @Operation(summary = "회원 - 회원 삭제")
     @PatchMapping("/delete/{memberCode}")
     public ResponseEntity<String> deleteMember(@PathVariable("memberCode") Long memberCode) {
         MemberDTO memberDTO = new MemberDTO();
