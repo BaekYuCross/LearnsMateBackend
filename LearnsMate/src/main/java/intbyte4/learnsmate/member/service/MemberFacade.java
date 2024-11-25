@@ -6,15 +6,11 @@ import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.service.LectureService;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoProgressDTO;
 import intbyte4.learnsmate.lecture_video_by_student.service.LectureVideoByStudentService;
 import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.CategoryCountDTO;
-import intbyte4.learnsmate.member.domain.dto.FindSingleStudentDTO;
-import intbyte4.learnsmate.member.domain.dto.FindSingleTutorDTO;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.dto.*;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
@@ -158,15 +154,18 @@ public class MemberFacade {
         return lectureCategoryByLectureService.countLecturesByCategoryWithinDateRange(startDate, endDate);
     }
 
-    public Map<LectureCategoryEnum, Double> calculateCategoryPercentage(List<CategoryCountDTO> categoryCounts) {
+    // Facade에 메소드 추가
+    public List<CategoryStatDTO> calculateCategoryStats(List<CategoryCountDTO> categoryCounts) {
         long total = categoryCounts.stream()
                 .mapToLong(CategoryCountDTO::getCount)
                 .sum();
 
         return categoryCounts.stream()
-                .collect(Collectors.toMap(
-                        CategoryCountDTO::getLectureCategoryName,
-                        dto -> (double) dto.getCount() / total * 100
-                ));
+                .map(dto -> new CategoryStatDTO(
+                        dto.getLectureCategoryName(),
+                        dto.getCount(),
+                        (double) dto.getCount() / total * 100
+                ))
+                .collect(Collectors.toList());
     }
 }

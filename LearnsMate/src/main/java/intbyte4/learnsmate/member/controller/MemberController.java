@@ -144,17 +144,17 @@ public class MemberController {
 
     @Operation(summary = "총 기간 카테고리 별 강의를 가진 학생 수 비율 조회")
     @GetMapping("/category-ratio")
-    public ResponseEntity<Map<LectureCategoryEnum, Double>> getCategoryRatio() {
+    public ResponseEntity<List<CategoryStatDTO>> getCategoryRatio() {
         List<CategoryCountDTO> categoryCounts = memberFacade.getCategoryCounts();
-        Map<LectureCategoryEnum, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
-        return ResponseEntity.ok(categoryPercentageMap);
+        List<CategoryStatDTO> stats = memberFacade.calculateCategoryStats(categoryCounts);
+        return ResponseEntity.ok(stats);
     }
 
     @Operation(summary = "특정 기간 카테고리 별 강의를 가진 학생 수 비율 조회")
     @PostMapping("/category-ratio/filter")
-    public ResponseEntity<Map<LectureCategoryEnum, Double>> getFilteredCategoryRatioWithPercentage(@RequestBody CategoryRatioFilterRequest request) {
+    public ResponseEntity<List<CategoryStatDTO>> getFilteredCategoryRatioWithPercentage(@RequestBody CategoryRatioFilterRequest request) {
         List<CategoryCountDTO> categoryCounts = memberFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
-        Map<LectureCategoryEnum, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
-        return ResponseEntity.ok(categoryPercentageMap);
+        List<CategoryStatDTO> stats = memberFacade.calculateCategoryStats(categoryCounts);
+        return ResponseEntity.ok(stats);
     }
 }
