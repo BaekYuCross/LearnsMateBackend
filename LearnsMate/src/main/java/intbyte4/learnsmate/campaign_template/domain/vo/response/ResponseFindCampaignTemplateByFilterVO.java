@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @RequiredArgsConstructor
 @Builder
-public class ResponseFindTemplateVO {
+public class ResponseFindCampaignTemplateByFilterVO {
     @JsonProperty("campaign_template_code")
     private final Long campaignTemplateCode;
 
