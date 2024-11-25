@@ -177,4 +177,21 @@ public class BlacklistService {
                 blacklistPage.getSize()
         );
     }
+
+    // filterDTO에서 MEMBER TYPE SET 함
+    public List<BlacklistDTO> findAllByFilterWithExcel(BlacklistFilterRequestDTO filterDTO){
+        List<Blacklist> blacklistList = blacklistRepository.searchByWithoutPaging(filterDTO);
+
+        return blacklistList.stream()
+                .map(blacklistMapper::fromBlacklistToBlacklistDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<BlacklistDTO> findAllByMemberTypeWithExcel(MemberType memberType){
+        List<Blacklist> blacklistList = blacklistRepository.findAllByMemberTypeWithExcel(memberType);
+
+        return blacklistList.stream()
+                .map(blacklistMapper::fromBlacklistToBlacklistDTO)
+                .collect(Collectors.toList());
+    }
 }
