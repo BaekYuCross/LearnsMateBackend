@@ -18,7 +18,7 @@ public class Member {
 
     @Id
     @Column(name = "member_code", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberCode;
 
     @Enumerated(EnumType.STRING)
