@@ -1,19 +1,17 @@
-package intbyte4.learnsmate.issue_coupon.domain.vo.request;
+package intbyte4.learnsmate.issue_coupon.domain.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
-import intbyte4.learnsmate.coupon_category.domain.dto.CouponCategoryEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@ToString
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class IssueCouponFilterRequestVO {
+public class IssuedCouponFilterDTO {
     private String couponIssuanceCode;
     private String couponName;
     private String couponContents;
@@ -32,17 +30,4 @@ public class IssueCouponFilterRequestVO {
     private LocalDateTime endCouponUseDate;
     private LocalDateTime startCouponIssueDate;
     private LocalDateTime endCouponIssueDate;
-
-    public Integer getCouponCategoryCode() {
-        if (couponCategoryName != null && !couponCategoryName.isEmpty()) {
-            try {
-                return CouponCategoryEnum.getCodeByName(couponCategoryName);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 카테고리 이름입니다.");
-            }
-        }
-        return null;
-    }
 }
-
-
