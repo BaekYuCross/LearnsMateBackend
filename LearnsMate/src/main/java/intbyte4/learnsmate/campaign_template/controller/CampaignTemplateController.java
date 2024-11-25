@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign_template.controller;
 
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.FindAllCampaignTemplatesDTO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestEditTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestRegisterTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseEditTemplateVO;
@@ -96,10 +97,10 @@ public class CampaignTemplateController {
     @Operation(summary = "직원 - 캠페인 템플릿 전체 조회")
     @GetMapping("/list")
     public ResponseEntity<List<ResponseFindTemplateVO>> listTemplates() {
-        List<CampaignTemplateDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
+        List<FindAllCampaignTemplatesDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
         List<ResponseFindTemplateVO> response = new ArrayList<>();
-        for (CampaignTemplateDTO campaignTemplateDTO : campaignTemplateDTOList) {
-            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
+        for (FindAllCampaignTemplatesDTO findAllCampaignTemplateDTO : campaignTemplateDTOList) {
+            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromFindAllDtoToFindResponseVO(findAllCampaignTemplateDTO);
             response.add(vocVO);
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
