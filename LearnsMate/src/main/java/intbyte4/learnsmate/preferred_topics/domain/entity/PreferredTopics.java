@@ -19,7 +19,7 @@ public class PreferredTopics {
 
     @Id
     @Column(name = "preferred_topic_code", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long preferredTopicCode;
 
     @ManyToOne
