@@ -19,4 +19,6 @@ public interface CampaignService {
     FindCampaignDTO findCampaign(FindCampaignDTO request);
     CampaignPageResponse<ResponseFindCampaignByConditionVO> findCampaignListByCondition
             (CampaignFilterDTO request, int page, int size);
+    List<FindAllCampaignsDTO> findCampaignListByConditionWithExcel(CampaignFilterDTO filterDTO);
+    List<FindAllCampaignsDTO> findAllCampaignListWithExcel();
 }
