@@ -15,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,13 +25,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberService {
-
+    private final BCryptPasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
 
     public void saveMember(MemberDTO memberDTO) {
-        LocalDateTime now = LocalDateTime.now();
 
+        // 비밀번호가 있고, 암호화되어 있지 않은 경우에만 암호화
+        if (memberDTO.getMemberPassword() != null && !isPasswordEncrypted(memberDTO.getMemberPassword())) {
+            memberDTO.setMemberPassword(passwordEncoder.encode(memberDTO.getMemberPassword()));
+        }
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
         memberRepository.save(member);
     }
@@ -41,7 +44,7 @@ public class MemberService {
         // Pageable 객체 생성
         PageRequest pageable = PageRequest.of(page, size);
         // 페이징 처리된 데이터 조회
-        Page<Member> memberPage = memberRepository.findByMemberFlagTrueAndMemberType(memberType, pageable);
+        Page<Member> memberPage = memberRepository.findByMemberType(memberType, pageable);
 
         // Member -> ResponseFindMemberVO 변환
         List<ResponseFindMemberVO> responseVOList = memberPage.getContent().stream()
@@ -85,7 +88,7 @@ public class MemberService {
 
     // memberCode, memberType -> memberDTO로 반환 메서드
     public MemberDTO findMemberByMemberCode(Long memberCode, MemberType memberType) {
-        Member member = memberRepository.findByMemberFlagTrueAndMemberCodeAndMemberType(memberCode, memberType);
+        Member member = memberRepository.findByMemberCodeAndMemberType(memberCode, memberType);
 
         if(memberType.equals(MemberType.STUDENT) && member.getMemberType().equals(MemberType.TUTOR)){ // 학생을 찾는데 강사인 경우
              throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
@@ -148,5 +151,26 @@ public class MemberService {
                 memberPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
                 memberPage.getSize()           // 페이지 크기
         );
+    }
+
+    public List<MemberDTO> findAllByFilterWithExcel(MemberFilterRequestDTO filterDTO){
+        List<Member> memberList = memberRepository.searchByWithoutPaging(filterDTO);
+
+        return memberList.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MemberDTO> findAllByMemberTypeWithExcel(MemberType memberType){
+        List<Member> memberList = memberRepository.findAllByMemberTypeWithExcel(memberType);
+
+        return memberList.stream()
+                .map(memberMapper::fromMembertoMemberDTO)
+                .collect(Collectors.toList());
+    }
+
+    // BCrypt로 암호화된 비밀번호인지 확인
+    private boolean isPasswordEncrypted(String password) {
+        return password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$");
     }
 }

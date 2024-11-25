@@ -17,16 +17,21 @@ import intbyte4.learnsmate.coupon_category.service.CouponCategoryServiceImpl;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureStatsFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.vo.response.LectureStatsVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureDetailVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
-import intbyte4.learnsmate.lecture.pagination.LectureCursorPaginationResponse;
+import intbyte4.learnsmate.lecture.pagination.LecturePaginationResponse;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
-import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
+import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
+import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
+import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -38,17 +43,19 @@ import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.service.VideoByLectureService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LectureFacade {
@@ -60,6 +67,7 @@ public class LectureFacade {
     private final MemberMapper memberMapper;
     private final VideoByLectureService videoByLectureService;
     private final LectureService lectureService;
+    private final LectureCategoryService lectureCategoryService;
     private final LectureCategoryByLectureService lectureCategoryByLectureService;
     private final CouponByLectureService couponByLectureService;
     private final CouponMapper couponMapper;
@@ -115,22 +123,6 @@ public class LectureFacade {
         return new Result(lectureDTO, tutor, lecture, issueCouponDTO, couponDTOInfo, couponCategory, adminDTO);
     }
 
-    public LectureCursorPaginationResponse<LectureDTO> getLecturesWithPagination(LocalDateTime cursor, int pageSize) {
-        Pageable pageable = PageRequest.of(0, pageSize);
-        List<Lecture> lectures = lectureRepository.findLecturesByCursor(cursor, pageable);
-
-        List<LectureDTO> lectureDTOs = lectures.stream()
-                .map(this::buildLectureDTOWithDetails)
-                .collect(Collectors.toList());
-
-        LocalDateTime nextCursor = lectureDTOs.isEmpty() ? null : lectureDTOs.get(lectureDTOs.size() - 1).getCreatedAt();
-
-        return LectureCursorPaginationResponse.<LectureDTO>builder()
-                .data(lectureDTOs)
-                .nextCursor(nextCursor)
-                .build();
-    }
-
     private LectureDTO buildLectureDTOWithDetails(Lecture lecture) {
         return LectureDTO.builder()
                 .lectureCode(lecture.getLectureCode())
@@ -147,30 +139,77 @@ public class LectureFacade {
                 .build();
     }
 
-    public List<LectureDTO> getLecturesWithPaginationByOffset(int page, int pageSize) {
-        Pageable pageable = PageRequest.of(page, pageSize);
-        List<Lecture> lectures = lectureRepository.findLecturesByOffset(pageable);
-        return lectures.stream()
-                .map(this::buildLectureDTOWithDetails)
-                .collect(Collectors.toList());
+    public LecturePaginationResponse<ResponseFindLectureVO> getLecturesWithPaginationByOffset(int page, int size) {
+        Page<Lecture> lectures = lectureRepository.findLecturesByOffset(PageRequest.of(page, size));
+        List<ResponseFindLectureVO> responseList = new ArrayList<>();
+
+        for (Lecture lecture : lectures) {
+            LectureDTO lectureDTO = buildLectureDTOWithDetails(lecture);
+            MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
+            LectureCategoryByLectureDTO lectureCategoryByLecture = lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+            LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLecture.getLectureCategoryCode());
+
+            ResponseFindLectureVO responseFindLectureVO = lectureMapper.fromDTOToResponseVOAll(lectureDTO, memberDTO, lectureCategoryDTO);
+
+            responseList.add(responseFindLectureVO);
+        }
+
+        return new LecturePaginationResponse<>(
+                responseList,
+                lectures.getTotalElements(),
+                lectures.getTotalPages(),
+                lectures.getNumber(),
+                lectures.getSize()
+        );
     }
 
-    public ResponseFindLectureVO convertToResponseFindLectureVO(LectureDTO lectureDTO) {
-        String lectureCategoryName = lectureCategoryByLectureService.findLectureCategoryNameByLectureCode(lectureDTO.getLectureCode());
-        MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
-        String tutorName = memberDTO.getMemberName();
+    public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPage(LectureFilterDTO filterDTO, int page, int size) {
+        Page<LectureDTO> lectures = lectureService.filterLectureWithPaging(filterDTO, PageRequest.of(page, size));
+        List<ResponseFindLectureVO> responseList = new ArrayList<>();
 
-        return ResponseFindLectureVO.builder()
-                .lectureCode(lectureDTO.getLectureCode())
+        for (LectureDTO lectureDTO : lectures) {
+            MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
+            LectureCategoryByLectureDTO lectureCategoryByLecture = lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+            LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLecture.getLectureCategoryCode());
+
+            ResponseFindLectureVO responseFindLectureVO = lectureMapper.fromDTOToResponseVOAll(lectureDTO, memberDTO, lectureCategoryDTO);
+
+            responseList.add(responseFindLectureVO);
+        }
+
+        return new LecturePaginationResponse<>(
+                responseList,
+                lectures.getTotalElements(),
+                lectures.getTotalPages(),
+                lectures.getNumber(),
+                lectures.getSize()
+        );
+    }
+
+    public LectureStatsVO getLectureStatsWithFilter(String lectureCode, LectureStatsFilterDTO filter) {
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+        if (lectureDTO == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+
+        LocalDateTime startDate = LocalDateTime.of(filter.getStartYear(), filter.getStartMonth(), 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(filter.getEndYear(), filter.getEndMonth(), filter.getEndMonth() == 12 ? 31 : YearMonth.of(filter.getEndYear(), filter.getEndMonth()).lengthOfMonth(), 23, 59, 59);
+
+        Integer totalStudentCount = paymentService.getTotalStudentCountBetween(startDate, endDate);
+        Integer totalClickCount = lectureService.getTotalClickCountBetween(startDate, endDate);
+        Double totalConversionRate = calculateConversionRate(totalClickCount, totalStudentCount, lectureCode);
+
+        Integer studentCount = paymentService.getStudentCountByLectureCodeBetween(lectureCode, startDate, endDate);
+        Integer clickCount = lectureService.getClickCountByLectureCodeBetween(lectureCode, startDate, endDate);
+        Double conversionRate = calculateConversionRate(clickCount, studentCount, lectureCode);
+
+        return LectureStatsVO.builder()
+                .totalStudentCount(totalStudentCount)
+                .totalLectureClickCount(totalClickCount)
+                .totalConversionRate(totalConversionRate)
+                .lectureCode(lectureCode)
                 .lectureTitle(lectureDTO.getLectureTitle())
-                .tutorCode(lectureDTO.getTutorCode())
-                .tutorName(tutorName)
-                .lectureCategoryName(lectureCategoryName)
-                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
-                .createdAt(lectureDTO.getCreatedAt())
-                .lecturePrice(lectureDTO.getLecturePrice())
-                .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
-                .lectureStatus(lectureDTO.getLectureStatus())
+                .studentCount(studentCount)
+                .lectureClickCount(clickCount)
+                .conversionRate(conversionRate)
                 .build();
     }
 
@@ -243,18 +282,24 @@ public class LectureFacade {
 
     public ResponseFindLectureDetailVO getLectureById(String lectureCode) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
-        if (lectureDTO == null) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
+        if (lectureDTO == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
 
+        MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
         int purchaseCount = paymentService.getPurchaseCountByLectureCode(lectureCode);
-        double purchaseConversionRate = calculateConversionRate(lectureDTO.getLectureClickCount(), purchaseCount);
+        double purchaseConversionRate = calculateConversionRate(lectureDTO.getLectureClickCount(), purchaseCount, lectureCode);
         String lectureCategoryName = lectureCategoryByLectureService.findLectureCategoryNameByLectureCode(lectureCode);
+        List<VideoByLectureDTO> videoByLectureDTOS = videoByLectureService.findVideoByLectureByLectureCode(lectureDTO.getLectureCode());
+        List<String> formattedVideoTitles = new ArrayList<>();
+        for (int i = 0; i < videoByLectureDTOS.size(); i++) {
+            VideoByLectureDTO videoDTO = videoByLectureDTOS.get(i);
+            formattedVideoTitles.add((i + 1) + "강. " + videoDTO.getVideoTitle());
+        }
 
         return ResponseFindLectureDetailVO.builder()
                 .lectureCode(lectureDTO.getLectureCode())
                 .lectureTitle(lectureDTO.getLectureTitle())
                 .tutorCode(lectureDTO.getTutorCode())
+                .tutorName(memberDTO.getMemberName())
                 .lectureCategoryName(lectureCategoryName)
                 .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
                 .createdAt(lectureDTO.getCreatedAt())
@@ -264,12 +309,15 @@ public class LectureFacade {
                 .lectureImage(lectureDTO.getLectureImage())
                 .lectureClickCount(lectureDTO.getLectureClickCount())
                 .purchaseCount(purchaseCount)
-                .purchaseConversionRate(purchaseConversionRate)
+                .purchaseConversionRate((int) purchaseConversionRate)
+                .lectureVideos(videoByLectureDTOS)
+                .formattedVideoTitles(formattedVideoTitles)
                 .build();
     }
 
-    private double calculateConversionRate(int clickCount, int purchaseCount) {
+    private double calculateConversionRate(int clickCount, int purchaseCount, String lectureCode) {
         if (clickCount == 0) {
+            log.warn("Click count is 0 for lectureCode: {}", lectureCode);
             return 0.0;
         }
         return (double) purchaseCount / clickCount * 100;
@@ -301,5 +349,45 @@ public class LectureFacade {
         }
 
         return lectureMapper.toDTO(lecture);
+    }
+
+    public List<ResponseFindLectureVO> findAllLecturesByFilter(LectureFilterDTO filterDTO) {
+        List<Lecture> lectures = lectureRepository.findAllByFilter(filterDTO);
+        List<ResponseFindLectureVO> responseList = new ArrayList<>();
+
+        for (Lecture lecture : lectures) {
+            LectureDTO lectureDTO = lectureMapper.toDTO(lecture);
+            MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());
+            LectureCategoryByLectureDTO lectureCategoryByLectureDTO =
+                    lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+            LectureCategoryDTO lectureCategoryDTO =
+                    lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLectureDTO.getLectureCategoryCode());
+
+            ResponseFindLectureVO responseVO =
+                    lectureMapper.fromDTOToResponseVOAll(lectureDTO, tutorDTO, lectureCategoryDTO);
+            responseList.add(responseVO);
+        }
+
+        return responseList;
+    }
+
+    public List<ResponseFindLectureVO> findAllLectures() {
+        List<Lecture> lectures = lectureRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<ResponseFindLectureVO> responseList = new ArrayList<>();
+
+        for (Lecture lecture : lectures) {
+            LectureDTO lectureDTO = lectureMapper.toDTO(lecture);
+            MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());
+            LectureCategoryByLectureDTO lectureCategoryByLectureDTO =
+                    lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+            LectureCategoryDTO lectureCategoryDTO =
+                    lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLectureDTO.getLectureCategoryCode());
+
+            ResponseFindLectureVO responseVO =
+                    lectureMapper.fromDTOToResponseVOAll(lectureDTO, tutorDTO, lectureCategoryDTO);
+            responseList.add(responseVO);
+        }
+
+        return responseList;
     }
 }

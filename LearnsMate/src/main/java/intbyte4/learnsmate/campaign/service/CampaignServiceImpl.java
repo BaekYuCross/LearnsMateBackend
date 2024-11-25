@@ -4,10 +4,7 @@ import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
-import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
-import intbyte4.learnsmate.campaign.domain.dto.CampaignFilterDTO;
-import intbyte4.learnsmate.campaign.domain.dto.CampaignPageResponse;
-import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
@@ -21,10 +18,12 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.couponbycampaign.domain.dto.CouponByCampaignDTO;
 import intbyte4.learnsmate.couponbycampaign.service.CouponByCampaignService;
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.userpercampaign.domain.dto.UserPerCampaignDTO;
 import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,7 +42,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
-    private final CampaignRepositoryCustom campaignRepositoryCustom;
     private final AdminService adminService;
     private final UserPerCampaignService userPerCampaignService;
     private final CouponByCampaignService couponByCampaignService;
@@ -83,7 +81,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         requestStudentList.forEach(memberDTO -> {
             MemberDTO foundStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
-                    , memberDTO.getMemberType());
+                    , MemberType.STUDENT);
             if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
             userPerCampaignService.registerUserPerCampaign(foundStudent, savedCampaignDTO);
         });
@@ -104,6 +102,7 @@ public class CampaignServiceImpl implements CampaignService {
     public CampaignDTO editCampaign(CampaignDTO requestCampaign
             , List<MemberDTO> requestStudentList
             , List<CouponDTO> requestCouponList) {
+        log.info("서비스에서 조회하는 캠페인 코드: {}", requestCampaign.getCampaignCode());
         if (requestCampaign.getCampaignCode() == null) {
             throw new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND);
         }
@@ -113,11 +112,10 @@ public class CampaignServiceImpl implements CampaignService {
 
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
-
+        log.info("서비스에서 조회하는 adminDTO: {}", adminDTO);
         Campaign updatedCampaign = campaignMapper.toEntity(requestCampaign, admin);
-
+        log.info("서비스에서 조회하는 toEntity(requestCampaign,admin): {}", updatedCampaign);
         campaignRepository.save(updatedCampaign);
-
         editStudent(requestCampaign, requestStudentList, updatedCampaign);
 
         editCoupon(requestCampaign, requestCouponList, updatedCampaign);
@@ -154,8 +152,12 @@ public class CampaignServiceImpl implements CampaignService {
     private void editStudent(CampaignDTO requestCampaign
             , List<MemberDTO> requestStudentList
             , Campaign updatedCampaign) {
+        log.info("editStuden메서드의 requestCampaign: {}", requestCampaign);
+        log.info("editStuden메서드의 requestStudentList: {}", requestStudentList);
+        log.info("editStuden메서드의 updatedCampaign: {}", updatedCampaign);
         List<UserPerCampaignDTO> existingStudentList = userPerCampaignService
                 .findByCampaignCode(updatedCampaign);
+
 
         List<UserPerCampaignDTO> studentsToRemove = existingStudentList.stream()
                 .filter(student -> requestStudentList.stream()
@@ -177,9 +179,13 @@ public class CampaignServiceImpl implements CampaignService {
             userPerCampaignService.registerUserPerCampaign(newStudent, requestCampaign);
         });
     }
-
+    @Transactional
     @Override
     public void removeCampaign(CampaignDTO request) {
+        userPerCampaignService.removeByCampaignCode(request.getCampaignCode());
+
+        couponByCampaignService.removeByCampaignCode(request.getCampaignCode());
+
         Campaign campaign = campaignRepository.findById(request.getCampaignCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
         if (Objects.equals(request.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
@@ -190,23 +196,51 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<FindAllCampaignDTO> findAllCampaignList() {
+    public List<FindAllCampaignsDTO> findAllCampaignList() {
         List<Campaign> campaigns = campaignRepository.findAll();
-        List<FindAllCampaignDTO> findAllCampaignDTOList = new ArrayList<>();
+        List<FindAllCampaignsDTO> findAllCampaignsDTOList = new ArrayList<>();
         for (Campaign campaign : campaigns) {
             CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
             AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
-            findAllCampaignDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
+            findAllCampaignsDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
         }
 
-        return findAllCampaignDTOList;
+        return findAllCampaignsDTOList;
     }
 
     @Override
-    public CampaignDTO findCampaign(CampaignDTO request) {
+    public FindCampaignDTO findCampaign(FindCampaignDTO request) {
         Campaign campaign = campaignRepository.findById(request.getCampaignCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
-        return campaignMapper.toDTO(campaign);
+
+        CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
+        log.info("캠페인 단건 조회 서비스에서 찾은 캠페인 : {}", campaignDTO);
+        // 캠페인 별 쿠폰에서 찾은 쿠폰 코드로 쿠폰 조회
+        List<CouponByCampaignDTO> couponByCampaignDTOList = couponByCampaignService.findByCampaignCode(campaign);
+
+        List<CouponDTO> couponDTOList = new ArrayList<>();
+        couponByCampaignDTOList.forEach(couponByCampaignDTO -> {
+            CouponDTO couponDTO = couponService.findCouponDTOByCouponCode(couponByCampaignDTO.getCouponCode());
+            if (couponDTO == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
+            couponDTOList.add(couponDTO);
+        });
+
+        // 학생 별 캠페인에서 찾은 유저 코드로 유저 조회
+        List<UserPerCampaignDTO> userPerCampaignDTOList = userPerCampaignService.findByCampaignCode(campaign);
+
+        List<MemberDTO> memberDTOList = new ArrayList<>();
+        userPerCampaignDTOList.forEach(userPerCampaignDTO -> {
+            MemberDTO memberDTO = memberService.findMemberByMemberCode(userPerCampaignDTO.getStudentCode()
+                    , MemberType.STUDENT);
+            if (memberDTO == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
+            memberDTOList.add(memberDTO);
+        });
+
+        // 위에서 찾은 쿠폰,유저 변환 후 리턴
+        return campaignMapper.toFindCampaignDTO(
+                campaignDTO,
+                couponDTOList,
+                memberDTOList);
     }
 
     @Override
@@ -229,5 +263,27 @@ public class CampaignServiceImpl implements CampaignService {
                 campaignPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
                 campaignPage.getSize()           // 페이지 크기
         );
+    }
+
+    @Override
+    public List<FindAllCampaignsDTO> findCampaignListByConditionWithExcel(CampaignFilterDTO filterDTO) {
+        List<Campaign> campaignList = campaignRepository.searchByWithoutPaging(filterDTO);
+
+        return campaignList.stream()
+                .map(campaignMapper::fromCampaignToFindAllCampaignDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FindAllCampaignsDTO> findAllCampaignListWithExcel() {
+        List<Campaign> campaigns = campaignRepository.findAll();
+        List<FindAllCampaignsDTO> findAllCampaignsDTOList = new ArrayList<>();
+        for (Campaign campaign : campaigns) {
+            CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
+            findAllCampaignsDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
+        }
+
+        return findAllCampaignsDTOList;
     }
 }

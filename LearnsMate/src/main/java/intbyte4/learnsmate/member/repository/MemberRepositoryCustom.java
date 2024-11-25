@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface MemberRepositoryCustom {
     Page<Member> searchBy(MemberFilterRequestDTO request, Pageable pageable);
+
+    List<Member> searchByWithoutPaging(MemberFilterRequestDTO request);
 }

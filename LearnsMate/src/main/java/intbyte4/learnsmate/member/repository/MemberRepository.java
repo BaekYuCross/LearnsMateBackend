@@ -18,10 +18,11 @@ import java.util.List;
 @Primary
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-    Page<Member> findByMemberFlagTrueAndMemberType(MemberType memberType, PageRequest pageable);
+    // 기존 offset 기반 쿼리
+    Page<Member> findByMemberType(MemberType memberType, Pageable pageable);
 
-    @Query("SELECT m FROM member m WHERE m.memberType = :memberType AND (:cursor IS NULL OR m.createdAt < :cursor) ORDER BY m.createdAt DESC")
-    List<Member> findMembersByCursorAndMemberType(@Param("cursor") LocalDateTime cursor, @Param("memberType") MemberType memberType, Pageable pageable);
+    Member findByMemberCodeAndMemberType(Long memberCode, MemberType memberType);
 
-    Member findByMemberFlagTrueAndMemberCodeAndMemberType(Long memberCode, MemberType memberType);
+    @Query("SELECT m FROM member m WHERE m.memberType = :memberType ORDER BY m.createdAt DESC")
+    List<Member> findAllByMemberTypeWithExcel(@Param("memberType") MemberType memberType);
 }

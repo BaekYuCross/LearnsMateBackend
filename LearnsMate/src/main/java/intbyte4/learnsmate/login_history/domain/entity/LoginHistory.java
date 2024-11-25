@@ -19,7 +19,7 @@ public class LoginHistory {
 
     @Id
     @Column(name = "login_history_code", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long loginHistoryCode;
 
     @Column(name = "last_login_date")

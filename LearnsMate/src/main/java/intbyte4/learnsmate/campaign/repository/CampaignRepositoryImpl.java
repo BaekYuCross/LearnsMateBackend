@@ -23,24 +23,25 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
     @Override
     public Page<Campaign> searchBy(CampaignFilterDTO campaignFilterDTO, Pageable pageable) {
 
-        JPAQuery<Campaign> query = queryFactory
-                .selectFrom(qCampaign)
-                .where(searchByType(campaignFilterDTO)
+        JPAQuery<Campaign> query = queryFactory.selectFrom(qCampaign).where(searchByType(campaignFilterDTO)
                         .and(searchByTitle(campaignFilterDTO))
                         .and(searchByPeriod(campaignFilterDTO))
-                        .and(searchBySentStatus(campaignFilterDTO))
-                        .and(searchByScheduledStatus(campaignFilterDTO))
-                );
+                        .and(searchBySendDateStatus(campaignFilterDTO)));
 
         long total = query.fetchCount();
 
         // 페이징 적용
-        List<Campaign> campaigns = query
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Campaign> campaigns = query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
 
         return new PageImpl<>(campaigns, pageable, total);
+    }
+
+    @Override
+    public List<Campaign> searchByWithoutPaging(CampaignFilterDTO request) {
+       return queryFactory.selectFrom(qCampaign).where(searchByType(request)
+                        .and(searchByTitle(request))
+                        .and(searchByPeriod(request))
+                        .and(searchBySendDateStatus(request))).fetch();
     }
 
     public BooleanBuilder searchByType(CampaignFilterDTO campaignFilterDTO) {
@@ -89,21 +90,29 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
     }
 
 
-    public BooleanBuilder searchBySentStatus(CampaignFilterDTO campaignFilterDTO) {
+    public BooleanBuilder searchBySendDateStatus(CampaignFilterDTO campaignFilterDTO) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (campaignFilterDTO.getCampaignSendDate() == null) return booleanBuilder;
 
-        booleanBuilder.and(qCampaign.campaignSendDate.loe(LocalDateTime.now()));
+        // 시작 발송 날짜 조건
+        if (campaignFilterDTO.getCampaignStartPostDate() != null) {
+            booleanBuilder.and(qCampaign.campaignSendDate.goe(campaignFilterDTO.getCampaignStartPostDate()));
+        }
+
+        // 종료 발송 날짜 조건
+        if (campaignFilterDTO.getCampaignEndPostDate() != null) {
+            booleanBuilder.and(qCampaign.campaignSendDate.loe(campaignFilterDTO.getCampaignEndPostDate()));
+        }
+
+        // 발송 상태에 따른 조건
+        if ("completed".equalsIgnoreCase(campaignFilterDTO.getCampaignStatus())) {
+            // 발송 완료: 현재 시간 이전
+            booleanBuilder.and(qCampaign.campaignSendDate.loe(LocalDateTime.now()));
+        } else if ("scheduled".equalsIgnoreCase(campaignFilterDTO.getCampaignStatus())) {
+            // 발송 예정: 현재 시간 이후
+            booleanBuilder.and(qCampaign.campaignSendDate.goe(LocalDateTime.now()));
+        }
 
         return booleanBuilder;
     }
 
-    public BooleanBuilder searchByScheduledStatus(CampaignFilterDTO campaignFilterDTO) {
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (campaignFilterDTO.getCampaignSendDate() == null) return booleanBuilder;
-
-        booleanBuilder.and(qCampaign.campaignSendDate.goe(LocalDateTime.now()));
-
-        return booleanBuilder;
-    }
 }

@@ -22,5 +22,6 @@ public class CampaignFilterDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long adminCode;
+    private String adminName;
 
 }

@@ -41,6 +41,14 @@ public class CouponController {
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
+    @Operation(summary = "직원 등록 쿠폰 전체 조회")
+    @GetMapping("/admin-coupons")
+    public ResponseEntity<List<CouponFindResponseVO>> getAdminCoupons() {
+        List<CouponFindResponseVO> responseList = couponFacade.findAdminRegisterCoupons();
+
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
+    }
+
     @Operation(summary = "쿠폰 단 건 조회")
     @GetMapping("/coupon/{couponCode}")
     public ResponseEntity<CouponFindResponseVO> getCouponByCouponCode(@PathVariable("couponCode") Long couponCode) {

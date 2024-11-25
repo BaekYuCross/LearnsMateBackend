@@ -57,6 +57,32 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return new PageImpl<>(members, pageable, total);
     }
 
+    @Override
+    public List<Member> searchByWithoutPaging(MemberFilterRequestDTO request) {
+        QMember member = QMember.member;
+
+        // 기존 BooleanBuilder 재사용
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(eqMemberCode(request.getMemberCode()))
+                .and(eqMemberType(request.getMemberType()))
+                .and(likeEmail(request.getMemberEmail()))
+                .and(likeName(request.getMemberName()))
+                .and(betweenAge(request.getMemberStartAge(), request.getMemberEndAge()))
+                .and(likePhone(request.getMemberPhone()))
+                .and(likeAddress(request.getMemberAddress()))
+                .and(eqMemberFlag(request.getMemberFlag()))
+                .and(eqMemberDormantFlag(request.getMemberDormantFlag()))
+                .and(betweenBirth(request.getBirthStartDate(), request.getBirthEndDate()))
+                .and(betweenCreatedAt(request.getCreatedStartDate(), request.getCreatedEndDate()));
+
+        // 페이징 없이 전체 데이터 조회
+        return queryFactory
+                .selectFrom(member)
+                .where(builder)
+                .orderBy(member.createdAt.desc())
+                .fetch();
+    }
+
     // memberCode 검색 조건
     private BooleanExpression eqMemberCode(Long memberCode) {
         return memberCode == null ? null : QMember.member.memberCode.eq(memberCode);
@@ -120,4 +146,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         if (endDate == null) return QMember.member.createdAt.goe(startDate);
         return QMember.member.createdAt.between(startDate, endDate);
     }
+
+
 }

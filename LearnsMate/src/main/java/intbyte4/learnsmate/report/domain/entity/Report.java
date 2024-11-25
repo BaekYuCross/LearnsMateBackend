@@ -18,7 +18,7 @@ public class Report {
 
     @Id
     @Column(name = "report_code", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reportCode;
 
     @Column(name = "report_reason", nullable = false)

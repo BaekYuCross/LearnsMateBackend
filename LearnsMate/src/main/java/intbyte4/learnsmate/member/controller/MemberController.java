@@ -5,7 +5,7 @@ import intbyte4.learnsmate.member.domain.dto.*;
 import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
 import intbyte4.learnsmate.member.domain.vo.request.CategoryRatioFilterRequest;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMembertVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -17,12 +17,10 @@ import intbyte4.learnsmate.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -38,18 +36,19 @@ public class MemberController {
 
     @Operation(summary = "직원 - 학생 전체 조회")
     @GetMapping("/students")
-    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
-        MemberPageResponse<ResponseFindMemberVO> memberPageResponse;
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        MemberPageResponse<ResponseFindMemberVO> response = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
 
-        if (cursor == null) memberPageResponse = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
-        else memberPageResponse = memberFacade.findAllMemberByCursor(cursor, size, MemberType.STUDENT);
-
-        return ResponseEntity.ok(memberPageResponse);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "직원 - 강사 전체 조회")
     @GetMapping("/tutors")
-    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutor(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutor(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
         MemberPageResponse<ResponseFindMemberVO> response = memberService.findAllMemberByMemberType(page, size, MemberType.TUTOR);
 
         return ResponseEntity.ok(response);
@@ -111,10 +110,11 @@ public class MemberController {
     @Operation(summary = "직원 - 학생 필터링 검색")
     @PostMapping("/filter/student")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findStudentByFilter(
-            @RequestBody RequestFilterMembertVO request,
+            @RequestBody RequestFilterMemberVO request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
+        log.info("vo는 :{}", request );
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
@@ -128,7 +128,7 @@ public class MemberController {
     @Operation(summary = "직원 - 강사 필터링 검색")
     @PostMapping("/filter/tutor")
     public ResponseEntity<?> findTutorByFilter(
-            @RequestBody RequestFilterMembertVO request,
+            @RequestBody RequestFilterMemberVO request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
@@ -144,17 +144,17 @@ public class MemberController {
 
     @Operation(summary = "총 기간 카테고리 별 강의를 가진 학생 수 비율 조회")
     @GetMapping("/category-ratio")
-    public ResponseEntity<Map<LectureCategoryEnum, Double>> getCategoryRatio() {
+    public ResponseEntity<List<CategoryStatDTO>> getCategoryRatio() {
         List<CategoryCountDTO> categoryCounts = memberFacade.getCategoryCounts();
-        Map<LectureCategoryEnum, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
-        return ResponseEntity.ok(categoryPercentageMap);
+        List<CategoryStatDTO> stats = memberFacade.calculateCategoryStats(categoryCounts);
+        return ResponseEntity.ok(stats);
     }
 
     @Operation(summary = "특정 기간 카테고리 별 강의를 가진 학생 수 비율 조회")
     @PostMapping("/category-ratio/filter")
-    public ResponseEntity<Map<LectureCategoryEnum, Double>> getFilteredCategoryRatioWithPercentage(@RequestBody CategoryRatioFilterRequest request) {
+    public ResponseEntity<List<CategoryStatDTO>> getFilteredCategoryRatioWithPercentage(@RequestBody CategoryRatioFilterRequest request) {
         List<CategoryCountDTO> categoryCounts = memberFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
-        Map<LectureCategoryEnum, Double> categoryPercentageMap = memberFacade.calculateCategoryPercentage(categoryCounts);
-        return ResponseEntity.ok(categoryPercentageMap);
+        List<CategoryStatDTO> stats = memberFacade.calculateCategoryStats(categoryCounts);
+        return ResponseEntity.ok(stats);
     }
 }

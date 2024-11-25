@@ -33,6 +33,7 @@ import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -135,13 +136,26 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String findLatestLectureCodeByStudent(Long studentCode) {
-        return paymentRepository.findLatestLectureCodeByStudent(studentCode)
-                .orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
+        Pageable pageable = PageRequest.of(0, 1); // 최신 1개의 강의만 가져옴
+        List<String> lectureCodes = paymentRepository.findLectureCodesByStudent(studentCode, pageable);
+
+        if(lectureCodes.isEmpty()) return null;
+        return lectureCodes.get(0); // 가장 최신 강의 코드 반환
     }
 
     @Override
     public List<Object[]> findRecommendedLectures(List<Long> similarStudents, String latestLectureCode, Long studentCode, Pageable pageable) {
         return paymentRepository.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
+    }
+
+    @Override
+    public Integer getTotalStudentCountBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsBetweenDates(startDate, endDate);
+    }
+
+    @Override
+    public Integer getStudentCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsByLectureCodeBetweenDates(lectureCode, startDate, endDate);
     }
 
     private Result getResult(MemberDTO memberDTO, LectureDTO lectureDTO) {
