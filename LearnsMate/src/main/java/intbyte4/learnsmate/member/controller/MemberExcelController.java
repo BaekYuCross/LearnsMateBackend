@@ -1,5 +1,7 @@
 package intbyte4.learnsmate.member.controller;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.service.MemberExcelService;
@@ -7,10 +9,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/member/excel")
@@ -61,6 +63,28 @@ public class MemberExcelController {
             log.error("Error during excel download:", e);
             throw new RuntimeException("Excel download failed", e);
         }
+    }
+
+    @PostMapping("/upload/student")
+    @Operation(summary = "학생 엑셀 업로드", description = "엑셀 파일을 통해 학생 정보를 일괄 등록합니다.")
+    public void uploadStudentExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        log.info("Excel upload request received for student. File name: {}", file.getOriginalFilename());
+
+        if (!isExcelFile(file)) {
+            log.error("Invalid file format: {}", file.getOriginalFilename());
+            throw new CommonException(StatusEnum.INVALID_FILE_FORMAT);
+        }
+
+        memberExcelService.importMemberFromExcel(file, MemberType.STUDENT);
+        log.info("good");
+    }
+
+    private boolean isExcelFile(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        return filename != null && (
+                filename.endsWith(".xlsx") ||
+                        filename.endsWith(".xls")
+        );
     }
 }
 
