@@ -15,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,13 +25,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberService {
-
+    private final BCryptPasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
 
     public void saveMember(MemberDTO memberDTO) {
-        LocalDateTime now = LocalDateTime.now();
 
+        // 비밀번호가 있고, 암호화되어 있지 않은 경우에만 암호화
+        if (memberDTO.getMemberPassword() != null && !isPasswordEncrypted(memberDTO.getMemberPassword())) {
+            memberDTO.setMemberPassword(passwordEncoder.encode(memberDTO.getMemberPassword()));
+        }
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
         memberRepository.save(member);
     }
@@ -164,5 +167,10 @@ public class MemberService {
         return memberList.stream()
                 .map(memberMapper::fromMembertoMemberDTO)
                 .collect(Collectors.toList());
+    }
+
+    // BCrypt로 암호화된 비밀번호인지 확인
+    private boolean isPasswordEncrypted(String password) {
+        return password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$");
     }
 }
