@@ -153,6 +153,20 @@ public class CampaignMapper {
                 .build()).collect(Collectors.toList());
     }
 
+    public List<ResponseFindCampaignByConditionVO> fromFindAllDtoListToFindCampaignByConditionVO(List<FindAllCampaignsDTO> dtoList) {
+        return dtoList.stream().map(dto -> ResponseFindCampaignByConditionVO.builder()
+                .campaignCode(dto.getCampaignCode())
+                .campaignTitle(dto.getCampaignTitle())
+                .campaignContents(dto.getCampaignContents())
+                .campaignType(dto.getCampaignType())
+                .campaignSendDate(dto.getCampaignSendDate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
+                .build()).collect(Collectors.toList());
+    }
+
     public FindAllCampaignsDTO toFindAllCampaignDTO(CampaignDTO campaignDTO, String adminName) {
         return FindAllCampaignsDTO.builder()
                 .campaignCode(campaignDTO.getCampaignCode())
@@ -164,6 +178,20 @@ public class CampaignMapper {
                 .updatedAt(campaignDTO.getUpdatedAt())
                 .adminCode(campaignDTO.getAdminCode())
                 .adminName(adminName)
+                .build();
+    }
+
+    public FindAllCampaignsDTO fromCampaignToFindAllCampaignDTO(Campaign entity) {
+        return FindAllCampaignsDTO.builder()
+                .campaignCode(entity.getCampaignCode())
+                .campaignTitle(entity.getCampaignTitle())
+                .campaignContents(entity.getCampaignContents())
+                .campaignType(String.valueOf(entity.getCampaignType()))
+                .campaignSendDate(entity.getCampaignSendDate())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .adminCode(entity.getAdmin().getAdminCode())
+                .adminName(entity.getAdmin().getAdminName())
                 .build();
     }
 

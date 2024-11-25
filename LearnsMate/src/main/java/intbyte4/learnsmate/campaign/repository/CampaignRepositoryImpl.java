@@ -23,23 +23,25 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
     @Override
     public Page<Campaign> searchBy(CampaignFilterDTO campaignFilterDTO, Pageable pageable) {
 
-        JPAQuery<Campaign> query = queryFactory
-                .selectFrom(qCampaign)
-                .where(searchByType(campaignFilterDTO)
+        JPAQuery<Campaign> query = queryFactory.selectFrom(qCampaign).where(searchByType(campaignFilterDTO)
                         .and(searchByTitle(campaignFilterDTO))
                         .and(searchByPeriod(campaignFilterDTO))
-                        .and(searchBySendDateStatus(campaignFilterDTO))
-                );
+                        .and(searchBySendDateStatus(campaignFilterDTO)));
 
         long total = query.fetchCount();
 
         // 페이징 적용
-        List<Campaign> campaigns = query
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Campaign> campaigns = query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
 
         return new PageImpl<>(campaigns, pageable, total);
+    }
+
+    @Override
+    public List<Campaign> searchByWithoutPaging(CampaignFilterDTO request) {
+       return queryFactory.selectFrom(qCampaign).where(searchByType(request)
+                        .and(searchByTitle(request))
+                        .and(searchByPeriod(request))
+                        .and(searchBySendDateStatus(request))).fetch();
     }
 
     public BooleanBuilder searchByType(CampaignFilterDTO campaignFilterDTO) {

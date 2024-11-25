@@ -36,10 +36,11 @@ public class CampaignController {
     @PostMapping("/register")
     public ResponseEntity<ResponseRegisterCampaignVO> createCampaign
             (@RequestBody RequestRegisterCampaignVO requestCampaign) {
+
+        log.info("requestCampaign:{}",requestCampaign);
         List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
                 .map(memberMapper::fromRequestFindCampaignStudentVOToMemberDTO)
                 .toList();
-        log.info("requestCampaign 발송시간 체크:{}",requestCampaign.getCampaignSendDate());
 
         List<CouponDTO> couponDTOList = requestCampaign.getCouponList().stream()
                 .map(couponMapper::fromRequestFindCampaignCouponVOToCouponDTO)
@@ -70,7 +71,7 @@ public class CampaignController {
                 .fromEditRequestVOtoDTO(requestCampaign)
                 , studentDTOList
                 , couponDTOList);
-
+        log.info("campaignDTO  수정완료 {}", campaignDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(campaignMapper.fromDtoToEditResponseVO(campaignDTO));
     }
 
