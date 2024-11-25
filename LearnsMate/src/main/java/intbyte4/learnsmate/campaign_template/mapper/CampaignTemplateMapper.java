@@ -5,6 +5,7 @@ import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateFilterDTO;
 import intbyte4.learnsmate.campaign_template.domain.dto.FindAllCampaignTemplatesDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.FindCampaignTemplateDTO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestEditTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestRegisterTemplateVO;
@@ -132,6 +133,32 @@ public class CampaignTemplateMapper {
                 .campaignTemplateTitle(vo.getCampaignTemplateTitle())
                 .campaignTemplateStartPostDate(vo.getCampaignTemplateStartPostDate())
                 .campaignTemplateEndPostDate(vo.getCampaignTemplateEndPostDate())
+                .build();
+    }
+
+    public FindCampaignTemplateDTO fromEntityToFindCampaignTemplateDTO(CampaignTemplate campaignTemplate) {
+        return FindCampaignTemplateDTO.builder()
+                .campaignTemplateCode(campaignTemplate.getCampaignTemplateCode())
+                .campaignTemplateTitle(campaignTemplate.getCampaignTemplateTitle())
+                .campaignTemplateContents(campaignTemplate.getCampaignTemplateContents())
+                .campaignTemplateFlag(campaignTemplate.getCampaignTemplateFlag())
+                .createdAt(campaignTemplate.getCreatedAt())
+                .updatedAt(campaignTemplate.getUpdatedAt())
+                .adminCode(campaignTemplate.getAdmin().getAdminCode())
+                .adminName(campaignTemplate.getAdmin().getAdminName())
+                .build();
+    }
+
+    public ResponseFindTemplateVO fromFindCampaignTemplateDtoToFindResponseVO(FindCampaignTemplateDTO findCampaignTemplateDTO) {
+        return ResponseFindTemplateVO.builder()
+                .campaignTemplateCode(findCampaignTemplateDTO.getCampaignTemplateCode())
+                .campaignTemplateTitle(findCampaignTemplateDTO.getCampaignTemplateTitle())
+                .campaignTemplateContents(findCampaignTemplateDTO.getCampaignTemplateContents())
+                .campaignTemplateFlag(findCampaignTemplateDTO.getCampaignTemplateFlag())
+                .createdAt(findCampaignTemplateDTO.getCreatedAt())
+                .updatedAt(findCampaignTemplateDTO.getUpdatedAt())
+                .adminCode(findCampaignTemplateDTO.getAdminCode())
+                .adminName(findCampaignTemplateDTO.getAdminName())
                 .build();
     }
 }
