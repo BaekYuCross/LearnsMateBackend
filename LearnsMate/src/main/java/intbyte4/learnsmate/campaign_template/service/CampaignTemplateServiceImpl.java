@@ -6,6 +6,7 @@ import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.FindAllCampaignTemplatesDTO;
 import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
 import intbyte4.learnsmate.campaign_template.repository.CampaignTemplateRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
@@ -70,15 +71,18 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     }
 
     @Override
-    public List<CampaignTemplateDTO> findAllByTemplate() {
+    public List<FindAllCampaignTemplatesDTO> findAllByTemplate() {
         log.info("템플릿 전체 조회 중");
         List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
-        List<CampaignTemplateDTO> campaignTemplateVOList = new ArrayList<>();
+        List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
 
         for (CampaignTemplate campaignTemplate : campaignTemplateList) {
-            campaignTemplateVOList.add(campaignTemplateMapper.fromEntityToDTO(campaignTemplate));
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
+            findAllCampaignTemplatesDTOList.add(campaignTemplateMapper.fromEntityToFindAllDTO(campaignTemplate, adminDTO.getAdminName()));
         }
-        return campaignTemplateVOList;
+
+        return findAllCampaignTemplatesDTOList;
     }
 
     @Override
