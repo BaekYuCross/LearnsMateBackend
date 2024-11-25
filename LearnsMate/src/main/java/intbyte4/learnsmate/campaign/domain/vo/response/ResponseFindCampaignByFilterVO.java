@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class ResponseFindCampaignByConditionVO {
+public class ResponseFindCampaignByFilterVO {
     @JsonProperty("campaign_code")
     private Long campaignCode;
 

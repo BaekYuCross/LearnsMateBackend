@@ -1,10 +1,14 @@
 package intbyte4.learnsmate.campaign_template.controller;
 
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateFilterDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplatePageResponse;
 import intbyte4.learnsmate.campaign_template.domain.dto.FindAllCampaignTemplatesDTO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestRegisterTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseRegisterTemplateVO;
 import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
@@ -123,4 +127,21 @@ public class CampaignTemplateController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
         }
     }
+
+    @Operation(summary = "직원 - 조건 별 캠페인 템플릿 조회")
+    @PostMapping("/filter")
+    public ResponseEntity<CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO>> filterCampaignTemplates
+            (@RequestBody RequestFindCampaignTemplateByFilterVO request,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "15") int size){
+        CampaignTemplateFilterDTO dto =
+                campaignTemplateMapper.fromFindCampaignTemplateByFilterVOtoFilterDTO(request);
+        log.info("반환된 조건 별 캠페인 : {}", dto);
+        CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> response = campaignTemplateService
+                .findCampaignTemplateListByFilter(dto, page, size);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }
