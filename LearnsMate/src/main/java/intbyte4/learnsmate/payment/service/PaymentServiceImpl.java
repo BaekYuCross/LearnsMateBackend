@@ -33,6 +33,8 @@ import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -127,10 +129,34 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentDTO;
     }
 
-    // 직원이 프론트엔드에서 화면에 그래프로 띄워주기 위해 예상 매출액(?)과 할인 매출액을 받아오는 코드
+    @Override
+    public int getPurchaseCountByLectureCode(String lectureCode) {
+        return paymentRepository.countPaymentsByLectureCode(lectureCode);
+    }
 
-    // 직원이 프론트엔드에서 화면에 그래프로 띄워주기 위해 기간 별 매출액을 받아오는 코드
+    @Override
+    public String findLatestLectureCodeByStudent(Long studentCode) {
+        Pageable pageable = PageRequest.of(0, 1); // 최신 1개의 강의만 가져옴
+        List<String> lectureCodes = paymentRepository.findLectureCodesByStudent(studentCode, pageable);
 
+        if(lectureCodes.isEmpty()) return null;
+        return lectureCodes.get(0); // 가장 최신 강의 코드 반환
+    }
+
+    @Override
+    public List<Object[]> findRecommendedLectures(List<Long> similarStudents, String latestLectureCode, Long studentCode, Pageable pageable) {
+        return paymentRepository.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
+    }
+
+    @Override
+    public Integer getTotalStudentCountBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsBetweenDates(startDate, endDate);
+    }
+
+    @Override
+    public Integer getStudentCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsByLectureCodeBetweenDates(lectureCode, startDate, endDate);
+    }
 
     private Result getResult(MemberDTO memberDTO, LectureDTO lectureDTO) {
         Member student = memberMapper.fromMemberDTOtoMember(memberDTO);

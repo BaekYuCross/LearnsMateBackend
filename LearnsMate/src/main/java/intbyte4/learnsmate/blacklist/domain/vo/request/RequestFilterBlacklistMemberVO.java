@@ -9,8 +9,9 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @ToString
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestFilterBlacklistMemberVO {
+    private Long blackCode;
     private Long memberCode;
     private String memberName;
     private String memberEmail;

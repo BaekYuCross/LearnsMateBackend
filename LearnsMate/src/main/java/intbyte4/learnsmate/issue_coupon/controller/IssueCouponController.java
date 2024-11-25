@@ -1,7 +1,8 @@
 package intbyte4.learnsmate.issue_coupon.controller;
 
-import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssuedCouponFilterDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
+import intbyte4.learnsmate.issue_coupon.domain.vo.response.AllIssuedCouponResponseVO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponFacade;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
@@ -65,15 +66,24 @@ public class IssueCouponController {
 
     @Operation(summary = "발급된 쿠폰 전체 조회")
     @GetMapping("/all-issued-coupons")
-    public ResponseEntity<List<AllIssuedCouponDTO>> findAllIssuedCoupons() {
-        List<AllIssuedCouponDTO> issuedCoupons = issueCouponService.getAllIssuedCoupons();
-        return ResponseEntity.ok(issuedCoupons);
+    public ResponseEntity<List<AllIssuedCouponResponseVO>> getAllIssuedCoupons() {
+        List<AllIssuedCouponResponseVO> allIssuedCoupons = issueCouponFacade.findAllIssuedCoupons();
+        return new ResponseEntity<>(allIssuedCoupons, HttpStatus.OK);
     }
 
     @Operation(summary = "발급된 쿠폰 필터링 조회")
-    @GetMapping("/filter")
-    public ResponseEntity<List<AllIssuedCouponDTO>> findIssuedCouponsByFilters(@RequestBody IssueCouponFilterRequestVO request) {
-        List<AllIssuedCouponDTO> filteredCoupons = issueCouponService.getFilteredIssuedCoupons(request);
-        return new ResponseEntity<>(filteredCoupons, HttpStatus.OK);
+    @PostMapping("/filters")
+    public ResponseEntity<List<AllIssuedCouponResponseVO>> findIssuedCouponsByFilters(@RequestBody IssueCouponFilterRequestVO request) {
+        log.info("발급 쿠폰 필터링 요청 수신");
+        try {
+            IssuedCouponFilterDTO dto = issueCouponMapper.fromVOToFilterResponseDTO(request);
+            log.info(dto.toString());
+            List<AllIssuedCouponResponseVO> response = issueCouponFacade.filterIssuedCoupon(dto);
+            log.info(response.toString());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

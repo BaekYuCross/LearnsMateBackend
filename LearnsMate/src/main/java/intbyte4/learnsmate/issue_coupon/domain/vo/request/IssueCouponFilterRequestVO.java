@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @AllArgsConstructor
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class IssueCouponFilterRequestVO {
     private String couponIssuanceCode;
@@ -21,7 +22,8 @@ public class IssueCouponFilterRequestVO {
     private Long studentCode;
     private String studentName;
     private Boolean couponUseStatus;
-    private Integer couponDiscountRate;
+    private Integer minDiscountRate;
+    private Integer maxDiscountRate;
     private LocalDateTime startCouponStartDate;
     private LocalDateTime endCouponStartDate;
     private LocalDateTime startCouponExpireDate;

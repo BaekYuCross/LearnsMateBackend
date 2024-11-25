@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service("vocAnswerService")
@@ -86,6 +87,15 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         return vocAnswerMapper.fromEntityToDTO(vocAnswer);
     }
 
+    @Override
+    public VOCAnswerDTO findByVOCCode(String vocCode) {
+        Optional<VOCAnswer> optionalVocAnswer = vocAnswerRepository.findByVoc_VocCode(vocCode);
+
+        return optionalVocAnswer
+                .map(vocAnswerMapper::fromEntityToDTO)
+                .orElse(null);
+    }
+
     private VOC getVOC(VOCAnswerDTO vocAnswerDTO) {
         VOCDTO vocDTO = vocService.findByVOCCode(vocAnswerDTO.getVocCode());
         if (vocDTO == null) {
@@ -95,20 +105,21 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         log.info(vocDTO.toString());
 
         VOCCategoryDTO vocCategoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
-        MemberDTO memberDTO = memberService.findByStudentCode(vocDTO.getMemberCode());
+        MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
         return vocMapper.toEntity(vocDTO, vocCategoryMapper.toEntity(vocCategoryDTO), memberMapper.fromMemberDTOtoMember(memberDTO));
     }
 
     public Admin validAdmin(AdminService adminService, Long adminCode, Logger log) {
+        log.info("Checking admin with adminCode: {}", adminCode); // adminCode 값 확인
         AdminDTO adminDTO = adminService.findByAdminCode(adminCode);
         if (adminDTO == null) {
-            log.warn("존재하지 않는 직원 : {}", adminCode);
+            log.warn("Admin not found for code: {}", adminCode);
             throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         }
-        log.info(adminDTO.toString());
+        log.info("Found admin: {}", adminDTO); // 반환된 adminDTO 확인
 
-        return adminMapper.toEntity(adminDTO);
+        Admin admin = adminMapper.toEntity(adminDTO);
+        log.info("Mapped admin entity: {}", admin); // Admin Entity 매핑 확인
+        return admin;
     }
-
-
 }

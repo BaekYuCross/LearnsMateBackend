@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @ToString
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class RequestFilterTutorVO {
+//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class RequestFilterMemberVO {
 
     private Long memberCode;
     private String memberName;

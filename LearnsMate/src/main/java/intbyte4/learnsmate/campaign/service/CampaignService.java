@@ -1,11 +1,10 @@
 package intbyte4.learnsmate.campaign.service;
 
-import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
-import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.*;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CampaignService {
@@ -16,8 +15,10 @@ public interface CampaignService {
             , List<MemberDTO> requestStudentList
             , List<CouponDTO> requestCouponList);
     void removeCampaign(CampaignDTO request);
-    List<FindAllCampaignDTO> findAllCampaignList();
-    CampaignDTO findCampaign(CampaignDTO request);
-    List<CampaignDTO> findCampaignListByCondition
-            (CampaignDTO request, LocalDateTime startDate, LocalDateTime endDate);
+    List<FindAllCampaignsDTO> findAllCampaignList();
+    FindCampaignDTO findCampaign(FindCampaignDTO request);
+    CampaignPageResponse<ResponseFindCampaignByConditionVO> findCampaignListByCondition
+            (CampaignFilterDTO request, int page, int size);
+    List<FindAllCampaignsDTO> findCampaignListByConditionWithExcel(CampaignFilterDTO filterDTO);
+    List<FindAllCampaignsDTO> findAllCampaignListWithExcel();
 }

@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.campaign.domain.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,7 @@ public class RequestFindCampaignStudentVO {
     @JsonProperty("member_address")
     private String memberAddress;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("member_birth")
     private LocalDateTime memberBirth;
 
@@ -47,9 +49,11 @@ public class RequestFindCampaignStudentVO {
     @JsonProperty("member_dormant_status")
     private Boolean memberDormantStatus;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 }

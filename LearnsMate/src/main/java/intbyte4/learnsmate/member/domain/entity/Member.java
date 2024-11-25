@@ -18,7 +18,7 @@ public class Member {
 
     @Id
     @Column(name = "member_code", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberCode;
 
     @Enumerated(EnumType.STRING)
@@ -58,7 +58,6 @@ public class Member {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // flag를 비활성화하는 메서드
     public void deactivate() {
         this.memberFlag = false;
     }

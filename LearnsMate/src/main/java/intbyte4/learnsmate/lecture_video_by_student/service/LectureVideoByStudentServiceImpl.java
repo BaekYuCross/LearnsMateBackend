@@ -35,9 +35,6 @@ public class LectureVideoByStudentServiceImpl implements LectureVideoByStudentSe
 
         // 학생이 수강한 모든 강의 목록 조회
         List<LectureByStudentDTO> lecturesByStudent = lectureByStudentService.findByStudentCode(student.getMemberCode());
-        if (lecturesByStudent.isEmpty()) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
 
         List<LectureVideoProgressDTO> progressList = new ArrayList<>();
 

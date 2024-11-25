@@ -5,8 +5,8 @@ import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
-import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssuedCouponFilterDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
 import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
 import intbyte4.learnsmate.issue_coupon.repository.IssueCouponRepository;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Qualifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,15 @@ public class IssueCouponServiceImpl implements IssueCouponService {
     private final IssueCouponRepository issueCouponRepository;
     private final IssueCouponMapper issueCouponMapper;
     private final CouponService couponService;
+
+    @Override
+    public List<IssueCouponDTO> findAllIssuedCoupons() {
+        List<IssueCoupon> issueCoupons = issueCouponRepository.findAll();
+        List<IssueCouponDTO> iussuedCouponDTOList = new ArrayList<>();
+        issueCoupons.forEach(entity -> iussuedCouponDTOList.add(issueCouponMapper.toDTO(entity)));
+
+        return iussuedCouponDTOList;
+    }
 
     @Override
     @Transactional
@@ -96,15 +105,13 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         issueCouponRepository.save(issueCoupon);
     }
 
-    @Override
-    public List<AllIssuedCouponDTO> getAllIssuedCoupons() {
-        return issueCouponRepository.findAllIssuedCoupons();
-    }
 
     @Override
-    public List<AllIssuedCouponDTO> getFilteredIssuedCoupons(IssueCouponFilterRequestVO request) {
-        List<AllIssuedCouponDTO> dtos = issueCouponRepository.findIssuedCouponsByFilters(request);
-        return dtos;
+    public List<IssueCoupon> getFilteredIssuedCoupons(IssuedCouponFilterDTO dto) {
+        IssueCouponFilterRequestVO filterVO = issueCouponMapper.fromDTOToFilterVO(dto);
+        log.info(filterVO.toString());
+        log.info(issueCouponRepository.findIssuedCouponsByFilters(filterVO).toString());
+        return issueCouponRepository.findIssuedCouponsByFilters(filterVO);
     }
 }
 

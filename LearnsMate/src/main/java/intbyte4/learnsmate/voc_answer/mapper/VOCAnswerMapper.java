@@ -28,7 +28,6 @@ public class VOCAnswerMapper {
 
     public VOCAnswerDTO fromRegisterRequestVOToDTO(RequestRegisterVOCAnswerVO request) {
         return VOCAnswerDTO.builder()
-                .vocAnswerCode(request.getVocAnswerCode())
                 .vocAnswerContent(request.getVocAnswerContent())
                 .vocCode(request.getVocCode())
                 .adminCode(request.getAdminCode())
@@ -45,9 +44,6 @@ public class VOCAnswerMapper {
         return ResponseRegisterVOCAnswerVO.builder()
                 .vocAnswerCode(registerVocAnswer.getVocAnswerCode())
                 .vocAnswerContent(registerVocAnswer.getVocAnswerContent())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .vocCode(registerVocAnswer.getVocCode())
                 .adminCode(registerVocAnswer.getAdminCode())
                 .build();
     }

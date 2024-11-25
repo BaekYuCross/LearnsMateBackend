@@ -1,15 +1,12 @@
 package intbyte4.learnsmate.lecture.controller;
 
-import intbyte4.learnsmate.lecture.domain.dto.MonthlyLectureCountDTO;
+import intbyte4.learnsmate.lecture.domain.dto.*;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.*;
+import intbyte4.learnsmate.lecture.pagination.LecturePaginationResponse;
 import intbyte4.learnsmate.lecture.service.LectureFacade;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.VideoByLectureDTO;
@@ -21,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lecture")
@@ -44,21 +40,24 @@ public class LectureController {
         }
     }
 
-    @Operation(summary = "강의 정보 전체 조회")
-    @GetMapping
-    public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
-        List<LectureDetailDTO> lectureDTOs = lectureFacade.getAllLecture();
-        List<ResponseFindLectureVO> lectureVOs = lectureDTOs.stream()
-                .map(lectureMapper::fromDtoToResponseVO)
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(lectureVOs);
+    @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 조회")
+    @GetMapping("/list")
+    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+        LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffset(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "강의 단건 조회")
+    @Operation(summary = "강의 단 건 조회 + 클릭수 -> 실제 결제까지의 비율 조회")
     @GetMapping("/{lectureCode}")
-    public ResponseEntity<ResponseFindLectureVO> getLecture(@PathVariable("lectureCode") String lectureCode) {
-        LectureDetailDTO lectureDTO = lectureFacade.getLectureById(lectureCode);
-        return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToResponseVO(lectureDTO));
+    public ResponseEntity<ResponseFindLectureDetailVO> getLecture(@PathVariable("lectureCode") String lectureCode) {
+        ResponseFindLectureDetailVO lectureDetail = lectureFacade.getLectureById(lectureCode);
+        return ResponseEntity.status(HttpStatus.OK).body(lectureDetail);
+    }
+
+    @PostMapping("/{lectureCode}/stats/filter")
+    public ResponseEntity<LectureStatsVO> getLectureStatsWithFilter(@PathVariable("lectureCode") String lectureCode, @RequestBody LectureStatsFilterDTO filterDTO) {
+        LectureStatsVO stats = lectureFacade.getLectureStatsWithFilter(lectureCode, filterDTO);
+        return ResponseEntity.ok(stats);
     }
 
     @Operation(summary = "강의와 강의별 동영상 등록 요청")
@@ -96,6 +95,28 @@ public class LectureController {
     @GetMapping("/monthly-counts")
     public ResponseEntity<List<MonthlyLectureCountDTO>> getMonthlyLectureCounts() {
         List<MonthlyLectureCountDTO> lectureCounts = lectureService.getMonthlyLectureCounts();
+        return ResponseEntity.ok(lectureCounts);
+    }
+
+    @Operation(summary = "전체 조회 화면에서의 필터링 기능")
+    @PostMapping("/filter")
+    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> filterLectures(@RequestBody RequestLectureFilterVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+        try {
+            LectureFilterDTO filterDTO = lectureMapper.toFilterDTO(request);
+            log.info("filterDTO: " + filterDTO.toString());
+            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("강의 필터링 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "기간별 월별 강의 수 조회")
+    @PostMapping("/monthly-counts/filter")
+    public ResponseEntity<List<MonthlyLectureCountDTO>> getFilteredMonthlyLectureCounts(
+            @RequestBody MonthlyLectureFilterDTO filterDTO) {
+        List<MonthlyLectureCountDTO> lectureCounts = lectureService.getFilteredMonthlyLectureCounts(filterDTO);
         return ResponseEntity.ok(lectureCounts);
     }
 }

@@ -15,16 +15,20 @@ import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCate
 import intbyte4.learnsmate.lecture_category_by_lecture.mapper.LectureCategoryByLectureMapper;
 import intbyte4.learnsmate.lecture_category_by_lecture.repository.LectureCategoryByLectureRepository;
 
+import intbyte4.learnsmate.member.domain.dto.CategoryCountDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LectureCategoryByLectureService {
@@ -78,5 +82,27 @@ public class LectureCategoryByLectureService {
     @Transactional
     public void deleteByLectureCode(String lectureCode) {
         lectureCategoryByLectureRepository.deleteAllByLectureCode(lectureCode);
+    }
+
+    public String findLectureCategoryNameByLectureCode(String lectureCode) {
+        try {
+            return lectureCategoryByLectureRepository.findLectureCategoryName(lectureCode);
+        } catch (Exception e) {
+            log.error("Error finding lecture category name for lectureCode: {}", lectureCode, e);
+            throw new CommonException(StatusEnum.LECTURE_CATEGORY_NOT_FOUND);
+        }
+    }
+
+    public List<CategoryCountDTO> countLecturesByCategory() {
+        return lectureCategoryByLectureRepository.countLecturesByCategory();
+    }
+
+    public List<CategoryCountDTO> countLecturesByCategoryWithinDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureCategoryByLectureRepository.countLecturesByCategoryWithinDateRange(startDate, endDate);
+    }
+
+    public LectureCategoryByLectureDTO findLectureCategoryByLectureCode(String lectureCode) {
+        LectureCategoryByLecture lectureCategoryByLecture = lectureCategoryByLectureRepository.findByLecture_LectureCode(lectureCode);
+        return lectureCategoryByLectureMapper.toDTO(lectureCategoryByLecture);
     }
 }

@@ -1,9 +1,9 @@
 package intbyte4.learnsmate.issue_coupon.service;
 
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
-import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
+import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
-import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssuedCouponFilterDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 
@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface IssueCouponService {
+
+    List<IssueCouponDTO> findAllIssuedCoupons();
 
     @Transactional
     IssueCouponDTO createAndSaveIssueCoupon(Member student, Long couponCode);
@@ -24,9 +26,7 @@ public interface IssueCouponService {
 
     void updateCouponUseStatus(IssueCouponDTO issueCouponDTO, Member member, CouponEntity couponEntity);
 
-    List<AllIssuedCouponDTO> getAllIssuedCoupons();
-
-    List<AllIssuedCouponDTO> getFilteredIssuedCoupons(IssueCouponFilterRequestVO request);
+    List<IssueCoupon> getFilteredIssuedCoupons(IssuedCouponFilterDTO dto);
 
 
     // 보유중인 쿠폰 조회

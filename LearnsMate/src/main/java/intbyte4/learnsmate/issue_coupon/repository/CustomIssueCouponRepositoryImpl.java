@@ -1,22 +1,24 @@
 package intbyte4.learnsmate.issue_coupon.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.issue_coupon.domain.QIssueCoupon;
-import intbyte4.learnsmate.issue_coupon.domain.dto.AllIssuedCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
 import jakarta.persistence.EntityManager;
 import intbyte4.learnsmate.coupon.domain.entity.QCouponEntity;
 import intbyte4.learnsmate.member.domain.entity.QMember;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 import static intbyte4.learnsmate.coupon.domain.entity.QCouponEntity.couponEntity;
+import static intbyte4.learnsmate.issue_coupon.domain.QIssueCoupon.issueCoupon;
 import static intbyte4.learnsmate.member.domain.entity.QMember.member;
 
+@Slf4j
 @Repository
 public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponRepository {
 
@@ -27,80 +29,58 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
     }
 
     @Override
-    public List<AllIssuedCouponDTO> findIssuedCouponsByFilters (IssueCouponFilterRequestVO request) {
+    public List<IssueCoupon> findIssuedCouponsByFilters(IssueCouponFilterRequestVO request) {
         QIssueCoupon issueCoupon = QIssueCoupon.issueCoupon;
         QMember member = QMember.member;
         QCouponEntity couponEntity = QCouponEntity.couponEntity;
 
         BooleanBuilder builder = new BooleanBuilder()
-                .and(eqCouponIssuanceCode(request))
                 .and(likeCouponName(request))
                 .and(likeCouponContents(request))
-                .and(eqCouponCategory(request))
+                .and(eqCouponCategoryName(request))
                 .and(eqStudentCode(request))
                 .and(eqStudentName(request))
                 .and(eqCouponUseStatus(request))
-                .and(eqCouponDiscountRate(request))
+                .and(betweenDiscountRate(request))
                 .and(betweenCouponStartDate(request))
                 .and(betweenCouponEndDate(request))
                 .and(betweenCouponUseDate(request))
                 .and(betweenCouponIssueDate(request));
 
+        // 필터링된 IssueCoupon 엔티티를 반환
         return queryFactory
-                .select(Projections.constructor(
-                        AllIssuedCouponDTO.class,
-                        issueCoupon.couponIssuanceCode,
-                        couponEntity.couponName,
-                        couponEntity.couponContents,
-                        couponEntity.couponCategory,
-                        member.memberCode,
-                        member.memberName,
-                        issueCoupon.couponUseStatus,
-                        couponEntity.couponDiscountRate,
-                        couponEntity.couponStartDate,
-                        couponEntity.couponExpireDate,
-                        issueCoupon.couponUseDate,
-                        issueCoupon.couponIssueDate
-                ))
-                .from(issueCoupon)
-                .join(issueCoupon.coupon, couponEntity)
-                .join(issueCoupon.student, member)
+                .selectFrom(issueCoupon)
+                .join(issueCoupon.coupon, couponEntity).fetchJoin()
+                .join(issueCoupon.student, member).fetchJoin()
                 .where(builder)
+                .select(issueCoupon)
                 .fetch();
-    }
-
-    private BooleanExpression eqCouponIssuanceCode(IssueCouponFilterRequestVO request) {
-
-        if (request.getCouponIssuanceCode() == null) {
-            return null;
-        }
-        return QIssueCoupon.issueCoupon.couponIssuanceCode.eq(request.getCouponIssuanceCode());
     }
 
     private BooleanExpression likeCouponName(IssueCouponFilterRequestVO request) {
 
-        if (request.getCouponName() == null) {
+        if (request.getCouponName() == null || request.getCouponName().isEmpty()) {
             return null;
         }
-        return QIssueCoupon.issueCoupon.coupon.couponName.likeIgnoreCase("%" + request.getCouponName() + "%");
+        return issueCoupon.coupon.couponName.likeIgnoreCase("%" + request.getCouponName() + "%");
     }
 
     private BooleanExpression likeCouponContents(IssueCouponFilterRequestVO request) {
 
-        if (request.getCouponContents() == null) {
+        if (request.getCouponContents() == null || request.getCouponContents().isEmpty()) {
             return null;
         }
-        return QIssueCoupon.issueCoupon.coupon.couponContents.likeIgnoreCase("%" + request.getCouponContents() + "%");
+        return issueCoupon.coupon.couponContents.likeIgnoreCase("%" + request.getCouponContents() + "%");
     }
 
-    private BooleanExpression eqCouponCategory(IssueCouponFilterRequestVO request) {
-        Integer categoryCode = request.getCouponCategoryCode();
+    private BooleanExpression eqCouponCategoryName(IssueCouponFilterRequestVO request) {
+        String couponCategoryName = request.getCouponCategoryName();
 
-        if (request.getCouponCategory() == null) {
+        if (request.getCouponCategoryName() == null || request.getCouponCategoryName().isEmpty()) {
             return null;
         }
 
-        return couponEntity.couponCategory.couponCategoryCode.eq(categoryCode);
+        return couponEntity.couponCategory.couponCategoryName.eq(couponCategoryName);
     }
 
     private BooleanExpression eqStudentCode(IssueCouponFilterRequestVO request) {
@@ -112,7 +92,7 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
     }
 
     private BooleanExpression eqStudentName(IssueCouponFilterRequestVO request) {
-        if (request.getStudentName() == null) {
+        if (request.getStudentName() == null || request.getStudentName().isEmpty()) {
             return null;
         }
 
@@ -124,15 +104,23 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
             return null;
         }
 
-        return QIssueCoupon.issueCoupon.couponUseStatus.eq(request.getCouponUseStatus());
+        return issueCoupon.couponUseStatus.eq(request.getCouponUseStatus());
     }
 
-    private BooleanExpression eqCouponDiscountRate(IssueCouponFilterRequestVO request) {
-        if (request.getCouponDiscountRate() == null) {
+    private BooleanExpression betweenDiscountRate(IssueCouponFilterRequestVO request) {
+        if (request.getMinDiscountRate() == null && request.getMaxDiscountRate() == null) {
             return null;
         }
 
-        return couponEntity.couponDiscountRate.eq(request.getCouponDiscountRate());
+        if (request.getMinDiscountRate() == null) {
+            return issueCoupon.coupon.couponDiscountRate.loe(request.getMaxDiscountRate());
+        }
+
+        if (request.getMaxDiscountRate() == null) {
+            return issueCoupon.coupon.couponDiscountRate.goe(request.getMinDiscountRate());
+        }
+
+            return issueCoupon.coupon.couponDiscountRate.between(request.getMinDiscountRate(), request.getMaxDiscountRate());
     }
 
     private BooleanExpression betweenCouponStartDate(IssueCouponFilterRequestVO request) {
@@ -173,14 +161,14 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
         }
 
         if (request.getStartCouponUseDate() == null) {
-            return QIssueCoupon.issueCoupon.couponUseDate.loe(request.getEndCouponUseDate());
+            return issueCoupon.couponUseDate.loe(request.getEndCouponUseDate());
         }
 
         if (request.getEndCouponUseDate() == null) {
-            return QIssueCoupon.issueCoupon.couponUseDate.goe(request.getStartCouponUseDate());
+            return issueCoupon.couponUseDate.goe(request.getStartCouponUseDate());
         }
 
-        return QIssueCoupon.issueCoupon.couponUseDate.between(request.getStartCouponUseDate(), request.getEndCouponUseDate());
+        return issueCoupon.couponUseDate.between(request.getStartCouponUseDate(), request.getEndCouponUseDate());
     }
 
     private BooleanExpression betweenCouponIssueDate(IssueCouponFilterRequestVO request) {
@@ -190,13 +178,13 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
         }
 
         if (request.getStartCouponIssueDate() == null) {
-            return QIssueCoupon.issueCoupon.couponIssueDate.loe(request.getEndCouponIssueDate());
+            return issueCoupon.couponIssueDate.loe(request.getEndCouponIssueDate());
         }
 
         if (request.getEndCouponIssueDate() == null) {
-            return QIssueCoupon.issueCoupon.couponIssueDate.goe(request.getStartCouponIssueDate());
+            return issueCoupon.couponIssueDate.goe(request.getStartCouponIssueDate());
         }
 
-        return QIssueCoupon.issueCoupon.couponIssueDate.between(request.getStartCouponIssueDate(), request.getEndCouponIssueDate());
+        return issueCoupon.couponIssueDate.between(request.getStartCouponIssueDate(), request.getEndCouponIssueDate());
     }
 }

@@ -21,7 +21,7 @@ public class ResponseFindVOCAnswerVO {
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
     @JsonProperty("voc_code")
-    private Long vocCode;
+    private String vocCode;
     @JsonProperty("admin_code")
     private Long adminCode;
 }

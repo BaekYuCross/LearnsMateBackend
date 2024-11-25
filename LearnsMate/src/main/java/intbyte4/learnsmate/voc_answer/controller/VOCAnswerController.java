@@ -27,7 +27,7 @@ public class VOCAnswerController {
 
     @Operation(summary = "직원 - VOC 답변 등록")
     @PostMapping("/register")
-    public ResponseEntity<?> registerTemplate(@RequestBody final RequestRegisterVOCAnswerVO request) {
+    public ResponseEntity<?> registerTemplate(@RequestBody RequestRegisterVOCAnswerVO request) {
         log.info("VOC 답변 등록 요청 : {}", request);
         try {
             VOCAnswerDTO vocAnswerDTO = vocAnswerMapper.fromRegisterRequestVOToDTO(request);

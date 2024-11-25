@@ -8,8 +8,7 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterStudentVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterTutorVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMemberVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
@@ -157,6 +156,7 @@ public class MemberMapper{
                 .usedCouponsList(dto.getUsedCouponsList())
                 .unansweredVOCByMemberList(dto.getUnansweredVOCByMemberList())
                 .answeredVOCByMemberList(dto.getAnsweredVOCByMemberList())
+                .recommendedLectureList(dto.getRecommendedLectureList())
                 .build();
     }
 
@@ -185,7 +185,7 @@ public class MemberMapper{
                 .build();
     }
 
-    public MemberFilterRequestDTO fromRequestFilterStudentVOtoMemberFilterRequestDTO(RequestFilterStudentVO request) {
+    public MemberFilterRequestDTO fromRequestFilterVOtoMemberFilterRequestDTO(RequestFilterMemberVO request) {
         return MemberFilterRequestDTO.builder()
                 .memberCode(request.getMemberCode())
                 .memberName(request.getMemberName())
@@ -203,22 +203,22 @@ public class MemberMapper{
                 .createdEndDate(request.getCreatedEndDate())
                 .build();
     }
-    public MemberFilterRequestDTO fromRequestFiltertutorVOtoMemberFilterRequestDTO(RequestFilterTutorVO request) {
-        return MemberFilterRequestDTO.builder()
-                .memberCode(request.getMemberCode())
-                .memberName(request.getMemberName())
-                .memberType(request.getMemberType())
-                .memberEmail(request.getMemberEmail())
-                .memberPhone(request.getMemberPhone())
-                .memberAddress(request.getMemberAddress())
-                .memberStartAge(request.getMemberStartAge())
-                .memberEndAge(request.getMemberEndAge())
-                .birthStartDate(request.getBirthStartDate())
-                .birthEndDate(request.getBirthEndDate())
-                .memberFlag(request.getMemberFlag())
-                .memberDormantFlag(request.getMemberDormantFlag())
-                .createdStartDate(request.getCreatedStartDate())
-                .createdEndDate(request.getCreatedEndDate())
+
+    public ResponseFindMemberVO fromMemberToResponseFindMemberVO(Member member) {
+        return ResponseFindMemberVO.builder()
+                .memberCode(member.getMemberCode())
+                .memberType(member.getMemberType())
+                .memberEmail(member.getMemberEmail())
+                .memberPassword(member.getMemberPassword())
+                .memberName(member.getMemberName())
+                .memberAge(member.getMemberAge())
+                .memberPhone(member.getMemberPhone())
+                .memberAddress(member.getMemberAddress())
+                .memberBirth(member.getMemberBirth())
+                .memberFlag(member.getMemberFlag())
+                .memberDormantStatus(member.getMemberDormantStatus())
+                .createdAt(member.getCreatedAt())
+                .updatedAt(member.getUpdatedAt())
                 .build();
     }
 }

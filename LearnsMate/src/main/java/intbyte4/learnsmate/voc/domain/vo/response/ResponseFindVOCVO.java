@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ResponseFindVOCVO {
     @JsonProperty("voc_code")
-    private Long vocCode;
+    private String vocCode;
     @JsonProperty("voc_content")
     private String vocContent;
     @JsonProperty("voc_category_name")
@@ -32,4 +32,8 @@ public class ResponseFindVOCVO {
     private Boolean vocAnswerStatus;
     @JsonProperty("voc_answer_satisfaction")
     private String vocAnswerSatisfaction;
+    @JsonProperty("voc_answer_code")
+    private Long vocAnswerCode;
+    @JsonProperty("voc_answer_content")
+    private String vocAnswerContent;
 }
