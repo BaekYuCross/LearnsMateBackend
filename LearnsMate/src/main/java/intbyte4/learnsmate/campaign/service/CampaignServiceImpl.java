@@ -7,11 +7,10 @@ import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByFilterVO;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 
-import intbyte4.learnsmate.campaign.repository.CampaignRepositoryCustom;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -244,7 +243,7 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public CampaignPageResponse<ResponseFindCampaignByConditionVO> findCampaignListByCondition
+    public CampaignPageResponse<ResponseFindCampaignByFilterVO> findCampaignListByFilter
             (CampaignFilterDTO request, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
@@ -252,7 +251,7 @@ public class CampaignServiceImpl implements CampaignService {
         // 필터 조건과 페이징 처리된 데이터 조회
         Page<Campaign> campaignPage = campaignRepository.searchBy(request, pageable);
 
-        List<ResponseFindCampaignByConditionVO> campaignDTOList = campaignPage.getContent().stream()
+        List<ResponseFindCampaignByFilterVO> campaignDTOList = campaignPage.getContent().stream()
                 .map(campaignMapper::fromCampaignToResponseFindCampaignByConditionVO)
                 .collect(Collectors.toList());
 
