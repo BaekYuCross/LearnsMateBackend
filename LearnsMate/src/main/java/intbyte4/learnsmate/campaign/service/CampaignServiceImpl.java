@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
-    private final CampaignRepositoryCustom campaignRepositoryCustom;
     private final AdminService adminService;
     private final UserPerCampaignService userPerCampaignService;
     private final CouponByCampaignService couponByCampaignService;
@@ -82,7 +81,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         requestStudentList.forEach(memberDTO -> {
             MemberDTO foundStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
-                    , memberDTO.getMemberType());
+                    , MemberType.STUDENT);
             if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
             userPerCampaignService.registerUserPerCampaign(foundStudent, savedCampaignDTO);
         });
@@ -264,5 +263,27 @@ public class CampaignServiceImpl implements CampaignService {
                 campaignPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
                 campaignPage.getSize()           // 페이지 크기
         );
+    }
+
+    @Override
+    public List<FindAllCampaignsDTO> findCampaignListByConditionWithExcel(CampaignFilterDTO filterDTO) {
+        List<Campaign> campaignList = campaignRepository.searchByWithoutPaging(filterDTO);
+
+        return campaignList.stream()
+                .map(campaignMapper::fromCampaignToFindAllCampaignDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FindAllCampaignsDTO> findAllCampaignListWithExcel() {
+        List<Campaign> campaigns = campaignRepository.findAll();
+        List<FindAllCampaignsDTO> findAllCampaignsDTOList = new ArrayList<>();
+        for (Campaign campaign : campaigns) {
+            CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
+            findAllCampaignsDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
+        }
+
+        return findAllCampaignsDTOList;
     }
 }

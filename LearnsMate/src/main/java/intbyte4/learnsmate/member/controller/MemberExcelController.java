@@ -4,6 +4,7 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.service.MemberExcelService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/member/excel")
@@ -78,6 +80,21 @@ public class MemberExcelController {
         memberExcelService.importMemberFromExcel(file, MemberType.STUDENT);
         log.info("good");
     }
+
+    @PostMapping("/upload/target-student")
+    @Operation(summary = "타겟 학생 엑셀 업로드", description = "엑셀 파일을 통해 학생 정보를 일괄 등록합니다.")
+    public List<ResponseFindMemberVO> uploadTargetStudentExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        log.info("Excel upload request received for student. File name: {}", file.getOriginalFilename());
+
+        if (!isExcelFile(file)) {
+            log.error("Invalid file format: {}", file.getOriginalFilename());
+            throw new CommonException(StatusEnum.INVALID_FILE_FORMAT);
+        }
+
+        // 유효한 타겟 유저 리스트 반환
+        return memberExcelService.importTargetStudentFromExcel(file, MemberType.STUDENT);
+    }
+
 
     private boolean isExcelFile(MultipartFile file) {
         String filename = file.getOriginalFilename();

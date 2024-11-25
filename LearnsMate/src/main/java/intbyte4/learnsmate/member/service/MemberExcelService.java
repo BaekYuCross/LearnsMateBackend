@@ -231,6 +231,69 @@ public class MemberExcelService {
         }
     }
 
+    public List<ResponseFindMemberVO> importTargetStudentFromExcel(MultipartFile file, MemberType memberType) throws IOException {
+        List<ResponseFindMemberVO> validMemberList = new ArrayList<>();
+        try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Row headerRow = sheet.getRow(0);
+            if (!validateHeaders(headerRow)) {
+                throw new IllegalArgumentException("파일 형식이 올바르지 않습니다. 다운로드한 템플릿 파일만 업로드하세요.");
+            }
+
+            int lastRowNum = findLastRow(sheet);
+            if (lastRowNum < 1) return validMemberList;
+
+            for (int rowNum = 1; rowNum <= lastRowNum; rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                if (row == null) continue;
+
+                MemberDTO memberDTO = MemberDTO.builder()
+                        .memberCode(getLongValue(row.getCell(0)))
+                        .memberName(getStringValue(row.getCell(1)))
+                        .memberEmail(getStringValue(row.getCell(2)))
+                        .memberPhone(getStringValue(row.getCell(3)))
+                        .memberAddress(getStringValue(row.getCell(4)))
+                        .memberAge(getIntValue(row.getCell(5)))
+                        .memberBirth(getLocalDateTime(row.getCell(6)))
+                        .memberFlag(getBooleanValue(row.getCell(7)))
+                        .createdAt(LocalDateTime.now())
+                        .memberDormantStatus(getBooleanValue(row.getCell(9)))
+                        .build();
+
+                if (isValidMember(memberDTO)) {
+                    validMemberList.add(memberMapper.fromMemberDTOtoResponseFindMemberVO(memberDTO));
+                } else {
+                    log.warn("유효하지 않은 회원 데이터: {}", memberDTO);
+                }
+            }
+        } catch (Exception e) {
+            log.error("엑셀 파일 처리 중 오류 발생", e);
+            throw new RuntimeException("엑셀 파일 처리 실패", e);
+        }
+
+        return validMemberList;
+    }
+
+    private Long getLongValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+
+        return switch (cell.getCellType()) {
+            case NUMERIC -> (long) cell.getNumericCellValue(); // Double -> Long 변환
+            case STRING -> {
+                try {
+                    yield Long.parseLong(cell.getStringCellValue().trim()); // 문자열에서 Long 변환
+                } catch (NumberFormatException e) {
+                    yield null; // 변환 실패 시 null 반환
+                }
+            }
+            default -> null; // 다른 타입은 null 처리
+        };
+    }
+
+
     // 셀 값 읽는 메서드
     private String getStringValue(Cell cell) {
         if (cell == null) return null;
@@ -324,4 +387,47 @@ public class MemberExcelService {
             default -> "UNSUPPORTED TYPE: " + cell.getCellType();
         };
     }
+
+    private boolean validateHeaders(Row headerRow) {
+        if (headerRow == null) return false;
+
+        int columnIndex = 0;
+        for (String expectedHeader : COLUMNS.values()) {
+            Cell cell = headerRow.getCell(columnIndex++);
+            if (cell == null || !expectedHeader.equals(cell.getStringCellValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isValidMember(MemberDTO memberDTO) {
+        if (memberDTO == null || memberDTO.getMemberCode() == null) {
+            return false;
+        }
+        try {
+            memberService.findMemberByMemberCode(memberDTO.getMemberCode(), MemberType.STUDENT);
+            return true;
+        } catch (CommonException e) {
+            return false;
+        }
+    }
+
+    private int findLastRow(Sheet sheet) {
+        int lastRowNum = -1;
+        for (Row row : sheet) {
+            boolean hasData = false;
+            for (Cell cell : row) {
+                if (cell != null && cell.getCellType() != CellType.BLANK) {
+                    hasData = true;
+                    break;
+                }
+            }
+            if (hasData) {
+                lastRowNum = row.getRowNum();
+            }
+        }
+        return lastRowNum;
+    }
+
 }
