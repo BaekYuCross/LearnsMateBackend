@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign_template.service;
 
 import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.FindAllCampaignTemplatesDTO;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface CampaignTemplateService {
 
     void deleteTemplate(CampaignTemplateDTO campaignTemplateDTO);
 
-    List<CampaignTemplateDTO> findAllByTemplate();
+    List<FindAllCampaignTemplatesDTO> findAllByTemplate();
 
     CampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode);
 }
