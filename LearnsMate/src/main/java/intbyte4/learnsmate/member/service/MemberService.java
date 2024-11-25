@@ -29,6 +29,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
 
+    // 회원 저장
     public void saveMember(MemberDTO memberDTO) {
 
         // 비밀번호가 있고, 암호화되어 있지 않은 경우에만 암호화
@@ -37,6 +38,21 @@ public class MemberService {
         }
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
         memberRepository.save(member);
+    }
+
+    // 회원 로그인
+    public void loginMember(MemberDTO memberDTO) {
+        if (memberDTO.getMemberPassword() != null && !isPasswordEncrypted(memberDTO.getMemberPassword())) {
+            memberDTO.setMemberPassword(passwordEncoder.encode(memberDTO.getMemberPassword()));
+        }
+
+        Member member = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
+
+        if(member == null) {
+            throw new CommonException(StatusEnum.USER_NOT_FOUND);
+        } else if(!member.getMemberPassword().equals(memberDTO.getMemberPassword())) {
+            throw new CommonException(StatusEnum.INVALID_PASSWORD);
+        }
     }
 
     public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberType(int page, int size, MemberType memberType) {
