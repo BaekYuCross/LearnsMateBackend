@@ -97,6 +97,9 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/lecture/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/lecture/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/lecture/excel/**", "POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "PATCH")).permitAll()
                                 .anyRequest().authenticated()
                 )
                 // UserDetails를 상속받는 Service 계층 + BCrypt 암호화

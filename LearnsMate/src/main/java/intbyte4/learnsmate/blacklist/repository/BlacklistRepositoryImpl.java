@@ -55,6 +55,37 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
         return new PageImpl<>(blacklists, pageable, total);
     }
 
+    @Override
+    public List<Blacklist> searchByWithoutPaging(BlacklistFilterRequestDTO request) {
+        QBlacklist blacklist = QBlacklist.blacklist;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 각 필터 조건 추가
+        if (eqBlackCode(request.getBlackCode()) != null) {
+            builder.and(eqBlackCode(request.getBlackCode()));
+        }
+        if (eqMemberCode(request.getMemberCode()) != null) {
+            builder.and(eqMemberCode(request.getMemberCode()));
+        }
+        if (likeMemberName(request.getMemberName()) != null) {
+            builder.and(likeMemberName(request.getMemberName()));
+        }
+        if (likeMemberEmail(request.getMemberEmail()) != null) {
+            builder.and(likeMemberEmail(request.getMemberEmail()));
+        }
+        if (eqMemberType(request.getMemberType()) != null) {
+            builder.and(eqMemberType(request.getMemberType()));
+        }
+
+        // 쿼리 실행
+        return queryFactory
+                .selectFrom(blacklist)
+                .join(blacklist.member).fetchJoin()  // N+1 문제 방지를 위한 fetch join
+                .where(builder)
+                .orderBy(blacklist.createdAt.desc())  // 생성일 기준 내림차순 정렬
+                .fetch();
+    }
+
     private BooleanExpression eqBlackCode(Long blackCode){
         return blackCode == null ? null : QBlacklist.blacklist.blackCode.eq(blackCode);
     }

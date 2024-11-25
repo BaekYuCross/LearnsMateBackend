@@ -139,9 +139,7 @@ public class PaymentServiceImpl implements PaymentService {
         Pageable pageable = PageRequest.of(0, 1); // 최신 1개의 강의만 가져옴
         List<String> lectureCodes = paymentRepository.findLectureCodesByStudent(studentCode, pageable);
 
-        if (lectureCodes.isEmpty()) {
-            throw new CommonException(StatusEnum.PAYMENT_NOT_FOUND);
-        }
+        if(lectureCodes.isEmpty()) return null;
         return lectureCodes.get(0); // 가장 최신 강의 코드 반환
     }
 

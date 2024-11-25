@@ -36,10 +36,6 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
 
         List<LectureByStudent> lecturesByStudent = lectureByStudentRepository.findByStudentAndOwnStatus(student, true);
 
-        if (lecturesByStudent.isEmpty()) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
-
         return lecturesByStudent.stream()
                 .map(lectureByStudentMapper::toDTO)
                 .collect(Collectors.toList());
