@@ -1,6 +1,5 @@
 package intbyte4.learnsmate.member.repository;
 
-import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import org.springframework.data.domain.Page;

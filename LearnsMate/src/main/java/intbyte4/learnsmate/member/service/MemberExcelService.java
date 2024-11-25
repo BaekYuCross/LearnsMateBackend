@@ -3,6 +3,7 @@ package intbyte4.learnsmate.member.service;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -11,14 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -158,5 +158,170 @@ public class MemberExcelService {
         CellStyle style = workbook.createCellStyle();
         style.setDataFormat(workbook.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
         return style;
+    }
+
+    public void importMemberFromExcel(MultipartFile file, MemberType memberType) throws IOException {
+        try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // 실제 사용된 행 찾기
+            int lastRowNum = -1;
+            for (Row row : sheet) {
+                boolean hasData = false;
+                for (Cell cell : row) {
+                    if (cell != null && cell.getCellType() != CellType.BLANK) {
+                        hasData = true;
+                        break;
+                    }
+                }
+                if (hasData) {
+                    lastRowNum = row.getRowNum();
+                }
+            }
+            log.info("마지막 데이터가 있는 행 번호: {}", lastRowNum);
+            if (lastRowNum < 1) return;  // 헤더만 있거나 데이터가 없는 경우
+
+            List<MemberDTO> memberDTOList = new ArrayList<>();
+            // 헤더 다음 행부터 마지막 데이터가 있는 행까지만 처리
+            for (int rowNum = 1; rowNum <= lastRowNum; rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                if (row == null) continue;
+
+                log.info("Processing row: {}", rowNum);
+
+//                // 각 셀의 원본 값 출력
+//                log.info("=== Row {} 데이터 ===", row.getRowNum());
+//                for (int i = 0; i < 11; i++) {  // 0부터 10까지의 cell 확인
+//                    Cell cell = row.getCell(i);
+//                    if (cell != null) {
+//                        log.info("Cell {}: Type={}, Value={}",
+//                                i,
+//                                cell.getCellType(),
+//                                getCellValueAsString(cell)
+//                        );
+//                    } else {
+//                        log.info("Cell {}: NULL", i);
+//                    }
+//                }
+//                log.info("==================");
+
+                MemberDTO memberDTO = MemberDTO.builder()
+                        .memberName(getStringValue(row.getCell(1)))
+                        .memberEmail(getStringValue(row.getCell(2)))
+                        .memberPhone(getStringValue(row.getCell(3)))
+                        .memberAddress(getStringValue(row.getCell(4)))
+                        .memberAge(getIntValue(row.getCell(5)))
+                        .memberBirth(getLocalDateTime(row.getCell(6)))
+                        .memberFlag(getBooleanValue(row.getCell(7)))
+                        .createdAt(LocalDateTime.now())
+                        .memberDormantStatus(getBooleanValue(row.getCell(9)))
+                        .memberPassword(getStringValue(row.getCell(10)))
+                        .memberType(memberType)
+                        .updatedAt(LocalDateTime.now())
+                        .build();
+
+                log.info("생성된 DTO: {}", memberDTO);
+                memberDTOList.add(memberDTO);
+            }
+
+            memberDTOList.forEach(memberDTO -> memberService.saveMember(memberDTO));
+        } catch (Exception e) {
+            log.error("엑셀 파일 처리 중 오류 발생", e);
+            throw new RuntimeException("엑셀 파일 처리 실패", e);
+        }
+    }
+
+    // 셀 값 읽는 메서드
+    private String getStringValue(Cell cell) {
+        if (cell == null) return null;
+
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield cell.getLocalDateTimeCellValue().toString();
+                }
+                yield String.valueOf((long) cell.getNumericCellValue());
+            }
+            default -> null;
+        };
+    }
+
+    private int getIntValue(Cell cell) {
+        if (cell == null) return 0;
+
+        return switch (cell.getCellType()) {
+            case NUMERIC -> (int) cell.getNumericCellValue();
+            case STRING -> {
+                try {
+                    yield Integer.parseInt(cell.getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    yield 0;
+                }
+            }
+            default -> 0;
+        };
+    }
+
+    private LocalDateTime getLocalDateTime(Cell cell) {
+        if (cell == null) return null;
+
+        try {
+            switch (cell.getCellType()) {
+                case NUMERIC:
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        return cell.getLocalDateTimeCellValue();
+                    }
+                    return null;
+                case STRING:
+                    String dateStr = cell.getStringCellValue();
+                    if (dateStr == null || dateStr.trim().isEmpty()) {
+                        return null;
+                    }
+                    // "yyyy-MM-dd'T'HH:mm:ss" 형식으로 파싱
+                    return LocalDateTime.parse(dateStr);
+                default:
+                    return null;
+            }
+        } catch (Exception e) {
+            log.error("날짜 변환 중 오류 발생: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private Boolean getBooleanValue(Cell cell) {
+        if (cell == null) return null;
+
+        switch (cell.getCellType()) {
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
+            case STRING:
+                String value = cell.getStringCellValue().trim().toLowerCase();
+                if (value.equals("활성") || value.equals("비휴면")) return true;
+                if (value.equals("비활성") || value.equals("휴면")) return false;
+                return null;
+            case NUMERIC:
+                double numericValue = cell.getNumericCellValue();
+                return numericValue == 1;
+            default:
+                return null;
+        }
+    }
+
+
+    private String getCellValueAsString(Cell cell) {
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield cell.getLocalDateTimeCellValue().toString();
+                }
+                yield String.valueOf(cell.getNumericCellValue());
+            }
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case FORMULA -> cell.getCellFormula();
+            case BLANK -> "BLANK";
+            default -> "UNSUPPORTED TYPE: " + cell.getCellType();
+        };
     }
 }
