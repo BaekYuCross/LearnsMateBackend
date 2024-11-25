@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RequestFindCampaignByConditionVO {
+public class RequestFindCampaignByFilterVO {
 
     @JsonProperty("campaign_title")
     private String campaignTitle;
