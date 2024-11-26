@@ -77,7 +77,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     @Override
     public List<FindAllCampaignTemplatesDTO> findAllByTemplate() {
         log.info("템플릿 전체 조회 중");
-        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAllByCampaignTemplateFlag(true);
         List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
 
         for (CampaignTemplate campaignTemplate : campaignTemplateList) {
