@@ -15,4 +15,5 @@ public class ResponseLoginVO {
     private Long memberCode;
     private String memberName;
     private String memberEmail;
+    private Long loginHistoryCode;
 }
