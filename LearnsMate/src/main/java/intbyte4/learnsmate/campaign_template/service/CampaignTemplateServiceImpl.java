@@ -99,10 +99,11 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     private CampaignTemplate convertToCampaignTemplate(CampaignTemplateDTO campaignTemplateDTO, AdminDTO adminDTO) {
         Admin user = adminMapper.toEntity(adminDTO);
+        campaignTemplateDTO.setCampaignTemplateCode(null);
         campaignTemplateDTO.setCampaignTemplateFlag(true);
         campaignTemplateDTO.setCreatedAt(LocalDateTime.now());
         campaignTemplateDTO.setUpdatedAt(LocalDateTime.now());
-
+        campaignTemplateDTO.setAdminCode(adminDTO.getAdminCode());
         return campaignTemplateMapper.toEntity(campaignTemplateDTO, user);
     }
 
