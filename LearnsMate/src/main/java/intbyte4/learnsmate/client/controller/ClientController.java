@@ -1,9 +1,12 @@
 package intbyte4.learnsmate.client.controller;
 
 
+import intbyte4.learnsmate.client.domain.dto.ClientLoginDTO;
+import intbyte4.learnsmate.client.domain.dto.ClientLoginHistoryDTO;
 import intbyte4.learnsmate.client.service.ClientService;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestLoginVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestLogoutVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseLoginVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -37,14 +40,30 @@ public class ClientController {
     @Operation(summary = "회원 - 로그인")
     @PostMapping("/login")
     public ResponseEntity<ResponseLoginVO> memberLogin(@RequestBody RequestLoginVO request){
-        MemberDTO memberDTO = MemberDTO.builder()
+        ClientLoginDTO loginDTO = ClientLoginDTO.builder()
                 .memberEmail(request.getMemberEmail())
                 .memberPassword(request.getMemberPassword())
                 .build();
 
-        MemberDTO findMemberDTO = clientService.loginMember(memberDTO);
-        ResponseLoginVO vo = memberMapper.fromMemberDTOtoResponseLoginVO(findMemberDTO);
+        ClientLoginHistoryDTO clientLoginHistoryDTO = clientService.loginMember(loginDTO);
+        System.out.println(clientLoginHistoryDTO.toString());
+        ResponseLoginVO vo = ResponseLoginVO.builder()
+                .memberCode(clientLoginHistoryDTO.getMemberCode())
+                .memberName(clientLoginHistoryDTO.getMemberName())
+                .memberEmail(clientLoginHistoryDTO.getMemberEmail())
+                .loginHistoryCode(clientLoginHistoryDTO.getLoginHistoryCode())
+                .build();
 
         return ResponseEntity.ok(vo);
+    }
+
+    @Operation(summary = "회원 - 로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<?> memberLogout(@RequestBody RequestLogoutVO request) {
+
+        System.out.println(request.toString());
+        clientService.logoutMember(request.getLoginHistoryCode());
+
+        return ResponseEntity.ok("로그아웃 성공");
     }
 }
