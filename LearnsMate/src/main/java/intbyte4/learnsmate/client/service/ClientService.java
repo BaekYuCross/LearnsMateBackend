@@ -7,11 +7,13 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClientService {
 
     private final BCryptPasswordEncoder passwordEncoder;
@@ -31,15 +33,12 @@ public class ClientService {
 
     // 회원 로그인
     public MemberDTO loginMember(MemberDTO memberDTO) {
-        if (memberDTO.getMemberPassword() != null && !isPasswordEncrypted(memberDTO.getMemberPassword())) {
-            memberDTO.setMemberPassword(passwordEncoder.encode(memberDTO.getMemberPassword()));
-        }
 
         Member member = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
 
         if(member == null) {
             throw new CommonException(StatusEnum.USER_NOT_FOUND);
-        } else if(!member.getMemberPassword().equals(memberDTO.getMemberPassword())) {
+        } else if(!passwordEncoder.matches(memberDTO.getMemberPassword(), member.getMemberPassword())) {
             throw new CommonException(StatusEnum.INVALID_PASSWORD);
         }
 

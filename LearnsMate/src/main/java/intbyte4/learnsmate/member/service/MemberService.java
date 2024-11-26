@@ -50,7 +50,7 @@ public class MemberService {
 
         if(member == null) {
             throw new CommonException(StatusEnum.USER_NOT_FOUND);
-        } else if(!member.getMemberPassword().equals(memberDTO.getMemberPassword())) {
+        } else if(!passwordEncoder.matches(memberDTO.getMemberPassword(), member.getMemberPassword())) {
             throw new CommonException(StatusEnum.INVALID_PASSWORD);
         }
     }
