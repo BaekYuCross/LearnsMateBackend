@@ -147,4 +147,27 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
                 CampaignTemplatePage.getSize()           // 페이지 크기
         );
     }
+
+    @Override
+    public List<FindAllCampaignTemplatesDTO> findTemplateListByFilterWithExcel(CampaignTemplateFilterDTO filterDTO) {
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.searchByWithoutPaging(filterDTO);
+        return campaignTemplateList.stream()
+                        .map(campaignTemplateMapper::fromTemplateToFindAllCampaignTemplateDTO)
+                        .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FindAllCampaignTemplatesDTO> findAllTemplateListWithExcel() {
+        List<CampaignTemplate> campaignTemplates = campaignTemplateRepository.findAll();
+
+        List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
+        for(CampaignTemplate campaignTemplate : campaignTemplates) {
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
+            findAllCampaignTemplatesDTOList.add(campaignTemplateMapper.toFindAllTemplateDTO(campaignTemplateDTO, adminDTO.getAdminName()));
+        }
+
+        return findAllCampaignTemplatesDTOList;
+    }
+
 }
