@@ -7,6 +7,7 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 
@@ -20,7 +21,12 @@ public interface CouponService {
 
     CouponEntity findByCouponCode(Long couponCode);
 
-    CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin);
+//    CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin);
+
+    @Transactional
+    CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request
+            , Admin admin
+            , List<LectureDTO> requestLectures);
 
     CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin);
 

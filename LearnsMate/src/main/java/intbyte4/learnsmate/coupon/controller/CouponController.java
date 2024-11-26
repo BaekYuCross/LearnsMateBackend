@@ -10,6 +10,7 @@ import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.coupon.service.CouponFacade;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
@@ -74,8 +75,8 @@ public class CouponController {
 
     @Operation(summary = "직원 - 쿠폰 등록")
     @PostMapping("/admin/register")
-    public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody AdminCouponRegisterRequestVO request, Admin admin) {
-        CouponDTO couponDTO = couponService.adminRegisterCoupon(request, admin);
+    public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody AdminCouponRegisterRequestVO request, Admin admin, List<LectureDTO> requestLectures) {
+        CouponDTO couponDTO = couponService.adminRegisterCoupon(request, admin, requestLectures);
         return ResponseEntity.status(HttpStatus.CREATED).body(couponMapper.fromDTOToRegisterResponseVO(couponDTO));
     }
 
