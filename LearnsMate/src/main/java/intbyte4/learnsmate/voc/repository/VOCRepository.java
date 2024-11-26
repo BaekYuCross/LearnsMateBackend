@@ -2,6 +2,8 @@ package intbyte4.learnsmate.voc.repository;
 
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -72,4 +74,8 @@ public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepository
     List<VOC> findVocByKeywordAndSatisfaction(@Param("startDate") LocalDateTime startDate,
                                               @Param("endDate") LocalDateTime endDate,
                                               @Param("keyword") String keyword);
+
+    // 현재 시각보다 이전의 created_at을 가져오기
+    @Query("SELECT v FROM Voc v WHERE v.createdAt <= :now")
+    Page<VOC> findAllBeforeNow(@Param("now") LocalDateTime now, Pageable pageable);
 }

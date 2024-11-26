@@ -102,6 +102,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "PATCH")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/voc/ai/**", "GET")).permitAll()
                                 .anyRequest().authenticated()
                 )
                 // UserDetails를 상속받는 Service 계층 + BCrypt 암호화
