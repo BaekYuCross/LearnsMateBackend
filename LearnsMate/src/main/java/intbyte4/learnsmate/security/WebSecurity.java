@@ -85,6 +85,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "DELETE")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign-template/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/campaign-template/**", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
