@@ -63,10 +63,10 @@ public class LoginHistoryService {
         LoginHistory loginHistory =
                 loginHistoryMapper.fromLoginHistoryDTOtoLoginHistory(loginHistoryDTO, member);
 
-        loginHistoryRepository.save(loginHistory);
+        LoginHistory saveHistory = loginHistoryRepository.save(loginHistory);
 
         // 로그인 내역 코드 반환 -> 로그아웃 시간 저장 해야하기 때문
-        return loginHistory.getLoginHistoryCode();
+        return saveHistory.getLoginHistoryCode();
     }
 
     // 특정 멤버가 로그아웃 할 시에 저장해놓은 코드를 통해 업데이트 로직 수행
