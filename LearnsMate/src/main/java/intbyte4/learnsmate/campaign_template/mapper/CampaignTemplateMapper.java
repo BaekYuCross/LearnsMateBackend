@@ -36,6 +36,7 @@ public class CampaignTemplateMapper {
         return CampaignTemplateDTO.builder()
                 .campaignTemplateTitle(requestRegisterTemplateVO.getCampaignTemplateTitle())
                 .campaignTemplateContents(requestRegisterTemplateVO.getCampaignTemplateContents())
+                .adminCode(requestRegisterTemplateVO.getAdminCode())
                 .build();
     }
 

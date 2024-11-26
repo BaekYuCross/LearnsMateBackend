@@ -8,6 +8,8 @@ import intbyte4.learnsmate.admin.domain.vo.response.ResponseFindAdminVO;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,6 +46,7 @@ public class AdminController {
 
     // @AuthenticationPrincipal을 활용 -> CustomUserDetails에서 사용자 정보를 추출
     // 인증 성공 시 사용자 이름과 권한을 상태에 저장 -> Pinia 로 이름과 권한 정보 넘어감 (loginState.js 롹인 바람)
+    @Operation(summary = "직원 정보 조회")
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> checkAuthStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("GET /admin/status 요청 도착");
@@ -53,8 +56,27 @@ public class AdminController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("name", userDetails.getUserDTO().getAdminName()); // 관리자 이름
+        response.put("code", userDetails.getUserDTO().getAdminCode()); // 관리자 사번
+        response.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment()); // 관리자 부서
         response.put("roles", userDetails.getAuthorities()); // 권한 정보
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "직원 로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        log.info("POST /admin/logout 요청 도착");
+        // 쿠키 삭제 명령
+        Cookie cookie = new Cookie("token", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // 쿠키 만료 처리
+        response.addCookie(cookie);
+
+        // 필요 시 블랙리스트로 JWT 관리
+        log.info("로그아웃 성공");
+        return ResponseEntity.ok().body("로그아웃 성공");
+    }
+
 }

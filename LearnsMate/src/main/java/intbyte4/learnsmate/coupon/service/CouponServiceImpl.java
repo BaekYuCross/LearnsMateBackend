@@ -9,11 +9,15 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
+import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.coupon_category.domain.dto.CouponCategoryEnum;
+import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.mapper.LectureMapper;
+import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service("couponService")
 @Slf4j
@@ -35,6 +38,9 @@ public class CouponServiceImpl implements CouponService {
     private final CouponRepository couponRepository;
     private final CouponMapper couponMapper;
     private final AdminService adminService;
+    private final LectureService lectureService;
+    private final CouponByLectureService couponByLectureService;
+    private final LectureMapper lectureMapper;
 
     @Override
     public List<CouponDTO> findAllCoupons() {
@@ -58,9 +64,11 @@ public class CouponServiceImpl implements CouponService {
         return couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
     }
 
-    @Override
     @Transactional
-    public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin) {
+    @Override
+    public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request
+            , Admin admin
+            , List<LectureDTO> requestLectures) {
 
         CouponCategoryEnum categoryEnum = getCouponCategoryEnumByName(request.getCouponCategoryName());
 
@@ -84,6 +92,15 @@ public class CouponServiceImpl implements CouponService {
                 .build();
 
         couponRepository.save(newCoupon);
+        CouponDTO savedCoupon = couponMapper.toDTO(newCoupon);
+
+        requestLectures.forEach(lectureDTO -> {
+            LectureDTO foundLectures = lectureService.getLectureById(lectureDTO.getLectureCode());
+            Lecture lectures = lectureMapper.fromDTOToEntity(lectureDTO);
+            if (foundLectures == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+            couponByLectureService.registerCouponByLecture(lectures, newCoupon);
+        });
+
         return couponMapper.toDTO(newCoupon);
     }
 
