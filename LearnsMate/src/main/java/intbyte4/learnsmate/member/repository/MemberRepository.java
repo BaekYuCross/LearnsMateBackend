@@ -18,7 +18,7 @@ import java.util.List;
 @Primary
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-    // 기존 offset 기반 쿼리
+    @Query("SELECT m from member m WHERE m.memberType = :memberType ORDER BY m.memberCode DESC ")
     Page<Member> findByMemberType(MemberType memberType, Pageable pageable);
 
     Member findByMemberCodeAndMemberType(Long memberCode, MemberType memberType);

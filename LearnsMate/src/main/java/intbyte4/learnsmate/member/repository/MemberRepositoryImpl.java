@@ -42,7 +42,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         // Query 생성
         JPAQuery<Member> query = queryFactory
                 .selectFrom(member)
-                .where(builder);
+                .where(builder)
+                .orderBy(member.memberCode.desc());
 
         // 전체 데이터 수 조회
         long total = query.fetchCount();
