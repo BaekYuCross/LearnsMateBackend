@@ -45,4 +45,31 @@ public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepository
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
+    @Query(nativeQuery = true, value = """
+    SELECT keyword, COUNT(*) AS keywordCount
+    FROM (
+        SELECT 
+            TRIM(REGEXP_REPLACE(v.voc_content, '([가-힣]+)(을|를|이|가|과|와|에서|까지)$', '\\1')) AS keyword
+        FROM voc v
+        WHERE v.created_at BETWEEN :startDate AND :endDate
+    ) AS processed
+    WHERE keyword != ''
+    GROUP BY keyword
+    ORDER BY keywordCount DESC
+    """)
+    List<Object[]> findKeywordFrequencyBetweenDates(@Param("startDate") LocalDateTime startDate,
+                                                    @Param("endDate") LocalDateTime endDate);
+
+    @Query("""
+        SELECT v
+        FROM Voc v
+        JOIN VocAnswer va
+          ON v.vocCode = va.voc.vocCode
+        WHERE v.createdAt BETWEEN :startDate AND :endDate
+          AND v.vocContent LIKE %:keyword%
+          AND (v.vocAnswerSatisfaction = '보통' OR v.vocAnswerSatisfaction = '만족')
+    """)
+    List<VOC> findVocByKeywordAndSatisfaction(@Param("startDate") LocalDateTime startDate,
+                                              @Param("endDate") LocalDateTime endDate,
+                                              @Param("keyword") String keyword);
 }

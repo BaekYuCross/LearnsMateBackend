@@ -13,6 +13,7 @@ import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseLoginVO;
 import intbyte4.learnsmate.payment.domain.vo.RequestRegisterMemberPaymentVO;
 import org.springframework.stereotype.Component;
 
@@ -219,6 +220,14 @@ public class MemberMapper{
                 .memberDormantStatus(member.getMemberDormantStatus())
                 .createdAt(member.getCreatedAt())
                 .updatedAt(member.getUpdatedAt())
+                .build();
+    }
+
+    public ResponseLoginVO fromMemberDTOtoResponseLoginVO(MemberDTO findMemberDTO) {
+        return ResponseLoginVO.builder()
+                .memberCode(findMemberDTO.getMemberCode())
+                .memberName(findMemberDTO.getMemberName())
+                .memberEmail(findMemberDTO.getMemberEmail())
                 .build();
     }
 }
