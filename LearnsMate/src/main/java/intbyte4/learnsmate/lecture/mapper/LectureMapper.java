@@ -1,7 +1,6 @@
 package intbyte4.learnsmate.lecture.mapper;
 
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
@@ -13,16 +12,26 @@ import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
+import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.payment.domain.vo.RequestRegisterLecturePaymentVO;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
 @Component
 public class LectureMapper {
+
+    private final MemberService memberService;
+    private final MemberMapper memberMapper;
+
+    public LectureMapper(MemberService memberService, MemberMapper memberMapper) {
+        this.memberService = memberService;
+        this.memberMapper = memberMapper;
+    }
 
     public LectureDTO toDTO(Lecture entity) {
         return LectureDTO.builder()
@@ -184,6 +193,22 @@ public class LectureMapper {
                 .lectureStatus(vo.getLectureStatus())
                 .lectureClickCount(0)
                 .lectureLevel(vo.getLectureLevel())
+                .build();
+    }
+
+    public Lecture fromDTOToEntity(LectureDTO lectureDTO) {
+        return Lecture.builder()
+                .lectureCode(lectureDTO.getLectureCode())
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
+                .createdAt(lectureDTO.getCreatedAt())
+                .updatedAt(null)
+                .lectureImage(null)
+                .lecturePrice(lectureDTO.getLecturePrice())
+                .tutor(memberMapper.fromMemberDTOtoMember(memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR)))
+                .lectureStatus(lectureDTO.getLectureStatus())
+                .lectureClickCount(lectureDTO.getLectureClickCount())
+                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
                 .build();
     }
 }
