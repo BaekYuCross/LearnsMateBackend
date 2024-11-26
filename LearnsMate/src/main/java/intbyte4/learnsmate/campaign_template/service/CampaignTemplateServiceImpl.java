@@ -5,10 +5,7 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateFilterDTO;
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplatePageResponse;
-import intbyte4.learnsmate.campaign_template.domain.dto.FindAllCampaignTemplatesDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.*;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
 import intbyte4.learnsmate.campaign_template.repository.CampaignTemplateRepository;
@@ -80,7 +77,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     @Override
     public List<FindAllCampaignTemplatesDTO> findAllByTemplate() {
         log.info("템플릿 전체 조회 중");
-        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAllByCampaignTemplateFlag(true);
         List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
 
         for (CampaignTemplate campaignTemplate : campaignTemplateList) {
@@ -93,11 +90,11 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     }
 
     @Override
-    public CampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode) {
+    public FindCampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode) {
         log.info("템플릿 단 건 조회 중: {}", campaignTemplateCode);
         CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
-        return campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+        return campaignTemplateMapper.fromEntityToFindCampaignTemplateDTO(campaignTemplate);
     }
 
     private CampaignTemplate convertToCampaignTemplate(CampaignTemplateDTO campaignTemplateDTO, AdminDTO adminDTO) {

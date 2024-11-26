@@ -3,6 +3,7 @@ package intbyte4.learnsmate.security;
 import intbyte4.learnsmate.admin.service.AdminService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -39,40 +40,46 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     // JWT 토큰을 검사하고 인증을 처리하는 실제 필터 로직. 만약 유효한 JWT 토큰이 있다면 인증을 처리하고, 없으면 다음 필터로 진행.
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-        log.info("UsernamePasswordAuthenticationFilter보다 먼저 동작하는 필터");
+        log.info("JwtFilter 실행 - 쿠키에서 토큰 추출 시도");
 
-        // Authorization 헤더에서 JWT 토큰을 추출
-        String authorizationHeader = request.getHeader("Authorization");
-        log.info("jwtFilter의 getHeader('Authorization'): {}", authorizationHeader);
-
+        // 쿠키에서 토큰 가져오기
         String token = null;
-
-        // Authorization 헤더에 "Bearer "로 시작하는 토큰이 있으면 해당 토큰을 추출
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 값만 추출
-            log.info("Bearer 토큰 추출 완료: {}", token);
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                log.info("쿠키 이름: {}, 쿠키 값: {}", cookie.getName(), cookie.getValue());
+                if ("token".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    log.info("추출된 토큰: {}", token);
+                    break;
+                }
+            }
         } else {
-            // 헤더에 토큰이 없으면 쿼리 파라미터에서 token 값을 찾음
-            token = request.getParameter("token");
-            log.info("OAuth 로그인: 쿼리 파라미터에서 토큰 추출. 토큰 : {}", token);
+            log.warn("요청에 쿠키가 없습니다.");
         }
 
-        // 토큰이 있을 경우에만 유효성 검사 및 인증 처리 ->
-        // 토큰이 유효하면 인증 정보를 SecurityContextHolder에 저장하고,
-        // 이후의 필터가 인증 정보를 사용 가능하게 함.
-
+        // 토큰 유효성 검사 및 인증 객체 설정
         if (token != null && jwtUtil.validateToken(token)) {
-            Authentication authentication = jwtUtil.getAuthentication(token);  // 토큰으로부터 인증 객체 추출
-            log.info("JwtFilter를 통과한 유효한 토큰을 통해 security가 관리할 principal 객체: {}", authentication);
-            SecurityContextHolder.getContext().setAuthentication(authentication);   // 인증된 객체를 SecurityContext에 설정하여 이후의 요청에서 인증 정보를 사용할 수 있도록 함
+            log.info("유효한 토큰입니다. SecurityContext 설정 시작");
+
+            // 토큰으로부터 인증 객체 생성
+            Authentication authentication = jwtUtil.getAuthentication(token);
+
+            log.info("생성된 인증 객체: {}", authentication);
+
+            // SecurityContext에 인증 객체 설정
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-            log.warn("유효하지 않은 토큰이거나 토큰이 없습니다.");
+            log.warn("유효하지 않은 토큰이거나 토큰이 없습니다.!!!!!!!");
         }
 
-        // 인증 처리가 끝난 후, 다음 필터로 요청을 전달 -> 실행될 다음 필터는 UsernamePasswordAuthenticationFilter가 처리
+        // 다음 필터 실행
         filterChain.doFilter(request, response);
     }
+
 }
+
