@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.campaign.service;
 
 import intbyte4.learnsmate.campaign.domain.dto.*;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByFilterVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 
@@ -17,7 +17,7 @@ public interface CampaignService {
     void removeCampaign(CampaignDTO request);
     List<FindAllCampaignsDTO> findAllCampaignList();
     FindCampaignDTO findCampaign(FindCampaignDTO request);
-    CampaignPageResponse<ResponseFindCampaignByConditionVO> findCampaignListByCondition
+    CampaignPageResponse<ResponseFindCampaignByFilterVO> findCampaignListByFilter
             (CampaignFilterDTO request, int page, int size);
     List<FindAllCampaignsDTO> findCampaignListByConditionWithExcel(CampaignFilterDTO filterDTO);
     List<FindAllCampaignsDTO> findAllCampaignListWithExcel();

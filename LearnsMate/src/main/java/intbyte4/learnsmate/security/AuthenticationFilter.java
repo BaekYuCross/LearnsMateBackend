@@ -2,12 +2,12 @@ package intbyte4.learnsmate.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import intbyte4.learnsmate.admin.domain.dto.JwtTokenDTO;
-import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.admin.domain.vo.request.RequestLoginVO;
 import intbyte4.learnsmate.admin.service.AdminService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -98,10 +98,18 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
         String token = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
 
-        // 생성된 JWT 토큰을 Authorization 헤더에 추가하여 응답 -> 생성된 JWT 토큰을 Authorization 헤더에 담아 응답으로 전송
-        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        // 쿠키 생성
+        Cookie jwtCookie = new Cookie("token", token);
+        jwtCookie.setHttpOnly(true); // HTTP Only 속성으로 설정 (JavaScript에서 접근 불가)
+        jwtCookie.setSecure(false); // HTTPS 연결에서만 전송 (테스트 환경에서는 false 설정 가능)
+        // https://learnsmate.site -> 배포 환경시 true로 전환
+        jwtCookie.setPath("/"); // 쿠키의 유효 경로 설정 (애플리케이션 전체에 사용 가능)
+        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // 쿠키 만료 시간 설정 (7일)
 
-        log.info("JWT 생성 완료. Authorization 헤더에 추가됨.");
+        // 응답에 쿠키 추가
+        response.addCookie(jwtCookie);
+
+        log.info("JWT 생성 완료. JWT 토큰을 쿠키로 응답에 포함시킴");
     }
 
 

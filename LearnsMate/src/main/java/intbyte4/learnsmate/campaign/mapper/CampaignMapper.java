@@ -9,7 +9,7 @@ import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignByConditionVO;
+import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignByFilterVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestRegisterCampaignVO;
 import intbyte4.learnsmate.campaign.domain.vo.response.*;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -64,7 +64,7 @@ public class CampaignMapper {
                 .build();
     }
 
-    public CampaignDTO fromFindCampaignByConditionVOtoDTO(RequestFindCampaignByConditionVO vo){
+    public CampaignDTO fromFindCampaignByConditionVOtoDTO(RequestFindCampaignByFilterVO vo){
         return CampaignDTO.builder()
 //                .campaignCode(vo.getCampaignCode())
                 .campaignTitle(vo.getCampaignTitle())
@@ -140,8 +140,8 @@ public class CampaignMapper {
                 .build();
     }
 
-    public List<ResponseFindCampaignByConditionVO> fromDtoListToFindCampaignByConditionVO(List<CampaignDTO> dtoList) {
-        return dtoList.stream().map(dto -> ResponseFindCampaignByConditionVO.builder()
+    public List<ResponseFindCampaignByFilterVO> fromDtoListToFindCampaignByConditionVO(List<CampaignDTO> dtoList) {
+        return dtoList.stream().map(dto -> ResponseFindCampaignByFilterVO.builder()
                 .campaignCode(dto.getCampaignCode())
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
@@ -153,8 +153,8 @@ public class CampaignMapper {
                 .build()).collect(Collectors.toList());
     }
 
-    public List<ResponseFindCampaignByConditionVO> fromFindAllDtoListToFindCampaignByConditionVO(List<FindAllCampaignsDTO> dtoList) {
-        return dtoList.stream().map(dto -> ResponseFindCampaignByConditionVO.builder()
+    public List<ResponseFindCampaignByFilterVO> fromFindAllDtoListToFindCampaignByConditionVO(List<FindAllCampaignsDTO> dtoList) {
+        return dtoList.stream().map(dto -> ResponseFindCampaignByFilterVO.builder()
                 .campaignCode(dto.getCampaignCode())
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
@@ -195,7 +195,7 @@ public class CampaignMapper {
                 .build();
     }
 
-    public CampaignFilterDTO fromFindCampaignByConditionVOtoFilterDTO(RequestFindCampaignByConditionVO request) {
+    public CampaignFilterDTO fromFindCampaignByConditionVOtoFilterDTO(RequestFindCampaignByFilterVO request) {
         return CampaignFilterDTO.builder()
 //                .campaignCode(request.getCampaignCode())
                 .campaignTitle(request.getCampaignTitle())
@@ -211,8 +211,8 @@ public class CampaignMapper {
                 .build();
     }
 
-    public ResponseFindCampaignByConditionVO fromCampaignToResponseFindCampaignByConditionVO(Campaign vo) {
-        return ResponseFindCampaignByConditionVO.builder()
+    public ResponseFindCampaignByFilterVO fromCampaignToResponseFindCampaignByConditionVO(Campaign vo) {
+        return ResponseFindCampaignByFilterVO.builder()
                 .campaignCode(vo.getCampaignCode())
                 .campaignTitle(vo.getCampaignTitle())
                 .campaignContents(vo.getCampaignContents())

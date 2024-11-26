@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.campaign.service;
 
 import intbyte4.learnsmate.campaign.domain.dto.CampaignFilterDTO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByConditionVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByFilterVO;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class CampaignExcelService {
             CellStyle dateStyle = createDateStyle(workbook);
             createHeader(sheet, headerStyle);
 
-            List<ResponseFindCampaignByConditionVO> campaignList;
+            List<ResponseFindCampaignByFilterVO> campaignList;
             if (filterDTO != null) {
                 campaignList = campaignMapper.fromFindAllDtoListToFindCampaignByConditionVO
                         (campaignService.findCampaignListByConditionWithExcel(filterDTO));
@@ -74,9 +74,9 @@ public class CampaignExcelService {
         }
     }
 
-    private void writeData(Sheet sheet, List<ResponseFindCampaignByConditionVO> vocList, CellStyle dateStyle) {
+    private void writeData(Sheet sheet, List<ResponseFindCampaignByFilterVO> vocList, CellStyle dateStyle) {
         int rowNum = 1;
-        for (ResponseFindCampaignByConditionVO campaign : vocList) {
+        for (ResponseFindCampaignByFilterVO campaign : vocList) {
             Row row = sheet.createRow(rowNum++);
             int columnIndex = 0;
             for (String key : COLUMNS.keySet()) {
@@ -86,7 +86,7 @@ public class CampaignExcelService {
         }
     }
 
-    private void setValueByColumnKey(Cell cell, String key, ResponseFindCampaignByConditionVO campaign, CellStyle dateStyle) {
+    private void setValueByColumnKey(Cell cell, String key, ResponseFindCampaignByFilterVO campaign, CellStyle dateStyle) {
         switch (key) {
             case "campaignCode" -> cell.setCellValue(campaign.getCampaignCode());
             case "campaignTitle" -> cell.setCellValue(campaign.getCampaignTitle());

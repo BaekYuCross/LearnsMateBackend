@@ -68,6 +68,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/users/verification-email/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/verify-code")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/send-sms")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/admin/**","GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "OPTIONS")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/nickname/check", "GET")).permitAll()
@@ -85,6 +86,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "DELETE")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign-template/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/campaign-template/**", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
@@ -122,7 +124,6 @@ public class WebSecurity {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // 허용할 HTTP 메서드 설정
         configuration.setAllowCredentials(true); // 인증 정보 허용 (쿠키 등)
         configuration.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더 허용
-        configuration.setExposedHeaders(Arrays.asList("Authorization")); // 노출할 헤더 설정
         configuration.setMaxAge(3600L); // 1시간 동안 캐시
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
