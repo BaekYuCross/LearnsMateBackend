@@ -104,7 +104,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         jwtCookie.setSecure(false); // HTTPS 연결에서만 전송 (테스트 환경에서는 false 설정 가능)
         // https://learnsmate.site -> 배포 환경시 true로 전환
         jwtCookie.setPath("/"); // 쿠키의 유효 경로 설정 (애플리케이션 전체에 사용 가능)
-        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // 쿠키 만료 시간 설정 (7일)
+        jwtCookie.setMaxAge(4 * 3600); // 쿠키 만료 시간 설정 (4시간)
         // 여기를 3-4시간정도로 만료시간 할건데 리프레시토큰을 해야하나? erp라 재로그인이 필요하지않을까
 
         // 응답에 쿠키 추가
