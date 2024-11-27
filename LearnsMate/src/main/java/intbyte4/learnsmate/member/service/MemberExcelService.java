@@ -103,8 +103,7 @@ public class MemberExcelService {
         for (ResponseFindMemberVO member : memberList) {
             Row row = sheet.createRow(rowNum++);
             int columnIndex = 0;
-            for (String key : COLUMNS.keySet()) {
-
+            for (String key : selectedColumns) {
                 Cell cell = row.createCell(columnIndex++);
                 setValueByColumnKey(cell, key, member, dateStyle);
             }
