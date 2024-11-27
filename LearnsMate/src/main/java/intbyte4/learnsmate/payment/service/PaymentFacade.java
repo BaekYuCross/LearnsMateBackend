@@ -20,6 +20,7 @@ import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentFacade {
@@ -75,7 +77,7 @@ public class PaymentFacade {
     }
 
     public PaymentDetailDTO getPaymentDetails(Long paymentCode) {
-        Payment payment = paymentRepository.findById(paymentCode).orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
+        Payment payment = paymentRepository.findByPaymentCode(paymentCode).orElseThrow(() -> new CommonException(StatusEnum.PAYMENT_NOT_FOUND));
         return getPaymentDetailDTO(payment);
     }
 
@@ -85,14 +87,17 @@ public class PaymentFacade {
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR);
         MemberDTO studentDTO = memberService.findMemberByMemberCode(payment.getLectureByStudent().getStudent().getMemberCode(), MemberType.STUDENT);
 
-        String couponIssuanceCode = payment.getCouponIssuance().getCouponIssuanceCode();
+        String couponIssuanceCode = null;
         String couponName = null;
 
-        if (couponIssuanceCode != null) {
-            IssueCouponDTO issuedCoupon = issueCouponService.useIssuedCoupon(studentDTO.getMemberCode(), couponIssuanceCode);
-            if (issuedCoupon != null) {
-                CouponDTO coupon = couponService.findCouponDTOByCouponCode(issuedCoupon.getCouponCode());
-                couponName = coupon.getCouponName();
+        if (payment.getCouponIssuance() != null) {
+            couponIssuanceCode = payment.getCouponIssuance().getCouponIssuanceCode();
+            if (couponIssuanceCode != null) {
+                IssueCouponDTO issuedCoupon = issueCouponService.useIssuedCoupon(studentDTO.getMemberCode(), couponIssuanceCode);
+                if (issuedCoupon != null) {
+                    CouponDTO coupon = couponService.findCouponDTOByCouponCode(issuedCoupon.getCouponCode());
+                    couponName = coupon.getCouponName();
+                }
             }
         }
 

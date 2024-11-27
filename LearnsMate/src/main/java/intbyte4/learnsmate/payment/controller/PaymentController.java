@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.payment.controller;
 
+import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.payment.domain.dto.PaymentMonthlyRevenueDTO;
 import intbyte4.learnsmate.payment.service.PaymentFacade;
 import intbyte4.learnsmate.lecture.service.LectureFacade;
@@ -18,14 +19,15 @@ import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.service.PaymentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/payments")
 @RequiredArgsConstructor
@@ -41,7 +43,7 @@ public class PaymentController {
 
     @Operation(summary = "결제 내역 및 월별 매출 데이터 조회 (전년도 데이터까지)")
     @GetMapping
-    public ResponseEntity<PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>> getPayments(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>> getPayments(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
         PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> response = paymentFacade.getPaymentsWithGraph(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -49,8 +51,17 @@ public class PaymentController {
     @Operation(summary = "특정 결제 내역 조회")
     @GetMapping("/{paymentCode}")
     public ResponseEntity<ResponseFindPaymentVO> getPaymentDetails(@PathVariable("paymentCode") Long paymentCode) {
-        PaymentDetailDTO paymentDTO = paymentFacade.getPaymentDetails(paymentCode);
-        return ResponseEntity.status(HttpStatus.OK).body(paymentMapper.fromDtoToResponseVO(paymentDTO));
+        log.info("Received request for payment details with code: {}", paymentCode);  // 로그 추가
+        try {
+            PaymentDetailDTO paymentDTO = paymentFacade.getPaymentDetails(paymentCode);
+            return ResponseEntity.ok(paymentMapper.fromDtoToResponseVO(paymentDTO));
+        } catch (CommonException e) {
+            log.error("Payment not found with code: {}", paymentCode);  // 로그 추가
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error getting payment details", e);  // 로그 추가
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Operation(summary = "결제 내역 등록")
@@ -78,11 +89,4 @@ public class PaymentController {
         List<PaymentFilterDTO> payments = paymentService.getPaymentsByFilters(request);
         return ResponseEntity.status(HttpStatus.OK).body(payments);
     }
-//    // 직원이 예상 매출액과 할인 매출액을 비교해서 조회 (추가 예시 메서드)
-//    @GetMapping("/revenue")
-//    public ResponseEntity<String> getRevenueComparison() {
-//        // 매출 비교 로직을 처리하고 응답을 반환하는 로직 작성
-//        return ResponseEntity.ok("예상 매출액과 할인 매출액 비교 결과");
-//    }
-
 }
