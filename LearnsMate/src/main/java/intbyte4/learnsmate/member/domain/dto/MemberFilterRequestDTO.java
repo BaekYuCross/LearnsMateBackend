@@ -4,6 +4,7 @@ import intbyte4.learnsmate.member.domain.MemberType;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,4 +35,6 @@ public class MemberFilterRequestDTO {
     // 생성일 범위
     private LocalDateTime createdStartDate;
     private LocalDateTime createdEndDate;
+
+    private List<String> selectedColumns;
 }
