@@ -32,6 +32,12 @@ public class CampaignTemplateRepositoryImpl implements CampaignTemplateRepositor
         return new PageImpl<>(campaignTemplates, pageable, total);
     }
 
+    @Override
+    public List<CampaignTemplate> searchByWithoutPaging(CampaignTemplateFilterDTO request) {
+        return queryFactory.selectFrom(qCampaignTemplate).where(searchByTitle(request)
+                .and(searchByPeriod(request))).fetch();
+    }
+
     public BooleanBuilder searchByTitle(CampaignTemplateFilterDTO campaignTemplateFilterDTO) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
