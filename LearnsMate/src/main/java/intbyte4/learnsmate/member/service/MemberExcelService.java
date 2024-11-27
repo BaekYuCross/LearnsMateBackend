@@ -54,7 +54,11 @@ public class MemberExcelService {
             }
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dateStyle = createDateStyle(workbook);
-            createHeader(sheet, headerStyle);
+
+            List<String> selectedColumns = filterDTO != null && filterDTO.getSelectedColumns() != null
+                    ? filterDTO.getSelectedColumns()
+                    : new ArrayList<>(COLUMNS.keySet());
+            createHeader(sheet, headerStyle, selectedColumns);
 
             List<ResponseFindMemberVO> memberList;
             if (filterDTO != null) {
@@ -71,7 +75,7 @@ public class MemberExcelService {
             }
             log.info("Found {} members to export", memberList.size());
 
-            writeData(sheet, memberList, dateStyle);
+            writeData(sheet, memberList, dateStyle, selectedColumns);
 
             for (int i = 0; i < COLUMNS.size(); i++) {
                 sheet.autoSizeColumn(i);
@@ -83,17 +87,17 @@ public class MemberExcelService {
         }
     }
 
-    private void createHeader(Sheet sheet, CellStyle headerStyle) {
+    private void createHeader(Sheet sheet, CellStyle headerStyle, List<String> selectedColumns) {
         Row headerRow = sheet.createRow(0);
         int columnIndex = 0;
-        for (String headerValue : COLUMNS.values()) {
+        for (String columnKey : selectedColumns) {
             Cell cell = headerRow.createCell(columnIndex++);
-            cell.setCellValue(headerValue);
+            cell.setCellValue(COLUMNS.get(columnKey));
             cell.setCellStyle(headerStyle);
         }
     }
 
-    private void writeData(Sheet sheet, List<ResponseFindMemberVO> memberList, CellStyle dateStyle) {
+    private void writeData(Sheet sheet, List<ResponseFindMemberVO> memberList, CellStyle dateStyle, List<String> selectedColumns) {
         int rowNum = 1;
         log.info("write Data(memberList.size()): {}",memberList.size());
         for (ResponseFindMemberVO member : memberList) {

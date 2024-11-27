@@ -45,10 +45,10 @@ public class CampaignExcelService {
 
             List<ResponseFindCampaignByFilterVO> campaignList;
             if (filterDTO != null) {
-                campaignList = campaignMapper.fromFindAllDtoListToFindCampaignByConditionVO
+                campaignList = campaignMapper.fromFindAllDtoListToFindCampaignByFilterVO
                         (campaignService.findCampaignListByConditionWithExcel(filterDTO));
             } else {
-                campaignList = campaignMapper.fromFindAllDtoListToFindCampaignByConditionVO
+                campaignList = campaignMapper.fromFindAllDtoListToFindCampaignByFilterVO
                         (campaignService.findAllCampaignListWithExcel());
             }
             log.info("Found {} Campaigns to export", campaignList.size());

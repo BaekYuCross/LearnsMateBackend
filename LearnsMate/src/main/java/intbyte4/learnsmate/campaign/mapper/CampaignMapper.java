@@ -153,7 +153,7 @@ public class CampaignMapper {
                 .build()).collect(Collectors.toList());
     }
 
-    public List<ResponseFindCampaignByFilterVO> fromFindAllDtoListToFindCampaignByConditionVO(List<FindAllCampaignsDTO> dtoList) {
+    public List<ResponseFindCampaignByFilterVO> fromFindAllDtoListToFindCampaignByFilterVO(List<FindAllCampaignsDTO> dtoList) {
         return dtoList.stream().map(dto -> ResponseFindCampaignByFilterVO.builder()
                 .campaignCode(dto.getCampaignCode())
                 .campaignTitle(dto.getCampaignTitle())

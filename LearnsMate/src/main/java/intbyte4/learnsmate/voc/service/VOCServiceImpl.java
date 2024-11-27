@@ -13,7 +13,9 @@ import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -88,11 +90,26 @@ public class VOCServiceImpl implements VOCService {
         return categoryCountMap;
     }
 
+//    @Override
+//    public Page<VOCDTO> findAllByVOCWithPaging(Pageable pageable) {
+//        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
+//        Page<VOC> vocPage = vocRepository.findAll(pageRequest);
+//        return vocPage.map(vocMapper::fromEntityToDTO);
+//    }
+
+    // 현재 시간보다 이전의 데이터를 가져오기 위해 해둔 것 실제라면 위의 서비스 로직으로 구현해야 함
     @Override
     public Page<VOCDTO> findAllByVOCWithPaging(Pageable pageable) {
-        Page<VOC> vocPage = vocRepository.findAll(pageable);
+        LocalDateTime now = LocalDateTime.now();
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        Page<VOC> vocPage = vocRepository.findAllBeforeNow(now, sortedPageable);
         return vocPage.map(vocMapper::fromEntityToDTO);
     }
+
 
     @Override
     public Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable) {
