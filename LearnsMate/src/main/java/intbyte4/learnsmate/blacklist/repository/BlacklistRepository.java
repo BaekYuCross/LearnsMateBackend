@@ -23,12 +23,13 @@ public interface BlacklistRepository extends JpaRepository<Blacklist, Long>, Bla
             "FROM blacklist b " +
             "JOIN b.member m " +
             "LEFT JOIN b.admin a " +
-            "WHERE m.memberType = :memberType")
+            "WHERE m.memberType = :memberType " +
+            "ORDER BY b.blackCode desc")
     Page<BlacklistDTO> findAllBlacklistByMemberType(@Param("memberType") MemberType memberType, PageRequest pageable);
 
     @Query("SELECT b FROM blacklist b " +
             "JOIN FETCH b.member m " +
             "WHERE m.memberType = :memberType " +
-            "ORDER BY b.createdAt DESC")
+            "ORDER BY b.blackCode DESC")
     List<Blacklist> findAllByMemberTypeWithExcel(@Param("memberType") MemberType memberType);
 }
