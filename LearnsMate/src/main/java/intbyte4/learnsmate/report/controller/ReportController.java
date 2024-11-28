@@ -4,6 +4,7 @@ import intbyte4.learnsmate.report.domain.dto.ReportDTO;
 import intbyte4.learnsmate.report.domain.vo.response.ResponseFindReportVO;
 import intbyte4.learnsmate.report.mapper.ReportMapper;
 import intbyte4.learnsmate.report.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class ReportController {
     }
 
     // 1. 모든 신고 내역 조회 // /report
+    @Operation(summary = "신고 내역 전체 조회")
     @GetMapping
     public ResponseEntity<List<ResponseFindReportVO>> findAllReport(){
 
