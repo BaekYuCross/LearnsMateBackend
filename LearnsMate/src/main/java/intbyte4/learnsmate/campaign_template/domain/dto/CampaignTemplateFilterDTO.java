@@ -3,6 +3,7 @@ package intbyte4.learnsmate.campaign_template.domain.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,4 +22,5 @@ public class CampaignTemplateFilterDTO {
     private LocalDateTime updatedAt;
     private Long adminCode;
     private String adminName;
+    private List<String> selectedColumns;
 }

@@ -52,6 +52,14 @@ dependencies {
     // EC2 인스턴스 헬스 체크를 위한 actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // Redis 통합
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // Redis 연결 풀 관리
+    // ( Redis와의 연결을 반복적으로 열고 닫는 대신, 연결을 풀(pool)에 저장해 두고 재사용함으로써 성능을 최적화하고 리소스를 절약 )
+    implementation 'org.apache.commons:commons-pool2'
+    // SMTP 이메일 발송
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     // jwt token을 위한 옵션
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
