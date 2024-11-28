@@ -30,8 +30,7 @@ public interface CouponService {
     Page<CouponDTO> findCouponsByCampaignCode(FindCampaignDetailDTO campaignDTO, Pageable pageable);
 
     @Transactional
-    CouponDTO adminRegisterCoupon(CouponDTO requestCoupon
-            , List<String> lectureCodeList);
+    CouponDTO adminRegisterCoupon(CouponDTO requestCoupon, List<String> lectureCodeList);
 
     CouponDTO editAdminCoupon(CouponDTO couponDTO);
 

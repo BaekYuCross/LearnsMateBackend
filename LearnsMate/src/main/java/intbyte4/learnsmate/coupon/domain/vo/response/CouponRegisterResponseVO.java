@@ -43,6 +43,9 @@ public class CouponRegisterResponseVO {
     @JsonProperty("coupon_flag")
     private Boolean couponFlag;
 
+    @JsonProperty("active_state")
+    private Boolean activeState;
+
     @JsonProperty("coupon_category_code")
     private Integer couponCategoryCode;
 
