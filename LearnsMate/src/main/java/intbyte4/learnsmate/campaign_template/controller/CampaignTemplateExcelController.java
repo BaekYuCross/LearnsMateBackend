@@ -20,8 +20,8 @@ public class CampaignTemplateExcelController {
     private final CampaignTemplateExcelService campaignTemplateExcelService;
 
     @PostMapping("/download/campaign-templates")
-    @Operation(summary = "캠페인 엑셀 다운로드", description = "캠페인템플릿 목록을 엑셀 파일로 다운로드합니다.")
-    public void downloadCampaignExcel(HttpServletResponse response, @RequestBody(required = false) CampaignTemplateFilterDTO filterDTO) {
+    @Operation(summary = "캠페인템플릿 엑셀 다운로드", description = "캠페인템플릿 목록을 엑셀 파일로 다운로드합니다.")
+    public void downloadCampaignTemplateExcel(HttpServletResponse response, @RequestBody(required = false) CampaignTemplateFilterDTO filterDTO) {
         try {
             log.info("Excel download request received");
             if (filterDTO != null) {
