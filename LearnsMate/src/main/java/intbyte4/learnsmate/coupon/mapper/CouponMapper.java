@@ -279,4 +279,22 @@ public class CouponMapper {
                 .tutorCode(null)
                 .build();
     }
+
+    // 쿠폰 전체 페이징
+    public CouponFindResponseVO fromCouponEntityToCouponFindResponseVO(CouponEntity coupon) {
+        return CouponFindResponseVO.builder()
+                .couponCode(coupon.getCouponCode())
+                .couponName(coupon.getCouponName())
+                .couponContents(coupon.getCouponContents())
+                .couponDiscountRate(coupon.getCouponDiscountRate())
+                .createdAt(coupon.getCreatedAt())
+                .updatedAt(coupon.getUpdatedAt())
+                .couponStartDate(coupon.getCouponStartDate())
+                .couponExpireDate(coupon.getCouponExpireDate())
+                .activeState(coupon.getActiveState())
+                .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
+                .adminName(coupon.getAdmin() != null ? coupon.getAdmin().getAdminName() : null)
+                .tutorName(coupon.getTutor() != null ? coupon.getTutor().getMemberName() : null)
+                .build();
+    }
  }
