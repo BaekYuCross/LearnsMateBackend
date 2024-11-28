@@ -153,7 +153,7 @@ public class CouponController {
 
     @Operation(summary = "강사 - 쿠폰 수정")
     @PatchMapping("/tutor/edit/{couponCode}")
-    public ResponseEntity<?> tutorEditCoupon(@PathVariable("couponCode") Long couponCode, @RequestBody TutorCouponEditRequestVO request, Member tutor) {
+    public ResponseEntity<?> tutorEditCoupon(@PathVariable("couponCode") Long couponCode, @RequestBody TutorCouponEditRequestVO request) {
         try {
             log.info("강사 쿠폰 수정 요청: {}", request);
             CouponDTO couponDTO = couponMapper.fromTutorEditRequestVOToDTO(request);
