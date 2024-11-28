@@ -76,8 +76,9 @@ public class MemberFacade {
         List<VOCDTO> unansweredVOCByMemberList = vocService.findUnansweredVOCByMember(studentCode);
         List<VOCDTO> answeredVOCByMemberList = vocService.findAnsweredVOCByMember(studentCode);
 
-        // 강의 추천 로직 추가
+        // 4. 강의 추천 로직 추가
         String latestLectureCode = paymentService.findLatestLectureCodeByStudent(studentCode);
+        log.info("마지막 강의 코드: {}", latestLectureCode);
 
         List<Long> similarStudents = preferredTopicsService.findStudentsWithSimilarPreferredTopics(studentCode);
         log.info("비슷한 학생들은: {}", similarStudents);
@@ -87,7 +88,7 @@ public class MemberFacade {
         if (!similarStudents.isEmpty()) {
             Pageable pageable = PageRequest.of(0, 3); // 상위 3개만 가져오기
             List<Object[]> recommendedLectures = paymentService.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
-
+            log.info("추천 강의들은: {}", recommendedLectures);
             recommendedLectureCodes = recommendedLectures.stream()
                     .map(record -> (String) record[0])
                     .collect(Collectors.toList());
