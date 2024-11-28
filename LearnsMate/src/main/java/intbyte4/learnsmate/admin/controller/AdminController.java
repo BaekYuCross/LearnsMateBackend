@@ -132,5 +132,16 @@ public class AdminController {
         }
     }
 
+    // 다음버튼 누를 시, 인증성공하면 ? -> 비번 재설정 칸 생성 -> 완료 버튼
+    @Operation(summary = "비밀번호 재설정")
+    @PostMapping("/password")
+    public ResponseEntity<String> resetPassword(@RequestBody RequestResetPasswordVO request) {
+        log.info("POST /admin/password 요청 도착: email={}", request.getUserEmail());
+        log.info("POST /admin/password 요청 도착: email={}", request.getUserPassword());
 
+        adminService.resetPassword(request);
+
+        log.info("비밀번호가 성공적으로 재설정되었습니다.");
+        return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다.");
+    }
 }
