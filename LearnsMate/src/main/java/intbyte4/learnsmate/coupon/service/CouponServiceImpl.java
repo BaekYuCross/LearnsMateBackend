@@ -3,6 +3,7 @@ package intbyte4.learnsmate.coupon.service;
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -23,6 +24,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -62,6 +65,12 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public CouponEntity findByCouponCode(Long couponCode) {
         return couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+    }
+
+    @Override
+    public Page<CouponDTO> findCouponsByCampaignCode(FindCampaignDetailDTO campaignDTO, Pageable pageable) {
+        return couponRepository.findCouponsByCampaignCode(campaignDTO.getCampaignCode(), pageable)
+                .map(couponMapper::toDTO);
     }
 
     @Transactional

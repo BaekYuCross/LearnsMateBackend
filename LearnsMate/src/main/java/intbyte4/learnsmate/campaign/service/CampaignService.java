@@ -15,8 +15,11 @@ public interface CampaignService {
             , List<MemberDTO> requestStudentList
             , List<CouponDTO> requestCouponList);
     void removeCampaign(CampaignDTO request);
-    List<FindAllCampaignsDTO> findAllCampaignList();
-    FindCampaignDTO findCampaign(FindCampaignDTO request);
+
+    CampaignPageResponse<FindAllCampaignsDTO> findAllCampaignList(int page, int size);
+
+    FindCampaignDetailDTO findCampaign(FindCampaignDetailDTO request, int page, int size);
+
     CampaignPageResponse<ResponseFindCampaignByFilterVO> findCampaignListByFilter
             (CampaignFilterDTO request, int page, int size);
     List<FindAllCampaignsDTO> findCampaignListByConditionWithExcel(CampaignFilterDTO filterDTO);

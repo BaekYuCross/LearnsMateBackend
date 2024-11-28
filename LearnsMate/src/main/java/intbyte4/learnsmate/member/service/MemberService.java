@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.service;
 
+import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
@@ -121,6 +122,12 @@ public class MemberService {
                 .orElseThrow(() -> new CommonException(StatusEnum.USER_NOT_FOUND));
 
         return memberMapper.fromMembertoMemberDTO(member);
+    }
+
+    // 캠페인 코드로 멤버를 조회하는 메서드 (Campaign에서 사용)
+    public Page<MemberDTO> findMembersByCampaignCode(FindCampaignDetailDTO campaignDTO, Pageable pageable) {
+        return memberRepository.findMembersByCampaignCode(campaignDTO.getCampaignCode(), pageable)
+                .map(memberMapper::fromMembertoMemberDTO);
     }
 
     // 학생 필터링하는 서비스 코드
