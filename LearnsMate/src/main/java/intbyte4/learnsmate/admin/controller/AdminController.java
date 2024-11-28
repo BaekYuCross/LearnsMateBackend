@@ -93,6 +93,8 @@ public class AdminController {
     @PostMapping("/verification-email/password")
     public ResponseEmailDTO<?> sendVerificationEmailPassword(@RequestBody @Validated AdminEmailVerificationVO request) {
 
+        log.info("POST /admin/verification-email/password 요청 도착: request={}", request);
+
         // 입력한 사번 코드와 이메일의 정보 검증
         AdminDTO adminByEmail = adminService.findUserByEmail(request.getEmail());
 
@@ -121,6 +123,8 @@ public class AdminController {
     @Operation(summary = "비번 재설정 전 이메일 인증번호 검증")
     @PostMapping("/verification-email/confirmation")
     public ResponseEmailDTO<?> verifyEmail(@RequestBody @Validated EmailVerificationVO request) {
+        log.info("POST /admin/verification-email/confirmation 요청 도착: request={}", request);
+
         boolean isVerified = emailService.verifyCode(request.getEmail(), request.getCode());
 
         ResponseEmailMessageVO responseEmailMessageVO =new ResponseEmailMessageVO();
@@ -136,8 +140,7 @@ public class AdminController {
     @Operation(summary = "비밀번호 재설정")
     @PostMapping("/password")
     public ResponseEntity<String> resetPassword(@RequestBody RequestResetPasswordVO request) {
-        log.info("POST /admin/password 요청 도착: email={}", request.getUserEmail());
-        log.info("POST /admin/password 요청 도착: email={}", request.getUserPassword());
+        log.info("POST /admin/password 요청 도착: request={}", request);
 
         adminService.resetPassword(request);
 
