@@ -116,4 +116,21 @@ public class AdminController {
         }
     }
 
+
+    // 다음버튼
+    @Operation(summary = "비번 재설정 전 이메일 인증번호 검증")
+    @PostMapping("/verification-email/confirmation")
+    public ResponseEmailDTO<?> verifyEmail(@RequestBody @Validated EmailVerificationVO request) {
+        boolean isVerified = emailService.verifyCode(request.getEmail(), request.getCode());
+
+        ResponseEmailMessageVO responseEmailMessageVO =new ResponseEmailMessageVO();
+        responseEmailMessageVO.setMessage("이메일 인증이 완료되었습니다.");
+        if (isVerified) {
+            return ResponseEmailDTO.ok(responseEmailMessageVO);
+        } else {
+            return ResponseEmailDTO.fail(new CommonException(StatusEnum.INVALID_VERIFICATION_CODE));
+        }
+    }
+
+
 }
