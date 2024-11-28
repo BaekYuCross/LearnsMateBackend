@@ -2,7 +2,9 @@ package intbyte4.learnsmate.admin.mapper;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.domain.vo.request.AdminEmailVerificationVO;
 import intbyte4.learnsmate.admin.domain.vo.request.RequestEditAdminVO;
+import intbyte4.learnsmate.admin.domain.vo.request.RequestResetPasswordVO;
 import intbyte4.learnsmate.admin.domain.vo.response.ResponseEditAdminVO;
 import intbyte4.learnsmate.admin.domain.vo.response.ResponseFindAdminVO;
 import org.springframework.stereotype.Component;
@@ -55,7 +57,7 @@ public class AdminMapper {
     }
 
     // RequestEditAdminVO -> AdminDTO 변환
-    public AdminDTO fromVoToDto(RequestEditAdminVO requestEditAdminVO) {
+    public AdminDTO fromAdminEmailVoToDto(RequestEditAdminVO requestEditAdminVO) {
         return AdminDTO.builder()
                 .adminEmail(requestEditAdminVO.getAdminEmail())
                 .adminPassword(requestEditAdminVO.getAdminPassword())
@@ -89,5 +91,13 @@ public class AdminMapper {
                 .adminLastLoginDate(adminDTO.getAdminLastLoginDate())
                 .build();
     }
+
+    public AdminDTO fromAdminEmailVoToDto(AdminEmailVerificationVO requestVO) {
+        return AdminDTO.builder()
+                .adminEmail(requestVO.getEmail())
+                .adminCode(requestVO.getAdminCode())
+                .build();
+    }
+
 
 }
