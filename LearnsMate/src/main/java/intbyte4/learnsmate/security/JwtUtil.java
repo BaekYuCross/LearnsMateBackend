@@ -109,6 +109,20 @@ public class JwtUtil {
                 .compact();
     }
 
+    // 리프레시 토큰은 단순히 새로운 액세스 토큰 발급을 요청하기 위한 용도
+    public String generateRefreshToken(JwtTokenDTO tokenDTO) {
+        Claims claims = Jwts.claims().setSubject(tokenDTO.getUserCode()); // 최소한의 정보
+        log.info("RefreshToken Claims 생성: {}", claims);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일 만료
+                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .compact();
+    }
+
+
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, claims -> claims.get("email", String.class));
     }
@@ -146,4 +160,7 @@ public class JwtUtil {
     public String getUserCodeFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
+
+
+
 }
