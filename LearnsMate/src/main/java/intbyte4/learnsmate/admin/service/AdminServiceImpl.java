@@ -65,5 +65,16 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
+    @Override
+    public AdminDTO findUserByEmail(String adminEmail) {
+        Admin admin = adminRepository.findByAdminEmail(adminEmail);
+        if (admin == null) {
+            throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
+        }
+        return adminMapper.toDTO(admin);
+    }
+
+
+
 }
 
