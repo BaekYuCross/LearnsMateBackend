@@ -99,5 +99,11 @@ public class AdminMapper {
                 .build();
     }
 
+    public AdminDTO fromResetPasswordVoToDto(RequestResetPasswordVO requestVO) {
+        return AdminDTO.builder()
+                .adminEmail(requestVO.getAdminEmail())
+                .adminPassword(requestVO.getAdminPassword())
+                .build();
+    }
 
 }
