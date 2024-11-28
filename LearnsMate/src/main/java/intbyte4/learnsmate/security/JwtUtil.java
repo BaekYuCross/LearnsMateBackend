@@ -161,6 +161,32 @@ public class JwtUtil {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    public String extractUserCode(String expiredToken) {
+        try {
+            // 만료된 토큰에서도 클레임을 추출
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(expiredToken)
+                    .getBody();
 
+            log.info("토큰이 유효하며, 클레임: {}", claims);
+
+            // 클레임에서 subject (userCode) 반환
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰에서도 클레임을 추출 가능
+            Claims claims = e.getClaims();
+
+            log.info("토큰이 만료되었습니다. 만료 시각: {}", e.getClaims().getExpiration());
+            String userCode = e.getClaims().getSubject();
+            log.info("추출된 userCode: {}", userCode);
+
+            return claims.getSubject(); // subject = userCode
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("토큰에서 사용자 코드를 추출하는 데 실패했습니다: {}", e.getMessage());
+            throw new CommonException(StatusEnum.INVALID_TOKEN);
+        }
+    }
 
 }
