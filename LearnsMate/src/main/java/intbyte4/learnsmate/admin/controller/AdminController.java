@@ -1,12 +1,20 @@
 package intbyte4.learnsmate.admin.controller;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
+import intbyte4.learnsmate.admin.domain.dto.ResponseEmailDTO;
 import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
+import intbyte4.learnsmate.admin.domain.vo.request.AdminEmailVerificationVO;
+import intbyte4.learnsmate.admin.domain.vo.request.EmailVerificationVO;
 import intbyte4.learnsmate.admin.domain.vo.request.RequestEditAdminVO;
+import intbyte4.learnsmate.admin.domain.vo.request.RequestResetPasswordVO;
 import intbyte4.learnsmate.admin.domain.vo.response.ResponseEditAdminVO;
+import intbyte4.learnsmate.admin.domain.vo.response.ResponseEmailMessageVO;
 import intbyte4.learnsmate.admin.domain.vo.response.ResponseFindAdminVO;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.admin.service.EmailService;
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -28,6 +37,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final AdminMapper adminMapper;
+    private final EmailService emailService;
 
     @Operation(summary = "직원 단건 조회")
     @GetMapping("/{adminCode}")
@@ -37,10 +47,9 @@ public class AdminController {
     }
 
     @Operation(summary = "직원 정보 수정")
-    @PatchMapping("/{adminCode}")
-    public ResponseEntity<ResponseEditAdminVO> updateAdmin(@PathVariable Long adminCode,
-                                                           @RequestBody RequestEditAdminVO editAdminVO) {
-        AdminDTO updatedAdmin = adminService.updateAdmin(adminCode, adminMapper.fromVoToDto(editAdminVO));
+    @PatchMapping("/password")
+    public ResponseEntity<ResponseEditAdminVO> updateAdmin(@RequestBody RequestEditAdminVO editAdminVO) {
+        AdminDTO updatedAdmin = adminService.updateAdmin(adminMapper.fromVoToDto(editAdminVO));
         return ResponseEntity.status(HttpStatus.OK).body(adminMapper.fromDtoToEditResponseVO(updatedAdmin));
     }
 
