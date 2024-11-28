@@ -3,6 +3,7 @@ package intbyte4.learnsmate.coupon.domain.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,4 +26,6 @@ public class CouponFilterDTO {
     private String couponCategoryName;
     private String adminName;
     private String tutorName;
+
+    private List<String> selectedColumns;
 }
