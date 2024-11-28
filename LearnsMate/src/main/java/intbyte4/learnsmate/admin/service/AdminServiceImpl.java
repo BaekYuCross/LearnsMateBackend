@@ -74,7 +74,20 @@ public class AdminServiceImpl implements AdminService {
         return adminMapper.toDTO(admin);
     }
 
+    @Override
+    public void resetPassword(RequestResetPasswordVO request) {
 
+        Admin admin = adminRepository.findByAdminEmail(request.getUserEmail());
+        if (admin == null) {
+            throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
+        }
+
+        // 비밀번호 bCrypt 암호화.
+        admin.setAdminPassword(bCryptPasswordEncoder.encode(request.getUserPassword()));
+
+        Admin updatedAdmin = adminRepository.save(admin);
+        adminMapper.toDTO(updatedAdmin);
+    }
 
 }
 
