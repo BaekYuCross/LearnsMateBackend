@@ -26,4 +26,10 @@ public class CouponCategoryServiceImpl implements CouponCategoryService {
                 .findById(couponCategoryCode).orElseThrow(() -> new RuntimeException("couponCategoryCode not found"));
         return couponCategoryMapper.toDTO(couponCategory);
     }
+
+    @Override
+    public CouponCategory findCouponCategoryByName(String couponCategoryName) {
+        log.info("{}", couponCategoryName);
+        return couponCategoryRepository.findCouponCategoryByCouponCategoryName(couponCategoryName);
+    }
 }

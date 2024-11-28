@@ -1,9 +1,13 @@
 package intbyte4.learnsmate.coupon.controller;
 
+import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
+import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
+import intbyte4.learnsmate.coupon.domain.dto.RegisterCouponDTO;
 import intbyte4.learnsmate.coupon.domain.vo.request.*;
 import intbyte4.learnsmate.coupon.domain.vo.response.*;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
@@ -11,13 +15,18 @@ import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.coupon.service.CouponFacade;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
+import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.mapper.LectureMapper;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.webmvc.core.service.RequestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +42,10 @@ public class CouponController {
     private final CouponService couponService;
     private final CouponMapper couponMapper;
     private final CouponFacade couponFacade;
+    private final MemberService memberService;
+    private final LectureMapper lectureMapper;
+    private final AdminMapper adminMapper;
+    private final AdminService adminService;
 
     @Operation(summary = "쿠폰 전체 조회")
     @GetMapping("/coupons")
@@ -75,8 +88,9 @@ public class CouponController {
 
     @Operation(summary = "직원 - 쿠폰 등록")
     @PostMapping("/admin/register")
-    public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody AdminCouponRegisterRequestVO request, Admin admin, List<LectureDTO> requestLectures) {
-        CouponDTO couponDTO = couponService.adminRegisterCoupon(request, admin, requestLectures);
+    public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody AdminCouponRegisterRequestVO request) {
+        log.info("{}", request.toString());
+        CouponDTO couponDTO = couponService.adminRegisterCoupon(couponMapper.adminRegisterRequestVOToDTO(request), request.getLectureCode());
         return ResponseEntity.status(HttpStatus.CREATED).body(couponMapper.fromDTOToRegisterResponseVO(couponDTO));
     }
 

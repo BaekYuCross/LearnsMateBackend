@@ -7,4 +7,6 @@ public interface CouponCategoryService {
     CouponCategory findByCouponCategoryCode(Integer couponCategoryCode);
 
     CouponCategoryDTO findDTOByCouponCategoryCode(Integer couponCategoryCode);
+
+    CouponCategory findCouponCategoryByName(String couponCategoryName);
 }
