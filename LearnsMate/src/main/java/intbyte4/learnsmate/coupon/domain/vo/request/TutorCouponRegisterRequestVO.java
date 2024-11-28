@@ -1,6 +1,8 @@
 package intbyte4.learnsmate.coupon.domain.vo.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,16 +14,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class TutorCouponRegisterRequestVO {
-    @JsonProperty("coupon_code")
     private Long couponCode;
 
-    @JsonProperty("coupon_name")
     private String couponName;
 
-    @JsonProperty("coupon_discount_rate")
     private Integer couponDiscountRate;
 
-    @JsonProperty("coupon_expire_date")
     private LocalDateTime couponExpireDate;
+
+    private Long tutorCode;
+
+    private Integer couponCategoryCode;
+
+    private String lectureCode;
 }
