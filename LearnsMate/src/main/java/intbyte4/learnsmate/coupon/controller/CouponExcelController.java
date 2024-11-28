@@ -1,8 +1,7 @@
 package intbyte4.learnsmate.coupon.controller;
 
+import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.service.CouponExcelService;
-import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ public class CouponExcelController {
 
     @PostMapping("/download")
     @Operation(summary = "쿠폰 엑셀 다운로드", description = "쿠폰 목록을 엑셀 파일로 다운로드합니다.")
-    public void downloadStudentExcel(HttpServletResponse response, @RequestBody(required = false) MemberFilterRequestDTO filterDTO) {
+    public void downloadStudentExcel(HttpServletResponse response, @RequestBody(required = false) CouponFilterDTO filterDTO) {
         try {
             log.info("Excel download request received");
 
