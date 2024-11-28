@@ -83,10 +83,9 @@ public class CouponServiceImpl implements CouponService {
     public CouponDTO adminRegisterCoupon(CouponDTO requestCoupon
             , List<String> lectureCodeList) {
 
-        Admin adminEntity = adminMapper.toEntity(adminService.findByAdminCode(202001001L));
+        Admin adminEntity = adminMapper.toEntity(adminService.findByAdminCode(getAdminCode()));
         log.info("{}", adminEntity.toString());
         CouponEntity newCoupon = CouponEntity.builder()
-                .couponCode(null)
                 .couponName(requestCoupon.getCouponName())
                 .couponContents(requestCoupon.getCouponContents())
                 .couponDiscountRate(requestCoupon.getCouponDiscountRate())
