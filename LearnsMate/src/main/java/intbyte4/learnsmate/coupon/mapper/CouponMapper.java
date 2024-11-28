@@ -139,7 +139,6 @@ public class CouponMapper {
 
     public CouponEntity newCouponEntity(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory) {
         return CouponEntity.builder()
-                .couponCode(request.getCouponCode())
                 .couponName(request.getCouponName())
                 .couponDiscountRate(request.getCouponDiscountRate())
                 .createdAt(LocalDateTime.now())
