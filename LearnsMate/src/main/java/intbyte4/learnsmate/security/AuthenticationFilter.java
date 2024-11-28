@@ -130,6 +130,29 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
 
+    // Redis에 refreshToken 저장
+    public void saveRefreshTokenToRedis(String userCode, String refreshToken) {
+        try {
+            // Redis에 refreshToken 저장
+            redisTemplate.opsForValue().set(
+                    "refreshToken:" + userCode,
+                    refreshToken,
+                    7, // 7일
+                    TimeUnit.DAYS
+            );
+
+            // 로그로 저장된 refreshToken 확인
+            log.info("Refresh Token 저장 완료: refreshToken:{}, userCode:{}", refreshToken, userCode);
+
+            // Redis에서 값을 확인 (디버깅용)
+            String storedToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
+            log.info("Redis에서 가져온 refreshToken: {}", storedToken);
+
+        } catch (Exception e) {
+            log.error("Redis 저장 실패", e);
+        }
+    }
+
     //로그인 실패시 실행하는 메소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
