@@ -28,12 +28,5 @@ public interface IssueCouponService {
 
     List<IssueCoupon> getFilteredIssuedCoupons(IssuedCouponFilterDTO dto);
 
-
-    // 보유중인 쿠폰 조회
-//    @Transactional
-//    List<IssueCouponDTO> findAllStudentCoupons(IssueCouponDTO dto, Long studentCode);
-
-    // 사용한 쿠폰 조회
-//    @Transactional
-//    List<IssueCouponDTO> findAllUsedStudentCoupons(IssueCouponDTO dto, Long studentCode);
+    void issueCouponsToStudents(List<Long> studentCodeList, List<Long> couponCodeList);
 }

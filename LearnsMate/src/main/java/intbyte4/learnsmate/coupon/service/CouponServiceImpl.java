@@ -119,11 +119,13 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin) {
+    public CouponDTO editAdminCoupon(CouponDTO couponDTO) {
         log.info("직원 쿠폰 수정 중: {}", couponDTO);
-        validAdmin(adminService, couponDTO.getAdminCode(), log);
+//        validAdmin(adminService, couponDTO.getAdminCode(), log);
+        validAdmin(adminService, getAdminCode(), log);
 
-        CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode()).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         coupon.updateAdminCouponDetails(couponDTO);
 
         log.info("데이터베이스에 수정된 직원 쿠폰 저장 중: {}", coupon);
@@ -135,11 +137,12 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO tutorEditCoupon(CouponDTO couponDTO, Member tutor) {
+    public CouponDTO editTutorCoupon(CouponDTO couponDTO) {
         log.info("강사 쿠폰 수정 중: {}", couponDTO);
-        validTutor(couponDTO, tutor);
 
-        CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode()).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        CouponEntity coupon = couponRepository.findById(couponDTO.getCouponCode())
+                .orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+
         coupon.updateTutorCouponDetails(couponDTO);
 
         log.info("데이터베이스에 수정된 강사 쿠폰 저장 중: {}", coupon);
@@ -151,12 +154,12 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO deleteAdminCoupon(Long couponCode, Admin admin) {
+    public CouponDTO deleteAdminCoupon(Long couponCode) {
         log.info("직원 쿠폰 삭제 중: couponCode = {}", couponCode);
+        log.info("삭제한 직원 코드: adminCode = {}", getAdminCode());
 
-        validAdmin(adminService, admin.getAdminCode(), log);
-
-        CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+        CouponEntity coupon = couponRepository.findById(couponCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         coupon.deleteCoupon();
 
         log.info("쿠폰 비활성화: {}", coupon);
@@ -167,10 +170,10 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO tutorDeleteCoupon(CouponDTO couponDTO, Long couponCode, Member tutor) {
-        log.info("강사 쿠폰 삭제 중: couponCode = {}", couponCode);
+    public CouponDTO tutorDeleteCoupon(Long couponCode) {
+        log.info("강사 쿠폰 삭제 중: {}", couponCode);
 
-        validTutor(couponDTO, tutor);
+//        validTutor(couponDTO, tutor);
 
         CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         coupon.deleteCoupon();
@@ -183,14 +186,8 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO tutorInactiveCoupon(Long couponCode, CouponDTO couponDTO, Member tutor) {
+    public CouponDTO tutorInactiveCoupon(Long couponCode) {
         log.info("강사 쿠폰 비활성화 중: couponCode = {}", couponCode);
-
-        validTutor(couponDTO, tutor);
-
-        if (!couponDTO.getActiveState()) {
-            throw new CommonException(StatusEnum.INACTIVATE_NOT_ALLOWED);
-        }
 
         CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         coupon.inactivateCoupon();
@@ -203,14 +200,8 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public CouponDTO tutorActivateCoupon(Long couponCode, CouponDTO couponDTO, Member tutor) {
-        log.info("강사 쿠폰 활성화 중: couponCode = {}", couponCode);
-
-        validTutor(couponDTO, tutor);
-
-        if (couponDTO.getActiveState()) {
-            throw new CommonException(StatusEnum.ACTIVATE_NOT_ALLOWED);
-        }
+    public CouponDTO tutorActivateCoupon(Long couponCode) {
+        log.info("강사 쿠폰 활성화 중: {}", couponCode);
 
         CouponEntity coupon = couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
         coupon.activateCoupon();
@@ -248,12 +239,6 @@ public class CouponServiceImpl implements CouponService {
         }
         log.info(tutor.toString());
     }
-
-
-
-
-
-
 
     public Long getAdminCode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

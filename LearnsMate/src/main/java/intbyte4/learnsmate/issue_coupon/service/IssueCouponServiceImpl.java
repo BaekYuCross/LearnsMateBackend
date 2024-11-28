@@ -10,7 +10,10 @@ import intbyte4.learnsmate.issue_coupon.domain.dto.IssuedCouponFilterDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
 import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
 import intbyte4.learnsmate.issue_coupon.repository.IssueCouponRepository;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
+import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,8 @@ public class IssueCouponServiceImpl implements IssueCouponService {
     private final IssueCouponRepository issueCouponRepository;
     private final IssueCouponMapper issueCouponMapper;
     private final CouponService couponService;
+    private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
     @Override
     public List<IssueCouponDTO> findAllIssuedCoupons() {
@@ -112,6 +117,25 @@ public class IssueCouponServiceImpl implements IssueCouponService {
         log.info(filterVO.toString());
         log.info(issueCouponRepository.findIssuedCouponsByFilters(filterVO).toString());
         return issueCouponRepository.findIssuedCouponsByFilters(filterVO);
+    }
+
+    @Override
+    public void issueCouponsToStudents(List<Long> studentCodeList, List<Long> couponCodeList){
+
+        List<IssueCoupon> issuedCouponList = new ArrayList<>();
+
+        for(Long couponCode : couponCodeList){
+            for(Long studentCode : studentCodeList){
+                MemberDTO studentDTO = memberService.findById(studentCode);
+                Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
+
+                CouponEntity coupon = couponService.findByCouponCode(couponCode);
+
+                issuedCouponList.add(IssueCoupon.createIssueCoupon(coupon, student));
+            }
+        }
+
+        issueCouponRepository.saveAll(issuedCouponList);
     }
 }
 

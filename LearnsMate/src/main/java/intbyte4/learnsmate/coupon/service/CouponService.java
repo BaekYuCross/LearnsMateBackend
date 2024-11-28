@@ -33,19 +33,19 @@ public interface CouponService {
     CouponDTO adminRegisterCoupon(CouponDTO requestCoupon
             , List<String> lectureCodeList);
 
-    CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin);
+    CouponDTO editAdminCoupon(CouponDTO couponDTO);
 
-    CouponDTO tutorEditCoupon(CouponDTO couponDTO, Member tutor);
+    CouponDTO editTutorCoupon(CouponDTO couponDTO);
 
-    CouponDTO deleteAdminCoupon(Long couponCode, Admin admin);
+    CouponDTO deleteAdminCoupon(Long couponCode);
 
-    CouponDTO tutorDeleteCoupon(CouponDTO couponDTO, Long couponCode, Member tutor);
-
-    @Transactional
-    CouponDTO tutorInactiveCoupon(Long couponCode, CouponDTO couponDTO, Member tutor);
+    CouponDTO tutorDeleteCoupon(Long couponCode);
 
     @Transactional
-    CouponDTO tutorActivateCoupon(Long couponCode, CouponDTO couponDTO, Member tutor);
+    CouponDTO tutorInactiveCoupon(Long couponCode);
+
+    @Transactional
+    CouponDTO tutorActivateCoupon(Long couponCode);
 
     @Transactional
     void saveCoupon(CouponEntity couponEntity);
