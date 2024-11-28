@@ -88,4 +88,32 @@ public class AdminController {
         return ResponseEntity.ok().body("로그아웃 성공");
     }
 
+    // 인증버튼
+    @Operation(summary = "직원 비밀번호 재설정시 이메일 전송")
+    @PostMapping("/verification-email/password")
+    public ResponseEmailDTO<?> sendVerificationEmailPassword(@RequestBody @Validated AdminEmailVerificationVO request) {
+
+        // 입력한 사번 코드와 이메일의 정보 검증
+        AdminDTO adminByEmail = adminService.findUserByEmail(request.getEmail());
+
+        if (adminByEmail == null || !adminByEmail.getAdminCode().equals(request.getAdminCode())) {
+            throw new CommonException(StatusEnum.EMAIL_NOT_FOUND);
+        }
+        // 이메일로 인증번호 전송
+        return getResponseEmailDTO(request);
+    }
+
+    private ResponseEmailDTO<?> getResponseEmailDTO(AdminEmailVerificationVO request) {
+        // 이메일로 인증번호 전송
+        try {
+            emailService.sendVerificationEmail(request.getEmail());
+
+            ResponseEmailMessageVO responseEmailMessageVO =new ResponseEmailMessageVO();
+            responseEmailMessageVO.setMessage("인증 코드가 이메일로 전송되었습니다.");
+            return ResponseEmailDTO.ok(responseEmailMessageVO);
+        } catch (Exception e) {
+            return ResponseEmailDTO.fail(new CommonException(StatusEnum.INTERNAL_SERVER_ERROR));
+        }
+    }
+
 }
