@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 ;
 
@@ -34,12 +35,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private AdminService userService;
     private Environment env;
     private JwtUtil jwtUtil;
+    private RedisTemplate<String, String> redisTemplate;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, AdminService userService, Environment env, JwtUtil jwtUtil) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager, AdminService userService, Environment env, JwtUtil jwtUtil,
+                                RedisTemplate<String, String> redisTemplate) {
         super(authenticationManager);
         this.userService = userService;
         this.env = env;
         this.jwtUtil = jwtUtil;
+        this.redisTemplate = redisTemplate;
 
         // 커스텀 로그인 경로 설정
         setFilterProcessesUrl("/users/login");
@@ -96,10 +100,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // JWT 생성: JwtTokenDTO에 사용자 정보를 담고, roles와 함께 JWT 토큰을 생성
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
-        String token = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
+        String accessToken = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
+        String refreshToken = jwtUtil.generateRefreshToken(tokenDTO); // 7일
 
         // 쿠키 생성
-        Cookie jwtCookie = new Cookie("token", token);
+        Cookie jwtCookie = new Cookie("accessToken", accessToken);
         jwtCookie.setHttpOnly(true); // HTTP Only 속성으로 설정 (JavaScript에서 접근 불가)
         jwtCookie.setSecure(false); // HTTPS 연결에서만 전송 (테스트 환경에서는 false 설정 가능)
         // https://learnsmate.site -> 배포 환경시 true로 전환
@@ -107,10 +112,21 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         jwtCookie.setMaxAge(4 * 3600); // 쿠키 만료 시간 설정 (4시간)
         // 여기를 3-4시간정도로 만료시간 할건데 리프레시토큰을 해야하나? erp라 재로그인이 필요하지않을까
 
-        // 응답에 쿠키 추가
-        response.addCookie(jwtCookie);
 
-        log.info("JWT 생성 완료. JWT 토큰을 쿠키로 응답에 포함시킴");
+        // Refresh Token 쿠키 생성
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);  // 개발 환경에서 false, 배포 환경에서는 true로 설정
+        refreshTokenCookie.setPath("/"); // 유효 경로 설정
+        refreshTokenCookie.setMaxAge(7 * 24 * 3600); // Refresh Token의 만료 시간 (7일)
+
+        // 쿠키 응답에 추가
+        response.addCookie(jwtCookie);
+        response.addCookie(refreshTokenCookie);
+
+        saveRefreshTokenToRedis(userCode,refreshToken);
+
+        log.info("Access Token 및 Refresh Token 생성 완료 !!!!!!!!!!!!!!!!!!!!");
     }
 
 
