@@ -4,8 +4,11 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
+import intbyte4.learnsmate.coupon.domain.dto.RegisterCouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
+import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
@@ -27,9 +30,8 @@ public interface CouponService {
     Page<CouponDTO> findCouponsByCampaignCode(FindCampaignDetailDTO campaignDTO, Pageable pageable);
 
     @Transactional
-    CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request
-            , Admin admin
-            , List<LectureDTO> requestLectures);
+    CouponDTO adminRegisterCoupon(CouponDTO requestCoupon
+            , List<String> lectureCodeList);
 
     CouponDTO editAdminCoupon(CouponDTO couponDTO, Admin admin);
 

@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
+@Service("campaignService")
 @RequiredArgsConstructor
 @Slf4j
 public class CampaignServiceImpl implements CampaignService {

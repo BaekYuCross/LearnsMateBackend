@@ -15,6 +15,7 @@ import lombok.*;
 public class CouponByLecture {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "coupon_by_lecture_code", nullable = false)
     private Long couponByLectureCode;
 

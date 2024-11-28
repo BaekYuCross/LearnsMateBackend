@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.lecture.mapper;
 
+import intbyte4.learnsmate.coupon.domain.vo.request.LectureRequestVO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
@@ -209,6 +210,22 @@ public class LectureMapper {
                 .lectureStatus(lectureDTO.getLectureStatus())
                 .lectureClickCount(lectureDTO.getLectureClickCount())
                 .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
+                .build();
+    }
+
+    public LectureDTO requestVOToDTO(LectureRequestVO request) {
+        return LectureDTO.builder()
+                .lectureCode(request.getLectureCode())
+                .lectureTitle(request.getLectureTitle())
+                .lectureConfirmStatus(request.getLectureConfirmStatus())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
+                .lectureImage(request.getLectureImage())
+                .lecturePrice(request.getLecturePrice())
+                .tutorCode(request.getTutorCode())
+                .lectureStatus(request.getLectureStatus())
+                .lectureClickCount(request.getLectureClickCount())
+                .lectureLevel(request.getLectureLevel())
                 .build();
     }
 }

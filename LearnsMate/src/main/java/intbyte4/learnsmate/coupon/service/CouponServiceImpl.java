@@ -2,6 +2,8 @@ package intbyte4.learnsmate.coupon.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
+import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.common.exception.CommonException;
@@ -13,8 +15,7 @@ import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
 import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
-import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
-import intbyte4.learnsmate.coupon_category.domain.dto.CouponCategoryEnum;
+import intbyte4.learnsmate.coupon_category.service.CouponCategoryService;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
@@ -24,6 +25,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,8 @@ public class CouponServiceImpl implements CouponService {
     private final LectureService lectureService;
     private final CouponByLectureService couponByLectureService;
     private final LectureMapper lectureMapper;
+    private final CouponCategoryService couponCategoryService;
+    private final AdminMapper adminMapper;
 
     @Override
     public List<CouponDTO> findAllCoupons() {
@@ -75,49 +80,41 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     @Override
-    public CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request
-            , Admin admin
-            , List<LectureDTO> requestLectures) {
+    public CouponDTO adminRegisterCoupon(CouponDTO requestCoupon
+            , List<String> lectureCodeList) {
 
-        CouponCategoryEnum categoryEnum = getCouponCategoryEnumByName(request.getCouponCategoryName());
-
-        CouponCategory couponCategory = CouponCategory.builder()
-                .couponCategoryCode(categoryEnum.getCategoryCode())
-                .couponCategoryName(categoryEnum.getCategoryName())
-                .build();
-
+        Admin adminEntity = adminMapper.toEntity(adminService.findByAdminCode(202001001L));
+        log.info("{}", adminEntity.toString());
         CouponEntity newCoupon = CouponEntity.builder()
-                .couponName(request.getCouponName())
-                .couponContents(request.getCouponContents())
-                .couponDiscountRate(request.getCouponDiscountRate())
-                .couponStartDate(request.getCouponStartDate())
-                .couponExpireDate(request.getCouponExpireDate())
+                .couponCode(null)
+                .couponName(requestCoupon.getCouponName())
+                .couponContents(requestCoupon.getCouponContents())
+                .couponDiscountRate(requestCoupon.getCouponDiscountRate())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .couponStartDate(requestCoupon.getCouponStartDate())
+                .couponExpireDate(requestCoupon.getCouponExpireDate())
                 .couponFlag(true)
                 .activeState(true)
-                .couponCategory(couponCategory)
-                .admin(admin)
+                .couponCategory(couponCategoryService.findByCouponCategoryCode(requestCoupon.getCouponCategoryCode()))
+                .admin(adminEntity)
+                .tutor(null)
                 .build();
 
-        couponRepository.save(newCoupon);
-        CouponDTO savedCoupon = couponMapper.toDTO(newCoupon);
+        // coupon 저장
+        CouponEntity savedCoupon = couponRepository.save(newCoupon);
+        CouponDTO savedCouponDTO = couponMapper.toDTO(savedCoupon);
 
-        requestLectures.forEach(lectureDTO -> {
-            LectureDTO foundLectures = lectureService.getLectureById(lectureDTO.getLectureCode());
-            Lecture lectures = lectureMapper.fromDTOToEntity(lectureDTO);
-            if (foundLectures == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+        lectureCodeList.forEach(lectureCode -> {
+            LectureDTO selectedLectures = lectureService.getLectureById(lectureCode);
+            Lecture lectures = lectureMapper.fromDTOToEntity(selectedLectures);
+
+            if (lectures == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+
             couponByLectureService.registerCouponByLecture(lectures, newCoupon);
         });
 
-        return couponMapper.toDTO(newCoupon);
-    }
-
-    private CouponCategoryEnum getCouponCategoryEnumByName(String categoryName) {
-        return Arrays.stream(CouponCategoryEnum.values())
-                .filter(category -> category.getCategoryName().equals(categoryName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리 이름이 존재하지 않습니다: " + categoryName));
+        return savedCouponDTO;
     }
 
     @Override
@@ -250,5 +247,33 @@ public class CouponServiceImpl implements CouponService {
             throw new CommonException(StatusEnum.RESTRICTED);
         }
         log.info(tutor.toString());
+    }
+
+
+
+
+
+
+
+    public Long getAdminCode() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new CommonException(StatusEnum.USER_NOT_FOUND);
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof String) {
+            throw new CommonException(StatusEnum.USER_NOT_FOUND);
+        }
+
+        if (principal instanceof CustomUserDetails userDetails) {
+            log.info("Authentication: {}", authentication);
+            log.info("userDetails: {}", userDetails.toString());
+            return userDetails.getUserDTO().getAdminCode();
+        }
+
+        throw new CommonException(StatusEnum.USER_NOT_FOUND);
     }
 }

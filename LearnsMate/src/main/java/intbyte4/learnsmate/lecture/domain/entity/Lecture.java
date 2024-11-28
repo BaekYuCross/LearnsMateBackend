@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.lecture.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
@@ -27,6 +28,7 @@ public class Lecture {
     @Column(name = "lecture_confirm_status", nullable = false)
     private Boolean lectureConfirmStatus;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
