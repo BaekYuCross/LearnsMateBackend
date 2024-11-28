@@ -11,13 +11,13 @@ import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.coupon_category.service.CouponCategoryService;
-import intbyte4.learnsmate.issue_coupon.domain.dto.IssuedCouponFilterDTO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +39,16 @@ public class CouponFacade {
     private final CouponByLectureService couponByLectureService;
     private final CouponMapper couponMapper;
     private final LectureMapper lectureMapper;
+    private final MemberMapper memberMapper;
 
     @Transactional
-    public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Member tutor, CouponCategory couponCategory, String lectureCode) {
+    public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Long tutorCode, Integer couponCategoryCode, String lectureCode) {
+
+        MemberDTO tutorDTO = memberService.findById(tutorCode);
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+
+        CouponCategory couponCategory = couponCategoryService.findByCouponCategoryCode(couponCategoryCode);
+
         CouponEntity newCouponEntity = couponMapper.newCouponEntity(request, tutor, couponCategory);
 
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
@@ -130,6 +137,33 @@ public class CouponFacade {
     }
 
 
+    public List<CouponFindResponseVO> findTutorRegisterCoupons() {
+        List<CouponDTO> couponDTOList = couponService.findAllCoupons();
+        List<CouponFindResponseVO> couponFindResponseVOList = new ArrayList<>();
+        for (CouponDTO couponDTO : couponDTOList) {
+            if (couponDTO.getTutorCode() != null) {
+                MemberDTO memberDTO = memberService.findById(couponDTO.getTutorCode());
+                CouponCategory couponCategory = couponCategoryService.findByCouponCategoryCode(couponDTO.getCouponCategoryCode());
+                CouponFindResponseVO response = CouponFindResponseVO.builder()
+                        .couponCode(couponDTO.getCouponCode())
+                        .couponName(couponDTO.getCouponName())
+                        .couponContents(couponDTO.getCouponContents())
+                        .couponDiscountRate(couponDTO.getCouponDiscountRate())
+                        .couponCategoryName(couponCategory.getCouponCategoryName())
+                        .activeState(couponDTO.getActiveState())
+                        .couponStartDate(couponDTO.getCouponStartDate())
+                        .couponExpireDate(couponDTO.getCouponExpireDate())
+                        .createdAt(couponDTO.getCreatedAt())
+                        .updatedAt(couponDTO.getUpdatedAt())
+                        .adminName(null)
+                        .tutorName(memberDTO.getMemberName())
+                        .build();
+
+                couponFindResponseVOList.add(response);
+            }
+        }
+        return couponFindResponseVOList;
+    }
 
     @Transactional
     public CouponFindResponseVO findCoupon(Long couponCode) {
@@ -203,6 +237,7 @@ public class CouponFacade {
                     .build();
         }).collect(Collectors.toList());
     }
+
 }
 
 
