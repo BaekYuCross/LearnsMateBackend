@@ -109,6 +109,20 @@ public class JwtUtil {
                 .compact();
     }
 
+    // 리프레시 토큰은 단순히 새로운 액세스 토큰 발급을 요청하기 위한 용도
+    public String generateRefreshToken(JwtTokenDTO tokenDTO) {
+        Claims claims = Jwts.claims().setSubject(tokenDTO.getUserCode()); // 최소한의 정보
+        log.info("RefreshToken Claims 생성: {}", claims);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일 만료
+                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .compact();
+    }
+
+
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, claims -> claims.get("email", String.class));
     }
@@ -146,4 +160,33 @@ public class JwtUtil {
     public String getUserCodeFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
+
+    public String extractUserCode(String expiredToken) {
+        try {
+            // 만료된 토큰에서도 클레임을 추출
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(expiredToken)
+                    .getBody();
+
+            log.info("토큰이 유효하며, 클레임: {}", claims);
+
+            // 클레임에서 subject (userCode) 반환
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰에서도 클레임을 추출 가능
+            Claims claims = e.getClaims();
+
+            log.info("토큰이 만료되었습니다. 만료 시각: {}", e.getClaims().getExpiration());
+            String userCode = e.getClaims().getSubject();
+            log.info("추출된 userCode: {}", userCode);
+
+            return claims.getSubject(); // subject = userCode
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("토큰에서 사용자 코드를 추출하는 데 실패했습니다: {}", e.getMessage());
+            throw new CommonException(StatusEnum.INVALID_TOKEN);
+        }
+    }
+
 }
