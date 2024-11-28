@@ -16,6 +16,15 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long>, Cus
     // couponFlag가 true인 쿠폰 전체 조회
     List<CouponEntity> findAllByCouponFlagTrue();
 
+    // couponFlag가 true인 쿠폰 전체 조회 + offset 페이징
+    Page<CouponEntity> findAllByCouponFlagTrue(Pageable pageable);
+
+    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true AND c.admin IS NOT NULL")
+    Page<CouponEntity> findAllAdminCoupons(Pageable pageable);
+
+    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true AND c.tutor IS NOT NULL")
+    Page<CouponEntity> findAllTutorCoupons(Pageable pageable);
+
     @Query("SELECT c FROM Coupon c JOIN couponByCampaign cbc ON c.couponCode = cbc.coupon.couponCode WHERE cbc.campaign.campaignCode = :campaignCode")
     Page<CouponEntity> findCouponsByCampaignCode(@Param("campaignCode") Long campaignCode, Pageable pageable);
 
