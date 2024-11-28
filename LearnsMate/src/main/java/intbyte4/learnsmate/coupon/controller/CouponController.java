@@ -3,6 +3,7 @@ package intbyte4.learnsmate.coupon.controller;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
+import intbyte4.learnsmate.coupon.domain.pagination.CouponPageResponse;
 import intbyte4.learnsmate.coupon.domain.vo.request.*;
 import intbyte4.learnsmate.coupon.domain.vo.response.*;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
@@ -35,6 +36,26 @@ public class CouponController {
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
+    @Operation(summary = "쿠폰 전체 조회 - offset")
+    @GetMapping("/coupons2")
+    public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findAllCoupon(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false) String type) {
+
+        CouponPageResponse<CouponFindResponseVO> response;
+
+        if (type == null) {
+            response = couponFacade.findAllCoupons(page, size);
+        } else switch (type) {
+            case "admin" -> response = couponFacade.findAdminCoupons(page, size);
+            case "tutor" -> response = couponFacade.findTutorCoupons(page, size);
+            default -> response = couponFacade.findAllCoupons(page, size);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "직원 등록 쿠폰 전체 조회")
     @GetMapping("/admin-coupons")
     public ResponseEntity<List<CouponFindResponseVO>> getAdminCoupons() {
@@ -42,7 +63,6 @@ public class CouponController {
 
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
-
 
     @Operation(summary = "쿠폰 단 건 조회")
     @GetMapping("/{couponCode}")
@@ -65,6 +85,20 @@ public class CouponController {
             log.error("예상치 못한 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @Operation(summary = "쿠폰 필터링 조회 - offset")
+    @PostMapping("/filters2")
+    public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findCouponByFilter(
+            @RequestBody CouponFilterRequestVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size){
+
+        CouponFilterDTO dto = couponMapper.fromFilterVOtoFilterDTO(request);
+
+        CouponPageResponse<CouponFindResponseVO> response = couponService.filterCoupons(dto, page, size);
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "직원 - 쿠폰 등록")
