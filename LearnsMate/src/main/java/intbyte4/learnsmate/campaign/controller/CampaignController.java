@@ -2,10 +2,7 @@ package intbyte4.learnsmate.campaign.controller;
 
 import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.vo.request.*;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseEditCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseRegisterCampaignVO;
-import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByFilterVO;
+import intbyte4.learnsmate.campaign.domain.vo.response.*;
 import intbyte4.learnsmate.campaign.mapper.CampaignMapper;
 import intbyte4.learnsmate.campaign.service.CampaignService;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
@@ -88,23 +85,27 @@ public class CampaignController {
 
     @Operation(summary = "직원 - 캠페인 전체 조회")
     @GetMapping("/campaigns")
-    public ResponseEntity<List<ResponseFindCampaignVO>> getAllCampaigns() {
-        List<FindAllCampaignsDTO> findAllCampaignsDTOList = campaignService.findAllCampaignList();
-        List<ResponseFindCampaignVO> responseFindCampaignVOList = campaignMapper
+    public ResponseEntity<CampaignPageResponse<ResponseFindCampaignVO>> getAllCampaigns(@RequestParam(defaultValue = "0") int page,
+                                                                        @RequestParam(defaultValue = "15") int size) {
+
+        CampaignPageResponse<FindAllCampaignsDTO> findAllCampaignsDTOList = campaignService.findAllCampaignList(page, size);
+        CampaignPageResponse<ResponseFindCampaignVO> response = campaignMapper
                 .fromDtoListToFindCampaignVO(findAllCampaignsDTOList);
 
-        return new ResponseEntity<>(responseFindCampaignVOList, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "직원 - 캠페인 단건 조회")
     @GetMapping("/{campaignCode}")
-    public ResponseEntity<ResponseFindCampaignVO> getCampaign
-            (@PathVariable Long campaignCode) {
-        FindCampaignDTO findCampaignDTO = new FindCampaignDTO();
-        findCampaignDTO.setCampaignCode(campaignCode);
-        FindCampaignDTO response = campaignService.findCampaign(findCampaignDTO);
+    public ResponseEntity<ResponseFindCampaignDetailVO> getCampaignDetails
+            (@PathVariable Long campaignCode,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "15") int size) {
+        FindCampaignDetailDTO findCampaignDetailDTO = new FindCampaignDetailDTO();
+        findCampaignDetailDTO.setCampaignCode(campaignCode);
+        FindCampaignDetailDTO response = campaignService.findCampaign(findCampaignDetailDTO, page, size);
         log.info("campaign단건 조회: {}", response);
-        return ResponseEntity.status(HttpStatus.OK).body(campaignMapper.fromFindCampaignDtoToFindResponseVO(response));
+        return ResponseEntity.status(HttpStatus.OK).body(campaignMapper.fromFindCampaignDetailDtoToFindResponseVO(response));
     }
 
     @Operation(summary = "직원 - 조건 별 캠페인 조회")

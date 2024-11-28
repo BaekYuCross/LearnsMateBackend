@@ -2,6 +2,7 @@ package intbyte4.learnsmate.blacklist.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.blacklist.domain.dto.*;
@@ -23,10 +24,13 @@ import intbyte4.learnsmate.report.domain.dto.ReportDTO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,6 +39,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BlacklistService {
 
     private final BlacklistRepository blacklistRepository;
@@ -142,9 +147,8 @@ public class BlacklistService {
         MemberDTO memberDTO = memberService.findById(dto.getMemberCode());
         Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
 
-        // 2. admin을 찾아와야 하는데 나중에 token으로 처리 할듯?
-        AdminDTO adminDTO = adminService.findByAdminCode(202001001L);
-//        AdminDTO adminDTO = new AdminDTO();
+        // 2. admin
+        AdminDTO adminDTO = adminService.findByAdminCode(getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
 
         // 3. BlacklistDTO 생성 -> 이유만 있으면 됨. -> 이유도 넘겨받아야함. -> dto 자체를 넘겨받으면 해결
@@ -193,5 +197,27 @@ public class BlacklistService {
         return blacklistList.stream()
                 .map(blacklistMapper::fromBlacklistToBlacklistDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Long getAdminCode() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new CommonException(StatusEnum.USER_NOT_FOUND);
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof String) {
+            throw new CommonException(StatusEnum.USER_NOT_FOUND);
+        }
+
+        if (principal instanceof CustomUserDetails userDetails) {
+            log.info("Authentication: {}", authentication);
+            log.info("userDetails: {}", userDetails.toString());
+            return userDetails.getUserDTO().getAdminCode();
+        }
+
+        throw new CommonException(StatusEnum.USER_NOT_FOUND);
     }
 }

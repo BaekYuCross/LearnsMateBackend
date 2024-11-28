@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -195,51 +196,37 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<FindAllCampaignsDTO> findAllCampaignList() {
-        List<Campaign> campaigns = campaignRepository.findAll();
+    public CampaignPageResponse<FindAllCampaignsDTO> findAllCampaignList(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Campaign> campaignPage = campaignRepository.findAll(pageable);
         List<FindAllCampaignsDTO> findAllCampaignsDTOList = new ArrayList<>();
-        for (Campaign campaign : campaigns) {
+        for (Campaign campaign : campaignPage) {
             CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
             AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
             findAllCampaignsDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
         }
 
-        return findAllCampaignsDTOList;
+        return new CampaignPageResponse<>(
+                findAllCampaignsDTOList,
+                campaignPage.getTotalElements(),
+                campaignPage.getTotalPages(),
+                campaignPage.getNumber(),
+                campaignPage.getSize()
+        );
     }
 
     @Override
-    public FindCampaignDTO findCampaign(FindCampaignDTO request) {
+    public FindCampaignDetailDTO findCampaign(FindCampaignDetailDTO request, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
         Campaign campaign = campaignRepository.findById(request.getCampaignCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
-
         CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
-        log.info("캠페인 단건 조회 서비스에서 찾은 캠페인 : {}", campaignDTO);
-        // 캠페인 별 쿠폰에서 찾은 쿠폰 코드로 쿠폰 조회
-        List<CouponByCampaignDTO> couponByCampaignDTOList = couponByCampaignService.findByCampaignCode(campaign);
 
-        List<CouponDTO> couponDTOList = new ArrayList<>();
-        couponByCampaignDTOList.forEach(couponByCampaignDTO -> {
-            CouponDTO couponDTO = couponService.findCouponDTOByCouponCode(couponByCampaignDTO.getCouponCode());
-            if (couponDTO == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
-            couponDTOList.add(couponDTO);
-        });
+        Page<MemberDTO> membersPage = memberService.findMembersByCampaignCode(request, pageable);
+        Page<CouponDTO> couponsPage = couponService.findCouponsByCampaignCode(request, pageable);
 
-        // 학생 별 캠페인에서 찾은 유저 코드로 유저 조회
-        List<UserPerCampaignDTO> userPerCampaignDTOList = userPerCampaignService.findByCampaignCode(campaign);
-
-        List<MemberDTO> memberDTOList = new ArrayList<>();
-        userPerCampaignDTOList.forEach(userPerCampaignDTO -> {
-            MemberDTO memberDTO = memberService.findMemberByMemberCode(userPerCampaignDTO.getStudentCode()
-                    , MemberType.STUDENT);
-            if (memberDTO == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
-            memberDTOList.add(memberDTO);
-        });
-
-        // 위에서 찾은 쿠폰,유저 변환 후 리턴
-        return campaignMapper.toFindCampaignDTO(
-                campaignDTO,
-                couponDTOList,
-                memberDTOList);
+        return campaignMapper.toFindCampaignDetailDTO(campaignDTO,couponsPage,membersPage);
     }
 
     @Override

@@ -56,6 +56,8 @@ public class AdminController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("name", userDetails.getUserDTO().getAdminName()); // 관리자 이름
+        response.put("code", userDetails.getUserDTO().getAdminCode()); // 관리자 사번
+        response.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment()); // 관리자 부서
         response.put("roles", userDetails.getAuthorities()); // 권한 정보
 
         return ResponseEntity.ok(response);

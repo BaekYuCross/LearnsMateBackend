@@ -5,11 +5,13 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
+import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
 import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
@@ -25,10 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service("couponService")
@@ -65,6 +70,12 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public CouponEntity findByCouponCode(Long couponCode) {
         return couponRepository.findById(couponCode).orElseThrow(() -> new CommonException(StatusEnum.COUPON_NOT_FOUND));
+    }
+
+    @Override
+    public Page<CouponDTO> findCouponsByCampaignCode(FindCampaignDetailDTO campaignDTO, Pageable pageable) {
+        return couponRepository.findCouponsByCampaignCode(campaignDTO.getCampaignCode(), pageable)
+                .map(couponMapper::toDTO);
     }
 
     @Transactional

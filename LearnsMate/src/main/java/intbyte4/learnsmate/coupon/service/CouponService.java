@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.coupon.service;
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
+import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.dto.RegisterCouponDTO;
@@ -11,6 +12,8 @@ import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,6 +24,10 @@ public interface CouponService {
     CouponDTO findCouponDTOByCouponCode(Long couponCode);
 
     CouponEntity findByCouponCode(Long couponCode);
+
+//    CouponDTO adminRegisterCoupon(AdminCouponRegisterRequestVO request, Admin admin);
+
+    Page<CouponDTO> findCouponsByCampaignCode(FindCampaignDetailDTO campaignDTO, Pageable pageable);
 
     @Transactional
     CouponDTO adminRegisterCoupon(CouponDTO requestCoupon

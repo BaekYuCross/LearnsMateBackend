@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -77,7 +78,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     @Override
     public List<FindAllCampaignTemplatesDTO> findAllByTemplate() {
         log.info("템플릿 전체 조회 중");
-        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAllByCampaignTemplateFlag(true);
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAllByCampaignTemplateFlag(Sort.by(Sort.Direction.DESC, "createdAt"),true);
         List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
 
         for (CampaignTemplate campaignTemplate : campaignTemplateList) {
@@ -99,10 +100,11 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     private CampaignTemplate convertToCampaignTemplate(CampaignTemplateDTO campaignTemplateDTO, AdminDTO adminDTO) {
         Admin user = adminMapper.toEntity(adminDTO);
+        campaignTemplateDTO.setCampaignTemplateCode(null);
         campaignTemplateDTO.setCampaignTemplateFlag(true);
         campaignTemplateDTO.setCreatedAt(LocalDateTime.now());
         campaignTemplateDTO.setUpdatedAt(LocalDateTime.now());
-
+        campaignTemplateDTO.setAdminCode(adminDTO.getAdminCode());
         return campaignTemplateMapper.toEntity(campaignTemplateDTO, user);
     }
 
@@ -146,4 +148,27 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
                 CampaignTemplatePage.getSize()           // 페이지 크기
         );
     }
+
+    @Override
+    public List<FindAllCampaignTemplatesDTO> findTemplateListByFilterWithExcel(CampaignTemplateFilterDTO filterDTO) {
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.searchByWithoutPaging(filterDTO);
+        return campaignTemplateList.stream()
+                        .map(campaignTemplateMapper::fromTemplateToFindAllCampaignTemplateDTO)
+                        .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FindAllCampaignTemplatesDTO> findAllTemplateListWithExcel() {
+        List<CampaignTemplate> campaignTemplates = campaignTemplateRepository.findAll();
+
+        List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
+        for(CampaignTemplate campaignTemplate : campaignTemplates) {
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
+            findAllCampaignTemplatesDTOList.add(campaignTemplateMapper.toFindAllTemplateDTO(campaignTemplateDTO, adminDTO.getAdminName()));
+        }
+
+        return findAllCampaignTemplatesDTOList;
+    }
+
 }

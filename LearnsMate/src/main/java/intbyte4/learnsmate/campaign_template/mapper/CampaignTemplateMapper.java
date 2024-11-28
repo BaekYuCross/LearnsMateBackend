@@ -16,6 +16,8 @@ import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseRegister
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CampaignTemplateMapper {
@@ -36,6 +38,7 @@ public class CampaignTemplateMapper {
         return CampaignTemplateDTO.builder()
                 .campaignTemplateTitle(requestRegisterTemplateVO.getCampaignTemplateTitle())
                 .campaignTemplateContents(requestRegisterTemplateVO.getCampaignTemplateContents())
+                .adminCode(requestRegisterTemplateVO.getAdminCode())
                 .build();
     }
 
@@ -146,6 +149,45 @@ public class CampaignTemplateMapper {
                 .updatedAt(campaignTemplate.getUpdatedAt())
                 .adminCode(campaignTemplate.getAdmin().getAdminCode())
                 .adminName(campaignTemplate.getAdmin().getAdminName())
+                .build();
+    }
+
+
+    public List<ResponseFindCampaignTemplateByFilterVO> fromFindAllDtoListToFindTemplateByFilterVO(List<FindAllCampaignTemplatesDTO> dtoList) {
+        return dtoList.stream().map(dto -> ResponseFindCampaignTemplateByFilterVO.builder()
+                .campaignTemplateCode(dto.getCampaignTemplateCode())
+                .campaignTemplateTitle(dto.getCampaignTemplateTitle())
+                .campaignTemplateContents(dto.getCampaignTemplateContents())
+                .campaignTemplateFlag(dto.getCampaignTemplateFlag())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
+                .build()).collect(Collectors.toList());
+    }
+
+    public FindAllCampaignTemplatesDTO toFindAllTemplateDTO(CampaignTemplateDTO dto, String adminName) {
+        return FindAllCampaignTemplatesDTO.builder()
+                .campaignTemplateCode(dto.getCampaignTemplateCode())
+                .campaignTemplateTitle(dto.getCampaignTemplateTitle())
+                .campaignTemplateContents(dto.getCampaignTemplateContents())
+                .campaignTemplateFlag(dto.getCampaignTemplateFlag())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .adminName(adminName)
+                .build();
+    }
+
+    public FindAllCampaignTemplatesDTO fromTemplateToFindAllCampaignTemplateDTO(CampaignTemplate entity) {
+        return FindAllCampaignTemplatesDTO.builder()
+                .campaignTemplateCode(entity.getCampaignTemplateCode())
+                .campaignTemplateTitle(entity.getCampaignTemplateTitle())
+                .campaignTemplateContents(entity.getCampaignTemplateContents())
+                .campaignTemplateFlag(entity.getCampaignTemplateFlag())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .adminCode(entity.getAdmin().getAdminCode())
+                .adminName(entity.getAdmin().getAdminName())
                 .build();
     }
 

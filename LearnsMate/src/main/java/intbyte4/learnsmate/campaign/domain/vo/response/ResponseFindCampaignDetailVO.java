@@ -2,21 +2,18 @@ package intbyte4.learnsmate.campaign.domain.vo.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
-import intbyte4.learnsmate.couponbycampaign.domain.dto.CouponByCampaignDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
-import intbyte4.learnsmate.userpercampaign.domain.dto.UserPerCampaignDTO;
 import lombok.*;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class ResponseFindCampaignVO {
-
+public class ResponseFindCampaignDetailVO {
     // 캠페인 정보
     @JsonProperty("campaign_code")
     private Long campaignCode;
@@ -47,9 +44,8 @@ public class ResponseFindCampaignVO {
     private String adminName;
 
     // 타겟 유저 정보
-    private List<MemberDTO> members;
+    private Page<MemberDTO> members;
 
     // 첨부된 쿠폰 정보
-    private List<CouponDTO> coupons;
-
+    private Page<CouponDTO> coupons;
 }

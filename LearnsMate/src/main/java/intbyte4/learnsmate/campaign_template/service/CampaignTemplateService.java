@@ -18,4 +18,8 @@ public interface CampaignTemplateService {
 
     CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> findCampaignTemplateListByFilter
             (CampaignTemplateFilterDTO request, int page, int size);
+
+    List<FindAllCampaignTemplatesDTO> findTemplateListByFilterWithExcel(CampaignTemplateFilterDTO filterDTO);
+
+    List<FindAllCampaignTemplatesDTO> findAllTemplateListWithExcel();
 }

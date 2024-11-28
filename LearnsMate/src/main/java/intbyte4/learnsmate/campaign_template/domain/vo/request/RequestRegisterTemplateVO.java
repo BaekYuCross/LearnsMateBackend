@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -19,4 +17,8 @@ public class RequestRegisterTemplateVO {
 
     @JsonProperty("campaign_template_contents")
     private final String campaignTemplateContents;
+
+    @JsonProperty("admin_code")
+    private final Long adminCode;
+
 }

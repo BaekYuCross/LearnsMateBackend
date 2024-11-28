@@ -43,7 +43,8 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
         // Query 생성
         JPAQuery<Blacklist> query = queryFactory
                 .selectFrom(blacklist)
-                .where(builder);
+                .where(builder)
+                .orderBy(blacklist.blackCode.desc());
 
         long total = query.fetchCount();
 
