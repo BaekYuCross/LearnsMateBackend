@@ -2,14 +2,13 @@ package intbyte4.learnsmate.security;
 
 import intbyte4.learnsmate.admin.service.AdminService;
 import jakarta.servlet.Filter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,16 +28,18 @@ import java.util.Collections;
 public class WebSecurity {
 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final RedisTemplate<String, String> redisTemplate;
     private AdminService userService;
     private Environment env;
     private JwtUtil jwtUtil;
 
     @Autowired
-    public WebSecurity(BCryptPasswordEncoder bCryptPasswordEncoder, AdminService userService, Environment env, JwtUtil jwtUtil) {
+    public WebSecurity(BCryptPasswordEncoder bCryptPasswordEncoder, AdminService userService, Environment env, JwtUtil jwtUtil, RedisTemplate<String, String> redisTemplate) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userService = userService;
         this.env = env;
         this.jwtUtil = jwtUtil;
+        this.redisTemplate = redisTemplate;
     }
 
 
@@ -65,16 +66,12 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/index.html", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/users/verification-email/**")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/users/verify-code")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/users/send-sms")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/admin/**","GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/admin/**","POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "OPTIONS")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "PATCH")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/users/mypage/edit/password", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc/list", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc/count-by-category", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc/filter", "POST")).permitAll()
@@ -136,7 +133,7 @@ public class WebSecurity {
 
     // Authentication 용 메소드(인증 필터 반환)
     private Filter getAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new AuthenticationFilter(authenticationManager, userService, env, jwtUtil);
+        return new AuthenticationFilter(authenticationManager, userService, env, jwtUtil, redisTemplate);
     }
 
 }
