@@ -26,14 +26,13 @@ public class EmailService {
 
     private final long VERIFICATION_CODE_TTL = 5; // 5분
 
+    // 인증 코드 발송 메소드
     public void sendVerificationEmail(String email) {
-        log.info("start sending verification email");
+        log.info("Start sending verification email");
         String verificationCode = generateVerificationCode();
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("[LearnsMate] 이메일 인증 코드 안내");
-        message.setText("안녕하세요,\n\n"
+        String subject = "[LearnsMate] 이메일 인증 코드 안내";
+        String content = "안녕하세요,\n\n"
                 + "LearnsMate를 이용해 주셔서 진심으로 감사드립니다.\n"
                 + "아래의 인증 코드를 입력하여 이메일 인증을 완료해 주시기 바랍니다.\n\n"
                 + "인증 코드: " + verificationCode + "\n\n"
@@ -41,11 +40,38 @@ public class EmailService {
                 + "본 이메일은 LearnsMate 서비스 이용과 관련하여 발송되었습니다. "
                 + "궁금하신 사항이 있으시면 LearnsMate 고객 지원팀으로 언제든 문의해 주시기 바랍니다.\n\n"
                 + "감사합니다.\n\n"
-                + "LearnsMate 드림");
+                + "LearnsMate 드림";
 
-        mailSender.send(message);
-
+        sendEmail(email, subject, content);
         saveVerificationCode(email, verificationCode);
+    }
+
+    // 캠페인 이메일 발송 메소드 추가
+    public void sendCampaignEmail(String email, String campaignTitle, String campaignContents) {
+        log.info("Start sending campaign email to: " + email);
+
+        String subject = "[LearnsMate]: " + campaignTitle;
+        String content = campaignContents + "\n\n"
+                + "더 자세한 사항은 LearnsMate 홈페이지를 방문해 주세요.\n\n"
+                + "감사합니다.\n\n"
+                + "LearnsMate 드림";
+
+        sendEmail(email, subject, content);
+    }
+
+    // 이메일 발송 공통 메소드
+    private void sendEmail(String to, String subject, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(content);
+
+        try {
+            mailSender.send(message);
+            log.info("Email sent successfully to: " + to);
+        } catch (Exception e) {
+            log.error("Failed to send email to: " + to + ", error: " + e.getMessage());
+        }
     }
 
     //필기. 해당 이메일의 코드가 일치하는지 확인하는 코드
