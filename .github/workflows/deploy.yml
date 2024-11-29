@@ -71,12 +71,12 @@ jobs:
               username: \${SMTP_USERNAME}
               password: \${SMTP_PASSWORD}
               port: \${SMTP_PORT}
-                properties:
-                  mail:
-                    smtp:
-                      auth: true
-                      starttls:
-                        enable: true
+              properties:
+                mail:
+                  smtp:
+                    auth: true
+                    starttls:
+                      enable: true
           
           openai:
             model: gpt-4o
