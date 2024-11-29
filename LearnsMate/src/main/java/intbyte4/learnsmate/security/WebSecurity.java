@@ -88,6 +88,7 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/campaign-template/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/coupon/**", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/excel/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/issue-coupon/**", "GET")).permitAll()
