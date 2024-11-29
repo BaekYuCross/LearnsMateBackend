@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,7 +94,7 @@ public class IssueCouponFacade {
         return allIssuedCouponResponseVOList;
     }
 
-    public List<AllIssuedCouponResponseVO> filterIssuedCoupon (IssuedCouponFilterDTO dto) {
+    public List<AllIssuedCouponResponseVO> filterIssuedCoupon(IssuedCouponFilterDTO dto) {
         log.info(dto.toString());
         // 필터링된 IssueCoupon 가져오기
         List<IssueCoupon> filteredIssuedCoupons = issueCouponService.getFilteredIssuedCoupons(dto);
@@ -134,31 +133,8 @@ public class IssueCouponFacade {
 
             log.info(filteredIssuedCoupons.toString());
             return responseVO;
-//            return AllIssuedCouponResponseVO.builder()
-//                    .couponIssuanceCode(issueCoupon.getCouponIssuanceCode())
-//                    .couponName(coupon.getCouponName() == null || coupon.getCouponName().isEmpty() ? null : coupon.getCouponName())
-//                    .couponContents(coupon.getCouponContents() == null || coupon.getCouponContents().isEmpty() ? null : coupon.getCouponContents())
-//                    .couponCategoryName(coupon.getCouponCategory() == null || coupon.getCouponCategory().getCouponCategoryName().isEmpty()
-//                            ? null
-//                            : coupon.getCouponCategory().getCouponCategoryName())
-//                    .studentCode(studentCode)
-//                    .studentName(studentName)
-//                    .couponDiscountRate(coupon != null ? coupon.getCouponDiscountRate() : null)
-//                    .couponUseStatus(issueCoupon.getCouponUseStatus())
-//                    .couponUseDate(issueCoupon.getCouponUseDate())
-//                    .couponIssueDate(issueCoupon.getCouponIssueDate())
-//                    .couponStartDate(coupon.getCouponStartDate() == null ? null : coupon.getCouponStartDate())
-//                    .couponExpireDate(coupon != null ? coupon.getCouponExpireDate() : null)
-//                    .couponCode(coupon != null ? coupon.getCouponCode() : null)
-//                    .lectureCode(lectureCodes)
-//                    .lectureName(lectureNames)
-//                    .tutorName(tutorNames)
-//                    .lecturePrice(lecturePrices)
-//                    .build();
 
         }).collect(Collectors.toList());
     }
-
-
 }
 
