@@ -23,6 +23,7 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CouponFacade {
@@ -143,6 +145,7 @@ public class CouponFacade {
                         .couponExpireDate(couponDTO.getCouponExpireDate())
                         .createdAt(couponDTO.getCreatedAt())
                         .updatedAt(couponDTO.getUpdatedAt())
+                        .adminCode(adminDTO.getAdminCode())
                         .adminName(adminDTO.getAdminName())
                         .tutorName(null)
                         .build();
