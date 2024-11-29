@@ -13,10 +13,12 @@ import intbyte4.learnsmate.admin.domain.vo.response.ResponseFindAdminVO;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.admin.service.EmailService;
+import intbyte4.learnsmate.admin.service.RedisService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,7 @@ public class AdminController {
     private final AdminService adminService;
     private final AdminMapper adminMapper;
     private final EmailService emailService;
+    private final RedisService redisService;
 
     @Operation(summary = "직원 단건 조회")
     @GetMapping("/{adminCode}")
@@ -49,7 +52,7 @@ public class AdminController {
     @Operation(summary = "직원 정보 수정")
     @PatchMapping("/password")
     public ResponseEntity<ResponseEditAdminVO> updateAdmin(@RequestBody RequestEditAdminVO editAdminVO) {
-        AdminDTO updatedAdmin = adminService.updateAdmin(adminMapper.fromVoToDto(editAdminVO));
+        AdminDTO updatedAdmin = adminService.updateAdmin(adminMapper.fromAdminEmailVoToDto(editAdminVO));
         return ResponseEntity.status(HttpStatus.OK).body(adminMapper.fromDtoToEditResponseVO(updatedAdmin));
     }
 
@@ -74,16 +77,41 @@ public class AdminController {
 
     @Operation(summary = "직원 로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest request,HttpServletResponse response) {
         log.info("POST /admin/logout 요청 도착");
-        // 쿠키 삭제 명령
-        Cookie cookie = new Cookie("token", null);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0); // 쿠키 만료 처리
-        response.addCookie(cookie);
 
-        // 필요 시 블랙리스트로 JWT 관리
+        // 쿠키에서 refreshToken 추출
+        String refreshToken = null;
+
+        // 쿠키에서 refreshToken 추출
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                }
+            }
+        }
+
+        // 쿠키 삭제
+        Cookie accessTokenCookie = new Cookie("accessToken", null);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setMaxAge(0); // 쿠키 만료 처리 (브라우저에서 삭제됨)
+        response.addCookie(accessTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setMaxAge(0); // 쿠키 만료 처리 (브라우저에서 삭제됨)
+        response.addCookie(refreshTokenCookie);
+
+        // Redis에서 refreshToken 삭제
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            redisService.deleteToken(refreshToken); // Redis에서 refreshToken 삭제
+        }
+
+
         log.info("로그아웃 성공");
         return ResponseEntity.ok().body("로그아웃 성공");
     }
@@ -91,12 +119,14 @@ public class AdminController {
     // 인증버튼
     @Operation(summary = "직원 비밀번호 재설정시 이메일 전송")
     @PostMapping("/verification-email/password")
-    public ResponseEmailDTO<?> sendVerificationEmailPassword(@RequestBody @Validated AdminEmailVerificationVO request) {
+    public ResponseEmailDTO<?> sendVerificationEmailPassword(@RequestBody @Validated AdminEmailVerificationVO requestVO) {
 
-        log.info("POST /admin/verification-email/password 요청 도착: request={}", request);
+        log.info("POST /admin/verification-email/password 요청 도착: request={}", requestVO);
+
+        AdminDTO request = adminMapper.fromAdminEmailVoToDto(requestVO);
 
         // 입력한 사번 코드와 이메일의 정보 검증
-        AdminDTO adminByEmail = adminService.findUserByEmail(request.getEmail());
+        AdminDTO adminByEmail = adminService.findUserByEmail(request.getAdminEmail());
 
         if (adminByEmail == null || !adminByEmail.getAdminCode().equals(request.getAdminCode())) {
             throw new CommonException(StatusEnum.EMAIL_NOT_FOUND);
@@ -105,10 +135,10 @@ public class AdminController {
         return getResponseEmailDTO(request);
     }
 
-    private ResponseEmailDTO<?> getResponseEmailDTO(AdminEmailVerificationVO request) {
+    private ResponseEmailDTO<?> getResponseEmailDTO(AdminDTO request) {
         // 이메일로 인증번호 전송
         try {
-            emailService.sendVerificationEmail(request.getEmail());
+            emailService.sendVerificationEmail(request.getAdminEmail());
 
             ResponseEmailMessageVO responseEmailMessageVO =new ResponseEmailMessageVO();
             responseEmailMessageVO.setMessage("인증 코드가 이메일로 전송되었습니다.");
@@ -139,9 +169,10 @@ public class AdminController {
     // 다음버튼 누를 시, 인증성공하면 ? -> 비번 재설정 칸 생성 -> 완료 버튼
     @Operation(summary = "비밀번호 재설정")
     @PostMapping("/password")
-    public ResponseEntity<String> resetPassword(@RequestBody RequestResetPasswordVO request) {
-        log.info("POST /admin/password 요청 도착: request={}", request);
+    public ResponseEntity<String> resetPassword(@RequestBody RequestResetPasswordVO requestVO) {
+        log.info("POST /admin/password 요청 도착: request={}", requestVO);
 
+        AdminDTO request = adminMapper.fromResetPasswordVoToDto(requestVO);
         adminService.resetPassword(request);
 
         log.info("비밀번호가 성공적으로 재설정되었습니다.");

@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 ;
 
@@ -34,12 +35,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private AdminService userService;
     private Environment env;
     private JwtUtil jwtUtil;
+    private RedisTemplate<String, String> redisTemplate;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, AdminService userService, Environment env, JwtUtil jwtUtil) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager, AdminService userService, Environment env, JwtUtil jwtUtil,
+                                RedisTemplate<String, String> redisTemplate) {
         super(authenticationManager);
         this.userService = userService;
         this.env = env;
         this.jwtUtil = jwtUtil;
+        this.redisTemplate = redisTemplate;
 
         // 커스텀 로그인 경로 설정
         setFilterProcessesUrl("/users/login");
@@ -79,6 +83,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             throw new IllegalArgumentException("Authentication 객체가 CustomUserDetails 타입이 아닙니다.");
         }
 
+        // CustomUserDetails로 캐스팅하여 사용자 정보를 가져옴
         CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
 
         // 사용자 정보 가져오기
@@ -97,6 +102,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // JWT 생성: JwtTokenDTO에 사용자 정보를 담고, roles와 함께 JWT 토큰을 생성
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
         String token = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
+        String refreshToken = jwtUtil.generateRefreshToken(tokenDTO); // 7일
 
         // 쿠키 생성
         Cookie jwtCookie = new Cookie("token", token);
@@ -107,12 +113,45 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         jwtCookie.setMaxAge(4 * 3600); // 쿠키 만료 시간 설정 (4시간)
         // 여기를 3-4시간정도로 만료시간 할건데 리프레시토큰을 해야하나? erp라 재로그인이 필요하지않을까
 
-        // 응답에 쿠키 추가
         response.addCookie(jwtCookie);
 
-        log.info("JWT 생성 완료. JWT 토큰을 쿠키로 응답에 포함시킴");
+        // Refresh Token 쿠키 생성
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);  // 개발 환경에서 false, 배포 환경에서는 true로 설정
+        refreshTokenCookie.setPath("/"); // 유효 경로 설정
+        refreshTokenCookie.setMaxAge(7 * 24 * 3600); // Refresh Token의 만료 시간 (7일)
+
+        response.addCookie(refreshTokenCookie);
+
+        saveRefreshTokenToRedis(userCode,refreshToken);
+
+        log.info("Access Token 및 Refresh Token 생성 완료 !!!!!!!!!!!!!!!!!!!!");
     }
 
+
+    // Redis에 refreshToken 저장
+    public void saveRefreshTokenToRedis(String userCode, String refreshToken) {
+        try {
+            // Redis에 refreshToken 저장
+            redisTemplate.opsForValue().set(
+                    "refreshToken:" + userCode,
+                    refreshToken,
+                    7, // 7일
+                    TimeUnit.DAYS
+            );
+
+            // 로그로 저장된 refreshToken 확인
+            log.info("Refresh Token 저장 완료: refreshToken:{}, userCode:{}", refreshToken, userCode);
+
+            // Redis에서 값을 확인 (디버깅용)
+            String storedToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
+            log.info("Redis에서 가져온 refreshToken: {}", storedToken);
+
+        } catch (Exception e) {
+            log.error("Redis 저장 실패", e);
+        }
+    }
 
     //로그인 실패시 실행하는 메소드
     @Override

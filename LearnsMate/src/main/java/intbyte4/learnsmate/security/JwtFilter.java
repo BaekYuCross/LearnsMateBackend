@@ -23,9 +23,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AdminService userService;
     private final JwtUtil jwtUtil;  // JWT 토큰을 다루는 JwtUtil 클래스
     private final List<String> excludeUrl  // JWT 토큰 검증을 제외할 URL 패턴 목록
-            = Arrays.asList("/users/verification-email/**"
-            , "/users/nickname/check", "/users/verification-email/password", "/swagger-ui.html", "/swagger-ui/index.html"
-            , "/users/password");
+            = Arrays.asList("/admin/verification-email/**"
+           , "/admin/verification-email/password", "/swagger-ui.html", "/swagger-ui/index.html"
+            , "/admin/password");
 
     public JwtFilter(AdminService userService, JwtUtil jwtUtil) {
         this.userService = userService;

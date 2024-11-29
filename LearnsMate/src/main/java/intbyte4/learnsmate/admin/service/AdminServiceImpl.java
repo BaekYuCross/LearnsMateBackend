@@ -4,7 +4,6 @@ package intbyte4.learnsmate.admin.service;
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
-import intbyte4.learnsmate.admin.domain.vo.request.RequestResetPasswordVO;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.repository.AdminRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
@@ -75,15 +74,15 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void resetPassword(RequestResetPasswordVO request) {
+    public void resetPassword(AdminDTO request) {
 
-        Admin admin = adminRepository.findByAdminEmail(request.getUserEmail());
+        Admin admin = adminRepository.findByAdminEmail(request.getAdminEmail());
         if (admin == null) {
             throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         }
 
         // 비밀번호 bCrypt 암호화.
-        admin.setAdminPassword(bCryptPasswordEncoder.encode(request.getUserPassword()));
+        admin.setAdminPassword(bCryptPasswordEncoder.encode(request.getAdminPassword()));
 
         Admin updatedAdmin = adminRepository.save(admin);
         adminMapper.toDTO(updatedAdmin);
