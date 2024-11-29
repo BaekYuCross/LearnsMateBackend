@@ -65,6 +65,30 @@ jobs:
               properties:
                 hibernate:
                   '[format_sql]': true
+            
+            mail:
+              host: \${SPRING_MAIL_SMTP_HOST}
+              username: \${SMTP_USERNAME}
+              password: \${SMTP_PASSWORD}
+              port: \${SMTP_PORT}
+              properties:
+                mail:
+                  smtp:
+                    auth: true
+                    starttls:
+                      enable: true
+          
+            data:
+              redis:
+                host: \{REDIS_HOST}
+                port: \{REDIS_PORT}
+                lettuce:
+                  pool:
+                    max-active: 50
+                    max-idle: 25
+                    min-idle: 5
+                    time-between-eviction-runs: 2000ms
+          
           openai:
             model: gpt-4o
             secret-key: \${SECRET_KEY}
@@ -88,6 +112,12 @@ jobs:
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           TOKEN_SECRET: ${{ secrets.JWT_SECRET }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SPRING_MAIL_SMTP_HOST: ${{ secrets.SPRING_MAIL_SMTP_HOST }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test

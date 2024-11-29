@@ -4,6 +4,7 @@ import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.admin.service.EmailService;
 import intbyte4.learnsmate.campaign.batch.CampaignIssueCouponReader;
 import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
@@ -55,6 +56,7 @@ public class CampaignServiceImpl implements CampaignService {
     private final MemberService memberService;
     private final CouponService couponService;
     private final IssueCouponService issueCouponService;
+    private final EmailService emailService;
     private final CampaignMapper campaignMapper;
     private final AdminMapper adminMapper;
     private final JobLauncher jobLauncher;
@@ -68,6 +70,7 @@ public class CampaignServiceImpl implements CampaignService {
         LocalDateTime sendTime;
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
+
         if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
             sendTime = LocalDateTime.now();
         } else {
@@ -81,6 +84,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .campaignContents(requestCampaign.getCampaignContents())
                 .campaignType(CampaignTypeEnum.valueOf(requestCampaign.getCampaignType()))
                 .campaignSendDate(sendTime)
+                .campaignSendFlag(false)
                 .createdAt(requestCampaign.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .admin(admin)
@@ -114,8 +118,11 @@ public class CampaignServiceImpl implements CampaignService {
         if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
             // 즉시 발송
             issueCouponService.issueCouponsToStudents(studentCodes, couponCodes);
+            requestStudentList.forEach(memberDTO -> {
+                emailService.sendCampaignEmail(memberDTO.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
+            });
         } else {
-            // 예약 발송은 스케줄러에 등록 아직
+            // 예약 발송은 스케줄러에 등록
             registerScheduledCampaign(requestStudentList, requestCouponList, savedCampaignDTO.getCampaignSendDate());
         }
 
@@ -126,17 +133,7 @@ public class CampaignServiceImpl implements CampaignService {
     public void registerScheduledCampaign(List<MemberDTO> studentList, List<CouponDTO> couponList, LocalDateTime scheduledTime) {
         System.out.println("캠페인 예약 작업이 등록되었습니다. 예약 시간: " + scheduledTime);
         try {
-
             couponMemberReader.setStudentCouponPairs(studentList, couponList);
-
-
-            // Job 파라미터 설정: 예약 시간과 관련된 정보를 파라미터에 추가
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addDate("scheduledTime", Timestamp.valueOf(scheduledTime))
-                    .toJobParameters();
-
-            // Job 실행
-            jobLauncher.run(campaignJob, jobParameters);
         } catch (Exception e) {
             // 에러 처리
             System.err.println("캠페인 예약 작업 등록 실패: " + e.getMessage());
@@ -149,7 +146,8 @@ public class CampaignServiceImpl implements CampaignService {
     @Transactional
     public List<CampaignDTO> getReadyCampaigns(LocalDateTime currentTime) {
         // 예약 시간이 현재 시간보다 이전이면서 아직 발송되지 않은 캠페인 조회
-        List<Campaign> readyCampaigns = campaignRepository.findByCampaignSendDateLessThanEqual(currentTime);
+        List<Campaign> readyCampaigns = campaignRepository
+                .findByCampaignSendDateLessThanEqualAndCampaignSendFlagFalseAndCampaignType(currentTime, CampaignTypeEnum.RESERVATION);
         return readyCampaigns.stream()
                 .map(campaignMapper::toDTO)
                 .toList();
@@ -169,9 +167,9 @@ public class CampaignServiceImpl implements CampaignService {
 
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
-        log.info("서비스에서 조회하는 adminDTO: {}", adminDTO);
+
         Campaign updatedCampaign = campaignMapper.toEntity(requestCampaign, admin);
-        log.info("서비스에서 조회하는 toEntity(requestCampaign,admin): {}", updatedCampaign);
+
         campaignRepository.save(updatedCampaign);
         editStudent(requestCampaign, requestStudentList, updatedCampaign);
 
@@ -209,9 +207,7 @@ public class CampaignServiceImpl implements CampaignService {
     private void editStudent(CampaignDTO requestCampaign
             , List<MemberDTO> requestStudentList
             , Campaign updatedCampaign) {
-        log.info("editStuden메서드의 requestCampaign: {}", requestCampaign);
-        log.info("editStuden메서드의 requestStudentList: {}", requestStudentList);
-        log.info("editStuden메서드의 updatedCampaign: {}", updatedCampaign);
+
         List<UserPerCampaignDTO> existingStudentList = userPerCampaignService
                 .findByCampaignCode(updatedCampaign);
 
@@ -329,4 +325,15 @@ public class CampaignServiceImpl implements CampaignService {
 
         return findAllCampaignsDTOList;
     }
+
+    @Override
+    public void updateCampaignSendFlag(Long campaignCode) {
+        Campaign campaign = campaignRepository.findById(campaignCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
+
+        campaign.updateSendFlag();
+
+        campaignRepository.save(campaign);
+    }
+
 }
