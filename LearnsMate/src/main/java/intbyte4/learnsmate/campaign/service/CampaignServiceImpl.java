@@ -149,7 +149,8 @@ public class CampaignServiceImpl implements CampaignService {
     @Transactional
     public List<CampaignDTO> getReadyCampaigns(LocalDateTime currentTime) {
         // 예약 시간이 현재 시간보다 이전이면서 아직 발송되지 않은 캠페인 조회
-        List<Campaign> readyCampaigns = campaignRepository.findByCampaignSendDateLessThanEqual(currentTime);
+        List<Campaign> readyCampaigns = campaignRepository
+                .findByCampaignSendDateLessThanEqualAndCampaignSendFlagFalseAndCampaignType(currentTime, CampaignTypeEnum.RESERVATION);
         return readyCampaigns.stream()
                 .map(campaignMapper::toDTO)
                 .toList();
@@ -329,4 +330,15 @@ public class CampaignServiceImpl implements CampaignService {
 
         return findAllCampaignsDTOList;
     }
+
+    @Override
+    public void updateCampaignSendFlag(Long campaignCode) {
+        Campaign campaign = campaignRepository.findById(campaignCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
+
+        campaign.updateSendFlag();
+
+        campaignRepository.save(campaign);
+    }
+
 }
