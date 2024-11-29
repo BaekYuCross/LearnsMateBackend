@@ -1,6 +1,9 @@
 package intbyte4.learnsmate.issue_coupon.repository;
 
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssuedCouponFilterDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,4 +36,6 @@ public interface IssueCouponRepository extends JpaRepository<IssueCoupon, Long>,
     @Query("SELECT c FROM issueCoupon c WHERE c.student.memberCode = :studentCode AND c.couponIssueDate <= CURRENT_TIMESTAMP AND c.couponUseStatus = true AND c.couponUseDate IS NOT NULL")
     List<IssueCoupon> findUsedCouponsByStudentCode(@Param("studentCode") Long studentCode);
 
+    // 발급 쿠폰 offset 페이지네이션 전체 (JPQL 대신)
+    Page<IssueCoupon> findAllByOrderByCouponIssueDateDesc(PageRequest pageable);
 }
