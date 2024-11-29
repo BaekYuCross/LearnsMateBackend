@@ -11,4 +11,5 @@ public class PaymentPageResponse<T, G> {
     private List<T> paymentData;
     private G graphData;
     private boolean hasNext;
+    private long totalElements;
 }

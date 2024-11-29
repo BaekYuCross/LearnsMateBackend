@@ -10,6 +10,7 @@ import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.repository.LectureRepository;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -116,5 +117,20 @@ public class LectureServiceImpl implements LectureService {
     @Override
     public Integer getClickCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
         return lectureRepository.getClickCountByLectureCodeBetweenDates(lectureCode, startDate, endDate);
+    }
+
+    @Override
+    public int getTotalClickCount() {
+        return lectureRepository.findTotalClickCount();
+    }
+
+    @Override
+    public int getClickCountByCategory(String lectureCategoryName) {
+        return lectureRepository.findClickCountByCategory(LectureCategoryEnum.valueOf(lectureCategoryName));
+    }
+
+    @Override
+    public Integer getClickCountByCategoryWithDateRange(String categoryName, LocalDateTime startDate, LocalDateTime endDate) {
+        return lectureRepository.findClickCountByCategoryWithDateRange(LectureCategoryEnum.valueOf(categoryName), startDate, endDate);
     }
 }

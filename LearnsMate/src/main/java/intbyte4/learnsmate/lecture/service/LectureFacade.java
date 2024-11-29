@@ -30,6 +30,7 @@ import intbyte4.learnsmate.lecture.repository.LectureRepository;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.repository.LectureByStudentRepository;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.service.LectureCategoryByLectureService;
@@ -186,20 +187,83 @@ public class LectureFacade {
         );
     }
 
-    public LectureStatsVO getLectureStatsWithFilter(String lectureCode, LectureStatsFilterDTO filter) {
+    public ResponseFindLectureDetailVO getLectureDetailsWithConversionRates(String lectureCode) {
+        LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
+        if (lectureDTO == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
+
+        MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
+        LectureCategoryByLectureDTO lectureCategoryByLecture = lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLecture.getLectureCategoryCode());
+        LectureCategoryEnum categoryEnum = LectureCategoryEnum.fromValue(lectureCategoryDTO.getLectureCategoryName());
+
+        int purchaseCount = paymentService.getPurchaseCountByLectureCode(lectureCode);
+        double singleLectureRate = calculateConversionRate(lectureDTO.getLectureClickCount(), purchaseCount);
+
+        List<VideoByLectureDTO> videoByLectureDTOS = videoByLectureService.findVideoByLectureByLectureCode(lectureCode);
+
+        int totalClickCount = lectureService.getTotalClickCount();
+        int totalPurchaseCount = paymentService.getTotalPurchaseCount();
+        double overallRate = calculateConversionRate(totalClickCount, totalPurchaseCount);
+
+        int categoryClickCount = lectureService.getClickCountByCategory(String.valueOf(categoryEnum));
+        int categoryPurchaseCount = paymentService.getPurchaseCountByCategory(String.valueOf(categoryEnum));
+        double categoryRate = calculateConversionRate(categoryClickCount, categoryPurchaseCount);
+
+        return ResponseFindLectureDetailVO.builder()
+                .lectureCode(lectureDTO.getLectureCode())
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .tutorCode(lectureDTO.getTutorCode())
+                .tutorName(memberDTO.getMemberName())
+                .lectureCategoryName(String.valueOf(categoryEnum))
+                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
+                .createdAt(lectureDTO.getCreatedAt())
+                .lecturePrice(lectureDTO.getLecturePrice())
+                .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
+                .lectureStatus(lectureDTO.getLectureStatus())
+                .lectureImage(lectureDTO.getLectureImage())
+                .lectureClickCount(lectureDTO.getLectureClickCount())
+                .purchaseCount(purchaseCount)
+                .singleLectureConversionRate((int) singleLectureRate)
+                .overallConversionRate((int) overallRate)
+                .categoryConversionRate((int) categoryRate)
+                .lectureVideos(videoByLectureDTOS)
+                .build();
+    }
+
+    private double calculateConversionRate(int clickCount, int purchaseCount) {
+        if (clickCount == 0) {
+            return 0.0;
+        }
+        return (double) purchaseCount / clickCount * 100;
+    }
+
+    public LectureStatsVO getLectureStatsWithFilterAndRates(String lectureCode, LectureStatsFilterDTO filter) {
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
         if (lectureDTO == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
 
         LocalDateTime startDate = LocalDateTime.of(filter.getStartYear(), filter.getStartMonth(), 1, 0, 0);
-        LocalDateTime endDate = LocalDateTime.of(filter.getEndYear(), filter.getEndMonth(), filter.getEndMonth() == 12 ? 31 : YearMonth.of(filter.getEndYear(), filter.getEndMonth()).lengthOfMonth(), 23, 59, 59);
+        LocalDateTime endDate = LocalDateTime.of(
+                filter.getEndYear(),
+                filter.getEndMonth(),
+                filter.getEndMonth() == 12 ? 31 : YearMonth.of(filter.getEndYear(), filter.getEndMonth()).lengthOfMonth(),
+                23, 59, 59
+        );
 
         Integer totalStudentCount = paymentService.getTotalStudentCountBetween(startDate, endDate);
         Integer totalClickCount = lectureService.getTotalClickCountBetween(startDate, endDate);
-        Double totalConversionRate = calculateConversionRate(totalClickCount, totalStudentCount, lectureCode);
+        Double totalConversionRate = calculateConversionRate(totalClickCount, totalStudentCount);
 
         Integer studentCount = paymentService.getStudentCountByLectureCodeBetween(lectureCode, startDate, endDate);
         Integer clickCount = lectureService.getClickCountByLectureCodeBetween(lectureCode, startDate, endDate);
-        Double conversionRate = calculateConversionRate(clickCount, studentCount, lectureCode);
+        Double conversionRate = calculateConversionRate(clickCount, studentCount);
+
+        LectureCategoryByLectureDTO lectureCategoryByLecture = lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+        LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLecture.getLectureCategoryCode());
+        LectureCategoryEnum categoryEnum = LectureCategoryEnum.fromValue(lectureCategoryDTO.getLectureCategoryName());
+
+        Integer categoryClickCount = lectureService.getClickCountByCategoryWithDateRange(String.valueOf(categoryEnum), startDate, endDate);
+        Integer categoryPurchaseCount = paymentService.getPurchaseCountByCategoryWithDateRange(String.valueOf(categoryEnum), startDate, endDate);
+        Double categoryConversionRate = calculateConversionRate(categoryClickCount, categoryPurchaseCount);
 
         return LectureStatsVO.builder()
                 .totalStudentCount(totalStudentCount)
@@ -210,6 +274,9 @@ public class LectureFacade {
                 .studentCount(studentCount)
                 .lectureClickCount(clickCount)
                 .conversionRate(conversionRate)
+                .categoryClickCount(categoryClickCount)
+                .categoryPurchaseCount(categoryPurchaseCount)
+                .categoryConversionRate(categoryConversionRate)
                 .build();
     }
 

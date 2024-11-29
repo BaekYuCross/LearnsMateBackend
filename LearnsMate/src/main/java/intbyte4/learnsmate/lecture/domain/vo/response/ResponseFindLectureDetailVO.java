@@ -37,4 +37,13 @@ public class ResponseFindLectureDetailVO {
 
     private Integer purchaseCount;
     private Integer purchaseConversionRate;
+
+    private Integer totalClickCount;
+    private Integer totalPurchaseCount;
+    private Integer categoryClickCount;
+    private Integer categoryPurchaseCount;
+    private Integer overallConversionRate;
+    private Integer categoryConversionRate;
+    private Integer singleLectureConversionRate;
 }
+
