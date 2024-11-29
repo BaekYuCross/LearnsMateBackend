@@ -15,6 +15,7 @@ public enum StatusEnum {
     MINIMUM_KEYWORD_LENGTH_REQUIRED(400,HttpStatus.BAD_REQUEST, "검색어는 최소 두 글자 이상이어야 합니다."),
     ENUM_NOT_MATCH(400, HttpStatus.BAD_REQUEST, "타입이 옳지 않습니다."),
     INVALID_FILE_FORMAT(400, HttpStatus.BAD_REQUEST, "파일 형식이 올바르지 않습니다."),
+    INVALID_COUPON_DATA(400, HttpStatus.BAD_REQUEST, "쿠폰 데이터가 올바르지 않습니다."),
 
     RESTRICTED(403, HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     DELETE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "삭제할 수 없습니다."),
@@ -44,10 +45,12 @@ public enum StatusEnum {
     MEMBER_PREFERRED_TOPICS_NOT_FOUND(404, HttpStatus.NOT_FOUND, "해당 멤버의 선호 주제가 없습니다."),
     LECTURE_CATEGORY_BY_LECTURE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 강의별 강의 카테고리 입니다."),
     ISSUE_COUPON_NOT_FOUND(404, HttpStatus.NOT_FOUND, "보유한 쿠폰이 없습니다."),
+    COUPON_CATEGORY_NOT_FOUND(404, HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰 카테고리입니다."),
 
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 
     INVALID_VERIFICATION_CODE(400, HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),
+    INVALID_TOKEN(400, HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다."),
     EMAIL_VERIFICATION_REQUIRED(400, HttpStatus.BAD_REQUEST, "이메일 인증이 필요합니다."),
 
     EXISTING_CONTRACT_PROCESS(409, HttpStatus.CONFLICT, "존재하는 강의 계약과정입니다."),

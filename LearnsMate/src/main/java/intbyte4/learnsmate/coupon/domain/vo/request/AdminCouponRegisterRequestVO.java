@@ -7,17 +7,31 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class AdminCouponRegisterRequestVO {
+
+    private List<String> lectureCode;
+
     private String couponName;
+
     private String couponCategoryName;
+
     private String couponContents;
+
     private Integer couponDiscountRate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime couponStartDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime couponExpireDate;
+
+    private Long adminCode;
 }

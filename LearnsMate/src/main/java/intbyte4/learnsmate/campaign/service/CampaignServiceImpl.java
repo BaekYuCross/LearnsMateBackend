@@ -4,6 +4,7 @@ import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.campaign.batch.CampaignIssueCouponReader;
 import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
@@ -17,6 +18,7 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.couponbycampaign.domain.dto.CouponByCampaignDTO;
 import intbyte4.learnsmate.couponbycampaign.service.CouponByCampaignService;
+import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.service.MemberService;
@@ -25,18 +27,24 @@ import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
+@Service("campaignService")
 @RequiredArgsConstructor
 @Slf4j
 public class CampaignServiceImpl implements CampaignService {
@@ -46,14 +54,17 @@ public class CampaignServiceImpl implements CampaignService {
     private final CouponByCampaignService couponByCampaignService;
     private final MemberService memberService;
     private final CouponService couponService;
+    private final IssueCouponService issueCouponService;
     private final CampaignMapper campaignMapper;
     private final AdminMapper adminMapper;
+    private final JobLauncher jobLauncher;
+    private final Job campaignJob;
+    private final CampaignIssueCouponReader couponMemberReader;
 
     @Override
     public CampaignDTO registerCampaign(CampaignDTO requestCampaign
             , List<MemberDTO> requestStudentList
             , List<CouponDTO> requestCouponList) {
-
         LocalDateTime sendTime;
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
@@ -84,7 +95,6 @@ public class CampaignServiceImpl implements CampaignService {
             if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
             userPerCampaignService.registerUserPerCampaign(foundStudent, savedCampaignDTO);
         });
-
         requestCouponList.forEach(couponDTO -> {
             CouponDTO foundCoupon = couponService.findCouponDTOByCouponCode(couponDTO.getCouponCode());
             if (foundCoupon == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
@@ -93,8 +103,56 @@ public class CampaignServiceImpl implements CampaignService {
             }
             couponByCampaignService.registerCouponByCampaign(foundCoupon, savedCampaignDTO);
         });
+        List<Long> studentCodes = requestStudentList.stream()
+                .map(MemberDTO::getMemberCode)
+                .toList();
+
+        List<Long> couponCodes = requestCouponList.stream()
+                .map(CouponDTO::getCouponCode)
+                .toList();
+
+        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
+            // 즉시 발송
+            issueCouponService.issueCouponsToStudents(studentCodes, couponCodes);
+        } else {
+            // 예약 발송은 스케줄러에 등록 아직
+            registerScheduledCampaign(requestStudentList, requestCouponList, savedCampaignDTO.getCampaignSendDate());
+        }
 
         return campaignMapper.toDTO(campaign);
+    }
+
+    @Override
+    public void registerScheduledCampaign(List<MemberDTO> studentList, List<CouponDTO> couponList, LocalDateTime scheduledTime) {
+        System.out.println("캠페인 예약 작업이 등록되었습니다. 예약 시간: " + scheduledTime);
+        try {
+
+            couponMemberReader.setStudentCouponPairs(studentList, couponList);
+
+
+            // Job 파라미터 설정: 예약 시간과 관련된 정보를 파라미터에 추가
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addDate("scheduledTime", Timestamp.valueOf(scheduledTime))
+                    .toJobParameters();
+
+            // Job 실행
+            jobLauncher.run(campaignJob, jobParameters);
+        } catch (Exception e) {
+            // 에러 처리
+            System.err.println("캠페인 예약 작업 등록 실패: " + e.getMessage());
+        }
+    }
+
+
+
+    @Override
+    @Transactional
+    public List<CampaignDTO> getReadyCampaigns(LocalDateTime currentTime) {
+        // 예약 시간이 현재 시간보다 이전이면서 아직 발송되지 않은 캠페인 조회
+        List<Campaign> readyCampaigns = campaignRepository.findByCampaignSendDateLessThanEqual(currentTime);
+        return readyCampaigns.stream()
+                .map(campaignMapper::toDTO)
+                .toList();
     }
 
     @Override
@@ -195,51 +253,37 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<FindAllCampaignsDTO> findAllCampaignList() {
-        List<Campaign> campaigns = campaignRepository.findAll();
+    public CampaignPageResponse<FindAllCampaignsDTO> findAllCampaignList(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Campaign> campaignPage = campaignRepository.findAll(pageable);
         List<FindAllCampaignsDTO> findAllCampaignsDTOList = new ArrayList<>();
-        for (Campaign campaign : campaigns) {
+        for (Campaign campaign : campaignPage) {
             CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
             AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
             findAllCampaignsDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
         }
 
-        return findAllCampaignsDTOList;
+        return new CampaignPageResponse<>(
+                findAllCampaignsDTOList,
+                campaignPage.getTotalElements(),
+                campaignPage.getTotalPages(),
+                campaignPage.getNumber(),
+                campaignPage.getSize()
+        );
     }
 
     @Override
-    public FindCampaignDTO findCampaign(FindCampaignDTO request) {
+    public FindCampaignDetailDTO findCampaign(FindCampaignDetailDTO request, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
         Campaign campaign = campaignRepository.findById(request.getCampaignCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
-
         CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
-        log.info("캠페인 단건 조회 서비스에서 찾은 캠페인 : {}", campaignDTO);
-        // 캠페인 별 쿠폰에서 찾은 쿠폰 코드로 쿠폰 조회
-        List<CouponByCampaignDTO> couponByCampaignDTOList = couponByCampaignService.findByCampaignCode(campaign);
 
-        List<CouponDTO> couponDTOList = new ArrayList<>();
-        couponByCampaignDTOList.forEach(couponByCampaignDTO -> {
-            CouponDTO couponDTO = couponService.findCouponDTOByCouponCode(couponByCampaignDTO.getCouponCode());
-            if (couponDTO == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
-            couponDTOList.add(couponDTO);
-        });
+        Page<MemberDTO> membersPage = memberService.findMembersByCampaignCode(request, pageable);
+        Page<CouponDTO> couponsPage = couponService.findCouponsByCampaignCode(request, pageable);
 
-        // 학생 별 캠페인에서 찾은 유저 코드로 유저 조회
-        List<UserPerCampaignDTO> userPerCampaignDTOList = userPerCampaignService.findByCampaignCode(campaign);
-
-        List<MemberDTO> memberDTOList = new ArrayList<>();
-        userPerCampaignDTOList.forEach(userPerCampaignDTO -> {
-            MemberDTO memberDTO = memberService.findMemberByMemberCode(userPerCampaignDTO.getStudentCode()
-                    , MemberType.STUDENT);
-            if (memberDTO == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
-            memberDTOList.add(memberDTO);
-        });
-
-        // 위에서 찾은 쿠폰,유저 변환 후 리턴
-        return campaignMapper.toFindCampaignDTO(
-                campaignDTO,
-                couponDTOList,
-                memberDTOList);
+        return campaignMapper.toFindCampaignDetailDTO(campaignDTO,couponsPage,membersPage);
     }
 
     @Override

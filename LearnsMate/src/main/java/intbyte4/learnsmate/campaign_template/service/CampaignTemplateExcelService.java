@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -39,7 +36,12 @@ public class CampaignTemplateExcelService {
             Sheet sheet = workbook.createSheet("CampaignTemplate Data");
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dateStyle = createDateStyle(workbook);
-            createHeader(sheet, headerStyle);
+
+            List<String> selectedColumns = filterDTO != null && filterDTO.getSelectedColumns() != null
+                    ? filterDTO.getSelectedColumns()
+                    : new ArrayList<>(COLUMNS.keySet());
+
+            createHeader(sheet, headerStyle, selectedColumns);
 
             List<ResponseFindCampaignTemplateByFilterVO> campaignTemplateList;
             if (filterDTO != null) {
@@ -51,9 +53,9 @@ public class CampaignTemplateExcelService {
             }
             log.info("Found {} CampaignTemplates to export", campaignTemplateList.size());
 
-            writeData(sheet, campaignTemplateList, dateStyle);
+            writeData(sheet, campaignTemplateList, dateStyle, selectedColumns);
 
-            for (int i = 0; i < COLUMNS.size(); i++) {
+            for (int i = 0; i < selectedColumns.size(); i++) {
                 sheet.autoSizeColumn(i);
             }
             workbook.write(outputStream);
@@ -62,22 +64,22 @@ public class CampaignTemplateExcelService {
             throw new RuntimeException("Failed to create CampaignTemplate Excel file", e);
         }
     }
-    private void createHeader(Sheet sheet, CellStyle headerStyle) {
+    private void createHeader(Sheet sheet, CellStyle headerStyle, List<String> selectedColumns) {
         Row headerRow = sheet.createRow(0);
         int columnIndex = 0;
-        for (String headerValue : COLUMNS.values()) {
+        for (String columnKey : selectedColumns) {
             Cell cell = headerRow.createCell(columnIndex++);
-            cell.setCellValue(headerValue);
+            cell.setCellValue(COLUMNS.get(columnKey));
             cell.setCellStyle(headerStyle);
         }
     }
 
-    private void writeData(Sheet sheet, List<ResponseFindCampaignTemplateByFilterVO> vocList, CellStyle dateStyle) {
+    private void writeData(Sheet sheet, List<ResponseFindCampaignTemplateByFilterVO> campaignTemplateList, CellStyle dateStyle, List<String> selectedColumns) {
         int rowNum = 1;
-        for (ResponseFindCampaignTemplateByFilterVO campaignTemplate : vocList) {
+        for (ResponseFindCampaignTemplateByFilterVO campaignTemplate : campaignTemplateList) {
             Row row = sheet.createRow(rowNum++);
             int columnIndex = 0;
-            for (String key : COLUMNS.keySet()) {
+            for (String key : selectedColumns) {
                 Cell cell = row.createCell(columnIndex++);
                 setValueByColumnKey(cell, key, campaignTemplate, dateStyle);
             }

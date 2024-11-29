@@ -34,6 +34,7 @@ import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
@@ -146,6 +148,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<Object[]> findRecommendedLectures(List<Long> similarStudents, String latestLectureCode, Long studentCode, Pageable pageable) {
+        log.info("{}{}{}", similarStudents, latestLectureCode, studentCode);
         return paymentRepository.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
     }
 

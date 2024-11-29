@@ -38,13 +38,4 @@ public enum CouponCategoryEnum {
         }
         throw new IllegalArgumentException("해당 카테고리의 이름이 존재하지 않습니다: " + categoryName);
     }
-//
-//    public static String getNameByCode(Integer categoryCode) {
-//        for (CouponCategoryEnum category : CouponCategoryEnum.values()) {
-//            if (category.getCategoryCode().equals(categoryCode)) {
-//                return category.getCategoryName();
-//            }
-//        }
-//        throw new IllegalArgumentException("해당 카테고리 코드가 존재하지 않습니다: " + categoryCode);
-//    }
 }

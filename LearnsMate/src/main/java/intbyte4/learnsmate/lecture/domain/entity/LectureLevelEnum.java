@@ -22,11 +22,20 @@ public enum LectureLevelEnum {
     @JsonCreator
     public static LectureLevelEnum fromValue(String value) {
         for (LectureLevelEnum level : LectureLevelEnum.values()) {
-            if (level.value.equalsIgnoreCase(value)) {
+            if (level.value.equals(value)) {
                 return level;
             }
         }
         throw new IllegalArgumentException("Invalid lecture level: " + value);
+    }
+
+    public static LectureLevelEnum fromString(String value) {
+        for (LectureLevelEnum level : values()) {
+            if (level.getValue().equals(value)) {
+                return level;
+            }
+        }
+        throw new IllegalArgumentException("Unknown lecture level: " + value);
     }
 }
 

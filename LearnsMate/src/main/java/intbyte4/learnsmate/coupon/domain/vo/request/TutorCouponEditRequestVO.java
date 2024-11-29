@@ -29,4 +29,7 @@ public class TutorCouponEditRequestVO {
 
     @JsonProperty("coupon_category_code")
     private Integer couponCategoryCode;
+
+    @JsonProperty("tutor_code")
+    private Long tutorCode;
 }

@@ -2,10 +2,7 @@ package intbyte4.learnsmate.campaign.mapper;
 
 
 import intbyte4.learnsmate.admin.domain.entity.Admin;
-import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
-import intbyte4.learnsmate.campaign.domain.dto.CampaignFilterDTO;
-import intbyte4.learnsmate.campaign.domain.dto.FindAllCampaignsDTO;
-import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDTO;
+import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignVO;
@@ -15,6 +12,7 @@ import intbyte4.learnsmate.campaign.domain.vo.response.*;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -116,8 +114,8 @@ public class CampaignMapper {
                 .build();
     }
 
-    public List<ResponseFindCampaignVO> fromDtoListToFindCampaignVO(List<FindAllCampaignsDTO> dtoList) {
-        return dtoList.stream().map(dto -> ResponseFindCampaignVO.builder()
+    public CampaignPageResponse<ResponseFindCampaignVO> fromDtoListToFindCampaignVO(CampaignPageResponse<FindAllCampaignsDTO> dtoPage) {
+        List<ResponseFindCampaignVO> voList = dtoPage.getContent().stream().map(dto -> ResponseFindCampaignVO.builder()
                 .campaignCode(dto.getCampaignCode())
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
@@ -127,7 +125,15 @@ public class CampaignMapper {
                 .updatedAt(dto.getUpdatedAt())
                 .adminCode(dto.getAdminCode())
                 .adminName(dto.getAdminName())
-                .build()).collect(Collectors.toList());
+                .build()).toList();
+
+        return new CampaignPageResponse<>(
+                voList,                              // 변환된 VO 리스트
+                dtoPage.getTotalElements(),          // 총 아이템 수
+                dtoPage.getTotalPages(),             // 총 페이지 수
+                dtoPage.getCurrentPage(),            // 현재 페이지 번호
+                dtoPage.getSize()                    // 페이지 크기
+        );
     }
 
     public ResponseFindCampaignVO fromDtoToFindResponseVO(CampaignDTO dto) {
@@ -237,11 +243,25 @@ public class CampaignMapper {
                 .members(dto.getMembers())
                 .coupons(dto.getCoupons())
                 .build();
-
     }
 
-    public FindCampaignDTO toFindCampaignDTO(CampaignDTO campaignDTO, List<CouponDTO> couponDTOList, List<MemberDTO> memberDTOList) {
-        return FindCampaignDTO.builder()
+    public ResponseFindCampaignDetailVO fromFindCampaignDetailDtoToFindResponseVO(FindCampaignDetailDTO dto) {
+        return ResponseFindCampaignDetailVO.builder()
+                .campaignCode(dto.getCampaignCode())
+                .campaignTitle(dto.getCampaignTitle())
+                .campaignContents(dto.getCampaignContents())
+                .campaignType(dto.getCampaignType())
+                .campaignSendDate(dto.getCampaignSendDate())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .members(dto.getMembers())
+                .coupons(dto.getCoupons())
+                .build();
+    }
+
+
+    public FindCampaignDetailDTO toFindCampaignDetailDTO(CampaignDTO campaignDTO, Page<CouponDTO> couponPage, Page<MemberDTO> memberPage) {
+        return FindCampaignDetailDTO.builder()
                 .campaignCode(campaignDTO.getCampaignCode())
                 .campaignTitle(campaignDTO.getCampaignTitle())
                 .campaignContents(campaignDTO.getCampaignContents())
@@ -249,8 +269,8 @@ public class CampaignMapper {
                 .campaignSendDate(campaignDTO.getCampaignSendDate())
                 .createdAt(campaignDTO.getCreatedAt())
                 .createdAt(campaignDTO.getUpdatedAt())
-                .members(memberDTOList)
-                .coupons(couponDTOList)
+                .members(memberPage)
+                .coupons(couponPage)
                 .build();
     }
 }

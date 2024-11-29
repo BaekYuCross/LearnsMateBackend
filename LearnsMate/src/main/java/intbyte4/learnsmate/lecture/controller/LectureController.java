@@ -120,4 +120,11 @@ public class LectureController {
         List<MonthlyLectureCountDTO> lectureCounts = lectureService.getFilteredMonthlyLectureCounts(filterDTO);
         return ResponseEntity.ok(lectureCounts);
     }
+
+    @Operation(summary = "전체 강의 조회")
+    @GetMapping("/all-lectures")
+    public ResponseEntity<List<ResponseFindLectureVO>> getAllLectures() {
+        List<ResponseFindLectureVO> response = lectureFacade.findAllLectures();
+        return ResponseEntity.ok(response);
+    }
 }

@@ -8,16 +8,13 @@ import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.repository.AdminRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
-import intbyte4.learnsmate.member.mapper.MemberMapper;
-import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +26,7 @@ import java.util.List;
 public class AdminServiceImpl implements AdminService {
 
     private final AdminRepository adminRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AdminMapper adminMapper;
 
     @Override
@@ -38,8 +36,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public AdminDTO updateAdmin(Long adminCode, AdminDTO adminDTO) {
-        Admin admin = adminRepository.findById(adminCode)
+    public AdminDTO updateAdmin(AdminDTO adminDTO) {
+        Admin admin = adminRepository.findById(adminDTO.getAdminCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.ADMIN_NOT_FOUND));
         admin.toUpdate(adminDTO);
         Admin updatedAdmin = adminRepository.save(admin);
@@ -63,6 +61,31 @@ public class AdminServiceImpl implements AdminService {
 
         AdminDTO adminDTO = adminMapper.toDTO(admin);
         return new CustomUserDetails(adminDTO, grantedAuthorities, true, true, true, true);
+    }
+
+
+    @Override
+    public AdminDTO findUserByEmail(String adminEmail) {
+        Admin admin = adminRepository.findByAdminEmail(adminEmail);
+        if (admin == null) {
+            throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
+        }
+        return adminMapper.toDTO(admin);
+    }
+
+    @Override
+    public void resetPassword(AdminDTO request) {
+
+        Admin admin = adminRepository.findByAdminEmail(request.getAdminEmail());
+        if (admin == null) {
+            throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
+        }
+
+        // 비밀번호 bCrypt 암호화.
+        admin.setAdminPassword(bCryptPasswordEncoder.encode(request.getAdminPassword()));
+
+        Admin updatedAdmin = adminRepository.save(admin);
+        adminMapper.toDTO(updatedAdmin);
     }
 
 }
