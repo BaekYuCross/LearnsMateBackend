@@ -32,4 +32,6 @@ public interface CampaignService {
             (CampaignFilterDTO request, int page, int size);
     List<FindAllCampaignsDTO> findCampaignListByConditionWithExcel(CampaignFilterDTO filterDTO);
     List<FindAllCampaignsDTO> findAllCampaignListWithExcel();
+
+    void updateCampaignSendFlag(Long campaignCode);
 }
