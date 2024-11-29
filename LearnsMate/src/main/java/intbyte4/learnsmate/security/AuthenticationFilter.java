@@ -83,6 +83,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             throw new IllegalArgumentException("Authentication 객체가 CustomUserDetails 타입이 아닙니다.");
         }
 
+        // CustomUserDetails로 캐스팅하여 사용자 정보를 가져옴
         CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
 
         // 사용자 정보 가져오기
@@ -100,11 +101,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // JWT 생성: JwtTokenDTO에 사용자 정보를 담고, roles와 함께 JWT 토큰을 생성
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
-        String accessToken = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
+        String token = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO); // 7일
 
         // 쿠키 생성
-        Cookie jwtCookie = new Cookie("accessToken", accessToken);
+        Cookie jwtCookie = new Cookie("token", token);
         jwtCookie.setHttpOnly(true); // HTTP Only 속성으로 설정 (JavaScript에서 접근 불가)
         jwtCookie.setSecure(false); // HTTPS 연결에서만 전송 (테스트 환경에서는 false 설정 가능)
         // https://learnsmate.site -> 배포 환경시 true로 전환
@@ -112,6 +113,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         jwtCookie.setMaxAge(4 * 3600); // 쿠키 만료 시간 설정 (4시간)
         // 여기를 3-4시간정도로 만료시간 할건데 리프레시토큰을 해야하나? erp라 재로그인이 필요하지않을까
 
+        response.addCookie(jwtCookie);
 
         // Refresh Token 쿠키 생성
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
@@ -120,8 +122,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         refreshTokenCookie.setPath("/"); // 유효 경로 설정
         refreshTokenCookie.setMaxAge(7 * 24 * 3600); // Refresh Token의 만료 시간 (7일)
 
-        // 쿠키 응답에 추가
-        response.addCookie(jwtCookie);
         response.addCookie(refreshTokenCookie);
 
         saveRefreshTokenToRedis(userCode,refreshToken);
