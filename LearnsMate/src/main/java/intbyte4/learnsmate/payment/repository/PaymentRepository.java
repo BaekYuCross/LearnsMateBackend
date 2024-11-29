@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.payment.repository;
 
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.payment.domain.dto.PaymentMonthlyRevenueDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import org.springframework.data.domain.Pageable;
@@ -62,4 +63,24 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, CustomP
 
     @Query("SELECT p FROM payment p WHERE p.paymentCode = :paymentCode")
     Optional<Payment> findByPaymentCode(@Param("paymentCode") Long paymentCode);
+
+    @Query("SELECT COALESCE(COUNT(p), 0) FROM payment p")
+    int findTotalPurchaseCount();
+
+    @Query("SELECT COALESCE(COUNT(p), 0) FROM payment p " +
+            "JOIN lecture_by_student lbs ON p.lectureByStudent.lectureByStudentCode = lbs.lectureByStudentCode " +
+            "JOIN lectureCategoryByLecture lc " +
+            "ON lc.lecture.lectureCode = lbs.lecture.lectureCode " +
+            "WHERE lc.lectureCategory.lectureCategoryName = :categoryName")
+    int findPurchaseCountByCategory(@Param("categoryName") LectureCategoryEnum categoryName);
+
+    @Query("SELECT COALESCE(COUNT(p), 0) " +
+            "FROM payment p " +
+            "JOIN lecture_by_student lbs ON p.lectureByStudent.lectureByStudentCode = lbs.lectureByStudentCode " +
+            "JOIN lectureCategoryByLecture lc ON lc.lecture.lectureCode = lbs.lecture.lectureCode " +
+            "WHERE lc.lectureCategory.lectureCategoryName = :categoryName " +
+            "AND p.createdAt BETWEEN :startDate AND :endDate")
+    int findPurchaseCountByCategoryWithDateRange(@Param("categoryName") LectureCategoryEnum categoryName,
+                                                 @Param("startDate") LocalDateTime startDate,
+                                                 @Param("endDate") LocalDateTime endDate);
 }

@@ -21,6 +21,7 @@ import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoByStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
@@ -157,6 +158,22 @@ public class PaymentServiceImpl implements PaymentService {
     public Integer getStudentCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
         return paymentRepository.countDistinctStudentsByLectureCodeBetweenDates(lectureCode, startDate, endDate);
     }
+
+    @Override
+    public int getTotalPurchaseCount() {
+        return paymentRepository.findTotalPurchaseCount();
+    }
+
+    @Override
+    public int getPurchaseCountByCategory(String lectureCategoryName) {
+        return paymentRepository.findPurchaseCountByCategory(LectureCategoryEnum.valueOf(lectureCategoryName));
+    }
+
+    @Override
+    public Integer getPurchaseCountByCategoryWithDateRange(String categoryName, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.findPurchaseCountByCategoryWithDateRange(LectureCategoryEnum.valueOf(categoryName), startDate, endDate);
+    }
+
 
     private Result getResult(MemberDTO memberDTO, LectureDTO lectureDTO) {
         Member student = memberMapper.fromMemberDTOtoMember(memberDTO);
