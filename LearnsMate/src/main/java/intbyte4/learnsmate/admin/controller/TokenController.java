@@ -1,6 +1,8 @@
 package intbyte4.learnsmate.admin.controller;
 
 import intbyte4.learnsmate.admin.domain.dto.JwtTokenDTO;
+import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
+import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.admin.service.RedisService;
 import intbyte4.learnsmate.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +29,7 @@ public class TokenController {
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisService redisService;
+    private final AdminService adminService;
 
     @Operation(summary = "직원 로그아웃")
     @PostMapping("/logout")
@@ -83,10 +88,18 @@ public class TokenController {
                 throw new RuntimeException("유효하지 않은 Refresh Token입니다.");
             }
 
+            // UserDetails
+            CustomUserDetails userDetails =
+                    (CustomUserDetails) adminService.loadUserByUsername(userCode);
+
+            // Authentication 객체
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
             // 새로운 Access Token 발급
             String newAccessToken = jwtUtil.generateToken(
                     new JwtTokenDTO(userCode, null, null),
-                    List.of("ROLE_USER"),null
+                    List.of("ROLE_USER"), null, authentication
             );
 
             // 새 Access Token을 HttpOnly 쿠키에 저장

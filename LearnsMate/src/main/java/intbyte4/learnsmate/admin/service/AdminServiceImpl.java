@@ -60,7 +60,8 @@ public class AdminServiceImpl implements AdminService {
         }
 
         AdminDTO adminDTO = adminMapper.toDTO(admin);
-        return new CustomUserDetails(adminDTO, grantedAuthorities, true, true, true, true);
+        // expiration은 일단 null로 설정 -> 토큰 생성시 따로 설정
+        return new CustomUserDetails(adminDTO, grantedAuthorities,null, true, true, true, true);
     }
 
 

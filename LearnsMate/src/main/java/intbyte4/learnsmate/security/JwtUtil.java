@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.security;
 
 import intbyte4.learnsmate.admin.domain.dto.JwtTokenDTO;
+import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
@@ -17,6 +18,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,7 +36,7 @@ public class JwtUtil {
     public JwtUtil(@Value("${token.secret}") String secretKey, @Value("${token.expiration_time}") long expirationTime, AdminService adminService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
-        this.expirationTime = expirationTime * 1000L;
+        this.expirationTime = expirationTime;
         this.adminService = adminService;
     }
 
@@ -65,6 +69,15 @@ public class JwtUtil {
         Claims claims = parseClaims(token);
         log.info("AccessToken Claims: {}", claims);
 
+        if (userDetails instanceof CustomUserDetails) {
+            Long expTimestamp = claims.get("exp", Long.class);
+            LocalDateTime expirationDateTime = LocalDateTime.ofInstant(
+                    Instant.ofEpochSecond(expTimestamp),
+                    ZoneId.systemDefault()
+            );
+            ((CustomUserDetails) userDetails).setExpiration(expirationDateTime);
+        }
+
         Collection<? extends GrantedAuthority> authorities = extractAuthorities(claims);
         return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
@@ -92,7 +105,7 @@ public class JwtUtil {
         return parseClaims(token).getSubject();
     }
 
-    public String generateToken(JwtTokenDTO tokenDTO, List<String> roles, String provider) {
+    public String generateToken(JwtTokenDTO tokenDTO, List<String> roles, String provider, Authentication authentication) {
         Claims claims = Jwts.claims().setSubject(tokenDTO.getUserCode());
         claims.put("email", tokenDTO.getUserEmail());
         claims.put("name", tokenDTO.getUserName());
@@ -100,6 +113,11 @@ public class JwtUtil {
         claims.put("provider", provider);
 
         log.info("Claims 생성: {}", claims);
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        LocalDateTime expirationDateTime = LocalDateTime.now().plusHours(expirationTime / (1000 * 60 * 60));
+        userDetails.setExpiration(expirationDateTime);
 
         return Jwts.builder()
                 .setClaims(claims)

@@ -101,7 +101,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // JWT 생성: JwtTokenDTO에 사용자 정보를 담고, roles와 함께 JWT 토큰을 생성
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
-        String token = jwtUtil.generateToken(tokenDTO, roles, null);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
+        String token = jwtUtil.generateToken(tokenDTO, roles, null, authResult);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO); // 7일
 
         // 쿠키 생성
