@@ -31,4 +31,10 @@ public interface PaymentService {
     Integer getTotalStudentCountBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     Integer getStudentCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate);
+
+    int getTotalPurchaseCount();
+
+    int getPurchaseCountByCategory(String lectureCategoryName);
+
+    Integer getPurchaseCountByCategoryWithDateRange(String lectureCategoryName, LocalDateTime startDate, LocalDateTime endDate);
 }

@@ -47,16 +47,17 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "강의 단 건 조회 + 클릭수 -> 실제 결제까지의 비율 조회")
+    @Operation(summary = "강의 단 건 조회 및 구매 전환율 계산")
     @GetMapping("/{lectureCode}")
     public ResponseEntity<ResponseFindLectureDetailVO> getLecture(@PathVariable("lectureCode") String lectureCode) {
-        ResponseFindLectureDetailVO lectureDetail = lectureFacade.getLectureById(lectureCode);
+        ResponseFindLectureDetailVO lectureDetail = lectureFacade.getLectureDetailsWithConversionRates(lectureCode);
         return ResponseEntity.status(HttpStatus.OK).body(lectureDetail);
     }
 
+    @Operation(summary = "강의 통계 및 날짜 필터 적용")
     @PostMapping("/{lectureCode}/stats/filter")
     public ResponseEntity<LectureStatsVO> getLectureStatsWithFilter(@PathVariable("lectureCode") String lectureCode, @RequestBody LectureStatsFilterDTO filterDTO) {
-        LectureStatsVO stats = lectureFacade.getLectureStatsWithFilter(lectureCode, filterDTO);
+        LectureStatsVO stats = lectureFacade.getLectureStatsWithFilterAndRates(lectureCode, filterDTO);
         return ResponseEntity.ok(stats);
     }
 
@@ -91,13 +92,6 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToRemoveResponseVO(removedLecture));
     }
 
-    @Operation(summary = "월별/연도별 전체 강의 수 조회")
-    @GetMapping("/monthly-counts")
-    public ResponseEntity<List<MonthlyLectureCountDTO>> getMonthlyLectureCounts() {
-        List<MonthlyLectureCountDTO> lectureCounts = lectureService.getMonthlyLectureCounts();
-        return ResponseEntity.ok(lectureCounts);
-    }
-
     @Operation(summary = "전체 조회 화면에서의 필터링 기능")
     @PostMapping("/filter")
     public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> filterLectures(@RequestBody RequestLectureFilterVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
@@ -110,6 +104,13 @@ public class LectureController {
             log.error("강의 필터링 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @Operation(summary = "월별/연도별 전체 강의 수 조회")
+    @GetMapping("/monthly-counts")
+    public ResponseEntity<List<MonthlyLectureCountDTO>> getMonthlyLectureCounts() {
+        List<MonthlyLectureCountDTO> lectureCounts = lectureService.getMonthlyLectureCounts();
+        return ResponseEntity.ok(lectureCounts);
     }
 
     @Operation(summary = "기간별 월별 강의 수 조회")

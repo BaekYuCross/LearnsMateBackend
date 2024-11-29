@@ -4,7 +4,6 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category.mapper.LectureCategoryMapper;
 import intbyte4.learnsmate.lecture_category.repository.LectureCategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +22,5 @@ public class LectureCategoryServiceImpl implements LectureCategoryService {
                 .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_CATEGORY_NOT_FOUND));
 
         return lectureCategoryMapper.toDTO(lectureCategory);
-    }
-
-    @Override
-    public LectureCategoryEnum findLectureCategoryNameByCode(Integer lectureCategoryCode) {
-        return lectureCategoryRepository.findById(lectureCategoryCode)
-                .orElseThrow(() -> new CommonException(StatusEnum.LECTURE_CATEGORY_NOT_FOUND))
-                .getLectureCategoryName();
     }
 }

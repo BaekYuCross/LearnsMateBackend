@@ -66,6 +66,9 @@ public class AdminController {
         response.put("code", userDetails.getUserDTO().getAdminCode()); // 관리자 사번
         response.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment()); // 관리자 부서
         response.put("roles", userDetails.getAuthorities()); // 권한 정보
+        response.put("exp", userDetails.getExpiration()); // 시간
+
+        log.info("만료시간은!!!: {}", userDetails.getExpiration());
 
         return ResponseEntity.ok(response);
     }

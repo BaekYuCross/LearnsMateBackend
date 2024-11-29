@@ -16,9 +16,15 @@ public class LectureStatsVO {
     private Integer totalStudentCount;
     private Integer totalLectureClickCount;
     private Double totalConversionRate;
+
     private String lectureCode;
     private String lectureTitle;
     private Integer studentCount;
     private Integer lectureClickCount;
     private Double conversionRate;
+
+    private Integer categoryClickCount;
+    private Integer categoryPurchaseCount;
+    private Double categoryConversionRate;
 }
+
