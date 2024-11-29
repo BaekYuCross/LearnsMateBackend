@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.lecture.repository;
 
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,4 +43,20 @@ public interface LectureRepository extends JpaRepository<Lecture, String> , JpaS
             "WHERE l.lectureCode = :lectureCode " +
             "AND l.createdAt BETWEEN :startDate AND :endDate")
     Integer getClickCountByLectureCodeBetweenDates(@Param("lectureCode") String lectureCode, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT COALESCE(SUM(l.lectureClickCount), 0) FROM lecture l")
+    int findTotalClickCount();
+
+    @Query("SELECT COALESCE(SUM(l.lectureClickCount), 0) FROM lecture l " +
+            "JOIN lectureCategoryByLecture lc " +
+            "ON lc.lecture.lectureCode = l.lectureCode " +
+            "WHERE lc.lectureCategory.lectureCategoryName = :categoryName")
+    int findClickCountByCategory(@Param("categoryName") LectureCategoryEnum categoryName);
+
+    @Query("SELECT COALESCE(SUM(l.lectureClickCount), 0) " +
+            "FROM lecture l " +
+            "JOIN lectureCategoryByLecture lc ON lc.lecture.lectureCode = l.lectureCode " +
+            "WHERE lc.lectureCategory.lectureCategoryName = :categoryName " +
+            "AND l.createdAt BETWEEN :startDate AND :endDate")
+    int findClickCountByCategoryWithDateRange(@Param("categoryName") LectureCategoryEnum categoryName, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }
