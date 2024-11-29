@@ -66,17 +66,17 @@ jobs:
                 hibernate:
                   '[format_sql]': true
             
-              mail:
-                smtp:
-                  host: \${SPRING_MAIL_SMTP_HOST}
-                  username: \${SMTP_USERNAME}
-                  password: \${SMTP_PASSWORD}
-                  port: \${SMTP_PORT}
-                  properties:
-                    mail:
-                      smtp:
-                        auth: true
-                        starttls.enable: true
+            mail:
+              host: \${SPRING_MAIL_SMTP_HOST}
+              username: \${SMTP_USERNAME}
+              password: \${SMTP_PASSWORD}
+              port: \${SMTP_PORT}
+                properties:
+                  mail:
+                    smtp:
+                      auth: true
+                      starttls:
+                        enable: true
           
           openai:
             model: gpt-4o
