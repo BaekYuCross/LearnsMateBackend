@@ -35,6 +35,8 @@ public class Campaign {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime campaignSendDate;
 
+    @Column(name="campaign_send_flag" , nullable = true)
+    private Boolean campaignSendFlag;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -47,4 +49,15 @@ public class Campaign {
     @JoinColumn(name = "admin_code", nullable = false)
     private Admin admin;
 
+    // 엔티티가 처음 저장되기 전에 실행되어 기본값을 설정해 줌
+    @PrePersist
+    public void prePersist() {
+        if (campaignSendFlag == null) {
+            campaignSendFlag = false;  // 기본값 설정
+        }
+    }
+
+    public void updateSendFlag() {
+        this.campaignSendFlag = true;
+    }
 }
