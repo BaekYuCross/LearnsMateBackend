@@ -1,12 +1,14 @@
 package intbyte4.learnsmate.admin.controller;
 
 import intbyte4.learnsmate.admin.domain.dto.JwtTokenDTO;
+import intbyte4.learnsmate.admin.service.RedisService;
 import intbyte4.learnsmate.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +18,57 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
+@Slf4j
+@RequiredArgsConstructor
 public class TokenController {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisService redisService;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    @Operation(summary = "직원 로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        log.info("POST /admin/logout 요청 도착");
+
+        // 쿠키에서 refreshToken 추출
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                }
+            }
+        }
+
+        // 쿠키 삭제
+        clearCookie(response, "token", "/", "localhost");
+        clearCookie(response, "refreshToken", "/", "localhost");
+
+        // Redis에서 refreshToken 삭제
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            // 토큰에서 userCode 추출
+            String userCode = jwtUtil.getUserCodeFromToken(refreshToken); // 토큰에서 사용자 식별자 추출
+            if (userCode != null) {
+                redisService.deleteToken(userCode); // userCode 기반으로 Redis에서 삭제
+            } else {
+                log.warn("RefreshToken에서 userCode를 추출하지 못했습니다.");
+            }
+        }
+
+        log.info("로그아웃 성공");
+        return ResponseEntity.ok().body("로그아웃 성공");
+    }
+
+    private void clearCookie(HttpServletResponse response, String cookieName, String path, String domain) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath(path);
+        cookie.setDomain(domain);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // 즉시 만료
+        response.addCookie(cookie);
+    }
 
     @Operation(summary = "토큰 리프레시 요청")
     @PostMapping("/refresh")
