@@ -16,8 +16,6 @@ import intbyte4.learnsmate.admin.service.EmailService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -72,21 +70,6 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "직원 로그아웃")
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        log.info("POST /admin/logout 요청 도착");
-        // 쿠키 삭제 명령
-        Cookie cookie = new Cookie("token", null);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0); // 쿠키 만료 처리
-        response.addCookie(cookie);
-
-        // 필요 시 블랙리스트로 JWT 관리
-        log.info("로그아웃 성공");
-        return ResponseEntity.ok().body("로그아웃 성공");
-    }
 
     // 인증버튼
     @Operation(summary = "직원 비밀번호 재설정시 이메일 전송")

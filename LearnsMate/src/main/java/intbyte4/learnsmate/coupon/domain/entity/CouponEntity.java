@@ -31,7 +31,7 @@ public class CouponEntity {
     private String couponContents;
 
     @Column(name = "coupon_discount_rate", nullable = false)
-    private int couponDiscountRate;
+    private Integer couponDiscountRate;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
