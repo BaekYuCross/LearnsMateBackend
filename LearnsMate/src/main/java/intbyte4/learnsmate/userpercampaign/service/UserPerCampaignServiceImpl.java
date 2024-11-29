@@ -78,4 +78,9 @@ public class UserPerCampaignServiceImpl implements UserPerCampaignService{
     public void removeByCampaignCode(Long campaignCode) {
         userPerCampaignRepository.deleteByCampaign_CampaignCode(campaignCode);
     }
+
+    @Override
+    public List<UserPerCampaignDTO> findUserByCampaignCode(Long campaignCode) {
+        return userPerCampaignRepository.findStudentsByCampaignCode(campaignCode);
+    }
 }
