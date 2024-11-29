@@ -1,15 +1,19 @@
 package intbyte4.learnsmate.coupon.controller;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
+import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.service.CouponExcelService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/coupon/excel")
@@ -42,4 +46,27 @@ public class CouponExcelController {
         }
     }
 
+
+    @PostMapping("/upload/target-coupon")
+    @Operation(summary = "타겟 쿠폰 엑셀 업로드", description = "엑셀 파일을 통해 쿠폰 정보를 일괄 등록합니다.")
+    public List<CouponFindResponseVO> uploadTargetCouponExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        log.info("쿠폰 파일 업로드 시작. 파일 이름은 : {}", file.getOriginalFilename());
+
+        if (!isExcelFile(file)) {
+            log.error("Invalid file format: {}", file.getOriginalFilename());
+            throw new CommonException(StatusEnum.INVALID_FILE_FORMAT);
+        }
+
+        // 유효한 타겟 유저 리스트 반환
+        return couponExcelService.importTargetStudentFromExcel(file);
+    }
+
+
+    private boolean isExcelFile(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        return filename != null && (
+                filename.endsWith(".xlsx") ||
+                        filename.endsWith(".xls")
+        );
+    }
 }
