@@ -78,17 +78,6 @@ jobs:
                         auth: true
                         ssl.enable: true
           
-            data:
-              redis:
-                host: localhost
-                port: 6379
-                lettuce:
-                  pool:
-                    max-active: 50
-                    max-idle: 25
-                    min-idle: 5
-                    time-between-eviction-runs: 2000ms
-          
           openai:
             model: gpt-4o
             secret-key: \${SECRET_KEY}
