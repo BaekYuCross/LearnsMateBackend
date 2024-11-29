@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 // security의 loadUserByUsername의 리턴 값을 바꿔주기 위한(토큰 생성을 위해) 커스텀 user
@@ -17,6 +18,7 @@ public class CustomUserDetails implements UserDetails {
 
     private final AdminDTO userDTO;   // Admin 엔티티를 담는 필드
     private List<GrantedAuthority> authorities;  // 권한 정보를 담을 필드
+    private LocalDateTime expiration;
 
     // 추가 필드: true/false 값을 받을 필드
     private boolean isAccountNonExpired;
