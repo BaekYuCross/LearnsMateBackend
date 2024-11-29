@@ -42,7 +42,11 @@ public class CouponFacade {
     private final MemberMapper memberMapper;
 
     @Transactional
-    public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request, Long tutorCode, Integer couponCategoryCode, String lectureCode) {
+    public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request) {
+
+        Long tutorCode = request.getTutorCode();
+        Integer couponCategoryCode = request.getCouponCategoryCode();
+        String lectureCode = request.getLectureCode();
 
         MemberDTO tutorDTO = memberService.findById(tutorCode);
         Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);

@@ -48,6 +48,7 @@ public enum StatusEnum {
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다"),
 
     INVALID_VERIFICATION_CODE(400, HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),
+    INVALID_TOKEN(400, HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다."),
     EMAIL_VERIFICATION_REQUIRED(400, HttpStatus.BAD_REQUEST, "이메일 인증이 필요합니다."),
 
     EXISTING_CONTRACT_PROCESS(409, HttpStatus.CONFLICT, "존재하는 강의 계약과정입니다."),

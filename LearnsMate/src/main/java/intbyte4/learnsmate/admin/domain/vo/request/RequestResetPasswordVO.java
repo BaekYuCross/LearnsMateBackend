@@ -15,8 +15,8 @@ public class RequestResetPasswordVO {
 
     @NotBlank
     @Email
-    String userEmail;
+    String adminEmail;
 
     @NotBlank
-    String userPassword;
+    String adminPassword;
 }

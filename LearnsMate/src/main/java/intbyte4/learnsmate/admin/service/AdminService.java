@@ -1,7 +1,6 @@
 package intbyte4.learnsmate.admin.service;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
-import intbyte4.learnsmate.admin.domain.vo.request.RequestResetPasswordVO;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface AdminService extends UserDetailsService {
@@ -11,5 +10,5 @@ public interface AdminService extends UserDetailsService {
 
     AdminDTO findUserByEmail(String adminEmail);
 
-    void resetPassword(RequestResetPasswordVO request);
+    void resetPassword(AdminDTO request);
 }

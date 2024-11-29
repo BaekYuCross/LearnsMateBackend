@@ -2,6 +2,7 @@ package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.voc.domain.VOCAiAnswer;
 import intbyte4.learnsmate.voc.service.VOCAiService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class VOCAiController {
 
     private final VOCAiService vocAiService;
 
+    @Operation(summary = "이번 주차 voc 분석 조회")
     @GetMapping("/current-week")
     public ResponseEntity<List<VOCAiAnswer>> getCurrentWeekAnalysis() {
         LocalDate currentWeekMonday = vocAiService.getCurrentWeekMonday();
@@ -32,6 +34,7 @@ public class VOCAiController {
         return ResponseEntity.ok(analysisData);
     }
 
+    @Operation(summary = "voc 분석 월요일 주차 별 조회")
     @GetMapping("/by-date")
     public ResponseEntity<List<VOCAiAnswer>> getAnalysisByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<VOCAiAnswer> analysisData = vocAiService.getAnalysisByDate(date);
