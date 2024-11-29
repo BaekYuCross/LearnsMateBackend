@@ -50,7 +50,7 @@ public class SchedulerConfig {
         vocAiService.analyzeVocForLastWeek();
     }
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 */3 * * *")
     public void scheduleCampaigns() {
         List<CampaignDTO> readyCampaigns = campaignService.getReadyCampaigns(LocalDateTime.now());
         for (CampaignDTO campaign : readyCampaigns) {
