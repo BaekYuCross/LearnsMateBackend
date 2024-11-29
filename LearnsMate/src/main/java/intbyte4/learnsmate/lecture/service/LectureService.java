@@ -28,4 +28,10 @@ public interface LectureService {
     Integer getTotalClickCountBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     Integer getClickCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate);
+
+    int getTotalClickCount();
+
+    int getClickCountByCategory(String lectureCategoryName);
+
+    Integer getClickCountByCategoryWithDateRange(String lectureCategoryName, LocalDateTime startDate, LocalDateTime endDate);
 }
