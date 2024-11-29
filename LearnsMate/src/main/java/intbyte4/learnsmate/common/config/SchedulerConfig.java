@@ -2,6 +2,7 @@ package intbyte4.learnsmate.common.config;
 
 import intbyte4.learnsmate.admin.service.EmailService;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.service.CampaignService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -52,23 +53,28 @@ public class SchedulerConfig {
 
     @Scheduled(cron = "0 0 */3 * * *")
     public void scheduleCampaigns() {
-        List<CampaignDTO> readyCampaigns = campaignService.getReadyCampaigns(LocalDateTime.now());
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        List<CampaignDTO> readyCampaigns = campaignService.getReadyCampaigns(currentTime);
+
         for (CampaignDTO campaign : readyCampaigns) {
             try {
-                JobParameters jobParameters = new JobParametersBuilder()
-                        .addLong("campaignCode", campaign.getCampaignCode())
-                        .addDate("startTime", new Date())
-                        .toJobParameters();
-                jobLauncher.run(campaignJob, jobParameters);
+                if (CampaignTypeEnum.RESERVATION.name().equals(campaign.getCampaignType())) {
+                    JobParameters jobParameters = new JobParametersBuilder()
+                            .addLong("campaignCode", campaign.getCampaignCode())
+                            .addDate("startTime", new Date())
+                            .toJobParameters();
+                    jobLauncher.run(campaignJob, jobParameters);
 
-                List<UserPerCampaignDTO> userPerCampaignDTOList = userPerCampaignService.findUserByCampaignCode(campaign.getCampaignCode());
-                for (UserPerCampaignDTO userPerCampaignDTO : userPerCampaignDTOList) {
-                    MemberDTO member = memberService.findMemberByMemberCode(userPerCampaignDTO.getStudentCode(), MemberType.STUDENT);
-                    if (member != null) {
-                        emailService.sendCampaignEmail(member.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
+                    List<UserPerCampaignDTO> userPerCampaignDTOList = userPerCampaignService.findUserByCampaignCode(campaign.getCampaignCode());
+                    for (UserPerCampaignDTO userPerCampaignDTO : userPerCampaignDTOList) {
+                        MemberDTO member = memberService.findMemberByMemberCode(userPerCampaignDTO.getStudentCode(), MemberType.STUDENT);
+                        if (member != null) {
+                            emailService.sendCampaignEmail(member.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
+                        }
                     }
+                    campaignService.updateCampaignSendFlag(campaign.getCampaignCode());
                 }
-                campaignService.updateCampaignSendFlag(campaign.getCampaignCode());
             } catch (Exception e) {
                 System.err.println("Failed to launch campaign job: " + e.getMessage());
             }

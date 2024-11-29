@@ -70,6 +70,7 @@ public class CampaignServiceImpl implements CampaignService {
         LocalDateTime sendTime;
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
+
         if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
             sendTime = LocalDateTime.now();
         } else {
@@ -83,6 +84,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .campaignContents(requestCampaign.getCampaignContents())
                 .campaignType(CampaignTypeEnum.valueOf(requestCampaign.getCampaignType()))
                 .campaignSendDate(sendTime)
+                .campaignSendFlag(false)
                 .createdAt(requestCampaign.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .admin(admin)
@@ -131,17 +133,7 @@ public class CampaignServiceImpl implements CampaignService {
     public void registerScheduledCampaign(List<MemberDTO> studentList, List<CouponDTO> couponList, LocalDateTime scheduledTime) {
         System.out.println("캠페인 예약 작업이 등록되었습니다. 예약 시간: " + scheduledTime);
         try {
-
             couponMemberReader.setStudentCouponPairs(studentList, couponList);
-
-
-            // Job 파라미터 설정: 예약 시간과 관련된 정보를 파라미터에 추가
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addDate("scheduledTime", Timestamp.valueOf(scheduledTime))
-                    .toJobParameters();
-
-            // Job 실행
-            jobLauncher.run(campaignJob, jobParameters);
         } catch (Exception e) {
             // 에러 처리
             System.err.println("캠페인 예약 작업 등록 실패: " + e.getMessage());
