@@ -78,16 +78,16 @@ jobs:
                     starttls:
                       enable: true
           
-              data:
-                redis:
-                  host: \{REDIS_HOST}
-                  port: \{REDIS_PORT}
-                  lettuce:
-                    pool:
-                      max-active: 50
-                      max-idle: 25
-                      min-idle: 5
-                      time-between-eviction-runs: 2000ms
+            data:
+              redis:
+                host: \{REDIS_HOST}
+                port: \{REDIS_PORT}
+                lettuce:
+                  pool:
+                    max-active: 50
+                    max-idle: 25
+                    min-idle: 5
+                    time-between-eviction-runs: 2000ms
           
           openai:
             model: gpt-4o
