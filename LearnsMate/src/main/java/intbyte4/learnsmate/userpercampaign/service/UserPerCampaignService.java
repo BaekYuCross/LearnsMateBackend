@@ -12,4 +12,5 @@ public interface UserPerCampaignService {
     List<UserPerCampaignDTO> findByCampaignCode(Campaign campaign);
     void removeUserPerCampaign(Long userPerCampaignCode);
     void removeByCampaignCode(Long campaignCode);
+    List<UserPerCampaignDTO> findUserByCampaignCode(Long campaignCode);
 }
