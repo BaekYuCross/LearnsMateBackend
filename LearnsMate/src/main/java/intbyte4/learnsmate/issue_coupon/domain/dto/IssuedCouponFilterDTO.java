@@ -4,6 +4,7 @@ import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,4 +31,6 @@ public class IssuedCouponFilterDTO {
     private LocalDateTime endCouponUseDate;
     private LocalDateTime startCouponIssueDate;
     private LocalDateTime endCouponIssueDate;
+
+    private List<String> selectedColumns;
 }
