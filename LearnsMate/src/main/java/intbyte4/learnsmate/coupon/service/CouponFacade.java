@@ -5,9 +5,11 @@ import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
+import intbyte4.learnsmate.coupon.domain.pagination.CouponPageResponse;
 import intbyte4.learnsmate.coupon.domain.vo.request.TutorCouponRegisterRequestVO;
 import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
+import intbyte4.learnsmate.coupon.repository.CouponRepository;
 import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
 import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.coupon_category.service.CouponCategoryService;
@@ -21,6 +23,8 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,6 +44,7 @@ public class CouponFacade {
     private final CouponMapper couponMapper;
     private final LectureMapper lectureMapper;
     private final MemberMapper memberMapper;
+    private final CouponRepository couponRepository;
 
     @Transactional
     public CouponDTO tutorRegisterCoupon(TutorCouponRegisterRequestVO request) {
@@ -63,6 +68,61 @@ public class CouponFacade {
         return couponMapper.toDTO(newCouponEntity);
     }
 
+    // offset 페이지네이션을 위한 전체 쿠폰 조회 함수
+    @Transactional
+    public CouponPageResponse<CouponFindResponseVO> findAllCoupons(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<CouponEntity> couponPage = couponRepository.findAllByCouponFlagTrue(pageable);
+
+        List<CouponFindResponseVO> responseVOList = couponPage.getContent().stream()
+                .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
+                .collect(Collectors.toList());
+
+        return new CouponPageResponse<>(
+                responseVOList,
+                couponPage.getTotalElements(),
+                couponPage.getTotalPages(),
+                couponPage.getNumber(),
+                couponPage.getSize()
+        );
+    }
+
+    // offset 페이지네이션을 위한 전체 admin 쿠폰 조회
+    public CouponPageResponse<CouponFindResponseVO> findAdminCoupons(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<CouponEntity> couponPage = couponRepository.findAllAdminCoupons(pageable);
+
+        List<CouponFindResponseVO> responseVOList = couponPage.getContent().stream()
+                .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
+                .collect(Collectors.toList());
+
+        return new CouponPageResponse<>(
+                responseVOList,
+                couponPage.getTotalElements(),
+                couponPage.getTotalPages(),
+                couponPage.getNumber(),
+                couponPage.getSize()
+        );
+    }
+
+    // offset 페이지네이션을 위한 전체 tutor 쿠폰 조회
+    public CouponPageResponse<CouponFindResponseVO> findTutorCoupons(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<CouponEntity> couponPage = couponRepository.findAllTutorCoupons(pageable);
+
+        List<CouponFindResponseVO> responseVOList = couponPage.getContent().stream()
+                .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
+                .collect(Collectors.toList());
+
+        return new CouponPageResponse<>(
+                responseVOList,
+                couponPage.getTotalElements(),
+                couponPage.getTotalPages(),
+                couponPage.getNumber(),
+                couponPage.getSize()
+        );
+    }
+
     @Transactional
     public List<CouponFindResponseVO> findAllCoupons() {
         List<CouponDTO> couponDTOList = couponService.findAllCoupons();
@@ -77,6 +137,7 @@ public class CouponFacade {
                         .couponContents(couponDTO.getCouponContents())
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
+                        .couponCategoryCode(couponCategory.getCouponCategoryCode())
                         .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
@@ -124,12 +185,14 @@ public class CouponFacade {
                         .couponName(couponDTO.getCouponName())
                         .couponContents(couponDTO.getCouponContents())
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
+                        .couponCategoryCode(couponDTO.getCouponCategoryCode())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
                         .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
                         .createdAt(couponDTO.getCreatedAt())
                         .updatedAt(couponDTO.getUpdatedAt())
+                        .adminCode(adminDTO.getAdminCode())
                         .adminName(adminDTO.getAdminName())
                         .tutorName(null)
                         .build();

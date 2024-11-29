@@ -33,8 +33,6 @@ public class CampaignController {
     @PostMapping("/register")
     public ResponseEntity<ResponseRegisterCampaignVO> createCampaign
             (@RequestBody RequestRegisterCampaignVO requestCampaign) {
-
-        log.info("requestCampaign:{}",requestCampaign);
         List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
                 .map(memberMapper::fromRequestFindCampaignStudentVOToMemberDTO)
                 .toList();

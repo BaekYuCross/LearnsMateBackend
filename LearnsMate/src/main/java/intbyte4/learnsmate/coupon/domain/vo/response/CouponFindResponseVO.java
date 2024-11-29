@@ -49,8 +49,14 @@ public class CouponFindResponseVO {
     @JsonProperty("coupon_category_name")
     private String couponCategoryName;
 
+    @JsonProperty("coupon_category_code")
+    private Integer couponCategoryCode;
+
     @JsonProperty("admin_name")
     private String adminName;
+
+    @JsonProperty("admin_code")
+    private Long adminCode;
 
     @JsonProperty("tutor_name")
     private String tutorName;

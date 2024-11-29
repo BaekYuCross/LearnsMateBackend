@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 @Builder
 public class IssueCoupon {
 

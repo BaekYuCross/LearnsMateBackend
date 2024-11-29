@@ -4,13 +4,9 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
-import intbyte4.learnsmate.coupon.domain.dto.RegisterCouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
-import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
-import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
-import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.coupon.domain.pagination.CouponPageResponse;
+import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,4 +46,6 @@ public interface CouponService {
     void saveCoupon(CouponEntity couponEntity);
 
     List<CouponEntity> filterCoupons(CouponFilterDTO dto);
+
+    CouponPageResponse<CouponFindResponseVO> filterCoupons(CouponFilterDTO dto, int page, int size);
 }
