@@ -43,17 +43,4 @@ public class ReportController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
-
-    // 2. 특정 신고 내역 조회하기
-
-//    // . 특정 멤버가 신고당한 횟수 구하기 (파라미터 -> memberCode -> vo로 담아서 보내야하는가?)
-//    -> 서비스코드만 있으면 될거같다!
-//    public ResponseEntity<Integer> findReportByMemberCode(@PathVariable Long memberCode){
-//
-//        ReportDTO reportDTO = new ReportDTO();
-//        reportDTO.setReportedMemberCode(memberCode);
-//
-//        reportService.findCountReportedByMemberCode(reportDTO);
-//
-//    }
 }

@@ -11,7 +11,8 @@ import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
-import intbyte4.learnsmate.coupon.domain.vo.request.AdminCouponRegisterRequestVO;
+import intbyte4.learnsmate.coupon.domain.pagination.CouponPageResponse;
+import intbyte4.learnsmate.coupon.domain.vo.response.CouponFindResponseVO;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
 import intbyte4.learnsmate.coupon.repository.CouponRepository;
 import intbyte4.learnsmate.coupon_by_lecture.service.CouponByLectureService;
@@ -21,10 +22,13 @@ import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
@@ -35,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("couponService")
 @Slf4j
@@ -220,6 +225,29 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public List<CouponEntity> filterCoupons(CouponFilterDTO dto) {
         return couponRepository.findCouponsByFilters(couponMapper.fromFilterDTOToFilterVO(dto));
+    }
+
+    // 필터링 offset pagination
+    @Override
+    public CouponPageResponse<CouponFindResponseVO> filterCoupons(CouponFilterDTO dto, int page, int size){
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 필터 조건과 페이징 처리된 데이터 조회
+        Page<CouponEntity> couponPage = couponRepository.searchBy(couponMapper.fromFilterDTOToFilterVO(dto), pageable);
+
+        // DTO 리스트로 변환
+        List<CouponFindResponseVO> couponVOList = couponPage.getContent().stream()
+                .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
+                .collect(Collectors.toList());
+
+        return new CouponPageResponse<>(
+                couponVOList,               // 데이터 리스트
+                couponPage.getTotalElements(), // 전체 데이터 수
+                couponPage.getTotalPages(),    // 전체 페이지 수
+                couponPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
+                couponPage.getSize()           // 페이지 크기
+        );
     }
 
     public void validAdmin(AdminService adminService, Long adminCode, Logger log) {
