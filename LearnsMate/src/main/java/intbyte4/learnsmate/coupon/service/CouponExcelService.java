@@ -48,9 +48,15 @@ public class CouponExcelService {
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dateStyle = createDateStyle(workbook);
 
-            List<String> selectedColumns = filterDTO != null && filterDTO.getSelectedColumns() != null
-                    ? filterDTO.getSelectedColumns()
-                    : new ArrayList<>(COLUMNS.keySet());
+
+            // 기본적으로 모든 컬럼 사용
+            List<String> selectedColumns = new ArrayList<>(COLUMNS.keySet());
+
+            // 필터DTO의 selectedColumns가 있다면 그것을 사용
+            if (filterDTO != null && filterDTO.getSelectedColumns() != null
+                    && !filterDTO.getSelectedColumns().isEmpty()) {
+                selectedColumns = filterDTO.getSelectedColumns();
+            }
 
             createHeader(sheet, headerStyle, selectedColumns);
 
@@ -58,9 +64,11 @@ public class CouponExcelService {
             if (filterDTO != null) {
                 log.info("Applying filter with DTO: {}", filterDTO);
                 couponList = couponFacade.filterCoupon(filterDTO);
+                log.info("Found {} coupons after filtering", couponList.size());
             } else {
                 log.info("No filter applied, getting all Lectures");
                 couponList = couponFacade.findAllCoupons();
+                log.info("Found {} total coupons", couponList.size());
             }
             log.info("Found {} Lectures to export", couponList.size());
 
