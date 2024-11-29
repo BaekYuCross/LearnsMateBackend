@@ -13,13 +13,9 @@ import intbyte4.learnsmate.admin.domain.vo.response.ResponseFindAdminVO;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.admin.service.EmailService;
-import intbyte4.learnsmate.admin.service.RedisService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,7 +36,6 @@ public class AdminController {
     private final AdminService adminService;
     private final AdminMapper adminMapper;
     private final EmailService emailService;
-    private final RedisService redisService;
 
     @Operation(summary = "직원 단건 조회")
     @GetMapping("/{adminCode}")
@@ -75,46 +70,6 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "직원 로그아웃")
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request,HttpServletResponse response) {
-        log.info("POST /admin/logout 요청 도착");
-
-        // 쿠키에서 refreshToken 추출
-        String refreshToken = null;
-
-        // 쿠키에서 refreshToken 추출
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
-                }
-            }
-        }
-
-        // 쿠키 삭제
-        Cookie accessTokenCookie = new Cookie("accessToken", null);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setMaxAge(0); // 쿠키 만료 처리 (브라우저에서 삭제됨)
-        response.addCookie(accessTokenCookie);
-
-        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setMaxAge(0); // 쿠키 만료 처리 (브라우저에서 삭제됨)
-        response.addCookie(refreshTokenCookie);
-
-        // Redis에서 refreshToken 삭제
-        if (refreshToken != null && !refreshToken.isEmpty()) {
-            redisService.deleteToken(refreshToken); // Redis에서 refreshToken 삭제
-        }
-
-
-        log.info("로그아웃 성공");
-        return ResponseEntity.ok().body("로그아웃 성공");
-    }
 
     // 인증버튼
     @Operation(summary = "직원 비밀번호 재설정시 이메일 전송")
