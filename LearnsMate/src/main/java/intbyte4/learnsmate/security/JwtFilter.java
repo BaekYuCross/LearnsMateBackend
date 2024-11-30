@@ -23,7 +23,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AdminService userService;
     private final JwtUtil jwtUtil;  // JWT 토큰을 다루는 JwtUtil 클래스
     private final List<String> excludeUrl  // JWT 토큰 검증을 제외할 URL 패턴 목록
-            = Arrays.asList("/admin/verification-email/**"
+            = Arrays.asList("/admin/verification-email/**", "/actuator/health"
            , "/admin/verification-email/password", "/swagger-ui.html", "/swagger-ui/index.html"
             , "/admin/password");
 
@@ -42,11 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
     // JWT 토큰을 검사하고 인증을 처리하는 실제 필터 로직. 만약 유효한 JWT 토큰이 있다면 인증을 처리하고, 없으면 다음 필터로 진행.
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-
-        log.info("JwtFilter 실행 - 쿠키에서 토큰 추출 시도");
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 쿠키에서 토큰 가져오기
         String token = null;
         if (request.getCookies() != null) {
@@ -54,7 +50,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 log.info("쿠키 이름: {}, 쿠키 값: {}", cookie.getName(), cookie.getValue());
                 if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
-                    log.info("추출된 토큰: {}", token);
                     break;
                 }
             }
