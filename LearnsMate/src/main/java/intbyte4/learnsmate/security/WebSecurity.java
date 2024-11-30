@@ -116,9 +116,6 @@ public class WebSecurity {
                 // 서버가 세션을 생성하지 않음
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-
-        // JWT 인증 필터 추가
-        http.addFilter(getAuthenticationFilter(authenticationManager));
         http.addFilterBefore(new JwtFilter(userService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
