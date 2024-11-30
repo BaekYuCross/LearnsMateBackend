@@ -62,7 +62,7 @@ public class WebSecurity {
         // HttpSecurity 설정
         http.authorizeHttpRequests((authz) ->
                         authz
-                                .requestMatchers("/actuator/health").permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/actuator/health")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/index.html", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**", "GET")).permitAll()
@@ -116,9 +116,6 @@ public class WebSecurity {
                 // 서버가 세션을 생성하지 않음
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-
-        // JWT 인증 필터 추가
-        http.addFilter(getAuthenticationFilter(authenticationManager));
         http.addFilterBefore(new JwtFilter(userService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

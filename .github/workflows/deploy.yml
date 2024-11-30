@@ -80,8 +80,8 @@ jobs:
           
             data:
               redis:
-                host: \{REDIS_HOST}
-                port: \{REDIS_PORT}
+                host: \${REDIS_HOST}
+                port: 6379
                 lettuce:
                   pool:
                     max-active: 50
@@ -117,7 +117,6 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SPRING_MAIL_SMTP_HOST: ${{ secrets.SPRING_MAIL_SMTP_HOST }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
