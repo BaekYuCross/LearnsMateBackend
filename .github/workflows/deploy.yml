@@ -82,6 +82,8 @@ jobs:
               redis:
                 host: \${REDIS_HOST}
                 port: 6379
+                repositories:
+                  enabled: false
                 lettuce:
                   pool:
                     max-active: 50

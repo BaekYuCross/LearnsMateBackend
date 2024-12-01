@@ -14,6 +14,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -22,6 +23,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 @EnableBatchProcessing
 public class BatchConfig {
+
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
 
@@ -46,7 +48,8 @@ public class BatchConfig {
                 .build();
     }
 
-
-
+    @Bean
+    public static BeanDefinitionRegistryPostProcessor jobRegistryBeanPostProcessorRemover() {
+        return registry -> registry.removeBeanDefinition("jobRegistryBeanPostProcessor");
+    }
 }
-
