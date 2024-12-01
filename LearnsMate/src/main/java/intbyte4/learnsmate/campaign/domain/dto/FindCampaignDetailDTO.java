@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,6 +20,8 @@ public class FindCampaignDetailDTO {
     private String campaignTitle;
     private String campaignContents;
     private String campaignType;
+    private String campaignMethod;
+    private Boolean campaignSendFlag;
     private LocalDateTime campaignSendDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

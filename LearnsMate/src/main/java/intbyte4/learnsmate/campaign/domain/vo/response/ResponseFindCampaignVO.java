@@ -2,9 +2,7 @@ package intbyte4.learnsmate.campaign.domain.vo.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
-import intbyte4.learnsmate.couponbycampaign.domain.dto.CouponByCampaignDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
-import intbyte4.learnsmate.userpercampaign.domain.dto.UserPerCampaignDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -29,6 +27,12 @@ public class ResponseFindCampaignVO {
 
     @JsonProperty("campaign_type")
     private String campaignType;
+
+    @JsonProperty("campaign_method")
+    private String campaignMethod;
+
+    @JsonProperty("campaign_send_flag")
+    private Boolean campaignSendFlag;
 
     @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;
