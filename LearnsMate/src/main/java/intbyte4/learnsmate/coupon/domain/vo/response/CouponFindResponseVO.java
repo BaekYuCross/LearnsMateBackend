@@ -61,4 +61,13 @@ public class CouponFindResponseVO {
     @JsonProperty("tutor_name")
     private String tutorName;
 
+    public CouponFindResponseVO updateAdminName(String adminName) {
+        this.adminName = adminName;
+        return this;
+    }
+
+    public CouponFindResponseVO updateTutorName(String tutorName) {
+        this.tutorName = tutorName;
+        return this;
+    }
 }
