@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class Campaign {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="campaign_code")
+    @Column(name = "campaign_code")
     private Long campaignCode;
 
     @Column(name = "campaign_title")
@@ -31,11 +31,14 @@ public class Campaign {
     @Enumerated(EnumType.STRING)
     private CampaignTypeEnum campaignType;
 
+    @Column(name = "campaign_method")
+    private String campaignMethod;
+
     @Column(name = "campaign_send_date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime campaignSendDate;
 
-    @Column(name="campaign_send_flag" , nullable = true)
+    @Column(name = "campaign_send_flag", nullable = true)
     private Boolean campaignSendFlag;
 
     @Column(name = "created_at")
@@ -54,6 +57,10 @@ public class Campaign {
     public void prePersist() {
         if (campaignSendFlag == null) {
             campaignSendFlag = false;  // 기본값 설정
+        }
+
+        if (campaignMethod == null) {
+            campaignMethod = "Email";
         }
     }
 
