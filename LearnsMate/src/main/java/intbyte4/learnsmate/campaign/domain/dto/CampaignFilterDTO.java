@@ -16,6 +16,7 @@ public class CampaignFilterDTO {
     private String campaignTitle;
     private String campaignContents;
     private String campaignType;
+    private String campaignMethod;
     private LocalDateTime campaignSendDate;
     private LocalDateTime campaignStartPostDate;
     private LocalDateTime campaignEndPostDate;

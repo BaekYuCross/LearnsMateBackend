@@ -30,6 +30,7 @@ public class CampaignMapper {
                 .campaignContents(entity.getCampaignContents())
                 .campaignType(String.valueOf(entity.getCampaignType()))
                 .campaignMethod(entity.getCampaignMethod())
+                .campaignSendFlag(entity.getCampaignSendFlag())
                 .campaignSendDate(entity.getCampaignSendDate())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
@@ -44,6 +45,7 @@ public class CampaignMapper {
                 .campaignContents(dto.getCampaignContents())
                 .campaignType(CampaignTypeEnum.valueOf(dto.getCampaignType()))
                 .campaignMethod(dto.getCampaignMethod())
+                .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
@@ -58,23 +60,11 @@ public class CampaignMapper {
                 .campaignContents(vo.getCampaignContents())
                 .campaignType(String.valueOf(vo.getCampaignType()))
                 .campaignMethod(vo.getCampaignMethod())
+                .campaignSendFlag(vo.getCampaignSendFlag())
                 .campaignSendDate(vo.getCampaignSendDate())
                 .createdAt(vo.getCreatedAt())
                 .updatedAt(vo.getUpdatedAt())
                 .adminCode(vo.getAdminCode())
-                .build();
-    }
-
-    public CampaignDTO fromFindCampaignByConditionVOtoDTO(RequestFindCampaignByFilterVO vo){
-        return CampaignDTO.builder()
-//                .campaignCode(vo.getCampaignCode())
-                .campaignTitle(vo.getCampaignTitle())
-//                .campaignContents(vo.getCampaignContents())
-                .campaignType(String.valueOf(vo.getCampaignType()))
-//                .campaignSendDate(vo.getCampaignSendDate())
-//                .createdAt(vo.getCreatedAt())
-//                .updatedAt(vo.getUpdatedAt())
-//                .adminCode(vo.getAdminCode())
                 .build();
     }
 
@@ -84,6 +74,8 @@ public class CampaignMapper {
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
                 .campaignType(dto.getCampaignType())
+                .campaignMethod(dto.getCampaignMethod())
+                .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
@@ -101,6 +93,8 @@ public class CampaignMapper {
                 .updatedAt(vo.getUpdatedAt())
                 .adminCode(vo.getAdminCode())
                 .campaignType(vo.getCampaignType())
+                .campaignMethod(vo.getCampaignMethod())
+                .campaignSendFlag(vo.getCampaignSendFlag())
                 .build();
     }
 
@@ -110,6 +104,8 @@ public class CampaignMapper {
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
                 .campaignType(dto.getCampaignType())
+                .campaignMethod(dto.getCampaignMethod())
+                .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
@@ -123,6 +119,8 @@ public class CampaignMapper {
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
                 .campaignType(dto.getCampaignType())
+                .campaignMethod(dto.getCampaignMethod())
+                .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
@@ -139,35 +137,14 @@ public class CampaignMapper {
         );
     }
 
-    public ResponseFindCampaignVO fromDtoToFindResponseVO(CampaignDTO dto) {
-        return ResponseFindCampaignVO.builder()
-                .campaignCode(dto.getCampaignCode())
-                .campaignTitle(dto.getCampaignTitle())
-                .campaignContents(dto.getCampaignContents())
-                .campaignType(dto.getCampaignType())
-                .campaignSendDate(dto.getCampaignSendDate())
-                .build();
-    }
-
-    public List<ResponseFindCampaignByFilterVO> fromDtoListToFindCampaignByConditionVO(List<CampaignDTO> dtoList) {
-        return dtoList.stream().map(dto -> ResponseFindCampaignByFilterVO.builder()
-                .campaignCode(dto.getCampaignCode())
-                .campaignTitle(dto.getCampaignTitle())
-                .campaignContents(dto.getCampaignContents())
-                .campaignType(dto.getCampaignType())
-                .campaignSendDate(dto.getCampaignSendDate())
-                .createdAt(dto.getCreatedAt())
-                .updatedAt(dto.getUpdatedAt())
-                .adminCode(dto.getAdminCode())
-                .build()).collect(Collectors.toList());
-    }
-
     public List<ResponseFindCampaignByFilterVO> fromFindAllDtoListToFindCampaignByFilterVO(List<FindAllCampaignsDTO> dtoList) {
         return dtoList.stream().map(dto -> ResponseFindCampaignByFilterVO.builder()
                 .campaignCode(dto.getCampaignCode())
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
                 .campaignType(dto.getCampaignType())
+                .campaignMethod(dto.getCampaignMethod())
+                .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
@@ -182,6 +159,8 @@ public class CampaignMapper {
                 .campaignTitle(campaignDTO.getCampaignTitle())
                 .campaignContents(campaignDTO.getCampaignContents())
                 .campaignType(campaignDTO.getCampaignType())
+                .campaignMethod(campaignDTO.getCampaignMethod())
+                .campaignSendFlag(campaignDTO.getCampaignSendFlag())
                 .campaignSendDate(campaignDTO.getCampaignSendDate())
                 .createdAt(campaignDTO.getCreatedAt())
                 .updatedAt(campaignDTO.getUpdatedAt())
@@ -196,6 +175,8 @@ public class CampaignMapper {
                 .campaignTitle(entity.getCampaignTitle())
                 .campaignContents(entity.getCampaignContents())
                 .campaignType(String.valueOf(entity.getCampaignType()))
+                .campaignMethod(entity.getCampaignMethod())
+                .campaignSendFlag(entity.getCampaignSendFlag())
                 .campaignSendDate(entity.getCampaignSendDate())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
@@ -210,6 +191,7 @@ public class CampaignMapper {
                 .campaignTitle(request.getCampaignTitle())
 //                .campaignContents(request.getCampaignContents())
                 .campaignType(request.getCampaignType())
+                .campaignMethod(request.getCampaignMethod())
 //                .campaignSendDate(request.getCampaignSendDate())
                 .campaignStartPostDate(request.getCampaignStartPostDate())
                 .campaignEndPostDate(request.getCampaignEndPostDate())
@@ -226,25 +208,12 @@ public class CampaignMapper {
                 .campaignTitle(vo.getCampaignTitle())
                 .campaignContents(vo.getCampaignContents())
                 .campaignType(vo.getCampaignType().getType())
+                .campaignMethod(vo.getCampaignMethod())
                 .campaignSendDate(vo.getCampaignSendDate())
                 .createdAt(vo.getCreatedAt())
                 .updatedAt(vo.getUpdatedAt())
                 .adminCode(vo.getAdmin().getAdminCode())
                 .adminName(vo.getAdmin().getAdminName())
-                .build();
-    }
-
-    public ResponseFindCampaignVO fromFindCampaignDtoToFindResponseVO(FindCampaignDTO dto) {
-        return ResponseFindCampaignVO.builder()
-                .campaignCode(dto.getCampaignCode())
-                .campaignTitle(dto.getCampaignTitle())
-                .campaignContents(dto.getCampaignContents())
-                .campaignType(dto.getCampaignType())
-                .campaignSendDate(dto.getCampaignSendDate())
-                .createdAt(dto.getCreatedAt())
-                .updatedAt(dto.getUpdatedAt())
-                .members(dto.getMembers())
-                .coupons(dto.getCoupons())
                 .build();
     }
 
@@ -254,6 +223,8 @@ public class CampaignMapper {
                 .campaignTitle(dto.getCampaignTitle())
                 .campaignContents(dto.getCampaignContents())
                 .campaignType(dto.getCampaignType())
+                .campaignMethod(dto.getCampaignMethod())
+                .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
@@ -269,6 +240,8 @@ public class CampaignMapper {
                 .campaignTitle(campaignDTO.getCampaignTitle())
                 .campaignContents(campaignDTO.getCampaignContents())
                 .campaignType(campaignDTO.getCampaignType())
+                .campaignMethod(campaignDTO.getCampaignMethod())
+                .campaignSendFlag(campaignDTO.getCampaignSendFlag())
                 .campaignSendDate(campaignDTO.getCampaignSendDate())
                 .createdAt(campaignDTO.getCreatedAt())
                 .createdAt(campaignDTO.getUpdatedAt())

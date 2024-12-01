@@ -26,6 +26,9 @@ public class ResponseRegisterCampaignVO {
     @JsonProperty("campaign_method")
     private String campaignMethod;
 
+    @JsonProperty("campaign_send_flag")
+    private Boolean campaignSendFlag;
+
     @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;
 
