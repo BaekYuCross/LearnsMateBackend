@@ -4,6 +4,7 @@ import intbyte4.learnsmate.admin.service.EmailService;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
 import intbyte4.learnsmate.campaign.service.CampaignService;
+import intbyte4.learnsmate.campaign.service.CoolSmsService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.service.MemberService;
@@ -35,8 +36,9 @@ public class SchedulerConfig {
     private final MemberService memberService;
     private final EmailService emailService;
     private final UserPerCampaignService userPerCampaignService;
+    private final CoolSmsService coolSmsService;
 
-    public SchedulerConfig(VOCAiService vocAiService, CampaignService campaignService, JobLauncher jobLauncher, Job campaignJob, MemberService memberService, EmailService emailService , UserPerCampaignService userPerCampaignService) {
+    public SchedulerConfig(VOCAiService vocAiService, CampaignService campaignService, JobLauncher jobLauncher, Job campaignJob, MemberService memberService, EmailService emailService , UserPerCampaignService userPerCampaignService, CoolSmsService coolSmsService) {
         this.vocAiService = vocAiService;
         this.campaignService = campaignService;
         this.jobLauncher = jobLauncher;
@@ -44,6 +46,7 @@ public class SchedulerConfig {
         this.memberService = memberService;
         this.emailService = emailService;
         this.userPerCampaignService = userPerCampaignService;
+        this.coolSmsService = coolSmsService;
     }
 
     @Scheduled(cron = "0 0 9 * * MON")
@@ -52,6 +55,7 @@ public class SchedulerConfig {
     }
 
     @Scheduled(cron = "0 0 */3 * * *")
+//    @Scheduled(cron = "0 * * * * *") // 테스트 용
     public void scheduleCampaigns() {
         LocalDateTime currentTime = LocalDateTime.now();
 
@@ -69,8 +73,11 @@ public class SchedulerConfig {
                     List<UserPerCampaignDTO> userPerCampaignDTOList = userPerCampaignService.findUserByCampaignCode(campaign.getCampaignCode());
                     for (UserPerCampaignDTO userPerCampaignDTO : userPerCampaignDTOList) {
                         MemberDTO member = memberService.findMemberByMemberCode(userPerCampaignDTO.getStudentCode(), MemberType.STUDENT);
-                        if (member != null) {
+                        if (member != null && campaign.getCampaignMethod().equals("Email")) {
                             emailService.sendCampaignEmail(member.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
+                        }
+                        else if (member != null && campaign.getCampaignMethod().equals("SMS")) {
+                            coolSmsService.sendSms(member.getMemberPhone(), campaign.getCampaignContents());
                         }
                     }
                     campaignService.updateCampaignSendFlag(campaign.getCampaignCode());
