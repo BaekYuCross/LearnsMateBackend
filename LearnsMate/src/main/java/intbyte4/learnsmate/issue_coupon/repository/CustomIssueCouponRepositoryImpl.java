@@ -10,6 +10,9 @@ import jakarta.persistence.EntityManager;
 import intbyte4.learnsmate.coupon.domain.entity.QCouponEntity;
 import intbyte4.learnsmate.member.domain.entity.QMember;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -55,6 +58,47 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
                 .where(builder)
                 .select(issueCoupon)
                 .fetch();
+    }
+
+    // 이슈 쿠폰 필터링 offset 페이지네이션
+    @Override
+    public Page<IssueCoupon> getFilteredIssuedCoupons(IssueCouponFilterRequestVO request, PageRequest pageable) {
+        QIssueCoupon issueCoupon = QIssueCoupon.issueCoupon;
+        QMember member = QMember.member;
+        QCouponEntity couponEntity = QCouponEntity.couponEntity;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(likeCouponName(request))
+                .and(likeCouponContents(request))
+                .and(eqCouponCategoryName(request))
+                .and(eqStudentCode(request))
+                .and(eqStudentName(request))
+                .and(eqCouponUseStatus(request))
+                .and(betweenDiscountRate(request))
+                .and(betweenCouponStartDate(request))
+                .and(betweenCouponEndDate(request))
+                .and(betweenCouponUseDate(request))
+                .and(betweenCouponIssueDate(request));
+
+        List<IssueCoupon> results = queryFactory
+                .selectFrom(issueCoupon)
+                .join(issueCoupon.coupon, couponEntity).fetchJoin()
+                .join(issueCoupon.student, member).fetchJoin()
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 카운트 조회
+        Long total = queryFactory
+                .select(issueCoupon.count())
+                .from(issueCoupon)
+                .join(issueCoupon.coupon, couponEntity)
+                .join(issueCoupon.student, member)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(results, pageable, total != null ? total : 0L);
     }
 
     private BooleanExpression likeCouponName(IssueCouponFilterRequestVO request) {
