@@ -155,7 +155,6 @@ public class CampaignServiceImpl implements CampaignService {
     public CampaignDTO editCampaign(CampaignDTO requestCampaign
             , List<MemberDTO> requestStudentList
             , List<CouponDTO> requestCouponList) {
-        log.info("서비스에서 조회하는 캠페인 코드: {}", requestCampaign.getCampaignCode());
         if (requestCampaign.getCampaignCode() == null) {
             throw new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND);
         }
