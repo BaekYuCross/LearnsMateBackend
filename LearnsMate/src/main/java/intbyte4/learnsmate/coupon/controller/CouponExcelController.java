@@ -58,7 +58,7 @@ public class CouponExcelController {
         }
 
         // 유효한 타겟 유저 리스트 반환
-        return couponExcelService.importTargetStudentFromExcel(file);
+        return couponExcelService.importTargetCouponFromExcel(file);
     }
 
 

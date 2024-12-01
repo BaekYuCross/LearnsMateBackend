@@ -166,11 +166,10 @@ public class CouponExcelService {
     }
 
     // 타겟 쿠폰 업로드
-    public List<CouponFindResponseVO> importTargetStudentFromExcel(MultipartFile file) throws IOException {
+    public List<CouponFindResponseVO> importTargetCouponFromExcel(MultipartFile file) throws IOException {
         List<CouponFindResponseVO> validCouponList = new ArrayList<>();
         try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
-
             Row headerRow = sheet.getRow(0);
             if (!validateHeaders(headerRow)) {
                 throw new IllegalArgumentException("파일 형식이 올바르지 않습니다. 다운로드한 템플릿 파일만 업로드하세요.");
@@ -182,7 +181,6 @@ public class CouponExcelService {
             for (int rowNum = 1; rowNum <= lastRowNum; rowNum++) {
                 Row row = sheet.getRow(rowNum);
                 if (row == null) continue;
-
                 Long couponCode = getLongValue(row.getCell(0));
                 if (couponCode == null) {
                     throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
@@ -193,20 +191,25 @@ public class CouponExcelService {
                     throw new CommonException(StatusEnum.INVALID_COUPON_DATA);
                 }
 
+
                 CouponFindResponseVO vo = CouponFindResponseVO.builder()
-                            .couponCode(existingCoupon.getCouponCode())
-                            .couponName(existingCoupon.getCouponName())
-                            .couponContents(existingCoupon.getCouponContents())
-                            .couponDiscountRate(existingCoupon.getCouponDiscountRate())
-                            .createdAt(existingCoupon.getCreatedAt())
-                            .updatedAt(existingCoupon.getUpdatedAt())
-                            .couponStartDate(existingCoupon.getCouponStartDate())
-                            .couponExpireDate(existingCoupon.getCouponExpireDate())
-                            .activeState(existingCoupon.getActiveState())
-                            .couponCategoryName(existingCoupon.getCouponCategory().getCouponCategoryName())
-                            .adminName(existingCoupon.getAdmin().getAdminName())
-                            .tutorName(existingCoupon.getTutor().getMemberName())
-                            .build();
+                        .couponCode(existingCoupon.getCouponCode())
+                        .couponName(existingCoupon.getCouponName())
+                        .couponContents(existingCoupon.getCouponContents())
+                        .couponDiscountRate(existingCoupon.getCouponDiscountRate())
+                        .createdAt(existingCoupon.getCreatedAt())
+                        .updatedAt(existingCoupon.getUpdatedAt())
+                        .couponStartDate(existingCoupon.getCouponStartDate())
+                        .couponExpireDate(existingCoupon.getCouponExpireDate())
+                        .activeState(existingCoupon.getActiveState())
+                        .couponCategoryName(existingCoupon.getCouponCategory().getCouponCategoryName())
+                        .build();
+
+                if(existingCoupon.getAdmin().getAdminName() != null){
+                    vo.updateAdminName(existingCoupon.getAdmin().getAdminName());
+                }else{
+                    vo.updateTutorName(existingCoupon.getTutor().getMemberName());
+                }
 
                 validCouponList.add(vo);
             }
@@ -219,28 +222,95 @@ public class CouponExcelService {
     }
 
     private Boolean validateCouponData(CouponEntity existingCoupon, Row row) {
-        if (!existingCoupon.getCouponCode().equals(getLongValue(row.getCell(0))) ||
-                !existingCoupon.getCouponName().equals(getStringValue(row.getCell(1))) ||
-                !existingCoupon.getCouponContents().equals(getStringValue(row.getCell(2))) ||
-                !existingCoupon.getCouponDiscountRate().equals(getIntValue(row.getCell(3))) ||
-                existingCoupon.getCouponCategory() == null ||
-                !existingCoupon.getCouponCategory().getCouponCategoryName().equals(getStringValue(row.getCell(4))) ||
-                !existingCoupon.getActiveState().equals(getActiveStateFromString(getStringValue(row.getCell(5)))) ||
-                !isSameDateTime(existingCoupon.getCouponStartDate(), getLocalDateTime(row.getCell(6))) ||
-                !isSameDateTime(existingCoupon.getCouponExpireDate(), getLocalDateTime(row.getCell(7))) ||
-                !isSameDateTime(existingCoupon.getCreatedAt(), getLocalDateTime(row.getCell(8))) ||
-                !isSameDateTime(existingCoupon.getUpdatedAt(), getLocalDateTime(row.getCell(9))) ||
-                existingCoupon.getAdmin() == null ||
-                !existingCoupon.getAdmin().getAdminName().equals(getStringValue(row.getCell(10))) ||
-                existingCoupon.getTutor() == null ||
-                !existingCoupon.getTutor().getMemberName().equals(getStringValue(row.getCell(11))) ||
-                existingCoupon.getCouponFlag() == null ||
-                !existingCoupon.getCouponFlag()) {
-
+        // 쿠폰 코드 검증
+        if (!existingCoupon.getCouponCode().equals(getLongValue(row.getCell(0)))) {
+            log.info("쿠폰 코드 불일치: DB={}, Excel={}", existingCoupon.getCouponCode(), getLongValue(row.getCell(0)));
             return false;
         }
+
+        // 쿠폰명 검증
+        if (!existingCoupon.getCouponName().equals(getStringValue(row.getCell(1)))) {
+            log.info("쿠폰명 불일치: DB={}, Excel={}", existingCoupon.getCouponName(), getStringValue(row.getCell(1)));
+            return false;
+        }
+
+        // 쿠폰 내용 검증
+        if (!existingCoupon.getCouponContents().equals(getStringValue(row.getCell(2)))) {
+            log.info("쿠폰 내용 불일치: DB={}, Excel={}", existingCoupon.getCouponContents(), getStringValue(row.getCell(2)));
+            return false;
+        }
+
+        // 할인율 검증
+        if (!existingCoupon.getCouponDiscountRate().equals(getIntValue(row.getCell(3)))) {
+            log.info("할인율 불일치: DB={}, Excel={}", existingCoupon.getCouponDiscountRate(), getIntValue(row.getCell(3)));
+            return false;
+        }
+
+        // 카테고리 검증
+        if (existingCoupon.getCouponCategory() == null) {
+            log.info("쿠폰 카테고리가 null입니다");
+            return false;
+        }
+
+        if (!existingCoupon.getCouponCategory().getCouponCategoryName().equals(getStringValue(row.getCell(4)))) {
+            log.info("카테고리명 불일치: DB={}, Excel={}", existingCoupon.getCouponCategory().getCouponCategoryName(), getStringValue(row.getCell(4)));
+            return false;
+        }
+
+        // 활성 상태 검증
+        if (!existingCoupon.getActiveState().equals(getActiveStateFromString(getStringValue(row.getCell(5))))) {
+            log.info("활성상태 불일치: DB={}, Excel={}", existingCoupon.getActiveState(), getActiveStateFromString(getStringValue(row.getCell(5))));
+            return false;
+        }
+
+        // 시작일 검증
+        if (!isSameDateTime(existingCoupon.getCouponStartDate(), getLocalDateTime(row.getCell(6)))) {
+            log.info("시작일 불일치: DB={}, Excel={}", existingCoupon.getCouponStartDate(), getLocalDateTime(row.getCell(6)));
+            return false;
+        }
+
+        // 만료일 검증
+        if (!isSameDateTime(existingCoupon.getCouponExpireDate(), getLocalDateTime(row.getCell(7)))) {
+            log.info("만료일 불일치: DB={}, Excel={}", existingCoupon.getCouponExpireDate(), getLocalDateTime(row.getCell(7)));
+            return false;
+        }
+
+        // 생성일 검증
+        if (!isSameDateTime(existingCoupon.getCreatedAt(), getLocalDateTime(row.getCell(8)))) {
+            log.info("생성일 불일치: DB={}, Excel={}", existingCoupon.getCreatedAt(), getLocalDateTime(row.getCell(8)));
+            return false;
+        }
+
+        // 수정일 검증
+        if (!isSameDateTime(existingCoupon.getUpdatedAt(), getLocalDateTime(row.getCell(9)))) {
+            log.info("수정일 불일치: DB={}, Excel={}", existingCoupon.getUpdatedAt(), getLocalDateTime(row.getCell(9)));
+            return false;
+        }
+//
+//        if (!existingCoupon.getAdmin().getAdminName().equals(getStringValue(row.getCell(10)))) {
+//            log.info("관리자명 불일치: DB={}, Excel={}", existingCoupon.getAdmin().getAdminName(), getStringValue(row.getCell(10)));
+//            return false;
+//        }
+//
+//        if (!existingCoupon.getTutor().getMemberName().equals(getStringValue(row.getCell(11)))) {
+//            log.info("강사명 불일치: DB={}, Excel={}", existingCoupon.getTutor().getMemberName(), getStringValue(row.getCell(11)));
+//            return false;
+//        }
+
+        // 쿠폰 플래그 검증
+        if (existingCoupon.getCouponFlag() == null) {
+            log.info("쿠폰 플래그가 null입니다");
+            return false;
+        }
+
+        if (!existingCoupon.getCouponFlag()) {
+            log.info("쿠폰 플래그가 false입니다");
+            return false;
+        }
+
         return true;
     }
+
 
 
     // 올바른 헤더인지 판별
@@ -323,7 +393,10 @@ public class CouponExcelService {
             case NUMERIC -> (int) cell.getNumericCellValue();
             case STRING -> {
                 try {
-                    yield Integer.parseInt(cell.getStringCellValue().trim());
+                    String value = cell.getStringCellValue().trim();
+                    // '%' 문자 제거하고 숫자만 파싱
+                    value = value.replace("%", "").trim();
+                    yield Integer.parseInt(value);
                 } catch (NumberFormatException e) {
                     yield 0;
                 }
