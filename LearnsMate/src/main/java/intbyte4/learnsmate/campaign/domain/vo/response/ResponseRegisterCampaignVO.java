@@ -23,6 +23,9 @@ public class ResponseRegisterCampaignVO {
     @JsonProperty("campaign_type")
     private String campaignType;
 
+    @JsonProperty("campaign_method")
+    private String campaignMethod;
+
     @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;
 
