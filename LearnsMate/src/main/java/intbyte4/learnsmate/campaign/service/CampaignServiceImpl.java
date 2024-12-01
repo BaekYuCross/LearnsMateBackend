@@ -28,17 +28,12 @@ import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +54,8 @@ public class CampaignServiceImpl implements CampaignService {
     private final EmailService emailService;
     private final CampaignMapper campaignMapper;
     private final AdminMapper adminMapper;
-    private final JobLauncher jobLauncher;
-    private final Job campaignJob;
     private final CampaignIssueCouponReader couponMemberReader;
+    private final CoolSmsService coolSmsService;
 
     @Override
     public CampaignDTO registerCampaign(CampaignDTO requestCampaign
@@ -83,6 +77,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .campaignTitle(requestCampaign.getCampaignTitle())
                 .campaignContents(requestCampaign.getCampaignContents())
                 .campaignType(CampaignTypeEnum.valueOf(requestCampaign.getCampaignType()))
+                .campaignMethod(requestCampaign.getCampaignMethod())
                 .campaignSendDate(sendTime)
                 .campaignSendFlag(false)
                 .createdAt(requestCampaign.getCreatedAt())
@@ -119,7 +114,10 @@ public class CampaignServiceImpl implements CampaignService {
             // 즉시 발송
             issueCouponService.issueCouponsToStudents(studentCodes, couponCodes);
             requestStudentList.forEach(memberDTO -> {
-                emailService.sendCampaignEmail(memberDTO.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
+                if(Objects.equals(requestCampaign.getCampaignMethod(), "Email"))
+                    emailService.sendCampaignEmail(memberDTO.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
+                else
+                    coolSmsService.sendSms(memberDTO.getMemberPhone(), campaign.getCampaignContents());
             });
         } else {
             // 예약 발송은 스케줄러에 등록
