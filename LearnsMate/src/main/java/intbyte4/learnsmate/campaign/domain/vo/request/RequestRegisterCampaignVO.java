@@ -34,6 +34,9 @@ public class RequestRegisterCampaignVO {
     @JsonProperty("campaign_type")
     private String campaignType;
 
+    @JsonProperty("campaign_method")
+    private String campaignMethod;
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;

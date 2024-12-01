@@ -50,11 +50,11 @@ public class EmailService {
     public void sendCampaignEmail(String email, String campaignTitle, String campaignContents) {
         log.info("Start sending campaign email to: " + email);
 
-        String subject = "[LearnsMate]: " + campaignTitle;
+        String subject = "[LearnsBuddy]: " + campaignTitle;
         String content = campaignContents + "\n\n"
-                + "더 자세한 사항은 LearnsMate 홈페이지를 방문해 주세요.\n\n"
+                + "더 자세한 사항은 LearnsBuddy 홈페이지를 방문해 주세요.\n\n"
                 + "감사합니다.\n\n"
-                + "LearnsMate 드림";
+                + "LearnsBuddy 드림";
 
         sendEmail(email, subject, content);
     }

@@ -73,6 +73,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework:spring-jdbc'
     runtimeOnly 'com.h2database:h2' // 임시 데이터 저장용
+
+    //coolsms 의존성
+    implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {
