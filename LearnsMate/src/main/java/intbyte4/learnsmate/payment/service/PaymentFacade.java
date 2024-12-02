@@ -111,6 +111,7 @@ public class PaymentFacade {
                 .lectureCode(payment.getLectureByStudent().getLecture().getLectureCode())
                 .lectureTitle(lectureDTO.getLectureTitle())
                 .lecturePrice(lectureDTO.getLecturePrice())
+                .lectureStatus(lectureDTO.getLectureStatus())
                 .tutorCode(tutorDTO.getMemberCode())
                 .tutorName(tutorDTO.getMemberName())
                 .studentCode(studentDTO.getMemberCode())
