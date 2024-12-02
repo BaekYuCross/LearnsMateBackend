@@ -1,14 +1,13 @@
 package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
-import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
-import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
-import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
-import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
+import intbyte4.learnsmate.voc.domain.dto.*;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
+import intbyte4.learnsmate.voc.domain.vo.request.RequestSaveVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.request.VOCCategoryRatioFilterRequest;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
+import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindClientVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.service.VOCFacade;
@@ -85,6 +84,18 @@ public class VOCController {
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
+    @Operation(summary = "직원 - 전체 유저 미답변 VOC 리스트 조회")
+    @GetMapping("/unanswered")
+    public ResponseEntity<List<ResponseFindVOCVO>> AllUnansweredVOC() {
+        List<VOCDTO> vocDTOList = vocService.findUnansweredVOC();
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+        for (VOCDTO vocdto : vocDTOList) {
+            ResponseFindVOCVO response = vocFacade.findVOC(vocdto.getVocCode());
+            responseList.add(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
+    }
+
     @Operation(summary = "직원 - 기간 별 VOC 카테고리 별 개수 조회")
     @GetMapping("/count-by-category")
     public ResponseEntity<List<ResponseCountByCategoryVO>> countVOCByCategory(@RequestBody RequestCountByCategoryVO requestVO) {
@@ -125,5 +136,35 @@ public class VOCController {
     public ResponseEntity<List<VOCCategoryCountDTO>> getFilteredCategoryCounts(@RequestBody VOCCategoryRatioFilterRequest request) {
         List<VOCCategoryCountDTO> filteredCategoryCounts = vocFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
         return ResponseEntity.ok(filteredCategoryCounts);
+    }
+
+    @Operation(summary = "학생 - VOC 등록")
+    @PostMapping
+    public ResponseEntity<?> saveVOC(@RequestBody RequestSaveVOCVO request) {
+
+        VOCDTO dto = vocMapper.fromRequestSaveVOCVOtoVOCDTO(request);
+
+        VOCDTO responseDTO = vocFacade.saveVOC(dto);
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @Operation(summary = "학생 - 자신이 작성한 전체 VOC 조회")
+    @GetMapping("/client/list/{memberCode}")
+    public ResponseEntity<?> findClientVOC(@PathVariable("memberCode") Long memberCode) {
+        List<VOCClientDTO> dtoList = vocService.findAllClientVOC(memberCode);
+        List<ResponseFindClientVOCVO> voList = vocMapper.fromDTOtoResponseFindClientVOCVO(dtoList);
+        return ResponseEntity.ok(voList);
+    }
+
+    @Operation(summary = "학생 - VOC 만족도 평가")
+    @PostMapping("/client/{vocCode}/feedback")
+    public ResponseEntity<String> updateVocSatisfaction(
+            @PathVariable("vocCode") String vocCode,
+            @RequestParam("satisfaction") Long satisfaction
+    ){
+        vocService.updateVocSatisfaction(vocCode, satisfaction);
+
+        return ResponseEntity.ok("만족도 업데이트 완료");
     }
 }

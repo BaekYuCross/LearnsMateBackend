@@ -9,7 +9,7 @@ public interface ContractStatusService {
     ContractStatusDTO getContractProcess(Long contractProcessCode);
 
     // 강의별 승인과정 절차 조회
-    ContractStatusDTO getApprovalProcessByLectureCode(String lectureCode);
+    List<ContractStatusDTO> getApprovalProcessByLectureCode(String lectureCode);
 
     // 계약과정 등록
     ContractStatusDTO createContractProcess(String lectureCode, ContractStatusDTO contractStatusDTO);

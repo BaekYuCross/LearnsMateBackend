@@ -6,13 +6,14 @@ import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
 @Repository
 public interface ContractStatusRepository extends JpaRepository<ContractStatus, Long> {
 
-    ContractStatus findByLecture(Lecture lecture);
+    List<ContractStatus> findByLecture(Lecture lecture);
 
     Optional<ContractStatus> findByLectureAndApprovalStatus(Lecture lecture, Integer approvalStatus);
 

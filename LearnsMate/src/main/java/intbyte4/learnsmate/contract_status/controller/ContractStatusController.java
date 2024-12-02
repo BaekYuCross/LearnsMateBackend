@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/contract-status")
@@ -26,7 +27,7 @@ public class ContractStatusController {
     private final ContractStatusMapper contractStatusMapper;
 
     @Operation(summary = "계약과정 전체 조회")
-    @GetMapping("list")
+    @GetMapping("/list")
     public ResponseEntity<List<ResponseFindContractStatusVO>> listContractProcess() {
         List<ContractStatusDTO> contractStatusDTOList = contractStatusService.findAll();
         List<ResponseFindContractStatusVO> response = new ArrayList<>();
@@ -46,9 +47,9 @@ public class ContractStatusController {
 
     @Operation(summary = "강의별 계약과정 조회")
     @GetMapping("/lecture/{lectureCode}")
-    public ResponseEntity<ResponseFindContractStatusVO> getApprovalProcessByLectureCode(@PathVariable("lectureCode") String lectureCode) {
-        ContractStatusDTO contractStatusDTO = contractStatusService.getApprovalProcessByLectureCode(lectureCode);
-        return ResponseEntity.status(HttpStatus.OK).body(contractStatusMapper.fromDtoToResponseVO(contractStatusDTO));
+    public ResponseEntity<List<ResponseFindContractStatusVO>> getApprovalProcessByLectureCode(@PathVariable("lectureCode") String lectureCode) {
+        List<ContractStatusDTO> contractStatusDTOList = contractStatusService.getApprovalProcessByLectureCode(lectureCode);
+        return ResponseEntity.status(HttpStatus.OK).body(contractStatusDTOList.stream().map(contractStatusMapper::fromDtoToResponseVO).collect(Collectors.toList()));
     }
 
     @Operation(summary = "강의별 계약과정 등록")
@@ -56,6 +57,6 @@ public class ContractStatusController {
     public ResponseEntity<ResponseRegisterContractStatusVO> createContractProcessByLecture(
             @PathVariable("lectureCode") String lectureCode, @RequestBody RequestRegisterContractStatusVO requestVO) {
         ContractStatusDTO contractStatusDTO = contractStatusService.createContractProcess(lectureCode, contractStatusMapper.fromRegisterRequestVOtoDto(requestVO));
-        return  ResponseEntity.status(HttpStatus.CREATED).body(contractStatusMapper.fromDtoToRegisterResponseVO(contractStatusDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(contractStatusMapper.fromDtoToRegisterResponseVO(contractStatusDTO));
     }
 }

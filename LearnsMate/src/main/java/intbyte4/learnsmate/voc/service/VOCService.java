@@ -1,8 +1,12 @@
 package intbyte4.learnsmate.voc.service;
 
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCClientDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
+import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindClientVOCVO;
+import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,6 +23,8 @@ public interface VOCService {
 
     List<VOCDTO> findAnsweredVOCByMember(Long memberCode);
 
+    List<VOCDTO> findUnansweredVOC();
+
     Map<Integer, Long> countVOCByCategory(LocalDateTime startDate, LocalDateTime endDate);
 
     Page<VOCDTO> findAllByVOCWithPaging(Pageable of);
@@ -32,4 +38,10 @@ public interface VOCService {
     List<VOCDTO> findAllByFilter(VOCFilterRequestDTO dto);
 
     List<VOCDTO> findAllVOCs();
+
+    VOCDTO saveVOC(VOCDTO dto, MemberDTO memberDTO, VOCCategoryDTO vocCategoryDto);
+
+    List<VOCClientDTO> findAllClientVOC(Long memberCode);
+
+    void updateVocSatisfaction(String vocCode, Long satisfaction);
 }

@@ -2,6 +2,7 @@ package intbyte4.learnsmate.voc.repository;
 
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCClientDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -78,4 +79,22 @@ public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepository
     // 현재 시각보다 이전의 created_at을 가져오기
     @Query("SELECT v FROM Voc v WHERE v.createdAt <= :now")
     Page<VOC> findAllBeforeNow(@Param("now") LocalDateTime now, Pageable pageable);
+
+    @Query("SELECT v FROM Voc v WHERE v.vocAnswerStatus = false ORDER BY v.createdAt DESC")
+    List<VOC> findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
+
+    @Query("""
+        SELECT new intbyte4.learnsmate.voc.domain.dto.VOCClientDTO(
+        v.vocCode,v.vocContent,v.vocAnswerStatus,v.vocAnswerSatisfaction,v.createdAt,
+        vc.vocCategoryCode, vc.vocCategoryName,m.memberCode,m.memberName,va.vocAnswerCode,
+        va.vocAnswerContent, va.createdAt, va.updatedAt, a.adminCode, a.adminName)
+        FROM Voc v
+        LEFT JOIN v.vocCategory vc
+        LEFT JOIN v.member m
+        LEFT JOIN VocAnswer va ON va.voc.vocCode = v.vocCode
+        LEFT JOIN va.admin a
+        WHERE v.member.memberCode = :memberCode
+        ORDER BY v.createdAt DESC
+    """)
+    List<VOCClientDTO> findAllClientVOC(@Param("memberCode") Long memberCode);
 }

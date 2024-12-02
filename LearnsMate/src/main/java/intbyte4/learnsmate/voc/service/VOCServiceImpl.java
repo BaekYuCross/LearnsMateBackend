@@ -2,12 +2,17 @@ package intbyte4.learnsmate.voc.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCClientDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.repository.VOCRepository;
+import intbyte4.learnsmate.voc_category.domain.VOCCategory;
 import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
 import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +37,7 @@ public class VOCServiceImpl implements VOCService {
     private final VOCRepository vocRepository;
     private final VOCMapper vocMapper;
     private final VOCCategoryService vocCategoryService;
+    private final MemberMapper memberMapper;
 
     @Override
     public VOCDTO findByVOCCode(String vocCode) {
@@ -65,6 +70,14 @@ public class VOCServiceImpl implements VOCService {
     @Override
     public List<VOCDTO> findAnsweredVOCByMember(Long memberCode) {
         List<VOC> vocList = vocRepository.findAnsweredVOCByMember(memberCode);
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VOCDTO> findUnansweredVOC() {
+        List<VOC> vocList = vocRepository.findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
         return vocList.stream()
                 .map(vocMapper::fromEntityToDTO)
                 .collect(Collectors.toList());
@@ -141,5 +154,47 @@ public class VOCServiceImpl implements VOCService {
         return vocList.stream()
                 .map(vocMapper::fromEntityToDTO)
                 .collect(Collectors.toList());
+    }
+
+    // 강의 등록
+    @Override
+    public VOCDTO saveVOC(VOCDTO dto, MemberDTO memberDTO, VOCCategoryDTO vocCategoryDTO) {
+
+        Member member = memberMapper.fromMemberDTOtoMember(memberDTO);
+        VOCCategory vocCategory = VOCCategory.builder()
+                .vocCategoryCode(vocCategoryDTO.getVocCategoryCode())
+                .vocCategoryName(vocCategoryDTO.getVocCategoryName()).build();
+
+        VOC voc = VOC.builder()
+                .vocContent(dto.getVocContent())
+                .vocAnswerStatus(false)
+                .vocAnswerSatisfaction(null)
+                .createdAt(LocalDateTime.now())
+                .vocCategory(vocCategory)
+                .member(member)
+                .build();
+
+        vocRepository.save(voc);
+
+        return vocMapper.fromEntityToDTO(voc);
+    }
+
+    // 회원의 전체 voc 조회
+    @Override
+    public List<VOCClientDTO> findAllClientVOC(Long memberCode) {
+
+        log.info("memberCode: {}", memberCode);
+        List<VOCClientDTO> dtoList = vocRepository.findAllClientVOC(memberCode);
+
+        return dtoList;
+    }
+
+    @Override
+    public void updateVocSatisfaction(String vocCode, Long satisfaction) {
+        VOC voc = vocRepository.findById(vocCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
+
+        voc.updateSatisfaction(satisfaction);
+        vocRepository.save(voc);
     }
 }
