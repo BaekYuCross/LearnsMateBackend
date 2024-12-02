@@ -7,6 +7,7 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
+import intbyte4.learnsmate.voc.domain.dto.VOCClientDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
@@ -176,5 +177,15 @@ public class VOCServiceImpl implements VOCService {
         vocRepository.save(voc);
 
         return vocMapper.fromEntityToDTO(voc);
+    }
+
+    // 회원의 전체 voc 조회
+    @Override
+    public List<VOCClientDTO> findAllClientVOC(Long memberCode) {
+
+        log.info("memberCode: {}", memberCode);
+        List<VOCClientDTO> dtoList = vocRepository.findAllClientVOC(memberCode);
+
+        return dtoList;
     }
 }
