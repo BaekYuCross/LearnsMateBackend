@@ -91,6 +91,12 @@ jobs:
                     min-idle: 5
                     time-between-eviction-runs: 2000ms
           
+          coolsms:
+            api:
+              key: \${COOL_SMS_API_KEY}
+              secret: \${COOL_SMS_API_SECRET}
+              base-url: \${COOL_SMS_API_BASE_URL}
+          
           openai:
             model: gpt-4o
             secret-key: \${SECRET_KEY}
@@ -119,6 +125,9 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SPRING_MAIL_SMTP_HOST: ${{ secrets.SPRING_MAIL_SMTP_HOST }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          COOL_SMS_API_KEY : ${{ secrets.COOL_SMS_API_KEY }}
+          COOL_SMS_API_SECRET : ${{ secrets.COOL_SMS_API_SECRET }}
+          COOL_SMS_API_BASE_URL : ${{ secrets.COOL_SMS_API_BASE_URL }}
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
