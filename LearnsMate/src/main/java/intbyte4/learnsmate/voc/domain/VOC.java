@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 @Entity(name = "Voc")
 @Table(name = "voc")
@@ -18,7 +20,6 @@ import java.time.LocalDateTime;
 public class VOC {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "voc_code", nullable = false, unique = true)
     private String vocCode;
 
@@ -41,4 +42,16 @@ public class VOC {
     @ManyToOne
     @JoinColumn(name = "member_code", nullable = false)
     private Member member;
+
+    @PrePersist
+    public void generateVocCode() {
+        int categoryCode = this.vocCategory.getVocCategoryCode();
+        String formattedCategoryCode = String.format("%03d", categoryCode);
+
+        String formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        String uniqueCode = UUID.randomUUID().toString().substring(0, 8);
+
+        this.vocCode = String.format("V%s-%s%s", formattedCategoryCode, formattedDate, uniqueCode);
+    }
 }
