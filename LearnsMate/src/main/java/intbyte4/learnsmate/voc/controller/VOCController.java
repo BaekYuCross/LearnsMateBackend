@@ -7,6 +7,7 @@ import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
+import intbyte4.learnsmate.voc.domain.vo.request.RequestSaveVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.request.VOCCategoryRatioFilterRequest;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
@@ -125,5 +126,16 @@ public class VOCController {
     public ResponseEntity<List<VOCCategoryCountDTO>> getFilteredCategoryCounts(@RequestBody VOCCategoryRatioFilterRequest request) {
         List<VOCCategoryCountDTO> filteredCategoryCounts = vocFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
         return ResponseEntity.ok(filteredCategoryCounts);
+    }
+
+    @Operation(summary = "학생 - VOC 등록")
+    @PostMapping
+    public ResponseEntity<?> saveVOC(@RequestBody RequestSaveVOCVO request) {
+
+        VOCDTO dto = vocMapper.fromRequestSaveVOCVOtoVOCDTO(request);
+
+        VOCDTO responseDTO = vocFacade.saveVOC(dto);
+
+        return ResponseEntity.ok(responseDTO);
     }
 }
