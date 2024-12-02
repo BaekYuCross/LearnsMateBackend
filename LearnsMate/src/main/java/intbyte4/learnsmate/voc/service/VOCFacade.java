@@ -132,4 +132,13 @@ public class VOCFacade {
 
         return responseList;
     }
+
+    public VOCDTO saveVOC(VOCDTO vocDto){
+        MemberDTO memberDTO = memberService.findById(vocDto.getMemberCode());
+        VOCCategoryDTO vocCategoryDto = vocCategoryService.findByVocCategoryCode(vocDto.getVocCategoryCode());
+
+        VOCDTO responseDTO = vocService.saveVOC(vocDto, memberDTO, vocCategoryDto);
+
+        return responseDTO;
+    }
 }
