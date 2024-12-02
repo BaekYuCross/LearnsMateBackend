@@ -156,4 +156,15 @@ public class VOCController {
         List<ResponseFindClientVOCVO> voList = vocMapper.fromDTOtoResponseFindClientVOCVO(dtoList);
         return ResponseEntity.ok(voList);
     }
+
+    @Operation(summary = "학생 - VOC 만족도 평가")
+    @PostMapping("/client/{vocCode}/feedback")
+    public ResponseEntity<String> updateVocSatisfaction(
+            @PathVariable("vocCode") String vocCode,
+            @RequestParam("satisfaction") Long satisfaction
+    ){
+        vocService.updateVocSatisfaction(vocCode, satisfaction);
+
+        return ResponseEntity.ok("만족도 업데이트 완료");
+    }
 }
