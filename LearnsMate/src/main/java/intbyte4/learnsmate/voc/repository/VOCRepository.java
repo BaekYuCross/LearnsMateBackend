@@ -78,4 +78,8 @@ public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepository
     // 현재 시각보다 이전의 created_at을 가져오기
     @Query("SELECT v FROM Voc v WHERE v.createdAt <= :now")
     Page<VOC> findAllBeforeNow(@Param("now") LocalDateTime now, Pageable pageable);
+
+    @Query("SELECT v FROM Voc v WHERE v.vocAnswerStatus = false ORDER BY v.createdAt DESC")
+    List<VOC> findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
+
 }

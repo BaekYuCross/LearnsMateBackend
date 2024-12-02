@@ -86,6 +86,18 @@ public class VOCController {
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
+    @Operation(summary = "직원 - 전체 유저 미답변 VOC 리스트 조회")
+    @GetMapping("/unanswered")
+    public ResponseEntity<List<ResponseFindVOCVO>> AllUnansweredVOC() {
+        List<VOCDTO> vocDTOList = vocService.findUnansweredVOC();
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+        for (VOCDTO vocdto : vocDTOList) {
+            ResponseFindVOCVO response = vocFacade.findVOC(vocdto.getVocCode());
+            responseList.add(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
+    }
+
     @Operation(summary = "직원 - 기간 별 VOC 카테고리 별 개수 조회")
     @GetMapping("/count-by-category")
     public ResponseEntity<List<ResponseCountByCategoryVO>> countVOCByCategory(@RequestBody RequestCountByCategoryVO requestVO) {

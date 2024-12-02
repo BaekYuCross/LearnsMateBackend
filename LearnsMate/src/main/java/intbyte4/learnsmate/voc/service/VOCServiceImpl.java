@@ -75,6 +75,14 @@ public class VOCServiceImpl implements VOCService {
     }
 
     @Override
+    public List<VOCDTO> findUnansweredVOC() {
+        List<VOC> vocList = vocRepository.findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Map<Integer, Long> countVOCByCategory(LocalDateTime startDate, LocalDateTime endDate){
         List<VOCCategoryDTO> VOCCategoryDTOList = vocCategoryService.findAll();
 
