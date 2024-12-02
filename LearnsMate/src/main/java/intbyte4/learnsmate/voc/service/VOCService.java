@@ -19,6 +19,8 @@ public interface VOCService {
 
     List<VOCDTO> findAnsweredVOCByMember(Long memberCode);
 
+    List<VOCDTO> findUnansweredVOC();
+
     Map<Integer, Long> countVOCByCategory(LocalDateTime startDate, LocalDateTime endDate);
 
     Page<VOCDTO> findAllByVOCWithPaging(Pageable of);

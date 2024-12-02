@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +48,7 @@ public class ContractStatusServiceImpl implements ContractStatusService {
     }
 
     @Override
-    public ContractStatusDTO getApprovalProcessByLectureCode(String lectureCode) {
+    public List<ContractStatusDTO> getApprovalProcessByLectureCode(String lectureCode) {
         LectureDTO lecturedto = lectureService.getLectureById(lectureCode);
 
         MemberDTO tutorDTO = memberService.findMemberByMemberCode(lecturedto.getTutorCode(), MemberType.TUTOR);
@@ -55,13 +56,15 @@ public class ContractStatusServiceImpl implements ContractStatusService {
 
         Lecture lecture = lectureMapper.toEntity(lecturedto, tutor);
 
-        ContractStatus contractStatus = contractStatusRepository.findByLecture(lecture);
+        List<ContractStatus> contractStatusList = contractStatusRepository.findByLecture(lecture);
 
-        if (contractStatus == null) {
+        if (contractStatusList == null) {
             throw new CommonException(StatusEnum.CONTRACT_PROCESS_NOT_FOUND);
         }
 
-        return contractStatusMapper.toDTO(contractStatus);
+        return contractStatusList.stream()
+                .map(contractStatusMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
