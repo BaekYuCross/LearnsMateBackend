@@ -1,15 +1,13 @@
 package intbyte4.learnsmate.voc.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
-import intbyte4.learnsmate.voc.domain.dto.VOCCategoryCountDTO;
-import intbyte4.learnsmate.voc.domain.dto.VOCPageResponse;
-import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
-import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
+import intbyte4.learnsmate.voc.domain.dto.*;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestCountByCategoryVO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestSaveVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.request.VOCCategoryRatioFilterRequest;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseCountByCategoryVO;
+import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindClientVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc.mapper.VOCMapper;
 import intbyte4.learnsmate.voc.service.VOCFacade;
@@ -149,5 +147,13 @@ public class VOCController {
         VOCDTO responseDTO = vocFacade.saveVOC(dto);
 
         return ResponseEntity.ok(responseDTO);
+    }
+
+    @Operation(summary = "학생 - 자신이 작성한 전체 VOC 조회")
+    @GetMapping("/client/list/{memberCode}")
+    public ResponseEntity<?> findClientVOC(@PathVariable("memberCode") Long memberCode) {
+        List<VOCClientDTO> dtoList = vocService.findAllClientVOC(memberCode);
+        List<ResponseFindClientVOCVO> voList = vocMapper.fromDTOtoResponseFindClientVOCVO(dtoList);
+        return ResponseEntity.ok(voList);
     }
 }
