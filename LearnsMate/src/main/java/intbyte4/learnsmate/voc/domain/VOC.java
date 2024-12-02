@@ -54,4 +54,14 @@ public class VOC {
 
         this.vocCode = String.format("V%s-%s%s", formattedCategoryCode, formattedDate, uniqueCode);
     }
+
+    public void updateSatisfaction(Long satisfaction){
+        if(satisfaction == 0){
+            this.vocAnswerSatisfaction = "불만족";
+        }else if(satisfaction == 1){
+            this.vocAnswerSatisfaction = "보통";
+        }else{
+            this.vocAnswerSatisfaction = "만족";
+        }
+    }
 }
