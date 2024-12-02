@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +64,14 @@ public class VOCServiceImpl implements VOCService {
     @Override
     public List<VOCDTO> findAnsweredVOCByMember(Long memberCode) {
         List<VOC> vocList = vocRepository.findAnsweredVOCByMember(memberCode);
+        return vocList.stream()
+                .map(vocMapper::fromEntityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VOCDTO> findUnansweredVOC() {
+        List<VOC> vocList = vocRepository.findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
         return vocList.stream()
                 .map(vocMapper::fromEntityToDTO)
                 .collect(Collectors.toList());
