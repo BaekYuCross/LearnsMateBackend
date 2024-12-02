@@ -7,6 +7,7 @@ import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
 import intbyte4.learnsmate.voc.domain.vo.request.RequestFilterVOCVO;
+import intbyte4.learnsmate.voc.domain.vo.request.RequestSaveVOCVO;
 import intbyte4.learnsmate.voc.domain.vo.response.ResponseFindVOCVO;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_category.domain.VOCCategory;
@@ -98,6 +99,18 @@ public class VOCMapper {
                 .createdAt(vocDTO.getCreatedAt())
                 .vocAnswerStatus(null)
                 .vocAnswerSatisfaction(null)
+                .build();
+    }
+
+    public VOCDTO fromRequestSaveVOCVOtoVOCDTO(RequestSaveVOCVO requestSaveVOCVO) {
+        return VOCDTO.builder()
+                .vocCode(requestSaveVOCVO.getVocCode())
+                .vocContent(requestSaveVOCVO.getVocContent())
+                .vocAnswerStatus(requestSaveVOCVO.getVocAnswerStatus())
+                .vocAnswerSatisfaction(requestSaveVOCVO.getVocAnswerSatisfaction())
+                .createdAt(requestSaveVOCVO.getCreatedAt())
+                .vocCategoryCode(requestSaveVOCVO.getVocCategoryCode())
+                .memberCode(requestSaveVOCVO.getMemberCode())
                 .build();
     }
 }
