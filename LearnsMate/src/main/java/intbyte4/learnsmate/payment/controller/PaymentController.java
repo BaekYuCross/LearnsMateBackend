@@ -20,6 +20,8 @@ import intbyte4.learnsmate.payment.service.PaymentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,15 +53,14 @@ public class PaymentController {
     @Operation(summary = "특정 결제 내역 조회")
     @GetMapping("/{paymentCode}")
     public ResponseEntity<ResponseFindPaymentVO> getPaymentDetails(@PathVariable("paymentCode") Long paymentCode) {
-        log.info("Received request for payment details with code: {}", paymentCode);  // 로그 추가
         try {
             PaymentDetailDTO paymentDTO = paymentFacade.getPaymentDetails(paymentCode);
             return ResponseEntity.ok(paymentMapper.fromDtoToResponseVO(paymentDTO));
         } catch (CommonException e) {
-            log.error("Payment not found with code: {}", paymentCode);  // 로그 추가
+            log.error("Payment not found with code: {}", paymentCode);
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            log.error("Error getting payment details", e);  // 로그 추가
+            log.error("Error getting payment details", e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -84,9 +85,9 @@ public class PaymentController {
     }
 
     @Operation(summary = "필터별 결제 내역 조회")
-    @GetMapping("/filter")
-    public ResponseEntity<List<PaymentFilterDTO>> getPaymentsByFilters(@RequestBody PaymentFilterRequestVO request) {
-        List<PaymentFilterDTO> payments = paymentService.getPaymentsByFilters(request);
+    @PostMapping("/filter")
+    public ResponseEntity<Page<PaymentFilterDTO>> getPaymentsByFilters(@RequestBody PaymentFilterRequestVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+        Page<PaymentFilterDTO> payments = paymentService.getPaymentsByFilters(request, PageRequest.of(page, size));
         return ResponseEntity.status(HttpStatus.OK).body(payments);
     }
 }
