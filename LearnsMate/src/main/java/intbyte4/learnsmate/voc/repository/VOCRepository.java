@@ -94,6 +94,7 @@ public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepository
         LEFT JOIN VocAnswer va ON va.voc.vocCode = v.vocCode
         LEFT JOIN va.admin a
         WHERE v.member.memberCode = :memberCode
+        ORDER BY v.createdAt DESC
     """)
     List<VOCClientDTO> findAllClientVOC(@Param("memberCode") Long memberCode);
 }
