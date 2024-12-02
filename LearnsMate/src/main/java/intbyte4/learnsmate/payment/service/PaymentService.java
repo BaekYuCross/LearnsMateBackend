@@ -6,6 +6,7 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface PaymentService {
     List<PaymentDTO> getAllPayments();
 
-    List<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request);
+    Page<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request, Pageable pageable);
 
     PaymentDTO getPaymentDetails(Long paymentCode);
 
