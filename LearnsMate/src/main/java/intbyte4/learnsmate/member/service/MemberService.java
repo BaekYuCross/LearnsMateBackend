@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -195,5 +196,16 @@ public class MemberService {
     // BCrypt로 암호화된 비밀번호인지 확인
     private boolean isPasswordEncrypted(String password) {
         return password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$");
+    }
+
+    public int findYesterdayCountByMemberType(MemberType memberType) {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        return memberRepository.countByMemberTypeAndCreatedAtBetween(
+                memberType, yesterday.atStartOfDay(), yesterday.plusDays(1).atStartOfDay()
+        );
+    }
+
+    public int findTotalCountByMemberType(MemberType memberType) {
+        return memberRepository.countByMemberType(memberType);
     }
 }
