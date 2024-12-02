@@ -188,4 +188,13 @@ public class VOCServiceImpl implements VOCService {
 
         return dtoList;
     }
+
+    @Override
+    public void updateVocSatisfaction(String vocCode, Long satisfaction) {
+        VOC voc = vocRepository.findById(vocCode)
+                .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
+
+        voc.updateSatisfaction(satisfaction);
+        vocRepository.save(voc);
+    }
 }

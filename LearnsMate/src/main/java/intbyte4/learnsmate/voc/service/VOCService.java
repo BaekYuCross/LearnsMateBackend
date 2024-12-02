@@ -42,4 +42,6 @@ public interface VOCService {
     VOCDTO saveVOC(VOCDTO dto, MemberDTO memberDTO, VOCCategoryDTO vocCategoryDto);
 
     List<VOCClientDTO> findAllClientVOC(Long memberCode);
+
+    void updateVocSatisfaction(String vocCode, Long satisfaction);
 }
