@@ -18,7 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -77,24 +80,44 @@ public class TokenController {
 
     @Operation(summary = "토큰 리프레시 요청")
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@CookieValue("accessToken") String expiredToken, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키에서 refreshToken을 추출
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();  // refreshToken 값 저장
+                    System.out.println("받았다 시발 ;; refreshToken: " + refreshToken);
+                }
+            }
+        }
+
+        // refreshToken이 없으면 400 에러 반환
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("refreshToken이 필요합니다.");
+        }
+
         try {
+            // JWT 토큰 형식 검증
+            if (!refreshToken.contains(".")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 refreshToken 형식입니다.");
+            }
+
             // 만료된 Access Token에서 사용자 ID 추출
-            String userCode = jwtUtil.extractUserCode(expiredToken);
+            String userCode = jwtUtil.extractUserCode(refreshToken);
 
             // Redis에서 Refresh Token 확인
-            String refreshToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
-            if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {
+            String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
+            if (redisToken == null || !jwtUtil.validateToken(redisToken)) {
                 throw new RuntimeException("유효하지 않은 Refresh Token입니다.");
             }
 
-            // UserDetails
-            CustomUserDetails userDetails =
-                    (CustomUserDetails) adminService.loadUserByUsername(userCode);
+            // UserDetails 조회 (CustomUserDetails는 사용자 정보를 가져오는 클래스)
+            CustomUserDetails userDetails = (CustomUserDetails) adminService.loadUserByUsername(userCode);
 
-            // Authentication 객체
-            Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            // Authentication 객체 생성
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
             // 새로운 Access Token 발급
             String newAccessToken = jwtUtil.generateToken(
@@ -102,19 +125,38 @@ public class TokenController {
                     List.of("ROLE_USER"), null, authentication
             );
 
-            // 새 Access Token을 HttpOnly 쿠키에 저장
-            Cookie accessTokenCookie = new Cookie("accessToken", newAccessToken);
+            // 토큰 만료 시간 추출 (JWT의 exp 클레임에서)
+            Date expirationDate = jwtUtil.getExpirationDateFromToken(newAccessToken);
+
+            // 만료 시간을 문자열로 포맷
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String expirationTime = dateFormat.format(expirationDate);
+            log.info("새로운 토큰의 만효 싲간 ㅜㅜㅜ " + expirationTime);
+
+            // 쿠키에 새로운 Access Token 설정
+            Cookie accessTokenCookie = new Cookie("token", newAccessToken);
             accessTokenCookie.setHttpOnly(true);
-            accessTokenCookie.setSecure(false);
-            accessTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(15 * 60);
+            accessTokenCookie.setSecure(false);  // 로컬 개발 환경에서는 false로 설정
+            accessTokenCookie.setPath("/");  // 모든 경로에서 쿠키 사용 가능
+            accessTokenCookie.setMaxAge(15 * 60);  // 15분
+
+            // SameSite=None 속성 추가 (CORS 문제 해결)
+            accessTokenCookie.setDomain("localhost");  // 도메인 설정 (로컬 개발 환경에서는 localhost)
+            accessTokenCookie.setSecure(true);  // HTTPS에서만 전송되도록 설정
+
+            // 응답에 쿠키 추가
             response.addCookie(accessTokenCookie);
 
-            return ResponseEntity.ok("새로운 Access Token 발급 완료");
+            // Set-Cookie 헤더로 새로운 토큰 추가
+            response.setHeader("Set-Cookie", "token=" + newAccessToken +
+                    "; HttpOnly; Secure; Path=/; Max-Age=" + (15 * 60) + "; SameSite=None");
+
+            return ResponseEntity.ok(Map.of("message", "새로운 Access Token 발급 완료 !", "exp", expirationTime));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("재발급 실패: " + e.getMessage());
         }
     }
+
 
     //Postman으로 refreshToken값 조회
     @Operation(summary = "Redis에 담긴 refreshToken값 조회")
