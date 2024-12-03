@@ -108,7 +108,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     }
 
     private BooleanExpression eqLectureCode(String lectureCode) {
-        return StringUtils.hasText(lectureCode) ? lecture.lectureCode.eq(lectureCode) : null;
+        return StringUtils.hasText(lectureCode) ? lecture.lectureCode.likeIgnoreCase("%" + lectureCode + "%") : null;
     }
 
     private BooleanExpression likeLectureTitle(String title) {
