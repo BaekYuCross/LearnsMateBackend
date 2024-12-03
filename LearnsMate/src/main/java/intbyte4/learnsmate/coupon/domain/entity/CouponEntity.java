@@ -52,11 +52,11 @@ public class CouponEntity {
     private Boolean activeState;
 
     @ManyToOne
-    @JoinColumn (name = "coupon_category_code", nullable = false)
+    @JoinColumn(name = "coupon_category_code", nullable = false)
     private CouponCategory couponCategory;
 
     @ManyToOne
-    @JoinColumn (name = "admin_code")
+    @JoinColumn(name = "admin_code")
     private Admin admin;
 
     @ManyToOne

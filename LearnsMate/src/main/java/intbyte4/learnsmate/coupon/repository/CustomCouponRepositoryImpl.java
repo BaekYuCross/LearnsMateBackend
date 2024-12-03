@@ -7,6 +7,7 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.entity.QCouponEntity;
 import intbyte4.learnsmate.coupon.domain.vo.request.CouponFilterRequestVO;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
+@Slf4j
 public class CustomCouponRepositoryImpl implements CustomCouponRepository {
 
     private final JPAQueryFactory queryFactory;
@@ -41,6 +43,17 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         builder.and(eqAdminName(request.getAdminName()));
         builder.and(eqTutorName(request.getTutorName()));
 
+        // registrationType 필터 조건 추가
+        BooleanBuilder registrationTypeFilter = new BooleanBuilder();
+        if ("admin".equals(request.getRegistrationType())) {
+            registrationTypeFilter.and(coupon.admin.isNotNull());  // admin이 설정된 데이터
+            registrationTypeFilter.and(coupon.tutor.isNull());    // tutor는 null이어야 함
+        } else if ("tutor".equals(request.getRegistrationType())) {
+            registrationTypeFilter.and(coupon.tutor.isNotNull()); // tutor가 설정된 데이터
+            registrationTypeFilter.and(coupon.admin.isNull());   // admin은 null이어야 함
+        }
+        builder.and(registrationTypeFilter);
+
         return queryFactory
                 .selectFrom(coupon)
                 .where(builder)
@@ -64,6 +77,20 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         builder.and(eqCouponCategoryName(request.getCouponCategoryName()));
         builder.and(eqAdminName(request.getAdminName()));
         builder.and(eqTutorName(request.getTutorName()));
+
+
+        // registrationType 필터 조건 추가
+        BooleanBuilder registrationTypeFilter = new BooleanBuilder();
+        if ("admin".equals(request.getRegistrationType())) {
+            registrationTypeFilter.and(coupon.admin.isNotNull());  // admin이 설정된 데이터
+            registrationTypeFilter.and(coupon.tutor.isNull());    // tutor는 null이어야 함
+        } else if ("tutor".equals(request.getRegistrationType())) {
+            registrationTypeFilter.and(coupon.tutor.isNotNull()); // tutor가 설정된 데이터
+            registrationTypeFilter.and(coupon.admin.isNull());   // admin은 null이어야 함
+        }
+        builder.and(registrationTypeFilter);
+
+        log.info("Query Filters: {}", builder.toString()); // 로그 추가
 
         List<CouponEntity> content = queryFactory
                 .selectFrom(coupon)
@@ -170,5 +197,14 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
     private BooleanExpression eqTutorName(String tutorName) {
         return tutorName == null || tutorName.isBlank() ? null :
                 QCouponEntity.couponEntity.tutor.memberName.equalsIgnoreCase(tutorName);
+    }
+
+    private String adminOrTutorFilter(String adminName, String tutorName) {
+        if (adminName != null) {
+            return "admin";
+        } else if (tutorName != null) {
+            return "tutor";
+        }
+        return null;
     }
 }
