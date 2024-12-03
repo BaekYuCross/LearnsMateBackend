@@ -61,10 +61,6 @@ public class LectureServiceImpl implements LectureService {
 
         List<Lecture> lectures = lectureRepository.findAllByTutor(tutor);
 
-        if (lectures.isEmpty()) {
-            throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
-        }
-
         return lectures.stream()
                 .map(lectureMapper::toDTO)
                 .collect(Collectors.toList());
