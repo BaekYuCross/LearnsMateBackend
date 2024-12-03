@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.coupon.controller;
 
 import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.coupon.domain.dto.ClientFindCouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.pagination.CouponPageResponse;
@@ -235,4 +236,17 @@ public class CouponController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
         }
     }
+
+    @Operation(summary = "강사 - 강사가 등록한 전체 쿠폰 조회")
+    @GetMapping("/client/{tutorCode}/allcoupon")
+    public ResponseEntity<?> findAllClientCoupon(@PathVariable("tutorCode")Long tutorCode) {
+
+        List<ClientFindCouponDTO> dtoList = couponService.findAllClientCoupon(tutorCode);
+
+        List<ResponseClientFindCouponVO> voList
+                = couponMapper.fromClientFindCouponDTOtoResponseClientFindCouponVO(dtoList);
+
+        return ResponseEntity.ok(voList);
+    }
+
 }
