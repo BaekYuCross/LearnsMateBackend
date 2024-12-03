@@ -81,7 +81,17 @@ public class TokenController {
     @Operation(summary = "토큰 리프레시 요청")
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
-      
+        // 쿠키에서 refreshToken을 추출
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();  // refreshToken 값 저장
+                    System.out.println("받았다 시발 ;; refreshToken: " + refreshToken);
+                }
+            }
+        }
 
         // refreshToken이 없으면 400 에러 반환
         if (refreshToken == null || refreshToken.isEmpty()) {
