@@ -44,7 +44,6 @@ public class VOCController {
     @Operation(summary = "직원 - VOC 단 건 조회")
     @GetMapping("/{vocCode}")
     public ResponseEntity<?> getVOC(@PathVariable("vocCode") String vocCode) {
-        log.info("조회 요청된 VOC 코드 : {}", vocCode);
         try {
             ResponseFindVOCVO response = vocFacade.findVOC(vocCode);
             log.info("VOC 단 건 조회 성공: {}", response);
@@ -61,7 +60,6 @@ public class VOCController {
     @Operation(summary = "직원 - 특정 유저 미답변 VOC 리스트 조회")
     @GetMapping("/{memberCode}/unanswered")
     public ResponseEntity<List<ResponseFindVOCVO>> listUnansweredVOC(@PathVariable("memberCode") Long memberCode) {
-        log.info("특정 유저 미답변 VOC 조회 요청: userCode = {}", memberCode);
         List<VOCDTO> vocDTOList = vocService.findUnansweredVOCByMember(memberCode);
         List<ResponseFindVOCVO> responseList = new ArrayList<>();
         for (VOCDTO vocdto : vocDTOList) {
@@ -74,7 +72,6 @@ public class VOCController {
     @Operation(summary = "직원 - 특정 유저 답변 VOC 리스트 조회")
     @GetMapping("/{memberCode}/answered")
     public ResponseEntity<List<ResponseFindVOCVO>> listAnsweredVOC(@PathVariable("memberCode") Long memberCode) {
-        log.info("특정 유저 답변 VOC 조회 요청: userCode = {}", memberCode);
         List<VOCDTO> vocDTOList = vocService.findAnsweredVOCByMember(memberCode);
         List<ResponseFindVOCVO> responseList = new ArrayList<>();
         for (VOCDTO vocdto : vocDTOList) {
@@ -113,7 +110,6 @@ public class VOCController {
     @Operation(summary = "VOC 필터링")
     @PostMapping("/filter")
     public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
-        log.info("VOC 필터링 요청 수신");
         try {
             VOCFilterRequestDTO dto = vocMapper.fromFilterVOtoFilterDTO(request);
             VOCPageResponse<ResponseFindVOCVO> response = vocFacade.filterVOCsByPage(dto, page, size);
