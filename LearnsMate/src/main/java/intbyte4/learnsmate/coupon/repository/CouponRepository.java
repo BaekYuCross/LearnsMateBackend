@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.coupon.repository;
 
+import intbyte4.learnsmate.coupon.domain.dto.ClientFindCouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,4 +29,12 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long>, Cus
     @Query("SELECT c FROM Coupon c JOIN couponByCampaign cbc ON c.couponCode = cbc.coupon.couponCode WHERE cbc.campaign.campaignCode = :campaignCode")
     Page<CouponEntity> findCouponsByCampaignCode(@Param("campaignCode") Long campaignCode, Pageable pageable);
 
+    @Query("SELECT new intbyte4.learnsmate.coupon.domain.dto.ClientFindCouponDTO(" +
+            "l.lectureCode, l.lectureTitle, l.lecturePrice, " +
+            "c.couponCode, c.couponDiscountRate, c.couponStartDate, c.couponExpireDate, c.activeState) " +
+            "FROM Coupon c " +
+            "JOIN couponByLecture cbl ON c.couponCode = cbl.coupon.couponCode " +
+            "JOIN cbl.lecture l " +
+            "WHERE c.couponFlag = true AND c.tutor.memberCode = :tutorCode")
+    List<ClientFindCouponDTO> findAllClientCoupon(@Param("tutorCode") Long tutorCode);
 }
