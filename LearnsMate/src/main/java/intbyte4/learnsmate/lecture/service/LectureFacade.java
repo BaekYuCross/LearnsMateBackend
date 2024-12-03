@@ -166,6 +166,7 @@ public class LectureFacade {
 
     public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPage(LectureFilterDTO filterDTO, int page, int size) {
         Page<LectureDTO> lectures = lectureService.filterLectureWithPaging(filterDTO, PageRequest.of(page, size));
+        log.info("{}", lectures.toString());
         List<ResponseFindLectureVO> responseList = new ArrayList<>();
 
         for (LectureDTO lectureDTO : lectures) {
@@ -176,13 +177,16 @@ public class LectureFacade {
             ResponseFindLectureVO responseFindLectureVO = lectureMapper.fromDTOToResponseVOAll(lectureDTO, memberDTO, lectureCategoryDTO);
 
             responseList.add(responseFindLectureVO);
+            log.info("{}", responseFindLectureVO.toString());
         }
+
+        log.info("{}, {}", lectures.getSize(), responseList.size());
 
         return new LecturePaginationResponse<>(
                 responseList,
                 lectures.getTotalElements(),
                 lectures.getTotalPages(),
-                lectures.getNumber(),
+                lectures.getNumber() + 1,
                 lectures.getSize()
         );
     }

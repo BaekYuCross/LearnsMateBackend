@@ -54,6 +54,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     public Page<ResponseFindLectureVO> searchByWithPaging(LectureFilterDTO filterDTO, Pageable pageable) {
         BooleanBuilder builder = createFilterConditions(filterDTO);
 
+        // 전체 개수 조회
         Long total = queryFactory
                 .select(lecture.countDistinct())
                 .from(lecture)
@@ -62,6 +63,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
                 .where(builder)
                 .fetchOne();
 
+        // 페이징 처리된 데이터 조회
         List<ResponseFindLectureVO> content = queryFactory
                 .select(Projections.fields(ResponseFindLectureVO.class,
                         lecture.lectureCode.as("lectureCode"),
@@ -80,6 +82,8 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
                 .leftJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
                 .leftJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
                 .where(builder)
+                .offset(pageable.getOffset())   // 페이지 시작점
+                .limit(pageable.getPageSize())  // 페이지 크기
                 .fetch();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
@@ -116,7 +120,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     }
 
     private BooleanExpression eqTutorName(String tutorName) {
-        return StringUtils.hasText(tutorName) ? lecture.tutor.memberName.eq(tutorName) : null;
+        return StringUtils.hasText(tutorName) ? lecture.tutor.memberName.likeIgnoreCase("%" + tutorName + "%") : null;
     }
 
     private BooleanExpression eqLectureCategoryName(String categoryName) {
