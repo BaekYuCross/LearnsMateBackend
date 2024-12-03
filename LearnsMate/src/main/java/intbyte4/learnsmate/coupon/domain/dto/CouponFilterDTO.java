@@ -26,6 +26,7 @@ public class CouponFilterDTO {
     private String couponCategoryName;
     private String adminName;
     private String tutorName;
+    private String registrationType;
 
     private List<String> selectedColumns;
 }
