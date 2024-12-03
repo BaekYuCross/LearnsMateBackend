@@ -8,6 +8,7 @@ import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.coupon.domain.dto.ClientFindCouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
@@ -22,8 +23,6 @@ import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
 import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
-import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -38,7 +37,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -252,7 +250,12 @@ public class CouponServiceImpl implements CouponService {
                 couponPage.getSize()           // 페이지 크기
         );
     }
+    @Override
+    public List<ClientFindCouponDTO> findAllClientCoupon(Long tutorCode) {
+        List<ClientFindCouponDTO> dtoList = couponRepository.findAllClientCoupon(tutorCode);
 
+        return dtoList;
+    }
     public void validAdmin(AdminService adminService, Long adminCode, Logger log) {
         AdminDTO adminDTO = adminService.findByAdminCode(adminCode);
         if (adminDTO == null) {

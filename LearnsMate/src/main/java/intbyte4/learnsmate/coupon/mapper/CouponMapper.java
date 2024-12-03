@@ -3,6 +3,7 @@ package intbyte4.learnsmate.coupon.mapper;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestEditCampaignCouponVO;
 import intbyte4.learnsmate.campaign.domain.vo.request.RequestFindCampaignCouponVO;
+import intbyte4.learnsmate.coupon.domain.dto.ClientFindCouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.dto.RegisterCouponDTO;
@@ -18,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -315,4 +318,19 @@ public class CouponMapper {
                 .registrationType(registrationType)
                 .build();
     }
- }
+
+    public List<ResponseClientFindCouponVO> fromClientFindCouponDTOtoResponseClientFindCouponVO(List<ClientFindCouponDTO> dtoList) {
+        return dtoList.stream()
+                .map(dto -> ResponseClientFindCouponVO.builder()
+                        .lectureCode(dto.getLectureCode())
+                        .lectureTitle(dto.getLectureTitle())
+                        .lecturePrice(dto.getLecturePrice())
+                        .couponCode(dto.getCouponCode())
+                        .couponDiscountRate(dto.getCouponDiscountRate())
+                        .couponStartDate(dto.getCouponStartDate())
+                        .couponExpireDate(dto.getCouponExpireDate())
+                        .activeState(dto.getActiveState())
+                        .build())
+                .collect(Collectors.toList());
+    }
+}

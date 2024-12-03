@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.coupon.service;
 
-import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.dto.FindCampaignDetailDTO;
+import intbyte4.learnsmate.coupon.domain.dto.ClientFindCouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
@@ -48,4 +48,6 @@ public interface CouponService {
     List<CouponEntity> filterCoupons(CouponFilterDTO dto);
 
     CouponPageResponse<CouponFindResponseVO> filterCoupons(CouponFilterDTO dto, int page, int size);
+
+    List<ClientFindCouponDTO> findAllClientCoupon(Long tutorCode);
 }
