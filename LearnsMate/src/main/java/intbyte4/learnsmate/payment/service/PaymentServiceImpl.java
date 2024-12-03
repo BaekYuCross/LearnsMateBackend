@@ -35,6 +35,7 @@ import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -75,8 +76,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request) {
-        return paymentRepository.findPaymentByFilters(request);
+    public Page<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request, Pageable pageable) {
+        return paymentRepository.findPaymentByFilters(request, pageable);
     }
 
     // 직원이 특정 결제 내역을 단건 상세 조회

@@ -2,10 +2,10 @@ package intbyte4.learnsmate.payment.repository;
 
 import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CustomPaymentRepository {
 
-    List<PaymentFilterDTO> findPaymentByFilters(PaymentFilterRequestVO request);
+    Page<PaymentFilterDTO> findPaymentByFilters(PaymentFilterRequestVO request, Pageable pageable);
 }

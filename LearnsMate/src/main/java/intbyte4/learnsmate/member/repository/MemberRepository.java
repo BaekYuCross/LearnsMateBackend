@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -28,4 +29,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     @Query("SELECT m FROM member m JOIN userPerCampaign upc ON m.memberCode = upc.student.memberCode WHERE upc.campaign.campaignCode = :campaignCode")
     Page<Member> findMembersByCampaignCode(@Param("campaignCode") Long campaignCode, Pageable pageable);
+
+    int countByMemberTypeAndCreatedAtBetween(MemberType memberType, LocalDateTime start, LocalDateTime end);
+
+    int countByMemberType(MemberType memberType);
 }

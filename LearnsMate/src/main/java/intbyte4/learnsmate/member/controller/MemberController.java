@@ -1,8 +1,11 @@
 package intbyte4.learnsmate.member.controller;
 
+import intbyte4.learnsmate.common.exception.CommonException;
+import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.member.domain.dto.*;
 import intbyte4.learnsmate.member.domain.pagination.MemberPageResponse;
 import intbyte4.learnsmate.member.domain.vo.request.*;
+import intbyte4.learnsmate.member.domain.vo.response.MemberCountResponse;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
@@ -82,7 +85,7 @@ public class MemberController {
 
     @Operation(summary = "회원 - 로그인")
     @PostMapping("/login")
-    public ResponseEntity<?> memberLogin(@RequestBody RequestLoginVO request){
+    public ResponseEntity<?> memberLogin(@RequestBody RequestLoginVO request) {
         MemberDTO memberDTO = MemberDTO.builder()
                 .memberEmail(request.getMemberEmail())
                 .memberPassword(request.getMemberPassword())
@@ -122,7 +125,6 @@ public class MemberController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
-        log.info("vo는 :{}", request );
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
@@ -164,5 +166,24 @@ public class MemberController {
         List<CategoryCountDTO> categoryCounts = memberFacade.getFilteredCategoryCounts(request.getStartDate(), request.getEndDate());
         List<CategoryStatDTO> stats = memberFacade.calculateCategoryStats(categoryCounts);
         return ResponseEntity.ok(stats);
+    }
+
+    @Operation(summary = "회원 가입 정보 조회")
+    @GetMapping("/count")
+    public ResponseEntity<MemberCountResponse> getMemberCount(@RequestParam("type") String type) {
+        int yesterdayCount = 0;
+        int totalCount = 0;
+
+        if (type.equalsIgnoreCase("student")) {
+            yesterdayCount = memberService.findYesterdayCountByMemberType(MemberType.STUDENT); // 어제 가입한 회원 수
+            totalCount = memberService.findTotalCountByMemberType(MemberType.STUDENT);       // 총 회원 수
+        } else if (type.equalsIgnoreCase("tutor")) {
+            yesterdayCount = memberService.findYesterdayCountByMemberType(MemberType.TUTOR);
+            totalCount = memberService.findTotalCountByMemberType(MemberType.TUTOR);
+        } else {
+            throw new CommonException(StatusEnum.ENUM_NOT_MATCH);
+        }
+        MemberCountResponse response = new MemberCountResponse(yesterdayCount, totalCount);
+        return ResponseEntity.ok(response);
     }
 }
