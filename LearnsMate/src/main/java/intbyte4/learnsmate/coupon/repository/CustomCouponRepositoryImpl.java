@@ -117,7 +117,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
     }
 
     private BooleanExpression eqActiveState(Boolean activeState) {
-        return activeState == null ? null : QCouponEntity.couponEntity.couponFlag.eq(activeState);
+        return activeState == null ? null : QCouponEntity.couponEntity.activeState.eq(activeState);
     }
 
     private BooleanExpression betweenDiscountRate(Integer minDiscountRate, Integer maxDiscountRate) {
