@@ -128,13 +128,14 @@ public class WebSecurity {
         configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173")); // 프론트엔드 도메인 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // 허용할 HTTP 메서드 설정
         configuration.setAllowCredentials(true); // 인증 정보 허용 (쿠키 등)
-        configuration.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더 허용
+        configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization")); // 필요한 헤더만 허용
         configuration.setMaxAge(3600L); // 1시간 동안 캐시
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
     // Authentication 용 메소드(인증 필터 반환)
     private Filter getAuthenticationFilter(AuthenticationManager authenticationManager) {
