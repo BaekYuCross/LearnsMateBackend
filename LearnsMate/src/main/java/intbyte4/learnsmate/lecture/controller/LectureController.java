@@ -127,4 +127,14 @@ public class LectureController {
         List<ResponseFindLectureVO> response = lectureFacade.findAllLectures();
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "강사 - 본인의 전체 강의 조회")
+    @GetMapping("/client/{tutorCode}")
+    public ResponseEntity<List<?>> findAllLectureByTutorCode(@PathVariable Long tutorCode) {
+        List<LectureDTO> dtoList = lectureService.getLecturesByTutorCode(tutorCode);
+
+        List<ResponseClientFindLectureVO> voList = lectureMapper.fromDTOtoResponseClinetFindLectureVO(dtoList);
+
+        return ResponseEntity.ok(voList);
+    }
 }
