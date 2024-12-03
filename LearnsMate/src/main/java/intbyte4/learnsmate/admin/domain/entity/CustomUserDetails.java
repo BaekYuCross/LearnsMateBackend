@@ -56,9 +56,4 @@ public class CustomUserDetails implements UserDetails {
         return this.isEnabled;  // 사용자로부터 받은 값을 반환
     }
 
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        // 예시로 'ROLE_ADMIN'과 같은 권한을 반환
-//        return List.of(new SimpleGrantedAuthority("ROLE_" + userDTO.getRole()));
-//    }
 }
