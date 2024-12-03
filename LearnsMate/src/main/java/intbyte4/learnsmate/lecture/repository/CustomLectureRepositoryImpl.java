@@ -120,7 +120,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
     }
 
     private BooleanExpression eqTutorName(String tutorName) {
-        return StringUtils.hasText(tutorName) ? lecture.tutor.memberName.eq(tutorName) : null;
+        return StringUtils.hasText(tutorName) ? lecture.tutor.memberName.likeIgnoreCase("%" + tutorName + "%") : null;
     }
 
     private BooleanExpression eqLectureCategoryName(String categoryName) {
