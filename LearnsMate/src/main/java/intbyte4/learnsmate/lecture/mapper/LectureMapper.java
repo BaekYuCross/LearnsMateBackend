@@ -8,10 +8,7 @@ import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.*;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -22,6 +19,8 @@ import intbyte4.learnsmate.payment.domain.vo.RequestRegisterLecturePaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class LectureMapper {
@@ -227,5 +226,23 @@ public class LectureMapper {
                 .lectureClickCount(request.getLectureClickCount())
                 .lectureLevel(request.getLectureLevel())
                 .build();
+    }
+
+    public List<ResponseClientFindLectureVO> fromDTOtoResponseClinetFindLectureVO(List<LectureDTO> dtoList) {
+        return dtoList.stream()
+                .map(dto -> ResponseClientFindLectureVO.builder()
+                        .lectureCode(dto.getLectureCode())
+                        .lectureTitle(dto.getLectureTitle())
+                        .lectureConfirmStatus(dto.getLectureConfirmStatus())
+                        .createdAt(dto.getCreatedAt())
+                        .updatedAt(dto.getUpdatedAt())
+                        .lectureImage(dto.getLectureImage())
+                        .lecturePrice(dto.getLecturePrice())
+                        .tutorCode(dto.getTutorCode())
+                        .lectureStatus(dto.getLectureStatus())
+                        .lectureClickCount(dto.getLectureClickCount())
+                        .lectureLevel(dto.getLectureLevel())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
