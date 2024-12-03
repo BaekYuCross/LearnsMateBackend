@@ -2,10 +2,7 @@ package intbyte4.learnsmate.coupon.domain.vo.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Builder
+@ToString
 public class CouponFindResponseVO {
 
     @JsonProperty("coupon_code")
@@ -60,6 +58,9 @@ public class CouponFindResponseVO {
 
     @JsonProperty("tutor_name")
     private String tutorName;
+
+    @JsonProperty("registration_type")
+    private String registrationType;
 
     public CouponFindResponseVO updateAdminName(String adminName) {
         this.adminName = adminName;

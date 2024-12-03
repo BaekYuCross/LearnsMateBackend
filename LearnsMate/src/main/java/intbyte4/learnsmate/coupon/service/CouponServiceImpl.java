@@ -25,6 +25,7 @@ import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.data.domain.PageRequest;
@@ -229,6 +230,7 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public CouponPageResponse<CouponFindResponseVO> filterCoupons(CouponFilterDTO dto, int page, int size){
 
+        log.info("{}", dto.toString());
         Pageable pageable = PageRequest.of(page, size);
 
         // 필터 조건과 페이징 처리된 데이터 조회
@@ -239,6 +241,7 @@ public class CouponServiceImpl implements CouponService {
                 .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
                 .collect(Collectors.toList());
 
+        log.info("{}", couponVOList);
         return new CouponPageResponse<>(
                 couponVOList,               // 데이터 리스트
                 couponPage.getTotalElements(), // 전체 데이터 수

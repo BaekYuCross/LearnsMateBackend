@@ -79,7 +79,7 @@ public class CouponController {
         log.info("쿠폰 필터링 요청 수신");
         try {
             CouponFilterDTO dto = couponMapper.fromFilterVOtoFilterDTO(request);
-            log.info(dto.toString());
+//            log.info(dto.toString());
             List<CouponFindResponseVO> response = couponFacade.filterCoupon(dto);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -95,8 +95,9 @@ public class CouponController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size){
 
+        log.info("{}", request);
         CouponFilterDTO dto = couponMapper.fromFilterVOtoFilterDTO(request);
-
+        log.info("{}", dto.toString());
         CouponPageResponse<CouponFindResponseVO> response = couponService.filterCoupons(dto, page, size);
 
         return ResponseEntity.ok(response);

@@ -14,6 +14,8 @@ import intbyte4.learnsmate.coupon_category.domain.CouponCategory;
 import intbyte4.learnsmate.coupon_category.service.CouponCategoryService;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
+@ToString
 public class CouponMapper {
 
     private final CouponCategoryService couponCategoryService;
@@ -228,10 +232,13 @@ public class CouponMapper {
                 .couponCategoryName(request.getCouponCategoryName())
                 .adminName(request.getAdminName())
                 .tutorName(request.getTutorName())
+                .registrationType(request.getRegistrationType())
                 .build();
     }
 
     public CouponFilterRequestVO fromFilterDTOToFilterVO(CouponFilterDTO dto) {
+
+
         return CouponFilterRequestVO.builder()
                 .couponName(dto.getCouponName())
                 .couponContents(dto.getCouponContents())
@@ -247,6 +254,7 @@ public class CouponMapper {
                 .couponCategoryName(dto.getCouponCategoryName())
                 .adminName(dto.getAdminName())
                 .tutorName(dto.getTutorName())
+                .registrationType(dto.getRegistrationType())
                 .build();
     }
 
@@ -285,6 +293,15 @@ public class CouponMapper {
 
     // 쿠폰 전체 페이징
     public CouponFindResponseVO fromCouponEntityToCouponFindResponseVO(CouponEntity coupon) {
+
+        String registrationType = null;
+
+        if (coupon.getAdmin() != null && coupon.getAdmin().getAdminName() != null) {
+            registrationType = "admin";
+        } else if (coupon.getTutor() != null && coupon.getTutor().getMemberName() != null) {
+            registrationType = "tutor";
+        }
+
         return CouponFindResponseVO.builder()
                 .couponCode(coupon.getCouponCode())
                 .couponName(coupon.getCouponName())
@@ -298,6 +315,7 @@ public class CouponMapper {
                 .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
                 .adminName(coupon.getAdmin() != null ? coupon.getAdmin().getAdminName() : null)
                 .tutorName(coupon.getTutor() != null ? coupon.getTutor().getMemberName() : null)
+                .registrationType(registrationType)
                 .build();
     }
 
