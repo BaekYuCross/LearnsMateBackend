@@ -128,6 +128,23 @@ public class LectureController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "쿠폰 등록 화면에서의 필터링 기능")
+    @PostMapping("/coupon-register/filter")
+    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> filterLecturesInCouponReg(@RequestBody RequestLectureFilterVO request,
+                                                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                                                      @RequestParam(defaultValue = "15") int size) {
+        try {
+            LectureFilterDTO filterDTO = lectureMapper.toFilterDTO(request);
+            log.info("filterDTO: " + filterDTO.toString());
+            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size);
+            log.info("{}, {}", page, size);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("강의 필터링 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @Operation(summary = "강사 - 본인의 전체 강의 조회")
     @GetMapping("/client/{tutorCode}")
     public ResponseEntity<List<?>> findAllLectureByTutorCode(@PathVariable Long tutorCode) {
