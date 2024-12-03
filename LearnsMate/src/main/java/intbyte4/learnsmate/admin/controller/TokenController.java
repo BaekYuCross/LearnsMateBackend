@@ -148,7 +148,7 @@ public class TokenController {
             response.addCookie(accessTokenCookie);
 
             // Set-Cookie 헤더로 새로운 토큰 추가
-            response.setHeader("Set-Cookie", "accessToken=" + newAccessToken +
+            response.setHeader("Set-Cookie", "token=" + newAccessToken +
                     "; HttpOnly; Secure; Path=/; Max-Age=" + (15 * 60) + "; SameSite=None");
 
             return ResponseEntity.ok(Map.of("message", "새로운 Access Token 발급 완료 !", "exp", expirationTime));
