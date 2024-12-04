@@ -131,7 +131,7 @@ public class TokenController {
             // 쿠키에 새로운 Access Token 설정
             Cookie accessTokenCookie = new Cookie("token", newAccessToken);
             accessTokenCookie.setHttpOnly(true);
-            accessTokenCookie.setSecure(false);  // 로컬 개발 환경에서는 false로 설정
+            accessTokenCookie.setSecure(true);  // 로컬 개발 환경에서는 false로 설정
             accessTokenCookie.setPath("/");  // 모든 경로에서 쿠키 사용 가능
             accessTokenCookie.setMaxAge(15 * 60);  // 15분
 

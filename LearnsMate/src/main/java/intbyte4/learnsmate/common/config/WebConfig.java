@@ -12,9 +12,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("https://learnsmate.site")
-//                .allowedOrigins("http://localhost:5173")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                .allowedHeaders("Content-Type", "Authorization")
-                .allowCredentials(true);
+                .allowedHeaders("*")  // 모든 헤더 허용
+                .exposedHeaders("Set-Cookie")  // Set-Cookie 헤더 노출
+                .allowCredentials(true)
+                .maxAge(3600);
     }
 }

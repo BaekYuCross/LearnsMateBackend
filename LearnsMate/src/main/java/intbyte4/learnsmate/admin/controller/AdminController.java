@@ -56,7 +56,6 @@ public class AdminController {
     @Operation(summary = "직원 정보 조회")
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> checkAuthStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("GET /admin/status 요청 도착");
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -68,8 +67,6 @@ public class AdminController {
         response.put("roles", userDetails.getAuthorities()); // 권한 정보
         response.put("exp", userDetails.getExpiration()); // 시간
 
-        log.info("만료시간은!!!: {}", userDetails.getExpiration());
-
         return ResponseEntity.ok(response);
     }
 
@@ -78,9 +75,6 @@ public class AdminController {
     @Operation(summary = "직원 비밀번호 재설정시 이메일 전송")
     @PostMapping("/verification-email/password")
     public ResponseEmailDTO<?> sendVerificationEmailPassword(@RequestBody @Validated AdminEmailVerificationVO requestVO) {
-
-        log.info("POST /admin/verification-email/password 요청 도착: request={}", requestVO);
-
         AdminDTO request = adminMapper.fromAdminEmailVoToDto(requestVO);
 
         // 입력한 사번 코드와 이메일의 정보 검증
@@ -111,8 +105,6 @@ public class AdminController {
     @Operation(summary = "비번 재설정 전 이메일 인증번호 검증")
     @PostMapping("/verification-email/confirmation")
     public ResponseEmailDTO<?> verifyEmail(@RequestBody @Validated EmailVerificationVO request) {
-        log.info("POST /admin/verification-email/confirmation 요청 도착: request={}", request);
-
         boolean isVerified = emailService.verifyCode(request.getEmail(), request.getCode());
 
         ResponseEmailMessageVO responseEmailMessageVO =new ResponseEmailMessageVO();
@@ -133,7 +125,6 @@ public class AdminController {
         AdminDTO request = adminMapper.fromResetPasswordVoToDto(requestVO);
         adminService.resetPassword(request);
 
-        log.info("비밀번호가 성공적으로 재설정되었습니다.");
         return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다.");
     }
 }
