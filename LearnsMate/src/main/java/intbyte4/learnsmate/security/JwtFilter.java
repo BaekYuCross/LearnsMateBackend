@@ -51,13 +51,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 쿠키에서 토큰 가져오기
         if (request.getCookies() != null) {
+            log.info("Cookies received: {}", Arrays.toString(request.getCookies())); // 쿠키 로그 추가
             for (Cookie cookie : request.getCookies()) {
+                log.info("Cookie name: {}, value: {}", cookie.getName(), cookie.getValue()); // 각 쿠키 로그
                 if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
                     log.info("Token found in cookies: {}", token);
                     break;
                 }
             }
+        } else {
+            log.warn("No cookies found in the request.");
         }
 
         // 토큰 검증
@@ -67,7 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return; // 필터 체인 진행 중단
         }
 
-        // 토큰 만료 시간 확인 (추가 디버깅 코드)
+        // 토큰 만료 시간 확인
         try {
             Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
             log.info("Token Expiration: {}, Current Time: {}", expirationDate, new Date());
