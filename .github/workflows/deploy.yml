@@ -77,6 +77,7 @@ jobs:
                     auth: true
                     starttls:
                       enable: true
+                      required: true
           
             data:
               redis:
@@ -102,7 +103,7 @@ jobs:
             secret-key: \${SECRET_KEY}
 
           token:
-            expiration_time: 43200000
+            expiration_time: 14400000
             secret: \${TOKEN_SECRET}
           EOL
 
