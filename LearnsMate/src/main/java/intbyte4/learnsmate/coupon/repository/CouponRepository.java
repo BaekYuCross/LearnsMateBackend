@@ -15,9 +15,11 @@ import java.util.List;
 public interface CouponRepository extends JpaRepository<CouponEntity, Long>, CustomCouponRepository {
 
     // couponFlag가 true인 쿠폰 전체 조회
+    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true ORDER BY c.createdAt DESC")
     List<CouponEntity> findAllByCouponFlagTrue();
 
     // couponFlag가 true인 쿠폰 전체 조회 + offset 페이징
+    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true ORDER BY c.createdAt DESC")
     Page<CouponEntity> findAllByCouponFlagTrue(Pageable pageable);
 
     @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true AND c.admin IS NOT NULL")
