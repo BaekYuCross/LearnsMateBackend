@@ -67,10 +67,6 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/index.html", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/auth/login", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/auth/logout", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/auth/refresh", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/admin/status", "GET")).authenticated()  // 인증 필요
                                 .requestMatchers(new AntPathRequestMatcher("/admin/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/auth/**","GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/auth/**","POST")).permitAll()
