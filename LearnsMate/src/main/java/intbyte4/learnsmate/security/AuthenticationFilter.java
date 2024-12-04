@@ -129,12 +129,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         try {
             saveRefreshTokenToRedis(userCode, refreshToken);
-            log.info("Redis 저장 완료");
+            log.info("Redis save complete");
         } catch (Exception e) {
-            log.error("Redis 저장 실패: {}", e.getMessage(), e);
+            log.error("Redis save fail - successfulAuthentication : : {}", e.getMessage(), e);
         }
 
-        log.info("인증 성공 처리 완료");
+        log.info("successfulAuthentication complete");
     }
 
     // Redis에 refreshToken 저장
@@ -150,7 +150,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                     TimeUnit.DAYS
             );
         } catch (Exception e) {
-            log.error("Redis 저장 실패", e);
+            log.error("Redis save fail - saveRefreshTokenToRedis : ", e);
         }
     }
 
