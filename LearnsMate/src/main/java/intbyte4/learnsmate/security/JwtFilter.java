@@ -28,8 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/swagger-ui.html",
             "/swagger-ui/index.html",
             "/admin/password",
-            "/users/login",
-            "/admin/status"
+            "/users/login"
     );
 
     public JwtFilter(AdminService userService, JwtUtil jwtUtil) {

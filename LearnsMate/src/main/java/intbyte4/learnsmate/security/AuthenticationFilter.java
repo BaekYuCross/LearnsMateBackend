@@ -23,7 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -117,6 +119,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         refreshTokenCookie.setMaxAge(7 * 24 * 3600);
         response.addCookie(refreshTokenCookie);
         log.info("Refresh 토큰 쿠키 설정 완료");
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("name", userName);
+        responseData.put("code", userCode);
+        responseData.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
+
+        response.setContentType("application/json");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(responseData));
 
         try {
             saveRefreshTokenToRedis(userCode, refreshToken);
