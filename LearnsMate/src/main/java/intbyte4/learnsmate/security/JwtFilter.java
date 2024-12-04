@@ -43,30 +43,35 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String token = null;
-        log.info("Request URL: {}", request.getRequestURL());  // URL 로깅 추가
+        log.info("Request URL: {}", request.getRequestURL());
 
         // 쿠키에서 토큰 가져오기
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
-                    log.info("Token found in cookies");  // 토큰 발견 로깅
+                    log.info("Token found in cookies: {}", token);
                     break;
                 }
             }
         }
 
-        // 토큰 유효성 검사 및 인증 객체 설정
-        if (token != null && jwtUtil.validateToken(token)) {
-            Authentication authentication = jwtUtil.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("Authentication 설정 완료: {}", authentication);
-        } else {
-            log.info("유효하지 않은 토큰이거나 토큰이 없습니다. Token: {}", token);
+        // 토큰 검증
+        if (token == null || !jwtUtil.validateToken(token)) {
+            log.warn("유효하지 않은 토큰 또는 토큰이 없습니다. Token: {}", token);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 응답
+            return; // 필터 체인 진행 중단
         }
+
+        // 인증 객체 생성 및 SecurityContext 설정
+        Authentication authentication = jwtUtil.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info("Authentication 설정 완료: {}", authentication);
 
         filterChain.doFilter(request, response);
     }
+
 }
