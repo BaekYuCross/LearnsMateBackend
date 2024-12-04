@@ -17,15 +17,22 @@ public class RedisService {
     }
 
     public void deleteToken(String userCode) {
-        if (userCode != null && !userCode.isEmpty()) {
-            String key = "refreshToken:" + userCode; // 키 이름 형식에 맞게 설정
+        if (userCode == null || userCode.isEmpty()) {
+            log.warn("삭제 요청 시 userCode가 null이거나 비어 있습니다.");
+            return;
+        }
+
+        String key = "refreshToken:" + userCode; // Redis 키 형식 설정
+        try {
             Boolean isDeleted = redisTemplate.delete(key);
-            if (isDeleted != null && isDeleted) {
+            if (Boolean.TRUE.equals(isDeleted)) {
                 log.info("Redis에서 refreshToken 삭제 성공: {}", key);
             } else {
-                log.warn("Redis에서 refreshToken 삭제 실패 또는 존재하지 않음: {}", key);
+                log.warn("Redis에서 refreshToken 삭제 실패 또는 키가 존재하지 않음: {}", key);
             }
+        } catch (Exception e) {
+            log.error("Redis에서 refreshToken 삭제 중 예외 발생: {}", e.getMessage(), e);
         }
     }
-
 }
+

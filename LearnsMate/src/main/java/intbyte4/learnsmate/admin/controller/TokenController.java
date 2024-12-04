@@ -37,34 +37,38 @@ public class TokenController {
     @Operation(summary = "직원 로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키에서 refreshToken 추출
-        String refreshToken = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
+        try {
+            String refreshToken = null;
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("refreshToken".equals(cookie.getName())) {
+                        refreshToken = cookie.getValue();
+                    }
                 }
             }
-        }
+            log.info("Extracted Refresh Token: {}", refreshToken);
 
-        // 쿠키 삭제
-        clearCookie(response, "token", "/", "learnsmate.shop");
-        clearCookie(response, "refreshToken", "/", "learnsmate.shop");
+            clearCookie(response, "token", "/", "learnsmate.shop");
+            clearCookie(response, "refreshToken", "/", "learnsmate.shop");
 
-        // Redis에서 refreshToken 삭제
-        if (refreshToken != null && !refreshToken.isEmpty()) {
-            // 토큰에서 userCode 추출
-            String userCode = jwtUtil.getUserCodeFromToken(refreshToken); // 토큰에서 사용자 식별자 추출
-            if (userCode != null) {
-                redisService.deleteToken(userCode); // userCode 기반으로 Redis에서 삭제
-            } else {
-                log.warn("RefreshToken에서 userCode를 추출하지 못했습니다.");
+            if (refreshToken != null && !refreshToken.isEmpty()) {
+                String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
+                log.info("Extracted userCode from Token: {}", userCode);
+                if (userCode != null) {
+                    redisService.deleteToken(userCode);
+                } else {
+                    log.warn("RefreshToken에서 userCode를 추출하지 못했습니다.");
+                }
             }
-        }
 
-        return ResponseEntity.ok().body("로그아웃 성공");
+            return ResponseEntity.ok().body("로그아웃 성공");
+        } catch (Exception e) {
+            log.error("An error occurred during logout: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 실패");
+        }
     }
+
 
     private void clearCookie(HttpServletResponse response, String cookieName, String path, String domain) {
         Cookie cookie = new Cookie(cookieName, null);
