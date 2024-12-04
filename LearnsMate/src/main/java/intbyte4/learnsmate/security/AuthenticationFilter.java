@@ -98,6 +98,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         Cookie jwtCookie = new Cookie("token", token);
         jwtCookie.setHttpOnly(true); // HTTP Only 속성으로 설정 (JavaScript에서 접근 불가)
         jwtCookie.setSecure(true); // HTTPS 연결에서만 전송 (테스트 환경에서는 false 설정 가능)
+        jwtCookie.setDomain("learnsmate.site");
         // https://learnsmate.site -> 배포 환경시 true로 전환
         jwtCookie.setPath("/"); // 쿠키의 유효 경로 설정 (애플리케이션 전체에 사용 가능)
         jwtCookie.setMaxAge(4 * 3600); // 쿠키 만료 시간 설정 (4시간)
@@ -109,6 +110,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(true);  // 개발 환경에서 false, 배포 환경에서는 true로 설정
+        jwtCookie.setDomain("learnsmate.site");
         refreshTokenCookie.setPath("/"); // 유효 경로 설정
         refreshTokenCookie.setMaxAge(7 * 24 * 3600); // Refresh Token의 만료 시간 (7일)
 
