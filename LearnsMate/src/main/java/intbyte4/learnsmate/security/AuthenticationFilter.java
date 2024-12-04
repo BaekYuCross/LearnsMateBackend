@@ -102,14 +102,24 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         log.info("토큰 생성 완료");
 
         // 쿠키 설정
-        response.setHeader("Set-Cookie", "token=" + token +
-                "; HttpOnly; Secure; Path=/; Max-Age=" + (4 * 3600) +
-                "; SameSite=None; Domain=learnsmate.shop");
+        Cookie accessTokenCookie = new Cookie("token", token);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true); // HTTPS만 사용
+        accessTokenCookie.setPath("/"); // 모든 경로에서 사용 가능
+        accessTokenCookie.setMaxAge(4 * 3600); // 4시간
+        accessTokenCookie.setDomain("learnsmate.shop"); // 도메인 설정
+        response.addCookie(accessTokenCookie);
 
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(7 * 24 * 3600); // 7일
+        refreshTokenCookie.setDomain("learnsmate.shop");
+        response.addCookie(refreshTokenCookie);
 
-        response.addHeader("Set-Cookie", "refreshToken=" + refreshToken +
-                "; HttpOnly; Secure; Path=/; Max-Age=" + (7 * 24 * 3600) +
-                "; SameSite=None; Domain=learnsmate.shop");
+        log.info("Access Token Cookie: {}", accessTokenCookie.toString());
+        log.info("Refresh Token Cookie: {}", refreshTokenCookie.toString());
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("name", userName);
@@ -132,6 +142,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     // Redis에 refreshToken 저장
     public void saveRefreshTokenToRedis(String userCode, String refreshToken) {
         try {
+            log.info("Saved Refresh Token to Redis: Key=refreshToken:{}, Value={}", userCode, refreshToken);
+
             // Redis에 refreshToken 저장
             redisTemplate.opsForValue().set(
                     "refreshToken:" + userCode,
