@@ -112,7 +112,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(true);
-        jwtCookie.setDomain("learnsmate.shop");
+        refreshTokenCookie.setDomain("learnsmate.shop");
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(7 * 24 * 3600);
         response.addCookie(refreshTokenCookie);
