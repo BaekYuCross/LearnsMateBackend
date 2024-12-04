@@ -171,13 +171,11 @@ public class TokenController {
 
     //Postman으로 refreshToken값 조회
     @Operation(summary = "Redis에 담긴 refreshToken값 조회")
-    @GetMapping("/check-refresh-token/{userCode}")
+    @GetMapping("/auth/check-refresh-token/{userCode}")
     public ResponseEntity<String> checkRefreshToken(@PathVariable String userCode) {
         String refreshToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
-        if (refreshToken != null) {
-            return ResponseEntity.ok(refreshToken);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh Token not found");
+        return refreshToken != null ? ResponseEntity.ok(refreshToken)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token not found");
     }
 }
 

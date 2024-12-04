@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -66,6 +67,14 @@ public class JwtFilter extends OncePerRequestFilter {
             return; // 필터 체인 진행 중단
         }
 
+        // 토큰 만료 시간 확인 (추가 디버깅 코드)
+        try {
+            Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
+            log.info("Token Expiration: {}, Current Time: {}", expirationDate, new Date());
+        } catch (Exception e) {
+            log.error("토큰 만료 시간 확인 중 오류 발생", e);
+        }
+
         // 인증 객체 생성 및 SecurityContext 설정
         Authentication authentication = jwtUtil.getAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -73,5 +82,4 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }

@@ -42,23 +42,17 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            if (token == null || token.isBlank()) {
-                log.warn("토큰이 null이거나 빈 문자열입니다.");
-                return false;
-            }
+            log.info("Validating token: {}", token);
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.warn("유효하지 않은 JWT 서명입니다: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.warn("지원하지 않는 JWT 토큰입니다: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.warn("JWT 클레임이 비어있거나 잘못되었습니다: {}", e.getMessage());
+            log.warn("Expired Token: {}", token);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid Token: {}", token, e);
         }
         return false;
     }
+
 
     public Authentication getAuthentication(String token) {
         if (!validateToken(token)) {
