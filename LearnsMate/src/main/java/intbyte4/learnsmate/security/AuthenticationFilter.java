@@ -102,23 +102,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         log.info("토큰 생성 완료");
 
         // 쿠키 설정
-        Cookie jwtCookie = new Cookie("token", token);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(true);
-        jwtCookie.setDomain("learnsmate.shop");
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(4 * 3600);
-        response.addCookie(jwtCookie);
-        log.info("JWT 쿠키 설정 완료");
+        response.setHeader("Set-Cookie", "token=" + token +
+                "; HttpOnly; Secure; Path=/; Max-Age=" + (4 * 3600) +
+                "; SameSite=None; Domain=learnsmate.shop");
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setDomain("learnsmate.shop");
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(7 * 24 * 3600);
-        response.addCookie(refreshTokenCookie);
-        log.info("Refresh 토큰 쿠키 설정 완료");
+
+        response.addHeader("Set-Cookie", "refreshToken=" + refreshToken +
+                "; HttpOnly; Secure; Path=/; Max-Age=" + (7 * 24 * 3600) +
+                "; SameSite=None; Domain=learnsmate.shop");
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("name", userName);
