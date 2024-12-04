@@ -1,5 +1,8 @@
 package intbyte4.learnsmate.common.config;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -7,7 +10,15 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
+@Slf4j
 public class RedisConfig {
+
+    private final Environment environment;
+
+    public RedisConfig(Environment environment) {
+        this.environment = environment;
+    }
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory();
@@ -24,5 +35,10 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory());
         return template;
+    }
+
+    @PostConstruct
+    public void init() {
+        log.info("Redis Host: {}", environment.getProperty("spring.data.redis.host"));
     }
 }
