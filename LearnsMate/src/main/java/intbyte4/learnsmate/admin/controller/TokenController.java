@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +49,22 @@ public class TokenController {
                 }
             }
             if (refreshToken == null || refreshToken.isEmpty()) {
-                log.warn("RefreshToken is missing in the request.");
+                log.warn("RefreshToken is missing in the request. Cookies: {}", Arrays.toString(request.getCookies()));
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("RefreshToken이 필요합니다.");
             }
 
-            String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
+            if (!refreshToken.contains(".")) {
+                log.warn("Invalid RefreshToken format: {}", refreshToken);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 RefreshToken 형식입니다.");
+            }
+
+            String userCode = null;
+            try {
+                userCode = jwtUtil.getUserCodeFromToken(refreshToken);
+            } catch (Exception e) {
+                log.error("Failed to parse userCode from RefreshToken: {}", refreshToken, e);
+            }
+
             if (userCode != null) {
                 redisService.deleteToken(userCode);
             } else {

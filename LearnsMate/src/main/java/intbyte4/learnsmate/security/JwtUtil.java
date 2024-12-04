@@ -176,7 +176,12 @@ public class JwtUtil {
     }
 
     public String getUserCodeFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
+        try {
+            return getClaimFromToken(token, Claims::getSubject);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid JWT token: {}", token, e);
+            return null;
+        }
     }
 
     public String extractUserCode(String expiredToken) {
