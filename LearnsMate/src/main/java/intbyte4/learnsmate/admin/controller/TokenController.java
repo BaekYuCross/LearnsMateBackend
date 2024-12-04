@@ -47,28 +47,28 @@ public class TokenController {
                     }
                 }
             }
-            log.info("Extracted Refresh Token: {}", refreshToken);
+            if (refreshToken == null || refreshToken.isEmpty()) {
+                log.warn("RefreshToken is missing in the request.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("RefreshToken이 필요합니다.");
+            }
+
+            String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
+            if (userCode != null) {
+                redisService.deleteToken(userCode);
+            } else {
+                log.warn("Failed to extract userCode from RefreshToken.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 RefreshToken입니다.");
+            }
 
             clearCookie(response, "token", "/", "learnsmate.shop");
             clearCookie(response, "refreshToken", "/", "learnsmate.shop");
 
-            if (refreshToken != null && !refreshToken.isEmpty()) {
-                String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
-                log.info("Extracted userCode from Token: {}", userCode);
-                if (userCode != null) {
-                    redisService.deleteToken(userCode);
-                } else {
-                    log.warn("RefreshToken에서 userCode를 추출하지 못했습니다.");
-                }
-            }
-
             return ResponseEntity.ok().body("로그아웃 성공");
         } catch (Exception e) {
-            log.error("An error occurred during logout: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 실패");
+            log.error("Logout failed: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 처리 중 오류가 발생했습니다.");
         }
     }
-
 
     private void clearCookie(HttpServletResponse response, String cookieName, String path, String domain) {
         Cookie cookie = new Cookie(cookieName, null);
