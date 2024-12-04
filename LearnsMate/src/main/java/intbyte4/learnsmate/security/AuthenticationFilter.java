@@ -104,18 +104,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // 쿠키 설정
         Cookie accessTokenCookie = new Cookie("token", token);
         accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true); // HTTPS만 사용
-        accessTokenCookie.setPath("/"); // 모든 경로에서 사용 가능
-        accessTokenCookie.setMaxAge(4 * 3600); // 4시간
-        accessTokenCookie.setDomain("learnsmate.shop"); // 도메인 설정
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(4 * 3600);
         response.addCookie(accessTokenCookie);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(7 * 24 * 3600); // 7일
-        refreshTokenCookie.setDomain("learnsmate.shop");
+        refreshTokenCookie.setMaxAge(7 * 24 * 3600);
         response.addCookie(refreshTokenCookie);
 
         log.info("Access Token Cookie: {}", accessTokenCookie.toString());
