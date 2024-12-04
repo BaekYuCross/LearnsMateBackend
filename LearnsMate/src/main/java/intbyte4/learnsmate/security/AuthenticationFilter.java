@@ -51,23 +51,34 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
 
-   // 로그인 시도 시 동작 "/users/login" 요청 시.
+    // 로그인 시도 시 동작 "/users/login" 요청 시.
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        // request body에 담긴 내용을 우리가 만든 RequestLoginVO 타입에 담는다.(일종의 @RequestBody의 개념)
         try {
+            // InputStream이 비어있는지 확인
+            if (request.getInputStream().available() == 0) {
+                log.warn("Request InputStream is empty");
+                throw new RuntimeException("Request body is empty. Login data is required.");
+            }
+
+            // JSON 데이터를 RequestLoginVO로 매핑
             RequestLoginVO creds = new ObjectMapper().readValue(request.getInputStream(), RequestLoginVO.class);
 
+            log.info("Parsed Login Data: adminCode={}, adminPassword=****", creds.getAdminCode());
+
+            // 인증 매니저에 인증 요청
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
-                             creds.getAdminCode(), // 사용자 사번
+                            creds.getAdminCode(), // 사용자 ID
                             creds.getAdminPassword(), // 사용자 비밀번호
                             new ArrayList<>()
                     ));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Error reading request InputStream or mapping to RequestLoginVO: ", e);
+            throw new RuntimeException("Failed to parse login request data", e);
         }
     }
+
 
     // 로그인 성공 시 실행되는 메소드 -> 여기서 JWT를 발급
     @Override
