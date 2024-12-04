@@ -37,8 +37,6 @@ public class TokenController {
     @Operation(summary = "직원 로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        log.info("POST /admin/logout 요청 도착");
-
         // 쿠키에서 refreshToken 추출
         String refreshToken = null;
         Cookie[] cookies = request.getCookies();
@@ -51,8 +49,8 @@ public class TokenController {
         }
 
         // 쿠키 삭제
-        clearCookie(response, "token", "/", "localhost");
-        clearCookie(response, "refreshToken", "/", "localhost");
+        clearCookie(response, "token", "/", "learnsmate.shop");
+        clearCookie(response, "refreshToken", "/", "learnsmate.shop");
 
         // Redis에서 refreshToken 삭제
         if (refreshToken != null && !refreshToken.isEmpty()) {
@@ -65,7 +63,6 @@ public class TokenController {
             }
         }
 
-        log.info("로그아웃 성공");
         return ResponseEntity.ok().body("로그아웃 성공");
     }
 
@@ -88,7 +85,6 @@ public class TokenController {
             for (Cookie cookie : cookies) {
                 if ("refreshToken".equals(cookie.getName())) {
                     refreshToken = cookie.getValue();  // refreshToken 값 저장
-                    System.out.println("받았다 시발 ;; refreshToken: " + refreshToken);
                 }
             }
         }
@@ -131,7 +127,6 @@ public class TokenController {
             // 만료 시간을 문자열로 포맷
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String expirationTime = dateFormat.format(expirationDate);
-            log.info("새로운 토큰의 만효 싲간 ㅜㅜㅜ " + expirationTime);
 
             // 쿠키에 새로운 Access Token 설정
             Cookie accessTokenCookie = new Cookie("token", newAccessToken);
@@ -141,7 +136,7 @@ public class TokenController {
             accessTokenCookie.setMaxAge(15 * 60);  // 15분
 
             // SameSite=None 속성 추가 (CORS 문제 해결)
-            accessTokenCookie.setDomain("localhost");  // 도메인 설정 (로컬 개발 환경에서는 localhost)
+            accessTokenCookie.setDomain("learnsmate.shop");  // 도메인 설정 (로컬 개발 환경에서는 localhost)
             accessTokenCookie.setSecure(true);  // HTTPS에서만 전송되도록 설정
 
             // 응답에 쿠키 추가
