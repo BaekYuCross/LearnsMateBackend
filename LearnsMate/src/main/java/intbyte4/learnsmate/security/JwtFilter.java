@@ -22,9 +22,14 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AdminService userService;
     private final JwtUtil jwtUtil;
     private final List<String> excludeUrl = Arrays.asList(
-            "/admin/verification-email/**", "/actuator/health",
-            "/admin/verification-email/password", "/swagger-ui.html",
-            "/swagger-ui/index.html", "/admin/password"
+            "/admin/verification-email/**",
+            "/actuator/health",
+            "/admin/verification-email/password",
+            "/swagger-ui.html",
+            "/swagger-ui/index.html",
+            "/admin/password",
+            "/users/login",
+            "/admin/status"
     );
 
     public JwtFilter(AdminService userService, JwtUtil jwtUtil) {
@@ -41,12 +46,14 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = null;
+        log.info("Request URL: {}", request.getRequestURL());  // URL 로깅 추가
 
         // 쿠키에서 토큰 가져오기
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
+                    log.info("Token found in cookies");  // 토큰 발견 로깅
                     break;
                 }
             }
@@ -56,13 +63,11 @@ public class JwtFilter extends OncePerRequestFilter {
         if (token != null && jwtUtil.validateToken(token)) {
             Authentication authentication = jwtUtil.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Authentication 설정 완료: {}", authentication);
+            log.info("Authentication 설정 완료: {}", authentication);
         } else {
-            // DEBUG 레벨로 로그를 기록하거나 로그 생략
-            log.debug("유효하지 않은 토큰이거나 토큰이 없습니다.");
+            log.info("유효하지 않은 토큰이거나 토큰이 없습니다. Token: {}", token);
         }
 
-        // 다음 필터 실행
         filterChain.doFilter(request, response);
     }
 }
