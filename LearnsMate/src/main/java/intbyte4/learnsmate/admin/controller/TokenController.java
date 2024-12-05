@@ -18,7 +18,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @RestController
@@ -64,39 +65,40 @@ public class TokenController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
         try {
-            // 요청 본문에서 refreshToken 추출
             String refreshToken = requestBody.get("refreshToken");
-
-            if (refreshToken == null || refreshToken.isEmpty()) {
-                log.warn("RefreshToken is missing in the request body");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("RefreshToken이 필요합니다.");
-            }
-
-            // refreshToken 검증 및 사용자 정보 확인
             String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
-            String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
 
-            if (redisToken == null || !jwtUtil.validateToken(redisToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 Refresh Token입니다.");
+            if (userCode == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
             }
 
-            // 새로운 AccessToken 발급
+            String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
+            if (redisToken == null || !jwtUtil.validateToken(redisToken)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
+            }
+
             CustomUserDetails userDetails = (CustomUserDetails) adminService.loadUserByUsername(userCode);
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             String newAccessToken = jwtUtil.generateToken(new JwtTokenDTO(userCode, null, null), List.of("ROLE_USER"), null, authentication);
 
-            Date newExpiration = jwtUtil.getExpirationDateFromToken(newAccessToken);
+            ZonedDateTime kstExpiration = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(4);
+            int[] expArray = new int[] {
+                    kstExpiration.getYear(),
+                    kstExpiration.getMonthValue(),
+                    kstExpiration.getDayOfMonth(),
+                    kstExpiration.getHour(),
+                    kstExpiration.getMinute(),
+                    kstExpiration.getSecond()
+            };
 
-            // 응답 본문으로 새 토큰 전달
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("accessToken", newAccessToken);
-            responseBody.put("exp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(newExpiration));
-            responseBody.put("message", "새로운 Access Token 발급 완료!");
+            responseBody.put("exp", expArray);
 
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
-            log.error("Token refresh failed: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("토큰 재발급 중 오류 발생");
+            log.error("Token refresh failed: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token refresh failed");
         }
     }
 
