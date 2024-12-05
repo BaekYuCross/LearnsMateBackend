@@ -66,13 +66,17 @@ public class TokenController {
     public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
         try {
             String refreshToken = requestBody.get("refreshToken");
+            log.info("Received refresh token: {}", refreshToken);
+
             String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
+            log.info("Extracted userCode: {}", userCode);
 
             if (userCode == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
             }
 
             String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
+            log.info("Redis token found: {}", redisToken != null);
             if (redisToken == null || !jwtUtil.validateToken(redisToken)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
             }
