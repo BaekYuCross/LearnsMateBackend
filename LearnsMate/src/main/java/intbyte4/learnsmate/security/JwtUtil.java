@@ -109,7 +109,8 @@ public class JwtUtil {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZoneId kst = ZoneId.of("Asia/Seoul");
+        ZonedDateTime now = ZonedDateTime.now(kst);
         ZonedDateTime expirationDateTime = now.plusHours(expirationTime / (1000 * 60 * 60));
 
         userDetails.setExpiration(expirationDateTime.toLocalDateTime());
