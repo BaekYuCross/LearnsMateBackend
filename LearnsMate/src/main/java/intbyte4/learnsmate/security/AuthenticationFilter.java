@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -108,8 +109,9 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // 만료 시간 계산 및 추가
         Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
-        ZonedDateTime expirationDateKST = expirationDate.toInstant().atZone(ZoneId.of("Asia/Seoul"));
-        String expTime = expirationDateKST.toString();
+        String expTime = expirationDate.toInstant()
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .format(DateTimeFormatter.ISO_INSTANT);
 
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO);
         log.info("토큰 생성 완료");
