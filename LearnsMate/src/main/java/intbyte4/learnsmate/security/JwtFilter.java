@@ -47,42 +47,32 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = null;
-        log.info("Request URL: {}", request.getRequestURL());
 
-        // 쿠키에서 토큰 가져오기
-        if (request.getCookies() != null) {
-            log.info("Cookies received: {}", Arrays.toString(request.getCookies())); // 쿠키 로그 추가
+        // 1. 헤더에서 토큰 가져오기
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        // 2. 쿠키에서 토큰 가져오기
+        if (token == null && request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                log.info("Cookie name: {}, value: {}", cookie.getName(), cookie.getValue()); // 각 쿠키 로그
                 if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
-                    log.info("Token found in cookies: {}", token);
                     break;
                 }
             }
-        } else {
-            log.warn("No cookies found in the request.");
         }
 
-        // 토큰 검증
+        // 3. 토큰 검증
         if (token == null || !jwtUtil.validateToken(token)) {
-            log.warn("유효하지 않은 토큰 또는 토큰이 없습니다. Token: {}", token);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 응답
-            return; // 필터 체인 진행 중단
+            return;
         }
 
-        // 토큰 만료 시간 확인
-        try {
-            Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
-            log.info("Token Expiration: {}, Current Time: {}", expirationDate, new Date());
-        } catch (Exception e) {
-            log.error("토큰 만료 시간 확인 중 오류 발생", e);
-        }
-
-        // 인증 객체 생성 및 SecurityContext 설정
+        // 4. 인증 객체 생성 및 SecurityContext 설정
         Authentication authentication = jwtUtil.getAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.info("Authentication 설정 완료: {}", authentication);
 
         filterChain.doFilter(request, response);
     }
