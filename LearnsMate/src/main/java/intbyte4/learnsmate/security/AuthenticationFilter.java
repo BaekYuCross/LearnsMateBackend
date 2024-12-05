@@ -125,6 +125,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         responseData.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
 
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(new ObjectMapper().writeValueAsString(responseData));
     }
 
