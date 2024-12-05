@@ -106,8 +106,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // 만료 시간 계산 및 추가
         Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-        String expTime = timeFormat.format(expirationDate);
+        String expTime = expirationDate.toInstant().toString();
+
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO);
         log.info("토큰 생성 완료");
 
