@@ -18,11 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.*;
 import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -112,32 +109,33 @@ public class JwtUtil {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        LocalDateTime expirationDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
-                .plusHours(expirationTime / (1000 * 60 * 60));
-        userDetails.setExpiration(expirationDateTime);
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime expirationDateTime = now.plusHours(expirationTime / (1000 * 60 * 60));
+
+        userDetails.setExpiration(expirationDateTime.toLocalDateTime());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(Date.from(Instant.now(Clock.system(ZoneOffset.UTC))))
-                .setExpiration(Date.from(expirationDateTime.atZone(ZoneId.of("Asia/Seoul")).toInstant()))
+                .setIssuedAt(Date.from(now.toInstant()))
+                .setExpiration(Date.from(expirationDateTime.toInstant()))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 
-
-    // 리프레시 토큰은 단순히 새로운 액세스 토큰 발급을 요청하기 위한 용도
     public String generateRefreshToken(JwtTokenDTO tokenDTO) {
-        Claims claims = Jwts.claims().setSubject(tokenDTO.getUserCode()); // 최소한의 정보
+        Claims claims = Jwts.claims().setSubject(tokenDTO.getUserCode());
         log.info("RefreshToken Claims 생성: {}", claims);
 
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime expirationDateTime = now.plusDays(7);
+
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일 만료
+                .setIssuedAt(Date.from(now.toInstant()))
+                .setExpiration(Date.from(expirationDateTime.toInstant()))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
-
 
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, claims -> claims.get("email", String.class));
@@ -152,7 +150,10 @@ public class JwtUtil {
     }
 
     public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
+        Date expiration = getClaimFromToken(token, Claims::getExpiration);
+        ZonedDateTime utcExpiration = expiration.toInstant().atZone(ZoneId.of("UTC"));
+        ZonedDateTime kstExpiration = utcExpiration.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return Date.from(kstExpiration.toInstant());
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
