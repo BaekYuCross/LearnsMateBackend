@@ -49,6 +49,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -317,8 +318,8 @@ public class LectureFacade {
         Lecture lecture = Lecture.builder()
                 .lectureTitle(lectureDTO.getLectureTitle())
                 .lectureConfirmStatus(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(lectureDTO.getLectureImage())
                 .lecturePrice(lectureDTO.getLecturePrice())
                 .tutor(tutor)
@@ -341,7 +342,7 @@ public class LectureFacade {
 
     private void setLectureCode(Lecture lecture, List<Integer> lectureCategoryCodeList) {
         String lectureCodePrefix;
-        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String date = LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String randomUUID = UUID.randomUUID().toString().substring(0, 8);
 
         if (lectureCategoryCodeList.contains(7)) lectureCodePrefix = "L007";

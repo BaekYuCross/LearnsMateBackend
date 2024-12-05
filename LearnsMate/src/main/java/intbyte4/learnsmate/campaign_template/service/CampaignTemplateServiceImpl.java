@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -102,8 +103,8 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         Admin user = adminMapper.toEntity(adminDTO);
         campaignTemplateDTO.setCampaignTemplateCode(null);
         campaignTemplateDTO.setCampaignTemplateFlag(true);
-        campaignTemplateDTO.setCreatedAt(LocalDateTime.now());
-        campaignTemplateDTO.setUpdatedAt(LocalDateTime.now());
+        campaignTemplateDTO.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        campaignTemplateDTO.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
         campaignTemplateDTO.setAdminCode(adminDTO.getAdminCode());
         return campaignTemplateMapper.toEntity(campaignTemplateDTO, user);
     }
@@ -123,7 +124,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
         campaignTemplate.setCampaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle());
         campaignTemplate.setCampaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents());
-        campaignTemplate.setUpdatedAt(LocalDateTime.now());
+        campaignTemplate.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
         return campaignTemplate;
     }
 

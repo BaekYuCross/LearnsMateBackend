@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class ClientService {
         }
 
         LoginHistoryDTO loginHistoryDTO = LoginHistoryDTO.builder()
-                .lastLoginDate(LocalDateTime.now())
+                .lastLoginDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .memberCode(member.getMemberCode())
                 .build();
 
