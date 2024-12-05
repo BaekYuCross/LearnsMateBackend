@@ -106,7 +106,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // 만료 시간 계산 및 추가
         Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
-        long expTimestamp = expirationDate.getTime();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        String expTime = timeFormat.format(expirationDate);
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO);
         log.info("토큰 생성 완료");
 
@@ -121,7 +122,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("accessToken", token);
         responseData.put("refreshToken", refreshToken);
-        responseData.put("exp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(expirationDate));
+        responseData.put("exp", expTime);
         responseData.put("name", userName);
         responseData.put("code", userCode);
         responseData.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
