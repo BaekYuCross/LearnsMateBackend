@@ -7,7 +7,6 @@ import intbyte4.learnsmate.admin.domain.vo.request.RequestLoginVO;
 import intbyte4.learnsmate.admin.service.AdminService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -22,10 +21,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -106,6 +103,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // JWT 생성
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
         String token = jwtUtil.generateToken(tokenDTO, roles, null, authResult);
+
+        // 만료 시간 계산 및 추가
+        Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
+        long expTimestamp = expirationDate.getTime();
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO);
         log.info("토큰 생성 완료");
 
@@ -120,6 +121,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("accessToken", token);
         responseData.put("refreshToken", refreshToken);
+        responseData.put("exp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(expirationDate));
         responseData.put("name", userName);
         responseData.put("code", userCode);
         responseData.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
