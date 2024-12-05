@@ -41,12 +41,21 @@ public class ClientService {
 
     // 회원 로그인
     public ClientLoginHistoryDTO loginMember(ClientLoginDTO loginDTO) {
+        log.debug("Received login request for email: {}", loginDTO.getMemberEmail());
 
         Member member = memberRepository.findByMemberEmail(loginDTO.getMemberEmail());
+        log.debug("Member found: {}", member != null);
 
         if(member == null) {
+            log.debug("User not found with email: {}", loginDTO.getMemberEmail());
             throw new CommonException(StatusEnum.USER_NOT_FOUND);
-        } else if(!passwordEncoder.matches(loginDTO.getMemberPassword(), member.getMemberPassword())) {
+        }
+
+        boolean passwordMatches = passwordEncoder.matches(loginDTO.getMemberPassword(), member.getMemberPassword());
+        log.debug("Password matches: {}", passwordMatches);
+
+        if(!passwordMatches) {
+            log.debug("Invalid password for user: {}", loginDTO.getMemberEmail());
             throw new CommonException(StatusEnum.INVALID_PASSWORD);
         }
 
