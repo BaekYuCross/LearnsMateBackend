@@ -75,17 +75,18 @@ public class TokenController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
             }
 
-            redisTemplate.delete("accessToken:" + userCode);
-
             String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
             log.info("Redis token found: {}", redisToken != null);
-            if (redisToken == null || !jwtUtil.validateToken(redisToken)) {
+
+            if (redisToken == null || !refreshToken.equals(redisToken) || !jwtUtil.validateToken(redisToken)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
             }
 
             CustomUserDetails userDetails = (CustomUserDetails) adminService.loadUserByUsername(userCode);
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             String newAccessToken = jwtUtil.generateToken(new JwtTokenDTO(userCode, null, null), List.of("ROLE_USER"), null, authentication);
+
+            redisTemplate.delete("accessToken:" + userCode);
 
             ZonedDateTime kstExpiration = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(4);
             int[] expArray = new int[] {
