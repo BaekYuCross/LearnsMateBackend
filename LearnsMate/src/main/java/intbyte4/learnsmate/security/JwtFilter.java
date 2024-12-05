@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -22,9 +23,13 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AdminService userService;
     private final JwtUtil jwtUtil;
     private final List<String> excludeUrl = Arrays.asList(
-            "/admin/verification-email/**", "/actuator/health",
-            "/admin/verification-email/password", "/swagger-ui.html",
-            "/swagger-ui/index.html", "/admin/password"
+            "/admin/verification-email/**",
+            "/actuator/health",
+            "/admin/verification-email/password",
+            "/swagger-ui.html",
+            "/swagger-ui/index.html",
+            "/admin/password",
+            "/users/login"
     );
 
     public JwtFilter(AdminService userService, JwtUtil jwtUtil) {
@@ -39,11 +44,18 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String token = null;
 
-        // 쿠키에서 토큰 가져오기
-        if (request.getCookies() != null) {
+        // 1. 헤더에서 토큰 가져오기
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        // 2. 쿠키에서 토큰 가져오기
+        if (token == null && request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
@@ -52,17 +64,16 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        // 토큰 유효성 검사 및 인증 객체 설정
-        if (token != null && jwtUtil.validateToken(token)) {
-            Authentication authentication = jwtUtil.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Authentication 설정 완료: {}", authentication);
-        } else {
-            // DEBUG 레벨로 로그를 기록하거나 로그 생략
-            log.debug("유효하지 않은 토큰이거나 토큰이 없습니다.");
+        // 3. 토큰 검증
+        if (token == null || !jwtUtil.validateToken(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 응답
+            return;
         }
 
-        // 다음 필터 실행
+        // 4. 인증 객체 생성 및 SecurityContext 설정
+        Authentication authentication = jwtUtil.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         filterChain.doFilter(request, response);
     }
 }

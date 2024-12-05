@@ -36,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,8 +94,8 @@ public class CouponServiceImpl implements CouponService {
                 .couponName(requestCoupon.getCouponName())
                 .couponContents(requestCoupon.getCouponContents())
                 .couponDiscountRate(requestCoupon.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .couponStartDate(requestCoupon.getCouponStartDate())
                 .couponExpireDate(requestCoupon.getCouponExpireDate())
                 .couponFlag(true)

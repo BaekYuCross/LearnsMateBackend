@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,7 @@ public class CampaignMapper {
                 .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .admin(admin)
                 .build();
     }

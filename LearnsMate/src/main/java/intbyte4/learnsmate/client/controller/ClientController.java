@@ -46,7 +46,7 @@ public class ClientController {
                 .build();
 
         ClientLoginHistoryDTO clientLoginHistoryDTO = clientService.loginMember(loginDTO);
-        System.out.println(clientLoginHistoryDTO.toString());
+
         ResponseLoginVO vo = ResponseLoginVO.builder()
                 .memberCode(clientLoginHistoryDTO.getMemberCode())
                 .memberName(clientLoginHistoryDTO.getMemberName())

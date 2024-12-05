@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ public class PaymentFacade {
     }
 
     private Map<Integer, List<PaymentMonthlyRevenueDTO>> getMonthlyRevenueComparison() {
-        int currentYear = LocalDateTime.now().getYear();
+        int currentYear = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getYear();
         int previousYear = currentYear - 1;
 
         List<PaymentMonthlyRevenueDTO> revenues = paymentRepository.findMonthlyRevenueWithComparison(currentYear, previousYear);

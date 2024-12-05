@@ -35,6 +35,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -66,7 +67,7 @@ public class CampaignServiceImpl implements CampaignService {
         Admin admin = adminMapper.toEntity(adminDTO);
 
         if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
-            sendTime = LocalDateTime.now();
+            sendTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         } else {
             sendTime = requestCampaign.getCampaignSendDate();
             log.info("예약 시간 {}", sendTime);
@@ -81,7 +82,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .campaignSendDate(sendTime)
                 .campaignSendFlag(false)
                 .createdAt(requestCampaign.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .admin(admin)
                 .build();
 
