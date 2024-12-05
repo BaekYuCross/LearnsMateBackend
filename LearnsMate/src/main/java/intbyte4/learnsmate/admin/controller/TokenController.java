@@ -79,6 +79,10 @@ public class TokenController {
             log.info("Redis token found: {}", redisToken != null);
 
             if (redisToken == null || !refreshToken.equals(redisToken) || !jwtUtil.validateToken(redisToken)) {
+                log.error("Token validation failed. Redis token: {}, Refresh token valid: {}",
+                        redisToken != null,
+                        refreshToken != null && jwtUtil.validateToken(refreshToken)
+                );
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
             }
 
@@ -104,8 +108,10 @@ public class TokenController {
 
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
-            log.error("Token refresh failed: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token refresh failed");
+            log.error("Token refresh failed: {}", e.getMessage());
+            log.error("Stack trace:", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Token refresh failed: " + e.getMessage());
         }
     }
 
