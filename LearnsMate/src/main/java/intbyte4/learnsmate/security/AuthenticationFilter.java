@@ -109,9 +109,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // 만료 시간 계산 및 추가
         Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
-        String expTime = expirationDate.toInstant()
-                .atZone(ZoneId.of("Asia/Seoul"))
-                .format(DateTimeFormatter.ISO_INSTANT);
+        ZonedDateTime kstExpiration = ZonedDateTime.ofInstant(expirationDate.toInstant(), ZoneId.of("Asia/Seoul"));
+
+        // KST 시간을 배열 형태로 전달
+        int[] expArray = new int[] {
+                kstExpiration.getYear(),
+                kstExpiration.getMonthValue(),
+                kstExpiration.getDayOfMonth(),
+                kstExpiration.getHour(),
+                kstExpiration.getMinute(),
+                kstExpiration.getSecond()
+        };
 
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO);
         log.info("토큰 생성 완료");
@@ -123,13 +131,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             log.error("Redis 저장 실패: {}", e.getMessage(), e);
         }
 
-        log.info("Generated exp for frontend: {}", expTime);
+        log.info("Generated exp for frontend: {}", expArray);
 
         // JSON으로 토큰 반환
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("accessToken", token);
         responseData.put("refreshToken", refreshToken);
-        responseData.put("exp", expTime);
+        responseData.put("exp", expArray);
         responseData.put("name", userName);
         responseData.put("code", userCode);
         responseData.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
