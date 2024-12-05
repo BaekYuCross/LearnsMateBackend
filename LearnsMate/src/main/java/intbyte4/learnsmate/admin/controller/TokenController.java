@@ -85,9 +85,12 @@ public class TokenController {
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             String newAccessToken = jwtUtil.generateToken(new JwtTokenDTO(userCode, null, null), List.of("ROLE_USER"), null, authentication);
 
+            Date newExpiration = jwtUtil.getExpirationDateFromToken(newAccessToken);
+
             // 응답 본문으로 새 토큰 전달
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("accessToken", newAccessToken);
+            responseBody.put("exp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(newExpiration));
             responseBody.put("message", "새로운 Access Token 발급 완료!");
 
             return ResponseEntity.ok(responseBody);
