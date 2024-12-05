@@ -91,11 +91,9 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             throw new IllegalArgumentException("Authentication 객체가 CustomUserDetails 타입이 아닙니다.");
         }
 
-        // CustomUserDetails로 캐스팅하여 사용자 정보를 가져옴
         CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
         log.info("사용자 정보 가져옴: {}", userDetails.getUsername());
 
-        // 사용자 정보 가져오기
         String userCode = userDetails.getUsername();
         String userEmail = userDetails.getUserDTO().getAdminEmail();
         String userName = userDetails.getUserDTO().getAdminName();
@@ -104,7 +102,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         List<String> roles = authResult.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
-        log.info("권한 정보 추출 완료: {}", roles);
 
         // JWT 생성
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
@@ -112,40 +109,23 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String refreshToken = jwtUtil.generateRefreshToken(tokenDTO);
         log.info("토큰 생성 완료");
 
-        // 쿠키 설정
-        Cookie accessTokenCookie = new Cookie("token", token);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(4 * 3600);
-        response.addCookie(accessTokenCookie);
+        try {
+            saveRefreshTokenToRedis(userCode, refreshToken);
+            log.info("Redis에 Refresh Token 저장 완료");
+        } catch (Exception e) {
+            log.error("Redis 저장 실패: {}", e.getMessage(), e);
+        }
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(7 * 24 * 3600);
-        response.addCookie(refreshTokenCookie);
-
-        log.info("Access Token Cookie: {}", accessTokenCookie.toString());
-        log.info("Refresh Token Cookie: {}", refreshTokenCookie.toString());
-
+        // JSON으로 토큰 반환
         Map<String, Object> responseData = new HashMap<>();
+        responseData.put("accessToken", token);
+        responseData.put("refreshToken", refreshToken);
         responseData.put("name", userName);
         responseData.put("code", userCode);
         responseData.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
 
         response.setContentType("application/json");
         response.getWriter().write(new ObjectMapper().writeValueAsString(responseData));
-
-        try {
-            saveRefreshTokenToRedis(userCode, refreshToken);
-            log.info("Redis save complete");
-        } catch (Exception e) {
-            log.error("Redis save fail - successfulAuthentication : : {}", e.getMessage(), e);
-        }
-
-        log.info("successfulAuthentication complete");
     }
 
     // Redis에 refreshToken 저장
