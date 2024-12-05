@@ -36,14 +36,18 @@ public class TokenController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
-            // 쿠키에서 토큰 가져오기
-            String refreshToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[] {}))
+            // 로그로 쿠키 출력
+            Cookie[] cookies = request.getCookies();
+            log.info("Received cookies: {}", Arrays.toString(cookies));
+
+            String refreshToken = Arrays.stream(Optional.ofNullable(cookies).orElse(new Cookie[] {}))
                     .filter(cookie -> "refreshToken".equals(cookie.getName()))
                     .map(Cookie::getValue)
                     .findFirst()
                     .orElse(null);
 
             if (refreshToken == null || refreshToken.isEmpty()) {
+                log.warn("RefreshToken is missing in the request");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("RefreshToken이 필요합니다.");
             }
 
@@ -55,9 +59,11 @@ public class TokenController {
 
             return ResponseEntity.ok().body("로그아웃 성공");
         } catch (Exception e) {
+            log.error("Logout failed: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 처리 중 오류가 발생했습니다.");
         }
     }
+
 
     @Operation(summary = "토큰 리프레시 요청")
     @PostMapping("/refresh")
@@ -120,4 +126,3 @@ public class TokenController {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token not found");
     }
 }
-
