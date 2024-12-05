@@ -75,6 +75,8 @@ public class TokenController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
             }
 
+            redisTemplate.delete("accessToken:" + userCode);
+
             String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
             log.info("Redis token found: {}", redisToken != null);
             if (redisToken == null || !jwtUtil.validateToken(redisToken)) {
