@@ -34,29 +34,25 @@ public class TokenController {
 
     @Operation(summary = "직원 로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
         try {
-            // 로그로 쿠키 출력
-            Cookie[] cookies = request.getCookies();
-            log.info("Received cookies: {}", Arrays.toString(cookies));
-
-            String refreshToken = Arrays.stream(Optional.ofNullable(cookies).orElse(new Cookie[] {}))
-                    .filter(cookie -> "refreshToken".equals(cookie.getName()))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElse(null);
+            // 요청 본문에서 refreshToken 추출
+            String refreshToken = requestBody.get("refreshToken");
 
             if (refreshToken == null || refreshToken.isEmpty()) {
-                log.warn("RefreshToken is missing in the request");
+                log.warn("RefreshToken is missing in the request body");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("RefreshToken이 필요합니다.");
             }
 
+            // refreshToken으로 사용자 정보 확인 및 Redis에서 토큰 삭제
             String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
             redisService.deleteToken(userCode);
 
+            // 응답에서 쿠키 제거
             clearCookie(response, "token");
             clearCookie(response, "refreshToken");
 
+            log.info("User logged out successfully: {}", userCode);
             return ResponseEntity.ok().body("로그아웃 성공");
         } catch (Exception e) {
             log.error("Logout failed: {}", e.getMessage(), e);
@@ -64,21 +60,19 @@ public class TokenController {
         }
     }
 
-
     @Operation(summary = "토큰 리프레시 요청")
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
         try {
-            String refreshToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[] {}))
-                    .filter(cookie -> "refreshToken".equals(cookie.getName()))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElse(null);
+            // 요청 본문에서 refreshToken 추출
+            String refreshToken = requestBody.get("refreshToken");
 
             if (refreshToken == null || refreshToken.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("refreshToken이 필요합니다.");
+                log.warn("RefreshToken is missing in the request body");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("RefreshToken이 필요합니다.");
             }
 
+            // refreshToken 검증 및 사용자 정보 확인
             String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
             String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
 
@@ -86,26 +80,21 @@ public class TokenController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 Refresh Token입니다.");
             }
 
+            // 새로운 AccessToken 발급
             CustomUserDetails userDetails = (CustomUserDetails) adminService.loadUserByUsername(userCode);
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
             String newAccessToken = jwtUtil.generateToken(new JwtTokenDTO(userCode, null, null), List.of("ROLE_USER"), null, authentication);
 
-            response.addCookie(createCookie("token", newAccessToken, 15 * 60)); // 15분
+            // 응답 본문으로 새 토큰 전달
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("accessToken", newAccessToken);
+            responseBody.put("message", "새로운 Access Token 발급 완료!");
 
-            return ResponseEntity.ok(Map.of("message", "새로운 Access Token 발급 완료 !"));
+            return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
+            log.error("Token refresh failed: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("토큰 재발급 중 오류 발생");
         }
-    }
-
-    private Cookie createCookie(String name, String value, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        return cookie;
     }
 
     private void clearCookie(HttpServletResponse response, String cookieName) {
