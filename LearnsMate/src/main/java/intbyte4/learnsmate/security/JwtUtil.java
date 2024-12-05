@@ -18,9 +18,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -110,16 +112,18 @@ public class JwtUtil {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        LocalDateTime expirationDateTime = LocalDateTime.now().plusHours(expirationTime / (1000 * 60 * 60));
+        LocalDateTime expirationDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
+                .plusHours(expirationTime / (1000 * 60 * 60));
         userDetails.setExpiration(expirationDateTime);
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setIssuedAt(Date.from(Instant.now(Clock.system(ZoneOffset.UTC))))
+                .setExpiration(Date.from(expirationDateTime.atZone(ZoneId.of("Asia/Seoul")).toInstant()))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
+
 
     // 리프레시 토큰은 단순히 새로운 액세스 토큰 발급을 요청하기 위한 용도
     public String generateRefreshToken(JwtTokenDTO tokenDTO) {
