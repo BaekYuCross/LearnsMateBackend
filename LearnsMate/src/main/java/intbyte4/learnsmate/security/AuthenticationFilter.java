@@ -118,6 +118,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             log.error("Redis 저장 실패: {}", e.getMessage(), e);
         }
 
+        log.info("Generated exp for frontend: {}", expTime);
+
         // JSON으로 토큰 반환
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("accessToken", token);
