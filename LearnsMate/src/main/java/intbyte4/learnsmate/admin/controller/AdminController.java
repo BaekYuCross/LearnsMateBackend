@@ -24,6 +24,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,19 +56,30 @@ public class AdminController {
 
     // @AuthenticationPrincipal을 활용 -> CustomUserDetails에서 사용자 정보를 추출
     // 인증 성공 시 사용자 이름과 권한을 상태에 저장 -> Pinia 로 이름과 권한 정보 넘어감 (loginState.js 롹인 바람)
-    @Operation(summary = "직원 정보 조회")
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> checkAuthStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        LocalDateTime expiration = userDetails.getExpiration();
+        ZonedDateTime kstExpiration = expiration.atZone(ZoneId.of("Asia/Seoul"));
+
+        int[] expArray = new int[] {
+                kstExpiration.getYear(),
+                kstExpiration.getMonthValue(),
+                kstExpiration.getDayOfMonth(),
+                kstExpiration.getHour(),
+                kstExpiration.getMinute(),
+                kstExpiration.getSecond()
+        };
+
         Map<String, Object> response = new HashMap<>();
-        response.put("name", userDetails.getUserDTO().getAdminName()); // 관리자 이름
-        response.put("code", userDetails.getUserDTO().getAdminCode()); // 관리자 사번
-        response.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment()); // 관리자 부서
-        response.put("roles", userDetails.getAuthorities()); // 권한 정보
-        response.put("exp", userDetails.getExpiration()); // 시간
+        response.put("name", userDetails.getUserDTO().getAdminName());
+        response.put("code", userDetails.getUserDTO().getAdminCode());
+        response.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
+        response.put("roles", userDetails.getAuthorities());
+        response.put("exp", expArray);
 
         return ResponseEntity.ok(response);
     }
