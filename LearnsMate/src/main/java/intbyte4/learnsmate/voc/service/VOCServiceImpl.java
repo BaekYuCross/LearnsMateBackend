@@ -157,7 +157,6 @@ public class VOCServiceImpl implements VOCService {
                 .collect(Collectors.toList());
     }
 
-    // 강의 등록
     @Override
     public VOCDTO saveVOC(VOCDTO dto, MemberDTO memberDTO, VOCCategoryDTO vocCategoryDTO) {
 
