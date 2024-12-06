@@ -40,7 +40,7 @@ public class ClientController {
     }
 
     @Operation(summary = "회원 - 로그인")
-    @PostMapping("/login")
+    @PostMapping("/enter")
     public ResponseEntity<ResponseLoginVO> memberLogin(@RequestBody RequestLoginVO request){
         log.info(request.getMemberEmail());
         log.info(request.getMemberPassword());
@@ -62,7 +62,7 @@ public class ClientController {
     }
 
     @Operation(summary = "회원 - 로그아웃")
-    @PostMapping("/logout")
+    @PostMapping("/exit")
     public ResponseEntity<?> memberLogout(@RequestBody RequestLogoutVO request) {
 
         System.out.println(request.toString());
