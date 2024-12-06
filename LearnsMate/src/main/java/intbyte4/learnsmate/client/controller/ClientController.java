@@ -12,6 +12,7 @@ import intbyte4.learnsmate.member.domain.vo.response.ResponseLoginVO;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/client")
 @RequiredArgsConstructor
+@Slf4j
 public class ClientController {
 
     private final ClientService clientService;
@@ -40,6 +42,8 @@ public class ClientController {
     @Operation(summary = "회원 - 로그인")
     @PostMapping("/login")
     public ResponseEntity<ResponseLoginVO> memberLogin(@RequestBody RequestLoginVO request){
+        log.info(request.getMemberEmail());
+        log.info(request.getMemberPassword());
         ClientLoginDTO loginDTO = ClientLoginDTO.builder()
                 .memberEmail(request.getMemberEmail())
                 .memberPassword(request.getMemberPassword())
