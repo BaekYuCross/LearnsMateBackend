@@ -64,8 +64,6 @@ public class ClientController {
     @Operation(summary = "회원 - 로그아웃")
     @PostMapping("/exit")
     public ResponseEntity<?> memberLogout(@RequestBody RequestLogoutVO request) {
-
-        System.out.println(request.toString());
         clientService.logoutMember(request.getLoginHistoryCode());
 
         return ResponseEntity.ok("로그아웃 성공");
