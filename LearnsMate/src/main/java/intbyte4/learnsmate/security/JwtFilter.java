@@ -31,7 +31,8 @@ public class JwtFilter extends OncePerRequestFilter {
             "/admin/password",
             "/users/login",
             "/client/enter",
-            "/client/**"
+            "/client/**",
+            "/voc"
     );
 
     public JwtFilter(AdminService userService, JwtUtil jwtUtil) {
