@@ -109,11 +109,7 @@ public class VOCMapper {
 
     public VOCDTO fromRequestSaveVOCVOtoVOCDTO(RequestSaveVOCVO requestSaveVOCVO) {
         return VOCDTO.builder()
-                .vocCode(requestSaveVOCVO.getVocCode())
                 .vocContent(requestSaveVOCVO.getVocContent())
-                .vocAnswerStatus(requestSaveVOCVO.getVocAnswerStatus())
-                .vocAnswerSatisfaction(requestSaveVOCVO.getVocAnswerSatisfaction())
-                .createdAt(requestSaveVOCVO.getCreatedAt())
                 .vocCategoryCode(requestSaveVOCVO.getVocCategoryCode())
                 .memberCode(requestSaveVOCVO.getMemberCode())
                 .build();
