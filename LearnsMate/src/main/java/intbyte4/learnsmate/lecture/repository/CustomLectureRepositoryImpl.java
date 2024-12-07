@@ -101,7 +101,7 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
                 .and(eqLectureLevel(filterDTO.getLectureLevel()))
                 .and(eqLectureConfirmStatus(filterDTO.getLectureConfirmStatus()))
                 .and(eqLectureStatus(filterDTO.getLectureStatus()))
-                .and(betweenLecturePrice(filterDTO.getMinPrice(), filterDTO.getMaxPrice()))
+                .and(betweenLecturePrice(filterDTO.getMinLecturePrice(), filterDTO.getMaxLecturePrice()))
                 .and(betweenCreatedAt(filterDTO.getStartCreatedAt(), filterDTO.getEndCreatedAt()));
 
         return builder;
@@ -139,17 +139,11 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
         return status != null ? lecture.lectureStatus.eq(status) : null;
     }
 
-    private BooleanExpression betweenLecturePrice(Integer minPrice, Integer maxPrice) {
-        if (minPrice == null && maxPrice == null) {
-            return null;
-        }
-        if (minPrice == null) {
-            return lecture.lecturePrice.loe(maxPrice);
-        }
-        if (maxPrice == null) {
-            return lecture.lecturePrice.goe(minPrice);
-        }
-        return lecture.lecturePrice.between(minPrice, maxPrice);
+    private BooleanExpression betweenLecturePrice(Integer minLecturePrice, Integer maxLecturePrice) {
+        if (minLecturePrice == null && maxLecturePrice == null) return null;
+        if (minLecturePrice == null) return lecture.lecturePrice.loe(maxLecturePrice);
+        if (maxLecturePrice == null) return lecture.lecturePrice.goe(minLecturePrice);
+        return lecture.lecturePrice.between(minLecturePrice, maxLecturePrice);
     }
 
     private BooleanExpression betweenCreatedAt(LocalDate startCreatedAt, LocalDate endCreatedAt) {
