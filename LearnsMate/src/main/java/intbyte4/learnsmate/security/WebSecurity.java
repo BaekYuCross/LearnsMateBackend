@@ -76,11 +76,10 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "OPTIONS")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "PATCH")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/list", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/count-by-category", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/filter", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/count-by-category", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/voc/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/voc/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "PATCH")).permitAll()
@@ -91,8 +90,6 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "PATCH")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/member/excel/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/issue-coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/issue-coupon/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc-answer/register", "POST")).permitAll()
@@ -105,9 +102,8 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/client/**", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/client/login", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/client/logout", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/ai/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/client/enter", "POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/client/exit", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/payments/filter", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/payments/excel/download", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/payments/**", "GET")).permitAll()
@@ -130,10 +126,10 @@ public class WebSecurity {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("https://learnsmate.site"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-Requested-With"));
-        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -141,10 +137,8 @@ public class WebSecurity {
         return source;
     }
 
-
     // Authentication 용 메소드(인증 필터 반환)
     private Filter getAuthenticationFilter(AuthenticationManager authenticationManager) {
         return new AuthenticationFilter(authenticationManager, userService, env, jwtUtil, redisTemplate);
     }
-
 }
