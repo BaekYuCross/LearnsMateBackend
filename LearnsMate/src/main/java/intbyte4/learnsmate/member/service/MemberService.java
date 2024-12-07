@@ -187,9 +187,16 @@ public class MemberService {
     }
 
     // 강사 필터링하는 코드 -> 강사 필터링은 조건이 더 적음(멤버에 다 포함됨)
-    public MemberPageResponse<ResponseFindMemberVO> filterTutor(MemberFilterRequestDTO dto, int page, int size){
+    public MemberPageResponse<ResponseFindMemberVO> filterTutortBySort(MemberFilterRequestDTO dto, int page, int size, String sortField, String sortDirection){
+        // Sort 객체 생성
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+
         // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         // 필터 조건과 페이징 처리된 데이터 조회
         Page<Member> memberPage = memberRepository.searchBy(dto, pageable);
