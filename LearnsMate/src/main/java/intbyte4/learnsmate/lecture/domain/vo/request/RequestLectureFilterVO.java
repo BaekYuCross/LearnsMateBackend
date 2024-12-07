@@ -1,7 +1,9 @@
 package intbyte4.learnsmate.lecture.domain.vo.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import intbyte4.learnsmate.common.EmptyStringToNullIntegerDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,8 +25,13 @@ public class RequestLectureFilterVO {
     private String lectureLevel; // 강의 난이도
     private Boolean lectureConfirmStatus; // 강의 계약 상태
     private Boolean lectureStatus; // 강의 상태
-    private Integer minPrice; // 최소 금액
-    private Integer maxPrice; // 최대 금액
+
+    @JsonDeserialize(using = EmptyStringToNullIntegerDeserializer.class)
+    private Integer minPrice;
+
+    @JsonDeserialize(using = EmptyStringToNullIntegerDeserializer.class)
+    private Integer maxPrice;
+
     private LocalDate startCreatedAt; // 강의 생성일 시작
     private LocalDate endCreatedAt; // 강의 생성일 끝
 }
