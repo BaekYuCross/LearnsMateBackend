@@ -25,10 +25,7 @@ import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -59,6 +56,35 @@ public class BlacklistService {
 
         // 페이징 처리된 데이터 조회
         Page<BlacklistDTO> blacklistPage = blacklistRepository.findAllBlacklistByMemberType(memberType, pageable);
+
+        // DTO -> VO 변환
+        List<ResponseFindBlacklistVO> responseList = blacklistPage.getContent().stream()
+                .map(blacklistMapper::fromBlacklistDTOtoResponseFindBlacklistVO)
+                .collect(Collectors.toList());
+
+        // 페이지 응답 생성
+        return new BlacklistPageResponse<>(
+                responseList,
+                blacklistPage.getTotalElements(),
+                blacklistPage.getTotalPages(),
+                blacklistPage.getNumber(),
+                blacklistPage.getSize()
+        );
+    }
+
+    // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
+    public BlacklistPageResponse<ResponseFindBlacklistVO> findAllBlacklistByMemberTypeBySort(
+            int page, int size, MemberType memberType, String sortField, String sortDirection) {
+
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+
+        // Pageable 객체 생성
+        PageRequest pageable = PageRequest.of(page, size, sort);
+        Page<BlacklistDTO> blacklistPage = blacklistRepository.findAllBlacklistByMemberTypeBySort(memberType, pageable);
 
         // DTO -> VO 변환
         List<ResponseFindBlacklistVO> responseList = blacklistPage.getContent().stream()

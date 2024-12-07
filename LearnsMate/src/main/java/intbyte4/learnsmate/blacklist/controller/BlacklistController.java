@@ -42,6 +42,20 @@ public class BlacklistController {
         return ResponseEntity.ok(response);
     }
 
+    // 1-2. 모든 학생 블랙리스트 조회
+    @Operation(summary = "직원 - 학생 블랙리스트 전체 정렬 조회")
+    @GetMapping("/student/sort")
+    public ResponseEntity<BlacklistPageResponse<ResponseFindBlacklistVO>> findAllStudentBlacklistBySort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        BlacklistPageResponse<ResponseFindBlacklistVO> response
+                = blacklistService.findAllBlacklistByMemberTypeBySort(page, size, MemberType.STUDENT, sortField, sortDirection);
+
+        return ResponseEntity.ok(response);
+    }
+
     // 2. 모든 강사 블랙리스트 조회
     @Operation(summary = "직원 - 강사 블랙리스트 전체 조회")
     @GetMapping("/tutor")
@@ -50,6 +64,20 @@ public class BlacklistController {
     ) {
         BlacklistPageResponse<ResponseFindBlacklistVO> response
                 = blacklistService.findAllBlacklistByMemberType(page, size, MemberType.TUTOR);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 2-2. 모든 강사 블랙리스트 조회
+    @Operation(summary = "직원 - 강사 블랙리스트 전체 조회")
+    @GetMapping("/tutor/sort")
+    public ResponseEntity<BlacklistPageResponse<ResponseFindBlacklistVO>> findAllTutorBlacklistBySort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        BlacklistPageResponse<ResponseFindBlacklistVO> response
+                = blacklistService.findAllBlacklistByMemberTypeBySort(page, size, MemberType.TUTOR, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }
