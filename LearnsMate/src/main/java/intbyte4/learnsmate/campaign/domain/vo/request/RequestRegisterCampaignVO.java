@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.campaign.domain.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,11 @@ import java.util.List;
 @Getter
 @Setter
 public class RequestRegisterCampaignVO {
+
+    @JsonProperty("student_list")
     private List<RequestFindCampaignStudentVO> studentList;
+
+    @JsonProperty("coupon_list")
     private List<RequestFindCampaignCouponVO> couponList;
 
     @JsonProperty("campaign_code")
@@ -29,12 +34,21 @@ public class RequestRegisterCampaignVO {
     @JsonProperty("campaign_type")
     private String campaignType;
 
+    @JsonProperty("campaign_method")
+    private String campaignMethod;
+
+    @JsonProperty("campaign_send_flag")
+    private Boolean campaignSendFlag;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @JsonProperty("campaign_send_date")
     private LocalDateTime campaignSendDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 

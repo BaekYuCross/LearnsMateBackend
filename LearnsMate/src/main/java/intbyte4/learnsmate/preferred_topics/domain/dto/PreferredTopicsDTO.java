@@ -2,12 +2,11 @@ package intbyte4.learnsmate.preferred_topics.domain.dto;
 
 
 import lombok.*;
-import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Getter
-@Service
+@Setter
 @Builder
 @ToString
 public class PreferredTopicsDTO {

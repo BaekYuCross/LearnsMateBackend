@@ -2,7 +2,7 @@ package intbyte4.learnsmate.lecture.domain.vo.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseRemoveLectureVO {
-    private Long lectureCode;
+    private String lectureCode;
     private String lectureTitle;
     private Boolean lectureConfirmStatus;
     private LocalDateTime createdAt;

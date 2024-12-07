@@ -2,10 +2,7 @@ package intbyte4.learnsmate.coupon.domain.vo.request;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Builder
+@ToString
 public class CouponFilterRequestVO {
 
     @JsonProperty("coupon_name")
@@ -21,8 +19,8 @@ public class CouponFilterRequestVO {
     @JsonProperty("coupon_contents")
     private String couponContents;
 
-    @JsonProperty("coupon_flag")
-    private Boolean couponFlag;
+    @JsonProperty("active_state")
+    private Boolean activeState;
 
     @JsonProperty("start_expire_date")
     private LocalDateTime startExpireDate;
@@ -42,21 +40,22 @@ public class CouponFilterRequestVO {
     @JsonProperty("max_discount_rate")
     private Integer maxDiscountRate;
 
-    @JsonProperty("updated_at")
-    private LocalDateTime updatedAt;
-
     @JsonProperty("start_coupon_start_date")
     private LocalDateTime startCouponStartDate;
 
     @JsonProperty("end_coupon_start_date")
     private LocalDateTime endCouponStartDate;
 
-    @JsonProperty("coupon_category_code")
-    private Integer couponCategoryCode;
+    @JsonProperty("coupon_category_name")
+    private String couponCategoryName;
 
-    @JsonProperty("admin_code")
-    private Long adminCode;
+    @JsonProperty("admin_name")
+    private String adminName;
 
-    @JsonProperty("tutor_code")
-    private Long tutorCode;
+    @JsonProperty("tutor_name")
+    private String tutorName;
+
+    @JsonProperty("registration_type")
+    private String registrationType;
 }
+

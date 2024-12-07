@@ -31,4 +31,7 @@ public class ResponseFindTemplateVO {
 
     @JsonProperty("admin_code")
     private final Long adminCode;
+
+    @JsonProperty("admin_name")
+    private final String adminName;
 }

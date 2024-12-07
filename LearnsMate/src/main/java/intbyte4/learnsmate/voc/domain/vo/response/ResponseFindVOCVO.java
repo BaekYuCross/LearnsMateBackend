@@ -13,19 +13,27 @@ import java.time.LocalDateTime;
 @Builder
 public class ResponseFindVOCVO {
     @JsonProperty("voc_code")
-    private Long vocCode;
+    private String vocCode;
     @JsonProperty("voc_content")
     private String vocContent;
+    @JsonProperty("voc_category_name")
+    private String vocCategoryName;
+    @JsonProperty("member_type")
+    private String memberType;
+    @JsonProperty("member_name")
+    private String memberName;
+    @JsonProperty("member_code")
+    private Long memberCode;
+    @JsonProperty("admin_name")
+    private String adminName;
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
     @JsonProperty("voc_answer_status")
     private Boolean vocAnswerStatus;
     @JsonProperty("voc_answer_satisfaction")
     private String vocAnswerSatisfaction;
-    @JsonProperty("voc_analysis")
-    private String vocAnalysis;
-    @JsonProperty("created_at")
-    private LocalDateTime createdAt;
-    @JsonProperty("voc_category_code")
-    private int vocCategoryCode;
-    @JsonProperty("member_code")
-    private Long memberCode;
+    @JsonProperty("voc_answer_code")
+    private Long vocAnswerCode;
+    @JsonProperty("voc_answer_content")
+    private String vocAnswerContent;
 }

@@ -2,9 +2,11 @@ package intbyte4.learnsmate.preferred_topics.mapper;
 
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicStatsConvertDTO;
 import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicsDTO;
 import intbyte4.learnsmate.preferred_topics.domain.entity.PreferredTopics;
 import intbyte4.learnsmate.preferred_topics.domain.vo.request.RequestSavePreferredHistoryVO;
+import intbyte4.learnsmate.preferred_topics.domain.vo.response.ResponseFindMonthlyStatsVO;
 import intbyte4.learnsmate.preferred_topics.domain.vo.response.ResponseFindPreferredTopicsVO;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +50,16 @@ public class PreferredTopicsMapper {
                 .map(category -> PreferredTopics.builder()
                         .member(member)
                         .lectureCategory(category)
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<ResponseFindMonthlyStatsVO> fromPreferredTopicStatsConvertDTOtoVO(List<PreferredTopicStatsConvertDTO> dtoList) {
+        return dtoList.stream()
+                .map(dto -> ResponseFindMonthlyStatsVO.builder()
+                        .yearMonth(dto.getYearMonth())
+                        .lectureCategoryName(dto.getLectureCategoryName())
+                        .topicCount(dto.getTopicCount())
                         .build())
                 .collect(Collectors.toList());
     }

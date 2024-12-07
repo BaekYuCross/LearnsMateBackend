@@ -17,7 +17,7 @@ public class LectureCategoryByLecture {
 
     @Id
     @Column(name = "lecture_category_by_lecture_code", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lectureCategoryByLectureCode;
 
     @ManyToOne

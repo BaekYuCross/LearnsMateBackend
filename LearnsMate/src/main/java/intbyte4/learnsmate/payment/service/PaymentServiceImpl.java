@@ -17,30 +17,37 @@ import intbyte4.learnsmate.issue_coupon.mapper.IssueCouponMapper;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture.mapper.LectureMapper;
-import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.lecture_by_student.mapper.LectureByStudentMapper;
 import intbyte4.learnsmate.lecture_by_student.service.LectureByStudentService;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_video_by_student.domain.dto.LectureVideoByStudentDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
+import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
@@ -48,7 +55,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final MemberMapper memberMapper;
     private final LectureByStudentMapper lectureByStudentMapper;
     private final IssueCouponMapper issueCouponMapper;
-    private final LectureService lectureService;
     private final MemberService memberService;
     private final LectureByStudentService lectureByStudentService;
     private final CouponService couponService;
@@ -57,6 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final CouponMapper couponMapper;
     private final AdminMapper adminMapper;
 
+    // payment facade에 있는 조회반환 값이랑 달라서 통계에 사용할 수 있으므로 남겨둠 지우지 마셈.
     // 직원이 전체 결제 내역을 조회
     @Override
     public List<PaymentDTO> getAllPayments() {
@@ -69,6 +76,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Page<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request, Pageable pageable) {
+        return paymentRepository.findPaymentByFilters(request, pageable);
+    }
 
     // 직원이 특정 결제 내역을 단건 상세 조회
     @Override
@@ -79,73 +90,136 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentDTO> lecturePayment(MemberDTO memberDTO, List<LectureDTO> lectureDTOList, IssueCouponDTO issueCouponDTO) {
-        List<LectureDTO> selectedLectures = lectureDTOList.stream()
-                .map(dto -> lectureService.getLectureById(dto.getLectureCode()))
-                .toList();
+    public PaymentDTO lectureAdaptedPayment(MemberDTO memberDTO, LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO) {
+        Result result = getResult(memberDTO, lectureDTO);
 
-        MemberDTO paidStudent = memberService
-                .findMemberByMemberCode(memberDTO.getMemberCode(),memberDTO.getMemberType());
-        if(paidStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
-
-        Member member = memberMapper.fromMemberDTOtoMember(paidStudent);
-        List<Lecture> lectureList = selectedLectures.stream()
-                .map(dto -> lectureMapper.toEntity(dto, member))
-                .toList();
-        List<LectureByStudentDTO> lectureByStudentDTOList = new ArrayList<>();
-
-        lectureList.forEach(lecture -> {
-            LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
-            lectureByStudentDTO.setOwnStatus(false);
-            lectureByStudentDTO.setLecture(lecture);
-            lectureByStudentDTO.setStudent(member);
-
-            lectureByStudentService.registerLectureByStudent(lectureByStudentDTO, lecture, member);
-
-            lectureByStudentDTOList.add(lectureByStudentDTO);
-        });
-
-        CouponDTO couponDTO = couponService.findCouponByCouponCode(issueCouponDTO.getCouponCode());
-
-        // 쿠폰카테고리는 왜 엔티티로 리턴하는 서비스 밖에 없는것이지? 하나 만들어주세요
+        CouponDTO couponDTO = couponService.findCouponDTOByCouponCode(issueCouponDTO.getCouponCode());
         CouponCategory couponCategory = couponCategoryService.findByCouponCategoryCode(couponDTO.getCouponCategoryCode());
 
         AdminDTO adminDTO = adminService.findByAdminCode(couponDTO.getAdminCode());
-        Admin admin = adminMapper.toEntity(adminDTO);
 
-        MemberDTO tutorDTO = memberService.findMemberByMemberCode(couponDTO.getTutorCode(), memberDTO.getMemberType());
-        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+        PaymentDTO paymentDTO;
 
-        CouponEntity coupon = couponMapper.toEntity(couponDTO, couponCategory, admin, tutor);
-        List<PaymentDTO> payments = new ArrayList<>();
-        lectureList.forEach(lecture -> {
-            LectureByStudentDTO lectureByStudentDTO = lectureByStudentService.findByLectureAndStudent(lecture, member);
-            LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(lectureByStudentDTO, lecture, member);
+        if (adminDTO == null) {
+            CouponEntity coupon = couponMapper.toTutorCouponEntity(couponDTO, couponCategory, result.tutor());
+            LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(result.lectureByStudentDTO(), result.lecture(), result.student());
 
-            PaymentDTO paymentDTO = new PaymentDTO();
-            paymentDTO.setPaymentCode(null);
-            paymentDTO.setPaymentPrice(lecture.getLecturePrice());
-            paymentDTO.setCreatedAt(LocalDateTime.now());
-            paymentDTO.setLectureByStudentCode(lectureByStudentService.findStudentCodeByLectureCode(lecture));
-            paymentDTO.setCouponIssuanceCode(issueCouponDTO.getCouponIssuanceCode());
+            paymentDTO = getPaymentDTO(lectureDTO, issueCouponDTO, result.lecture(), result.lectureByStudentDTO(), lectureByStudent, result.student(), coupon);
+        } else {
+            Admin admin = adminMapper.toEntity(adminDTO);
+            CouponEntity coupon = couponMapper.toAdminCouponEntity(couponDTO, couponCategory, admin);
+            LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(result.lectureByStudentDTO(), result.lecture(), result.student());
 
-            Payment payment = paymentMapper.toEntity(paymentDTO, lectureByStudent, issueCouponMapper
-                    .toEntity(issueCouponDTO, member, coupon));
-
-            paymentRepository.save(payment);
-
-            payments.add(paymentDTO);
-        });
-        lectureByStudentDTOList.forEach(lectureByStudentDTO -> {
-            LectureVideoByStudentDTO lectureVideoByStudentDTO = new LectureVideoByStudentDTO();
-            lectureVideoByStudentDTO.setVideoCode(null);
-            lectureVideoByStudentDTO.setLectureByStudentCode(lectureByStudentDTO.getLectureByStudentCode());
-            lectureVideoByStudentDTO.setLectureStatus(false);
-        });
-        return payments;
+            paymentDTO = getPaymentDTO(lectureDTO, issueCouponDTO, result.lecture(), result.lectureByStudentDTO(), lectureByStudent, result.student(), coupon);
+        }
+        return paymentDTO;
     }
-    // 직원이 예상 매출액과 할인 매출액을 비교해서 조회
 
-    // 직원이 기간 별 매출액을 리스트와 그래프로 조회
+    @Override
+    public PaymentDTO lectureUnAdaptedPayment(MemberDTO memberDTO, LectureDTO lectureDTO) {
+        Member student = memberMapper.fromMemberDTOtoMember(memberDTO);
+        MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
+        LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
+        lectureByStudentService.registerLectureByStudent(lectureByStudentDTO, lecture, student);
+        LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(lectureByStudentDTO, lecture, student);
+
+        PaymentDTO paymentDTO = getPaymentDTO(lectureDTO, lecture);
+        Payment payment = paymentMapper.toEntity(paymentDTO, lectureByStudent);
+
+        paymentRepository.save(payment);
+
+        return paymentDTO;
+    }
+
+    @Override
+    public int getPurchaseCountByLectureCode(String lectureCode) {
+        return paymentRepository.countPaymentsByLectureCode(lectureCode);
+    }
+
+    @Override
+    public String findLatestLectureCodeByStudent(Long studentCode) {
+        Pageable pageable = PageRequest.of(0, 1); // 최신 1개의 강의만 가져옴
+        List<String> lectureCodes = paymentRepository.findLectureCodesByStudent(studentCode, pageable);
+
+        if(lectureCodes.isEmpty()) return null;
+        return lectureCodes.get(0); // 가장 최신 강의 코드 반환
+    }
+
+    @Override
+    public List<Object[]> findRecommendedLectures(List<Long> similarStudents, String latestLectureCode, Long studentCode, Pageable pageable) {
+        log.info("{}{}{}", similarStudents, latestLectureCode, studentCode);
+        return paymentRepository.findRecommendedLectures(similarStudents, latestLectureCode, studentCode, pageable);
+    }
+
+    @Override
+    public Integer getTotalStudentCountBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsBetweenDates(startDate, endDate);
+    }
+
+    @Override
+    public Integer getStudentCountByLectureCodeBetween(String lectureCode, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.countDistinctStudentsByLectureCodeBetweenDates(lectureCode, startDate, endDate);
+    }
+
+    @Override
+    public int getTotalPurchaseCount() {
+        return paymentRepository.findTotalPurchaseCount();
+    }
+
+    @Override
+    public int getPurchaseCountByCategory(String lectureCategoryName) {
+        return paymentRepository.findPurchaseCountByCategory(LectureCategoryEnum.valueOf(lectureCategoryName));
+    }
+
+    @Override
+    public Integer getPurchaseCountByCategoryWithDateRange(String categoryName, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.findPurchaseCountByCategoryWithDateRange(LectureCategoryEnum.valueOf(categoryName), startDate, endDate);
+    }
+
+
+    private Result getResult(MemberDTO memberDTO, LectureDTO lectureDTO) {
+        Member student = memberMapper.fromMemberDTOtoMember(memberDTO);
+        MemberDTO tutorDTO = memberService.findById(lectureDTO.getTutorCode());
+        Member tutor = memberMapper.fromMemberDTOtoMember(tutorDTO);
+        Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
+
+        LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
+        lectureByStudentService.registerLectureByStudent(lectureByStudentDTO, lecture, student);
+        return new Result(student, tutor, lecture, lectureByStudentDTO);
+    }
+
+    private record Result(Member student, Member tutor, Lecture lecture, LectureByStudentDTO lectureByStudentDTO) {
+    }
+
+    private PaymentDTO getPaymentDTO(LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO, Lecture lecture, LectureByStudentDTO lectureByStudentDTO, LectureByStudent lectureByStudent, Member student, CouponEntity coupon) {
+        PaymentDTO paymentDTO = getPaymentDTO(lectureDTO, lecture);
+        if (issueCouponDTO.getStudentCode().equals(lectureByStudentDTO.getStudent().getMemberCode())) {
+            paymentDTO.setCouponIssuanceCode(issueCouponDTO.getCouponIssuanceCode());
+        }
+
+        Payment payment = paymentMapper.toAdaptEntity(paymentDTO, lectureByStudent, issueCouponMapper.toEntity(issueCouponDTO, student, coupon));
+        paymentRepository.save(payment);
+
+        setLectureByStudentDTO(lectureByStudentDTO);
+        return paymentDTO;
+    }
+
+    private void setLectureByStudentDTO(LectureByStudentDTO lectureByStudentDTO) {
+        LectureVideoByStudentDTO lectureVideoByStudentDTO = new LectureVideoByStudentDTO();
+        lectureVideoByStudentDTO.setVideoCode(null);
+        lectureVideoByStudentDTO.setLectureByStudentCode(lectureByStudentDTO.getLectureByStudentCode());
+        lectureVideoByStudentDTO.setLectureStatus(false);
+    }
+
+    private PaymentDTO getPaymentDTO(LectureDTO lectureDTO, Lecture lecture) {
+        PaymentDTO paymentInfo = new PaymentDTO();
+        paymentInfo.setPaymentCode(null);
+        paymentInfo.setPaymentPrice(lectureDTO.getLecturePrice());
+        paymentInfo.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        paymentInfo.setLectureByStudentCode(lectureByStudentService.findStudentCodeByLectureCode(lecture));
+        return paymentInfo;
+    }
 }

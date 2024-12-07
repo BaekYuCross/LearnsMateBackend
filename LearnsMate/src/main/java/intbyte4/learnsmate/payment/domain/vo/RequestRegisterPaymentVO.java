@@ -15,10 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestRegisterPaymentVO {
-
-    private Long paymentCode;
+    private RequestRegisterIssueCouponPaymentVO issueCouponVO;
+    private RequestRegisterMemberPaymentVO memberVO;
+    private RequestRegisterLecturePaymentVO LectureVO;
     private Integer paymentPrice;
-    private LocalDateTime createdAt;
-    private Long lectureByStudentCode;
-    private String couponIssuanceCode;
 }

@@ -8,4 +8,6 @@ public interface VOCAnswerService {
     VOCAnswerDTO editVOCAnswer(VOCAnswerDTO vocAnswerDTO);
 
     VOCAnswerDTO findById(Long vocAnswerCode);
+
+    VOCAnswerDTO findByVOCCode(String vocCode);
 }

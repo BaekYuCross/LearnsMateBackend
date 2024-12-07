@@ -7,5 +7,7 @@ import java.util.List;
 public interface CommentService {
     List<CommentDTO> findAllComments();
 
-    CommentDTO findComentByCommentCode(Long commentCode);
+    CommentDTO findCommentByCommentCode(Long commentCode);
+
+    List<CommentDTO> findCommentByLectureCode(String lectureCode);
 }

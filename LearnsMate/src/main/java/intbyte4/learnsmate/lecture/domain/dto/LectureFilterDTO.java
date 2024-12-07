@@ -1,23 +1,29 @@
 package intbyte4.learnsmate.lecture.domain.dto;
 
-import intbyte4.learnsmate.lecture.enums.LectureCategoryEnum;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
+@ToString
+@Builder
 public class LectureFilterDTO {
-    private Long lectureCode;
+    private String lectureCode;
     private String lectureTitle;
     private Long tutorCode;
     private String tutorName;
-    private LectureCategoryEnum lectureCategoryEnum;
-    private LocalDateTime createdAt;
-    private Integer contractStage;
-    private LectureLevelEnum lectureLevel;
-    private Integer lecturePrice;
+    private String lectureCategoryName;
+    private String lectureLevel;
+    private Boolean lectureConfirmStatus;
     private Boolean lectureStatus;
+    private Integer minLecturePrice;
+    private Integer maxLecturePrice;
+    private LocalDate startCreatedAt;
+    private LocalDate endCreatedAt;
+    private List<String> selectedColumns;
 }
+

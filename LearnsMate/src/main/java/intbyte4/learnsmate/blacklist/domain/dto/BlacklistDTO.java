@@ -14,10 +14,13 @@ import java.time.LocalDateTime;
 public class BlacklistDTO {
 
     private Long blackCode;
-    private String blackReason;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private Long memberCode;
-    private Long reportCode;
+    private String memberName;
+    private String memberEmail;
+    private String blackReason;
+
+    private LocalDateTime createdAt;
+
     private Long adminCode;
+    private String adminName;
 }

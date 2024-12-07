@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface CouponByCampaignRepository extends JpaRepository<CouponByCampaign, Long> {
     List<CouponByCampaign> findByCampaign(Campaign getCampaignCode);
+    void deleteByCampaign_CampaignCode(Long campaignCode);
 }

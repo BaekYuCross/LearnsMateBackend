@@ -5,7 +5,8 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.*;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
 import intbyte4.learnsmate.campaign_template.repository.CampaignTemplateRepository;
 import intbyte4.learnsmate.common.exception.CommonException;
@@ -13,11 +14,17 @@ import intbyte4.learnsmate.common.exception.StatusEnum;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("campaignTemplateService")
@@ -70,31 +77,35 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     }
 
     @Override
-    public List<CampaignTemplateDTO> findAllByTemplate() {
+    public List<FindAllCampaignTemplatesDTO> findAllByTemplate() {
         log.info("템플릿 전체 조회 중");
-        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAll();
-        List<CampaignTemplateDTO> campaignTemplateVOList = new ArrayList<>();
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.findAllByCampaignTemplateFlag(Sort.by(Sort.Direction.DESC, "createdAt"),true);
+        List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
 
         for (CampaignTemplate campaignTemplate : campaignTemplateList) {
-            campaignTemplateVOList.add(campaignTemplateMapper.fromEntityToDTO(campaignTemplate));
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
+            findAllCampaignTemplatesDTOList.add(campaignTemplateMapper.fromEntityToFindAllDTO(campaignTemplate, adminDTO.getAdminName()));
         }
-        return campaignTemplateVOList;
+
+        return findAllCampaignTemplatesDTOList;
     }
 
     @Override
-    public CampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode) {
+    public FindCampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode) {
         log.info("템플릿 단 건 조회 중: {}", campaignTemplateCode);
         CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
-        return campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+        return campaignTemplateMapper.fromEntityToFindCampaignTemplateDTO(campaignTemplate);
     }
 
     private CampaignTemplate convertToCampaignTemplate(CampaignTemplateDTO campaignTemplateDTO, AdminDTO adminDTO) {
         Admin user = adminMapper.toEntity(adminDTO);
+        campaignTemplateDTO.setCampaignTemplateCode(null);
         campaignTemplateDTO.setCampaignTemplateFlag(true);
-        campaignTemplateDTO.setCreatedAt(LocalDateTime.now());
-        campaignTemplateDTO.setUpdatedAt(LocalDateTime.now());
-
+        campaignTemplateDTO.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        campaignTemplateDTO.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        campaignTemplateDTO.setAdminCode(adminDTO.getAdminCode());
         return campaignTemplateMapper.toEntity(campaignTemplateDTO, user);
     }
 
@@ -113,7 +124,52 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
         CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateDTO.getCampaignTemplateCode()).orElseThrow(() -> new CommonException(StatusEnum.TEMPLATE_NOT_FOUND));
         campaignTemplate.setCampaignTemplateTitle(campaignTemplateDTO.getCampaignTemplateTitle());
         campaignTemplate.setCampaignTemplateContents(campaignTemplateDTO.getCampaignTemplateContents());
-        campaignTemplate.setUpdatedAt(LocalDateTime.now());
+        campaignTemplate.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
         return campaignTemplate;
     }
+
+    @Override
+    public CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> findCampaignTemplateListByFilter
+            (CampaignTemplateFilterDTO request, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 필터 조건과 페이징 처리된 데이터 조회
+        Page<CampaignTemplate> CampaignTemplatePage = campaignTemplateRepository.searchBy(request, pageable);
+
+        List<ResponseFindCampaignTemplateByFilterVO> campaignTemplateDTOList = CampaignTemplatePage.getContent().stream()
+                .map(campaignTemplateMapper::fromCampaignTemplateToResponseFindCampaignTemplateByFilterVO)
+                .collect(Collectors.toList());
+
+        return new CampaignTemplatePageResponse<>(
+                campaignTemplateDTOList,               // 데이터 리스트
+                CampaignTemplatePage.getTotalElements(), // 전체 데이터 수
+                CampaignTemplatePage.getTotalPages(),    // 전체 페이지 수
+                CampaignTemplatePage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
+                CampaignTemplatePage.getSize()           // 페이지 크기
+        );
+    }
+
+    @Override
+    public List<FindAllCampaignTemplatesDTO> findTemplateListByFilterWithExcel(CampaignTemplateFilterDTO filterDTO) {
+        List<CampaignTemplate> campaignTemplateList = campaignTemplateRepository.searchByWithoutPaging(filterDTO);
+        return campaignTemplateList.stream()
+                        .map(campaignTemplateMapper::fromTemplateToFindAllCampaignTemplateDTO)
+                        .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FindAllCampaignTemplatesDTO> findAllTemplateListWithExcel() {
+        List<CampaignTemplate> campaignTemplates = campaignTemplateRepository.findAll();
+
+        List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
+        for(CampaignTemplate campaignTemplate : campaignTemplates) {
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
+            findAllCampaignTemplatesDTOList.add(campaignTemplateMapper.toFindAllTemplateDTO(campaignTemplateDTO, adminDTO.getAdminName()));
+        }
+
+        return findAllCampaignTemplatesDTOList;
+    }
+
 }

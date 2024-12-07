@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.coupon.domain.vo.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +25,10 @@ public class AdminCouponEditResponseVO {
     private Integer couponDiscountRate;
 
     @JsonProperty("coupon_start_date")
-    private LocalDateTime couponStartDate; ;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime couponStartDate;
 
     @JsonProperty("coupon_expire_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime couponExpireDate;
 }
