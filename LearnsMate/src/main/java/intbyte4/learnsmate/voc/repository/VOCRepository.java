@@ -80,8 +80,7 @@ public interface VOCRepository extends JpaRepository<VOC, String>, VOCRepository
     @Query("SELECT v FROM Voc v WHERE v.createdAt <= :now")
     Page<VOC> findAllBeforeNow(@Param("now") LocalDateTime now, Pageable pageable);
 
-    @Query("SELECT v FROM Voc v WHERE v.vocAnswerStatus = false ORDER BY v.createdAt DESC")
-    List<VOC> findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
+    List<VOC> findTop5ByVocAnswerStatusFalseOrderByCreatedAtDesc();
 
     @Query("""
         SELECT new intbyte4.learnsmate.voc.domain.dto.VOCClientDTO(
