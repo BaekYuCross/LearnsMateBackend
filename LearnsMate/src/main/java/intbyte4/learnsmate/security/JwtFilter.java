@@ -34,8 +34,8 @@ public class JwtFilter extends OncePerRequestFilter {
             "/client/**",
             "/voc",
             "/voc/client/**",
-            "coupon/tutor/**",
-            "coupon/client/**"
+            "/coupon/tutor/**",
+            "/coupon/client/**"
     );
 
     public JwtFilter(AdminService userService, JwtUtil jwtUtil) {
