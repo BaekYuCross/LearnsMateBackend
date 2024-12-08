@@ -85,12 +85,12 @@ public class LectureServiceImpl implements LectureService {
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public Page<LectureDTO> filterLectureWithPaging(LectureFilterDTO filterDTO, Pageable pageable) {
-//        Page<ResponseFindLectureVO> lecturePage = lectureRepository.searchByWithPaging(filterDTO, pageable);
-//
-//        return lecturePage.map(lectureMapper::convertToLectureDTO);
-//    }
+    @Override
+    public Page<LectureDTO> filterLectureWithPaging(LectureFilterDTO filterDTO, Pageable pageable) {
+        Page<ResponseFindLectureVO> lecturePage = lectureRepository.searchByWithPaging(filterDTO, pageable);
+
+        return lecturePage.map(lectureMapper::convertToLectureDTO);
+    }
 
     @Override
     public List<MonthlyLectureCountDTO> getFilteredMonthlyLectureCounts(MonthlyLectureFilterDTO filterDTO) {
