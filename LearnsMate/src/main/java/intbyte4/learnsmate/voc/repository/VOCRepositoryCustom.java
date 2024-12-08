@@ -13,5 +13,9 @@ public interface VOCRepositoryCustom {
 
     List<VOC> findAllByFilter(VOCFilterRequestDTO dto);
 
+    // 필터링x 정렬o
     Page<VOC> findAllBeforeNowWithSort(LocalDateTime now, Pageable pageable);
+
+    // 필터링o 정렬o
+    Page<VOC> searchByWithPagingWithSort(VOCFilterRequestDTO dto, Pageable pageable);
 }

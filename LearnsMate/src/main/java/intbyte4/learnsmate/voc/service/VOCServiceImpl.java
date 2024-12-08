@@ -138,6 +138,13 @@ public class VOCServiceImpl implements VOCService {
         return vocPage.map(vocMapper::fromEntityToDTO);
     }
 
+    // 필터링o 정렬o
+    @Override
+    public Page<VOCDTO> filterVOCWithPagingWithSort(VOCFilterRequestDTO dto, Pageable pageable) {
+        Page<VOC> vocPage = vocRepository.searchByWithPagingWithSort(dto, pageable);
+        return vocPage.map(vocMapper::fromEntityToDTO);
+    }
+
     @Override
     public List<VOCCategoryCountDTO> getCategoryCounts() {
         return vocRepository.countVocByCategory();

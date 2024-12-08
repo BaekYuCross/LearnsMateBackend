@@ -34,6 +34,9 @@ public interface VOCService {
 
     Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable);
 
+    // 필터링o 정렬o
+    Page<VOCDTO> filterVOCWithPagingWithSort(VOCFilterRequestDTO dto, Pageable pageable);
+
     List<VOCCategoryCountDTO> getCategoryCounts();
 
     List<VOCCategoryCountDTO> getFilteredCategoryCounts(LocalDateTime startDate, LocalDateTime endDate);

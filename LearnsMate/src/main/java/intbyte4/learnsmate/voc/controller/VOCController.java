@@ -138,6 +138,27 @@ public class VOCController {
         }
     }
 
+    // 필터링o 정렬o
+    @Operation(summary = "VOC 필터링")
+    @PostMapping("/filter/sort")
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOCWithSort(
+            @RequestBody RequestFilterVOCVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        log.info("VOC 컬럼 필터링 요청 수신");
+        log.info("{}{}{}{}", page, size, sortField, sortDirection);
+        try {
+            VOCFilterRequestDTO dto = vocMapper.fromFilterVOtoFilterDTO(request);
+            VOCPageResponse<ResponseFindVOCVO> response = vocFacade.filterVOCsByPageWithSort(dto, page, size, sortField, sortDirection);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @Operation(summary = "전체 VOC 카테고리별 건수 조회")
     @GetMapping("/category-count")
     public ResponseEntity<List<VOCCategoryCountDTO>> getCategoryCounts() {

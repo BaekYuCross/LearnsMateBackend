@@ -290,4 +290,53 @@ public class VOCRepositoryImpl implements VOCRepositoryCustom {
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
+    @Override
+    public Page<VOC> searchByWithPagingWithSort(VOCFilterRequestDTO dto, Pageable pageable) {
+        log.info("Searching VOCs with criteria: {} and page: {} with sorting", dto, pageable);
+
+        // 기본 쿼리 생성
+        JPAQuery<VOC> query = queryFactory
+                .selectFrom(qVOC)
+                .leftJoin(qVOC.vocCategory).fetchJoin()
+                .leftJoin(qVOC.member).fetchJoin();
+
+        // adminName 정렬이 필요한 경우 추가 조인
+        if (pageable.getSort().stream().anyMatch(order -> order.getProperty().equals("adminName"))) {
+            query.leftJoin(qVOCAnswer).on(qVOCAnswer.voc.eq(qVOC))
+                    .leftJoin(qVOCAnswer.admin);
+        }
+
+        // 조건절 적용
+        List<VOC> content = query
+                .where(
+                        eqVOCCode(dto.getVocCode()),
+                        searchByContents(dto.getVocContent()),
+                        searchByType(dto.getVocCategoryCode()),
+                        searchByMemberType(dto.getMemberType()),
+                        searchByAnswerStatus(dto.getVocAnswerStatus()),
+                        searchByAnswerSatisfaction(dto.getVocAnswerSatisfaction()),
+                        searchByCreatedAt(dto.getStartCreateDate(), dto.getStartEndDate())
+                )
+                .orderBy(getSortedColumn(pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 카운트 조회
+        Long total = queryFactory
+                .select(qVOC.count())
+                .from(qVOC)
+                .where(
+                        eqVOCCode(dto.getVocCode()),
+                        searchByContents(dto.getVocContent()),
+                        searchByType(dto.getVocCategoryCode()),
+                        searchByMemberType(dto.getMemberType()),
+                        searchByAnswerStatus(dto.getVocAnswerStatus()),
+                        searchByAnswerSatisfaction(dto.getVocAnswerSatisfaction()),
+                        searchByCreatedAt(dto.getStartCreateDate(), dto.getStartEndDate())
+                )
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
 }

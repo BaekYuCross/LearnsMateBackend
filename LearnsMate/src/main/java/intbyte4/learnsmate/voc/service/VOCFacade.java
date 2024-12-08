@@ -128,6 +128,33 @@ public class VOCFacade {
         );
     }
 
+    // 필터링o 정렬o
+    public VOCPageResponse<ResponseFindVOCVO> filterVOCsByPageWithSort(VOCFilterRequestDTO dto, int page, int size, String sortField, String sortDirection) {
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        Page<VOCDTO> vocPage = vocService.filterVOCWithPagingWithSort(dto, pageRequest);
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+
+        for (VOCDTO vocDTO : vocPage.getContent()) {
+            MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
+            VOCCategoryDTO categoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
+            VOCAnswerDTO vocAnswerDTO = vocAnswerService.findByVOCCode(vocDTO.getVocCode());
+            AdminDTO adminDTO = vocAnswerDTO != null ? adminService.findByAdminCode(vocAnswerDTO.getAdminCode()) : null;
+
+            ResponseFindVOCVO responseVO = vocMapper.fromDTOToResponseVOAll(vocDTO, memberDTO, categoryDTO, adminDTO);
+            responseList.add(responseVO);
+        }
+
+        return new VOCPageResponse<>(
+                responseList,
+                vocPage.getTotalElements(),
+                vocPage.getTotalPages(),
+                vocPage.getNumber(),
+                vocPage.getSize()
+        );
+    }
+
     public List<VOCCategoryCountDTO> getCategoryCounts() {
         return vocService.getCategoryCounts();
     }
