@@ -55,7 +55,7 @@ public class PaymentController {
     public ResponseEntity<PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>> getPaymentsWithSort(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> response =
                 paymentFacade.getPaymentsWithGraphAndSort(page, size, sortField, sortDirection);
@@ -109,7 +109,7 @@ public class PaymentController {
             @RequestBody PaymentFilterRequestVO request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         log.info(request.toString());
         log.info("{}{}{}{}",page, size, sortField, sortDirection);
