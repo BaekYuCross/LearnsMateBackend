@@ -36,7 +36,7 @@ public class VOCController {
 
     @Operation(summary = "직원 - VOC 페이지 조회")
     @GetMapping("/list")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "30") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
         VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPage(page, size);
         return ResponseEntity.ok(response);
     }
@@ -46,7 +46,7 @@ public class VOCController {
     @GetMapping("/list/sort")
     public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOCWithSort(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "30") int size,
+            @RequestParam(defaultValue = "15") int size,
             @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         log.info("{}{}{}{}", page, size, sortField, sortDirection);
