@@ -83,8 +83,9 @@ jobs:
               redis:
                 cluster: 
                   endpoint: ${REDIS_HOST}
-              port: 6379
-                max-redirects: 3
+                  max-redirects: 3
+                port: 6379
+                
           
           coolsms:
             api:

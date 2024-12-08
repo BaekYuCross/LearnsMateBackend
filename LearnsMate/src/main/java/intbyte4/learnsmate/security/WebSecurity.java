@@ -47,10 +47,10 @@ public class WebSecurity {
     /* 인가(Authorization)용 메소드 */
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        // CSRF 비활성화
-        http.csrf(csrf -> csrf.disable());
-        // CORS 설정 적용
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable());
 
         // 로그인 시 추가할 authenticationManager 설정
         AuthenticationManagerBuilder authenticationManagerBuilder =
@@ -127,10 +127,10 @@ public class WebSecurity {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("https://learnsmate.site"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "LOGIN"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
