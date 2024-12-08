@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign.service;
 
 import intbyte4.learnsmate.campaign.domain.dto.*;
+import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.vo.response.ResponseFindCampaignByFilterVO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -13,6 +14,8 @@ public interface CampaignService {
     CampaignDTO registerCampaign(CampaignDTO requestCampaign
             , List<MemberDTO> requestStudentList
             , List<CouponDTO> requestCouponList);
+
+    void executeCampaign(Campaign campaign);
 
     void registerScheduledCampaign(List<MemberDTO> studentList, List<CouponDTO> couponList, LocalDateTime scheduledTime);
 

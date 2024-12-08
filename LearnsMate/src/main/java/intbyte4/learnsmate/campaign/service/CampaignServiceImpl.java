@@ -28,6 +28,8 @@ import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -57,24 +60,64 @@ public class CampaignServiceImpl implements CampaignService {
     private final AdminMapper adminMapper;
     private final CampaignIssueCouponReader couponMemberReader;
     private final CoolSmsService coolSmsService;
+    private final JobLauncher jobLauncher;
+    private final Job campaignJob;
 
     @Override
-    public CampaignDTO registerCampaign(CampaignDTO requestCampaign
-            , List<MemberDTO> requestStudentList
-            , List<CouponDTO> requestCouponList) {
-        LocalDateTime sendTime;
+    public CampaignDTO registerCampaign(CampaignDTO requestCampaign,
+                                        List<MemberDTO> requestStudentList,
+                                        List<CouponDTO> requestCouponList) {
+        // 캠페인 기본 정보 설정
+        Campaign campaign = createCampaign(requestCampaign);
+        Campaign savedCampaign = campaignRepository.save(campaign);
+        CampaignDTO savedCampaignDTO = campaignMapper.toDTO(savedCampaign);
+
+        // 학생과 쿠폰 정보 등록
+        registerStudentsAndCoupons(requestStudentList, requestCouponList, savedCampaignDTO);
+
+        // 즉시 발송인 경우 바로 실행
+        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
+            executeCampaign(savedCampaign);
+        }
+
+        return savedCampaignDTO;
+    }
+
+    private void registerStudentsAndCoupons(List<MemberDTO> requestStudentList,
+                                            List<CouponDTO> requestCouponList,
+                                            CampaignDTO savedCampaignDTO) {
+        // 학생 검증 및 등록
+        requestStudentList.forEach(memberDTO -> {
+            MemberDTO foundStudent = memberService.findMemberByMemberCode(
+                    memberDTO.getMemberCode(),
+                    MemberType.STUDENT
+            );
+            if (foundStudent == null) {
+                throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
+            }
+            userPerCampaignService.registerUserPerCampaign(foundStudent, savedCampaignDTO);
+        });
+
+        // 쿠폰 검증 및 등록
+        requestCouponList.forEach(couponDTO -> {
+            CouponDTO foundCoupon = couponService.findCouponDTOByCouponCode(couponDTO.getCouponCode());
+            if (foundCoupon == null) {
+                throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
+            } else if (foundCoupon.getTutorCode() != null) {
+                throw new CommonException(StatusEnum.COUPON_CANNOT_BE_SENT_BY_TUTOR);
+            }
+            couponByCampaignService.registerCouponByCampaign(foundCoupon, savedCampaignDTO);
+        });
+    }
+
+    private Campaign createCampaign(CampaignDTO requestCampaign) {
         AdminDTO adminDTO = adminService.findByAdminCode(requestCampaign.getAdminCode());
         Admin admin = adminMapper.toEntity(adminDTO);
 
-        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
-            sendTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        } else {
-            sendTime = requestCampaign.getCampaignSendDate();
-            log.info("예약 시간 {}", sendTime);
-        };
+        LocalDateTime sendTime = Objects.equals(requestCampaign.getCampaignType(),
+                CampaignTypeEnum.INSTANT.getType()) ? LocalDateTime.now() : requestCampaign.getCampaignSendDate();
 
-        Campaign campaign = Campaign.builder()
-                .campaignCode(null)
+        return Campaign.builder()
                 .campaignTitle(requestCampaign.getCampaignTitle())
                 .campaignContents(requestCampaign.getCampaignContents())
                 .campaignType(CampaignTypeEnum.valueOf(requestCampaign.getCampaignType()))
@@ -85,47 +128,53 @@ public class CampaignServiceImpl implements CampaignService {
                 .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .admin(admin)
                 .build();
+    }
 
-        Campaign savedCampaign = campaignRepository.save(campaign);
-        CampaignDTO savedCampaignDTO = campaignMapper.toDTO(savedCampaign);
+    @Override
+    public void executeCampaign(Campaign campaign) {
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("campaignCode", campaign.getCampaignCode())
+                    .addDate("startTime", new Date())
+                    .toJobParameters();
 
-        requestStudentList.forEach(memberDTO -> {
-            MemberDTO foundStudent = memberService.findMemberByMemberCode(memberDTO.getMemberCode()
-                    , MemberType.STUDENT);
-            if (foundStudent == null) throw new CommonException(StatusEnum.STUDENT_NOT_FOUND);
-            userPerCampaignService.registerUserPerCampaign(foundStudent, savedCampaignDTO);
-        });
-        requestCouponList.forEach(couponDTO -> {
-            CouponDTO foundCoupon = couponService.findCouponDTOByCouponCode(couponDTO.getCouponCode());
-            if (foundCoupon == null) throw new CommonException(StatusEnum.COUPON_NOT_FOUND);
-            else if (foundCoupon.getTutorCode() != null) {
-                throw new CommonException(StatusEnum.COUPON_CANNOT_BE_SENT_BY_TUTOR);
+            JobExecution jobExecution = jobLauncher.run(campaignJob, jobParameters);
+
+            if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
+                sendNotifications(campaign);
+                updateCampaignSendFlag(campaign.getCampaignCode());
             }
-            couponByCampaignService.registerCouponByCampaign(foundCoupon, savedCampaignDTO);
-        });
-        List<Long> studentCodes = requestStudentList.stream()
-                .map(MemberDTO::getMemberCode)
-                .toList();
-
-        List<Long> couponCodes = requestCouponList.stream()
-                .map(CouponDTO::getCouponCode)
-                .toList();
-
-        if (Objects.equals(requestCampaign.getCampaignType(), CampaignTypeEnum.INSTANT.getType())) {
-            // 즉시 발송
-            issueCouponService.issueCouponsToStudents(studentCodes, couponCodes);
-            requestStudentList.forEach(memberDTO -> {
-                if(Objects.equals(requestCampaign.getCampaignMethod(), "Email"))
-                    emailService.sendCampaignEmail(memberDTO.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
-                else
-                    coolSmsService.sendSms(memberDTO.getMemberPhone(), campaign.getCampaignContents());
-            });
-        } else {
-            // 예약 발송은 스케줄러에 등록
-            registerScheduledCampaign(requestStudentList, requestCouponList, savedCampaignDTO.getCampaignSendDate());
+        } catch (Exception e) {
+            log.error("Campaign execution failed for campaign: {}", campaign.getCampaignCode(), e);
+            throw new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND);
         }
+    }
 
-        return campaignMapper.toDTO(campaign);
+    private void sendNotifications(Campaign campaign) {
+        List<UserPerCampaignDTO> userPerCampaignDTOList =
+                userPerCampaignService.findUserByCampaignCode(campaign.getCampaignCode());
+
+        for (UserPerCampaignDTO userPerCampaign : userPerCampaignDTOList) {
+            MemberDTO member = memberService.findMemberByMemberCode(
+                    userPerCampaign.getStudentCode(),
+                    MemberType.STUDENT
+            );
+
+            if (member != null) {
+                if (campaign.getCampaignMethod().equals("Email")) {
+                    emailService.sendCampaignEmail(
+                            member.getMemberEmail(),
+                            campaign.getCampaignTitle(),
+                            campaign.getCampaignContents()
+                    );
+                } else if (campaign.getCampaignMethod().equals("SMS")) {
+                    coolSmsService.sendSms(
+                            member.getMemberPhone(),
+                            campaign.getCampaignContents()
+                    );
+                }
+            }
+        }
     }
 
     @Override
