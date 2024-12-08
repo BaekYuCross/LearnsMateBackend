@@ -81,16 +81,10 @@ jobs:
           
             data:
               redis:
-                host: \${REDIS_HOST}
-                port: 6379
-                repositories:
-                  enabled: false
-                lettuce:
-                  pool:
-                    max-active: 50
-                    max-idle: 25
-                    min-idle: 5
-                    time-between-eviction-runs: 2000ms
+                cluster: 
+                  nodes:
+                    - ${REDIS_HOST}:6379
+                max-redirects: 3
           
           coolsms:
             api:
