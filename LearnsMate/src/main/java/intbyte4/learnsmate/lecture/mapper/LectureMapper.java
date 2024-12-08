@@ -159,8 +159,8 @@ public class LectureMapper {
                 .lectureLevel(request.getLectureLevel())
                 .lectureConfirmStatus(request.getLectureConfirmStatus())
                 .lectureStatus(request.getLectureStatus())
-                .minPrice(request.getMinPrice())
-                .maxPrice(request.getMaxPrice())
+                .minLecturePrice(request.getMinLecturePrice())
+                .maxLecturePrice(request.getMaxLecturePrice())
                 .startCreatedAt(request.getStartCreatedAt())
                 .endCreatedAt(request.getEndCreatedAt())
                 .build();
