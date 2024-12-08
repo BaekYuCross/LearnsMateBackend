@@ -50,4 +50,6 @@ public interface CouponService {
     CouponPageResponse<CouponFindResponseVO> filterCoupons(CouponFilterDTO dto, int page, int size);
 
     List<ClientFindCouponDTO> findAllClientCoupon(Long tutorCode);
+
+    boolean findAdminCouponByCouponCode(Long couponCode);
 }
