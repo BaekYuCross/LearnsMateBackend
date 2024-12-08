@@ -116,6 +116,10 @@ public class CouponController {
     public ResponseEntity<?> editCoupon(@PathVariable("couponCode") Long couponCode, @RequestBody AdminCouponEditRequestVO request) {
         log.info("직원 쿠폰 수정 요청 : {}", request);
         try {
+            if (!couponService.findAdminCouponByCouponCode(couponCode)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("직원 쿠폰이 아닙니다.");
+            }
+
             CouponDTO couponDTO = couponMapper.fromEditRequestVOToDto(request);
             couponDTO.setCouponCode(couponCode);
 
@@ -137,8 +141,11 @@ public class CouponController {
     @Operation(summary = "직원 - 쿠폰 삭제 (비활성화)")
     @PatchMapping("/admin/delete/{couponCode}")
     public ResponseEntity<?> deleteCoupon(@PathVariable("couponCode") Long couponCode) {
-        log.info("직원 쿠폰 삭제 요청: couponCode = {}", couponCode);
         try {
+            if (!couponService.findAdminCouponByCouponCode(couponCode)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("직원 쿠폰이 아닙니다.");
+            }
+
             CouponDTO updatedCoupon = couponService.deleteAdminCoupon(couponCode);
             return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
         } catch (CommonException e) {
@@ -149,7 +156,6 @@ public class CouponController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
         }
     }
-
 
     @Operation(summary = "강사 등록 쿠폰 전체 조회")
     @GetMapping("/tutor-coupons")

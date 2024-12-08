@@ -19,8 +19,8 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long>, Cus
     List<CouponEntity> findAllByCouponFlagTrue();
 
     // couponFlag가 true인 쿠폰 전체 조회 + offset 페이징
-    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true ORDER BY c.createdAt DESC")
-    Page<CouponEntity> findAllByCouponFlagTrue(Pageable pageable);
+    @Query("SELECT c FROM Coupon c ORDER BY c.createdAt DESC")
+    Page<CouponEntity> findAllByCoupon(Pageable pageable);
 
     @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true AND c.admin IS NOT NULL")
     Page<CouponEntity> findAllAdminCoupons(Pageable pageable);
@@ -39,4 +39,8 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long>, Cus
             "JOIN cbl.lecture l " +
             "WHERE c.couponFlag = true AND c.tutor.memberCode = :tutorCode")
     List<ClientFindCouponDTO> findAllClientCoupon(@Param("tutorCode") Long tutorCode);
+
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
+            "FROM Coupon c WHERE c.couponCode = :couponCode AND c.admin IS NOT NULL")
+    boolean findByAdminCouponByCouponCode(@Param("couponCode") Long couponCode);
 }
