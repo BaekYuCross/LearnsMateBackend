@@ -40,14 +40,14 @@ public class LectureController {
         }
     }
 
-//    @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 정렬 조회")
-//    @GetMapping("/list")
-//    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(
-//            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size,
-//    ){
-//        LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffset(page, size);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
+    @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 정렬 조회")
+    @GetMapping("/list")
+    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size
+    ){
+        LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffset(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 정렬 조회")
     @GetMapping("/list/sort")
@@ -56,7 +56,7 @@ public class LectureController {
             @RequestParam(required = false, defaultValue = "memberCode") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection
     ){
-        LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffset(page, size, sortField, sortDirection);
+        LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffsetWithSort(page, size, sortField, sortDirection);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
