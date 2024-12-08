@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -79,6 +80,14 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Page<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request, Pageable pageable) {
         return paymentRepository.findPaymentByFilters(request, pageable);
+    }
+
+    // 필터링 + 정렬
+    @Override
+    public Page<PaymentFilterDTO> getPaymentsByFiltersWithSort(PaymentFilterRequestVO request, int page, int size, String sortField, String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.valueOf(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return paymentRepository.findPaymentByFiltersWithSort(request, pageable);
     }
 
     // 직원이 특정 결제 내역을 단건 상세 조회

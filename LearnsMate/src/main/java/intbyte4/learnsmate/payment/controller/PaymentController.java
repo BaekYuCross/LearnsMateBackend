@@ -50,6 +50,18 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "결제 내역 및 월별 매출 데이터 정렬 조회 (전년도 데이터까지)")
+    @GetMapping("/sort")
+    public ResponseEntity<PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>> getPaymentsWithSort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> response =
+                paymentFacade.getPaymentsWithGraphAndSort(page, size, sortField, sortDirection);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @Operation(summary = "특정 결제 내역 조회")
     @GetMapping("/{paymentCode}")
     public ResponseEntity<ResponseFindPaymentVO> getPaymentDetails(@PathVariable("paymentCode") Long paymentCode) {
@@ -88,6 +100,21 @@ public class PaymentController {
     @PostMapping("/filter")
     public ResponseEntity<Page<PaymentFilterDTO>> getPaymentsByFilters(@RequestBody PaymentFilterRequestVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
         Page<PaymentFilterDTO> payments = paymentService.getPaymentsByFilters(request, PageRequest.of(page, size));
+        return ResponseEntity.status(HttpStatus.OK).body(payments);
+    }
+
+    @Operation(summary = "필터별 결제 내역 조회")
+    @PostMapping("/filter/sort")
+    public ResponseEntity<Page<PaymentFilterDTO>> getPaymentsByFiltersWithSort(
+            @RequestBody PaymentFilterRequestVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        log.info(request.toString());
+        log.info("{}{}{}{}",page, size, sortField, sortDirection);
+        Page<PaymentFilterDTO> payments = paymentService.getPaymentsByFiltersWithSort(request, page, size, sortField, sortDirection);
+        log.info("payments: {}:", payments.toString());
         return ResponseEntity.status(HttpStatus.OK).body(payments);
     }
 }
