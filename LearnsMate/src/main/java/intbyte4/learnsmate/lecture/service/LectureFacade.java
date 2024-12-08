@@ -185,34 +185,35 @@ public class LectureFacade {
         );
     }
 
-//    public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPage(LectureFilterDTO filterDTO, int page, int size) {
-//        Page<LectureDTO> lectures = lectureService.filterLectureWithPaging(filterDTO, PageRequest.of(page, size));
-//        log.info("{}", lectures.toString());
-//        List<ResponseFindLectureVO> responseList = new ArrayList<>();
-//
-//        for (LectureDTO lectureDTO : lectures) {
-//            MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
-//            LectureCategoryByLectureDTO lectureCategoryByLecture = lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
-//            LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLecture.getLectureCategoryCode());
-//
-//            ResponseFindLectureVO responseFindLectureVO = lectureMapper.fromDTOToResponseVOAll(lectureDTO, memberDTO, lectureCategoryDTO);
-//
-//            responseList.add(responseFindLectureVO);
-//            log.info("{}", responseFindLectureVO.toString());
-//        }
-//
-//        log.info("{}, {}", lectures.getSize(), responseList.size());
-//
-//        return new LecturePaginationResponse<>(
-//                responseList,
-//                lectures.getTotalElements(),
-//                lectures.getTotalPages(),
-//                lectures.getNumber() + 1,
-//                lectures.getSize()
-//        );
-//    }
-
     public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPage(
+            LectureFilterDTO filterDTO, int page, int size, String sortField, String sortDirection) {
+        Page<LectureDTO> lectures = lectureService.filterLectureWithPaging(filterDTO, PageRequest.of(page, size));
+        log.info("{}", lectures.toString());
+        List<ResponseFindLectureVO> responseList = new ArrayList<>();
+
+        for (LectureDTO lectureDTO : lectures) {
+            MemberDTO memberDTO = memberService.findById(lectureDTO.getTutorCode());
+            LectureCategoryByLectureDTO lectureCategoryByLecture = lectureCategoryByLectureService.findLectureCategoryByLectureCode(lectureDTO.getLectureCode());
+            LectureCategoryDTO lectureCategoryDTO = lectureCategoryService.findByLectureCategoryCode(lectureCategoryByLecture.getLectureCategoryCode());
+
+            ResponseFindLectureVO responseFindLectureVO = lectureMapper.fromDTOToResponseVOAll(lectureDTO, memberDTO, lectureCategoryDTO);
+
+            responseList.add(responseFindLectureVO);
+            log.info("{}", responseFindLectureVO.toString());
+        }
+
+        log.info("{}, {}", lectures.getSize(), responseList.size());
+
+        return new LecturePaginationResponse<>(
+                responseList,
+                lectures.getTotalElements(),
+                lectures.getTotalPages(),
+                lectures.getNumber() + 1,
+                lectures.getSize()
+        );
+    }
+
+    public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPageWithSort(
             LectureFilterDTO filterDTO, int page, int size, String sortField, String sortDirection) {
 
         Sort sort = Sort.by(

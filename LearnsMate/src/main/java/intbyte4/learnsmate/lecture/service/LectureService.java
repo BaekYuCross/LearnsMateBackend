@@ -21,7 +21,7 @@ public interface LectureService {
 
     List<MonthlyLectureCountDTO> getMonthlyLectureCounts();
 
-//    Page<LectureDTO> filterLectureWithPaging(LectureFilterDTO filterDTO, Pageable pageable);
+    Page<LectureDTO> filterLectureWithPaging(LectureFilterDTO filterDTO, Pageable pageable);
 
     List<MonthlyLectureCountDTO> getFilteredMonthlyLectureCounts(MonthlyLectureFilterDTO filterDTO);
 

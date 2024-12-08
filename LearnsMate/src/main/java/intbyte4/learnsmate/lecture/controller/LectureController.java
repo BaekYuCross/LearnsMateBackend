@@ -53,7 +53,7 @@ public class LectureController {
     @GetMapping("/list/sort")
     public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection
     ){
         LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffsetWithSort(page, size, sortField, sortDirection);
@@ -125,13 +125,13 @@ public class LectureController {
             @RequestBody RequestLectureFilterVO request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection
     ) {
         try {
             LectureFilterDTO filterDTO = lectureMapper.toFilterDTO(request);
             log.info("filterDTO: " + filterDTO.toString());
-            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size, sortField, sortDirection);
+            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPageWithSort(filterDTO, page, size, sortField, sortDirection);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("강의 필터링 중 오류 발생", e);
