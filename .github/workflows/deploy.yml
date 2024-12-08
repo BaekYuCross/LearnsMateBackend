@@ -77,11 +77,13 @@ jobs:
                     auth: true
                     starttls:
                       enable: true
+                      required: true
           
             data:
               redis:
                 host: \${REDIS_HOST}
                 port: 6379
+                password: \${REDIS_PASSWORD}
                 repositories:
                   enabled: false
                 lettuce:
@@ -102,7 +104,7 @@ jobs:
             secret-key: \${SECRET_KEY}
 
           token:
-            expiration_time: 43200000
+            expiration_time: 14400000
             secret: \${TOKEN_SECRET}
           EOL
 
@@ -125,6 +127,7 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SPRING_MAIL_SMTP_HOST: ${{ secrets.SPRING_MAIL_SMTP_HOST }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           COOL_SMS_API_KEY : ${{ secrets.COOL_SMS_API_KEY }}
           COOL_SMS_API_SECRET : ${{ secrets.COOL_SMS_API_SECRET }}
           COOL_SMS_API_BASE_URL : ${{ secrets.COOL_SMS_API_BASE_URL }}

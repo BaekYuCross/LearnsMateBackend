@@ -76,6 +76,8 @@ dependencies {
 
     //coolsms 의존성
     implementation 'net.nurigo:sdk:4.3.0'
+
+    implementation 'org.springframework.session:spring-session-core:3.0.0'
 }
 
 tasks.named('test') {

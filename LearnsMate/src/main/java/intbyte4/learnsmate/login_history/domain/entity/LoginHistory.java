@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity(name = "loginHistory")
 @Table(name = "login_history")
@@ -33,9 +34,16 @@ public class LoginHistory {
     private Member member;
 
     public void updateLogoutDate(){
-        this.lastLogoutDate = LocalDateTime.now();
-        if(lastLogoutDate.isBefore(lastLoginDate)){
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        if(lastLoginDate == null) {
             throw new CommonException(StatusEnum.DATA_INTEGRITY_VIOLATION);
         }
+
+        if(now.isBefore(lastLoginDate)){
+            throw new CommonException(StatusEnum.DATA_INTEGRITY_VIOLATION);
+        }
+
+        this.lastLogoutDate = now;
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -40,17 +41,26 @@ public class ClientService {
 
     // 회원 로그인
     public ClientLoginHistoryDTO loginMember(ClientLoginDTO loginDTO) {
+        log.debug("Received login request for email: {}", loginDTO.getMemberEmail());
 
         Member member = memberRepository.findByMemberEmail(loginDTO.getMemberEmail());
+        log.debug("Member found: {}", member != null);
 
         if(member == null) {
+            log.debug("User not found with email: {}", loginDTO.getMemberEmail());
             throw new CommonException(StatusEnum.USER_NOT_FOUND);
-        } else if(!passwordEncoder.matches(loginDTO.getMemberPassword(), member.getMemberPassword())) {
+        }
+
+        boolean passwordMatches = passwordEncoder.matches(loginDTO.getMemberPassword(), member.getMemberPassword());
+        log.debug("Password matches: {}", passwordMatches);
+
+        if(!passwordMatches) {
+            log.debug("Invalid password for user: {}", loginDTO.getMemberEmail());
             throw new CommonException(StatusEnum.INVALID_PASSWORD);
         }
 
         LoginHistoryDTO loginHistoryDTO = LoginHistoryDTO.builder()
-                .lastLoginDate(LocalDateTime.now())
+                .lastLoginDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .memberCode(member.getMemberCode())
                 .build();
 

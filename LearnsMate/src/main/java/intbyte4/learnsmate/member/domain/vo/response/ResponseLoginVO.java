@@ -1,7 +1,6 @@
 package intbyte4.learnsmate.member.domain.vo.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -9,11 +8,16 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @ToString
-//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseLoginVO {
-
+    @JsonProperty("member_code")
     private Long memberCode;
+
+    @JsonProperty("member_name")
     private String memberName;
+
+    @JsonProperty("member_email")
     private String memberEmail;
+
+    @JsonProperty("login_history_code")
     private Long loginHistoryCode;
 }

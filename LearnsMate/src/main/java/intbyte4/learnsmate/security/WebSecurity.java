@@ -19,6 +19,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,19 +68,18 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/index.html", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/admin/**","GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/admin/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/auth/**","GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/auth/**","POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/admin/**","POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/admin/status")).authenticated()                                .requestMatchers(new AntPathRequestMatcher("/admin/**","POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "OPTIONS")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "PATCH")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/list", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/count-by-category", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/filter", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/count-by-category", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/voc/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/voc/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/member/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/campaign/**", "PATCH")).permitAll()
@@ -90,8 +90,6 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/coupon/**", "PATCH")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/member/**", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/member/excel/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/issue-coupon/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/issue-coupon/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/voc-answer/register", "POST")).permitAll()
@@ -104,8 +102,8 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/blacklist/**", "PATCH")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/client/**", "GET")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/client/**", "POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/voc/ai/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/client/enter", "POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/client/exit", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/payments/filter", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/payments/excel/download", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/payments/**", "GET")).permitAll()
@@ -117,8 +115,9 @@ public class WebSecurity {
                 // 서버가 세션을 생성하지 않음
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilter(getAuthenticationFilter(authenticationManager));
-        http.addFilterBefore(new JwtFilter(userService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilter(getAuthenticationFilter(authenticationManager))
+                .addFilterBefore(new JwtFilter(userService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CorsFilter(corsConfigurationSource()), UsernamePasswordAuthenticationFilter.class);  // CORS 필터 추가
 
         return http.build();
     }
@@ -138,10 +137,8 @@ public class WebSecurity {
         return source;
     }
 
-
     // Authentication 용 메소드(인증 필터 반환)
     private Filter getAuthenticationFilter(AuthenticationManager authenticationManager) {
         return new AuthenticationFilter(authenticationManager, userService, env, jwtUtil, redisTemplate);
     }
-
 }

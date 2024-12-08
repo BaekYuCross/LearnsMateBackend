@@ -11,10 +11,12 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginHistoryService {
@@ -71,11 +73,16 @@ public class LoginHistoryService {
 
     // 특정 멤버가 로그아웃 할 시에 저장해놓은 코드를 통해 업데이트 로직 수행
     public void saveLogoutTime(Long loginHistoryCode) {
+        log.info("로그아웃 요청된 loginHistoryCode: {}", loginHistoryCode);  // 로그 추가
 
         LoginHistory loginHistory = loginHistoryRepository.findById(loginHistoryCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.LOGIN_HISTORY_NOT_FOUND));
 
+        log.info("찾은 LoginHistory: {}", loginHistory);  // 로그 추가
+
         loginHistory.updateLogoutDate();
         loginHistoryRepository.save(loginHistory);
+
+        log.info("로그아웃 처리 완료");  // 로그 추가
     }
 }

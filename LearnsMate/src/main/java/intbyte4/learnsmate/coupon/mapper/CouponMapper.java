@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -151,9 +152,9 @@ public class CouponMapper {
         return CouponEntity.builder()
                 .couponName(request.getCouponName())
                 .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .couponStartDate(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .couponStartDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)
                 .activeState(true)
@@ -263,8 +264,8 @@ public class CouponMapper {
                 .couponName(request.getCouponName())
                 .couponContents(request.getCouponContents())
                 .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .couponStartDate(request.getCouponStartDate())
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)
@@ -279,8 +280,8 @@ public class CouponMapper {
                 .couponName(request.getCouponName())
                 .couponContents(request.getCouponContents())
                 .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .couponStartDate(request.getCouponStartDate())
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)

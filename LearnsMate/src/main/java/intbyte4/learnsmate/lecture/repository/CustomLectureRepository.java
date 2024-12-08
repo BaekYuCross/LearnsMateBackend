@@ -14,4 +14,6 @@ public interface CustomLectureRepository {
     List<Lecture> findAllByFilter(LectureFilterDTO dto);
 
     Page<ResponseFindLectureVO> searchByWithPaging(LectureFilterDTO filterDTO, Pageable pageable);
+
+    Page<ResponseFindLectureVO> findLecturesWithSorting(Pageable pageable);
 }

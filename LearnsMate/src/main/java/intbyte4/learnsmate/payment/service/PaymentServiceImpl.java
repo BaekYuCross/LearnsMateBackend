@@ -41,6 +41,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -217,7 +218,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentDTO paymentInfo = new PaymentDTO();
         paymentInfo.setPaymentCode(null);
         paymentInfo.setPaymentPrice(lectureDTO.getLecturePrice());
-        paymentInfo.setCreatedAt(LocalDateTime.now());
+        paymentInfo.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
         paymentInfo.setLectureByStudentCode(lectureByStudentService.findStudentCodeByLectureCode(lecture));
         return paymentInfo;
     }

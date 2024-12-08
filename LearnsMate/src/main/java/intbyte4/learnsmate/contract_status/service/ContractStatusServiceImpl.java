@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,7 +92,7 @@ public class ContractStatusServiceImpl implements ContractStatusService {
                 .lecture(lecture)
                 .admin(admin)
                 .approvalStatus(contractStatusDTO.getApprovalStatus())
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .note(null)
                 .build();
 

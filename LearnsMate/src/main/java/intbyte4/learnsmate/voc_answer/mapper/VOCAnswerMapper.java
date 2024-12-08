@@ -12,6 +12,7 @@ import intbyte4.learnsmate.voc_answer.domain.vo.response.ResponseRegisterVOCAnsw
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class VOCAnswerMapper {
@@ -19,8 +20,8 @@ public class VOCAnswerMapper {
         return VOCAnswerDTO.builder()
                 .vocAnswerCode(savedVOCAnswer.getVocAnswerCode())
                 .vocAnswerContent(savedVOCAnswer.getVocAnswerContent())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .vocCode(savedVOCAnswer.getVoc().getVocCode())
                 .adminCode(savedVOCAnswer.getAdmin().getAdminCode())
                 .build();

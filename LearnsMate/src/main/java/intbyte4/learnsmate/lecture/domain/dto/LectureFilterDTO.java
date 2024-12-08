@@ -20,8 +20,8 @@ public class LectureFilterDTO {
     private String lectureLevel;
     private Boolean lectureConfirmStatus;
     private Boolean lectureStatus;
-    private Integer minPrice;
-    private Integer maxPrice;
+    private Integer minLecturePrice;
+    private Integer maxLecturePrice;
     private LocalDate startCreatedAt;
     private LocalDate endCreatedAt;
     private List<String> selectedColumns;

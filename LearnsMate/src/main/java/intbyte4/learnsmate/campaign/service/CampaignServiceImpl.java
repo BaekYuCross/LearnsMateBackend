@@ -37,6 +37,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -124,7 +125,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .campaignSendDate(sendTime)
                 .campaignSendFlag(false)
                 .createdAt(requestCampaign.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .admin(admin)
                 .build();
     }
@@ -323,7 +324,6 @@ public class CampaignServiceImpl implements CampaignService {
         CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
 
         Page<MemberDTO> membersPage = memberService.findMembersByCampaignCode(request, pageable);
-        log.info("캠페인 등록한 직원: {}", membersPage.get().toList());
         Page<CouponDTO> couponsPage = couponService.findCouponsByCampaignCode(request, pageable);
 
         return campaignMapper.toFindCampaignDetailDTO(campaignDTO,couponsPage,membersPage);

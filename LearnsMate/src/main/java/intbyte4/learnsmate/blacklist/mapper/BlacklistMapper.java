@@ -16,6 +16,7 @@ import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,7 @@ public class BlacklistMapper {
 
     public Blacklist fromBlacklistDTOtoBlacklist(BlacklistDTO dto, Member member, Admin admin) {
         return Blacklist.builder()
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .blackReason(dto.getBlackReason())
                 .admin(admin)
                 .member(member)
