@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @Slf4j
@@ -22,19 +23,17 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        // 구성 엔드포인트 읽기
-        String redisClusterEndpoint = environment.getProperty("spring.data.redis.cluster.endpoint");
-        int redisPort = environment.getProperty("spring.data.redis.port", Integer.class, 6379);
+        String redisClusterNodes = environment.getProperty("spring.data.redis.cluster.nodes");
 
-        if (redisClusterEndpoint == null || redisClusterEndpoint.isEmpty()) {
-            throw new IllegalArgumentException("Redis cluster endpoint must not be null or empty");
+        if (redisClusterNodes == null || redisClusterNodes.isEmpty()) {
+            throw new IllegalArgumentException("Redis cluster nodes must not be null or empty");
         }
 
-        log.info("Connecting to Redis cluster at: {}:{}", redisClusterEndpoint, redisPort);
+        log.info("Connecting to Redis cluster at: {}", redisClusterNodes);
 
-        // Redis 클러스터 구성
         RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration();
-        clusterConfig.clusterNode(redisClusterEndpoint, redisPort);
+        String[] parts = redisClusterNodes.split(":");
+        clusterConfig.clusterNode(parts[0], Integer.parseInt(parts[1]));
         clusterConfig.setMaxRedirects(3);
 
         return new LettuceConnectionFactory(clusterConfig);
@@ -44,11 +43,8 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
-    }
-
-    @PostConstruct
-    public void init() {
-        log.info("Redis configuration initialized");
     }
 }
