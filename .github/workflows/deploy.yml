@@ -82,7 +82,7 @@ jobs:
             data:
               redis:
                 cluster: 
-                  nodes: ${REDIS_HOST}:6379
+                  nodes: \${REDIS_HOST}:6379
                   max-redirects: 3
                 
           
