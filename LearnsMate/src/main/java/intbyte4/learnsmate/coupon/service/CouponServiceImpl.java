@@ -257,6 +257,12 @@ public class CouponServiceImpl implements CouponService {
 
         return dtoList;
     }
+
+    @Override
+    public boolean findAdminCouponByCouponCode(Long couponCode) {
+        return couponRepository.findByAdminCouponByCouponCode(couponCode);
+    }
+
     public void validAdmin(AdminService adminService, Long adminCode, Logger log) {
         AdminDTO adminDTO = adminService.findByAdminCode(adminCode);
         if (adminDTO == null) {

@@ -74,7 +74,7 @@ public class CouponFacade {
     @Transactional
     public CouponPageResponse<CouponFindResponseVO> findAllCoupons(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
-        Page<CouponEntity> couponPage = couponRepository.findAllByCouponFlagTrue(pageable);
+        Page<CouponEntity> couponPage = couponRepository.findAllByCoupon(pageable);
 
         List<CouponFindResponseVO> responseVOList = couponPage.getContent().stream()
                 .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
