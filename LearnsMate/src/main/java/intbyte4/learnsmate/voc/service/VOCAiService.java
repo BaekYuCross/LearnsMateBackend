@@ -19,6 +19,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -184,6 +185,68 @@ public class VOCAiService {
             log.error("GPT 응답을 JSON으로 처리 중 오류 발생: {}", e.getMessage(), e);
         } catch (Exception e) {
             log.error("GPT 응답 처리 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public void analyzeVocForSpecificDate(LocalDate targetDate) {
+        // 지정된 날짜가 포함된 주의 월요일 9시부터 다음주 월요일 8시 59분 59초까지
+        LocalDateTime startOfWeek = targetDate.with(DayOfWeek.MONDAY).atTime(9, 0);
+        LocalDateTime endOfWeek = targetDate.plus(1, ChronoUnit.WEEKS).with(DayOfWeek.MONDAY).atTime(8, 59, 59);
+
+        log.info("특정 날짜의 VOC 분석 시작: {} ~ {}", startOfWeek, endOfWeek);
+
+        List<Object[]> keywordFrequencyData = vocRepository.findKeywordFrequencyBetweenDates(startOfWeek, endOfWeek);
+
+        if (keywordFrequencyData.isEmpty()) {
+            log.info("해당 기간({} ~ {}) 동안 발견된 주요 키워드가 없습니다.", startOfWeek, endOfWeek);
+            return;
+        }
+
+        log.info("해당 기간({} ~ {}) 동안 발견된 키워드 개수: {}", startOfWeek, endOfWeek, keywordFrequencyData.size());
+
+        Map<String, Integer> keywordFrequency = keywordFrequencyData.stream()
+                .collect(Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> ((Number) row[1]).intValue()
+                ));
+
+        List<Map.Entry<String, Integer>> topKeywords = keywordFrequency.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(5)
+                .toList();
+
+        if (topKeywords.isEmpty()) {
+            log.info("해당 기간({} ~ {}) 동안 상위 키워드가 없습니다.", startOfWeek, endOfWeek);
+            return;
+        }
+
+        log.info("해당 기간 상위 키워드: {}", topKeywords);
+
+        StringBuilder vocContents = new StringBuilder("VOC 분석 데이터:\n");
+        StringBuilder recommendations = new StringBuilder("추천 답안:\n");
+
+        for (Map.Entry<String, Integer> entry : topKeywords) {
+            String keyword = entry.getKey();
+            int count = entry.getValue();
+            log.info("키워드 '{}'에 대한 VOC {}건 분석 중...", keyword, count);
+
+            vocContents.append(keyword).append(": ").append(count).append("건\n");
+
+            List<VOC> relatedVocs = vocRepository.findVocByKeywordAndSatisfaction(startOfWeek, endOfWeek, keyword);
+            for (VOC voc : relatedVocs) {
+                Optional<VOCAnswer> vocAnswerOptional = vocAnswerRepository.findByVoc_VocCode(voc.getVocCode());
+                vocAnswerOptional.ifPresent(vocAnswer -> {
+                    recommendations.append("- ").append(vocAnswer.getVocAnswerContent()).append("\n");
+                });
+            }
+        }
+
+        try {
+            String response = gptService.analyzeVocContents(vocContents.toString());
+            processGptResponse(response);
+        } catch (Exception e) {
+            log.error("GPT로 VOC 분석 중 오류 발생: {}", e.getMessage(), e);
         }
     }
 }
