@@ -81,8 +81,9 @@ jobs:
           
             data:
               redis:
-                host: \${REDIS_HOST}
-                port: 6379
+                cluster:
+                  nodes:
+                    - \${REDIS_HOST}:6379
                 repositories:
                   enabled: false
                 lettuce:
