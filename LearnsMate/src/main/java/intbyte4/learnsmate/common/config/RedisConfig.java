@@ -1,9 +1,10 @@
 package intbyte4.learnsmate.common.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -21,20 +22,33 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        String redisHost = environment.getProperty("spring.data.redis.host");
-        log.info("Connecting to Redis cluster at: {}", redisHost);
+        // 구성 엔드포인트 읽기
+        String redisClusterEndpoint = environment.getProperty("spring.data.redis.cluster.endpoint");
+        int redisPort = environment.getProperty("spring.data.redis.port", Integer.class, 6379);
 
-        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
-        clusterConfiguration.clusterNode(redisHost, 6379);
-        clusterConfiguration.setMaxRedirects(3);
+        if (redisClusterEndpoint == null || redisClusterEndpoint.isEmpty()) {
+            throw new IllegalArgumentException("Redis cluster endpoint must not be null or empty");
+        }
 
-        return new LettuceConnectionFactory(clusterConfiguration);
+        log.info("Connecting to Redis cluster at: {}:{}", redisClusterEndpoint, redisPort);
+
+        // Redis 클러스터 구성
+        RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration();
+        clusterConfig.clusterNode(redisClusterEndpoint, redisPort);
+        clusterConfig.setMaxRedirects(3);
+
+        return new LettuceConnectionFactory(clusterConfig);
     }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
-        return template;
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        return redisTemplate;
+    }
+
+    @PostConstruct
+    public void init() {
+        log.info("Redis configuration initialized");
     }
 }
