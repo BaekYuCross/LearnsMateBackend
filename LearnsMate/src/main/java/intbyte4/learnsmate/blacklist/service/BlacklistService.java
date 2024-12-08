@@ -108,6 +108,39 @@ public class BlacklistService {
     // (피신고자 코드의 횟수만 가져오면 됨. -> 피신고자 멤버코드, 신고 횟수)
     // 2. Member table에서 가져오기(true인 놈들)
     public ReservedBlacklistPageResponse<?> findAllReservedBlacklistByMemberType(
+            int page, int size, MemberType memberType)
+    {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 모든 멤버 가져옴 (페이지네이션 포함)
+        Page<ReportedMemberDTO> reportedMemberPage = reportService.findReportCountByMemberCode(memberType, pageable);
+
+        // 멤버 타입이 동일하고 flag가 true인 사람만 필터링
+        List<ReportedMemberDTO> filteredList = reportedMemberPage.stream()
+                .filter(dto -> dto.getReportedMember().getMemberType().equals(memberType)
+                        && dto.getReportedMember().getMemberFlag())
+                .toList();
+
+        // Page로 다시 변환
+        Page<ReportedMemberDTO> filteredPage = new PageImpl<>(filteredList, pageable, filteredList.size());
+
+        // DTO -> VO 변환
+        List<ResponseFindReservedStudentBlacklistVO> content = filteredPage.getContent().stream()
+                .map(blacklistMapper::fromReportedMemberDTOToResponseFindReservedStudentBlacklistVO)
+                .toList();
+
+        return new ReservedBlacklistPageResponse<>(
+                content,
+                filteredPage.getTotalElements(),
+                filteredPage.getTotalPages(),
+                page,
+                size
+        );
+    }
+
+    // 컬럼 정렬 적용
+    public ReservedBlacklistPageResponse<?> findAllReservedBlacklistByMemberTypeWithSort(
             int page, int size, MemberType memberType, String sortField, String sortDirection
     ) {
         Sort sort = createSort(sortField, sortDirection);

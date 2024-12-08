@@ -114,6 +114,33 @@ public class BlacklistController {
 
     // 직원 - 예비 블랙리스트 전체 조회(학생)
     @Operation(summary = "직원 - 학생 예비 블랙리스트 전체 조회")
+    @GetMapping("/student/reserved")
+    public ResponseEntity<ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size
+    ) {
+        ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO> response
+                = (ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>)
+                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.STUDENT);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 직원 - 예비 블랙리스트 전체 조회(강사)
+    @Operation(summary = "직원 - 강사 예비 블랙리스트 전체 조회")
+    @GetMapping("/tutor/reserved")
+    public ResponseEntity<ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ){
+        ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO> response
+                = (ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>)
+                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.TUTOR);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 직원 - 예비 블랙리스트 전체 조회(학생)
+    @Operation(summary = "직원 - 학생 예비 블랙리스트 전체 조회")
     @GetMapping("/student/reserved/sort")
     public ResponseEntity<ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist(
             @RequestParam(defaultValue = "0") int page,
@@ -123,7 +150,7 @@ public class BlacklistController {
     ) {
         ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO> response
                 = (ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>)
-                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.STUDENT, sortField, sortDirection);
+                blacklistService.findAllReservedBlacklistByMemberTypeWithSort(page, size, MemberType.STUDENT, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }
@@ -139,7 +166,7 @@ public class BlacklistController {
     ){
         ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO> response
                 = (ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>)
-                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.TUTOR, sortField, sortDirection);
+                blacklistService.findAllReservedBlacklistByMemberTypeWithSort(page, size, MemberType.TUTOR, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }
