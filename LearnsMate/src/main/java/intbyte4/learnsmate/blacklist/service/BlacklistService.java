@@ -22,10 +22,12 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.report.domain.dto.ReportDTO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
+import intbyte4.learnsmate.report.repository.ReportRepository;
 import intbyte4.learnsmate.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,7 @@ public class BlacklistService {
     private final MemberMapper memberMapper;
     private final AdminMapper adminMapper;
     private final AdminService adminService;
+    private final ReportRepository reportRepository;
 
     // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
     public BlacklistPageResponse<ResponseFindBlacklistVO> findAllBlacklistByMemberType(int page, int size, MemberType memberType) {
@@ -105,35 +108,35 @@ public class BlacklistService {
     // (피신고자 코드의 횟수만 가져오면 됨. -> 피신고자 멤버코드, 신고 횟수)
     // 2. Member table에서 가져오기(true인 놈들)
     public ReservedBlacklistPageResponse<?> findAllReservedBlacklistByMemberType(
-            int page, int size, MemberType memberType)
-    {
+            int page, int size, MemberType memberType, String sortField, String sortDirection
+    ) {
+        Sort sort = createSort(sortField, sortDirection);
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        // 모든 멤버 가져옴 (페이지네이션 포함)
-        Page<ReportedMemberDTO> reportedMemberPage = reportService.findReportCountByMemberCode(pageable);
+        Page<ReportedMemberDTO> reportedMemberPage = reportService.findReportCountByMemberCode(memberType, pageable);
 
-        // 멤버 타입이 동일하고 flag가 true인 사람만 필터링
-        List<ReportedMemberDTO> filteredList = reportedMemberPage.stream()
-                .filter(dto -> dto.getReportedMember().getMemberType().equals(memberType)
-                        && dto.getReportedMember().getMemberFlag())
-                .toList();
-
-        // Page로 다시 변환
-        Page<ReportedMemberDTO> filteredPage = new PageImpl<>(filteredList, pageable, filteredList.size());
-
-        // DTO -> VO 변환
-        List<ResponseFindReservedStudentBlacklistVO> content = filteredPage.getContent().stream()
+        List<ResponseFindReservedStudentBlacklistVO> content = reportedMemberPage.getContent().stream()
                 .map(blacklistMapper::fromReportedMemberDTOToResponseFindReservedStudentBlacklistVO)
                 .toList();
 
         return new ReservedBlacklistPageResponse<>(
                 content,
-                filteredPage.getTotalElements(),
-                filteredPage.getTotalPages(),
+                reportedMemberPage.getTotalElements(),
+                reportedMemberPage.getTotalPages(),
                 page,
                 size
         );
+    }
+    private Sort createSort(String sortField, String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        return switch (sortField) {
+            case "memberName" -> Sort.by(direction, "reportedMember.memberName");
+            case "memberCode" -> Sort.by(direction, "reportedMember.memberCode");
+            case "reportCount" -> JpaSort.unsafe(direction, "COUNT(r)");
+            default -> JpaSort.unsafe(Sort.Direction.DESC, "COUNT(r)");  // 기본 정렬
+        };
     }
 
     // 블랙리스트에서 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
@@ -189,9 +192,13 @@ public class BlacklistService {
     }
 
     // 블랙리스트 필터링 메서드
-    public BlacklistPageResponse<ResponseFindBlacklistVO> filterBlacklistMember(BlacklistFilterRequestDTO dto, int page, int size){
-
-        Pageable pageable = PageRequest.of(page, size);
+    public BlacklistPageResponse<ResponseFindBlacklistVO> filterBlacklistMember(BlacklistFilterRequestDTO dto, int page, int size, String sortField, String sortDirection){
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<Blacklist> blacklistPage = blacklistRepository.searchBy(dto, pageable);
 

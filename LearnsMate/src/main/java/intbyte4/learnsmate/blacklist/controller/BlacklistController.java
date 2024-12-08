@@ -114,29 +114,32 @@ public class BlacklistController {
 
     // 직원 - 예비 블랙리스트 전체 조회(학생)
     @Operation(summary = "직원 - 학생 예비 블랙리스트 전체 조회")
-    @GetMapping("/student/reserved")
+    @GetMapping("/student/reserved/sort")
     public ResponseEntity<ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>> findAllStudentReservedBlacklist(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection
     ) {
-
         ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO> response
                 = (ReservedBlacklistPageResponse<ResponseFindReservedStudentBlacklistVO>)
-                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.STUDENT);
+                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.STUDENT, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }
 
     // 직원 - 예비 블랙리스트 전체 조회(강사)
     @Operation(summary = "직원 - 강사 예비 블랙리스트 전체 조회")
-    @GetMapping("/tutor/reserved")
+    @GetMapping("/tutor/reserved/sort")
     public ResponseEntity<ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>> findAllTutorReservedBlacklist(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection
     ){
-
         ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO> response
                 = (ReservedBlacklistPageResponse<ResponseFindReservedTutorBlacklistVO>)
-                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.TUTOR);
+                blacklistService.findAllReservedBlacklistByMemberType(page, size, MemberType.TUTOR, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }
@@ -192,17 +195,18 @@ public class BlacklistController {
     }
 
     @Operation(summary = "학생 - 블랙리스트 필터링 기능 추가")
-    @PostMapping("/filter/student")
+    @PostMapping("/filter/student/sort")
     public ResponseEntity<BlacklistPageResponse<ResponseFindBlacklistVO>> filterBlackStudent(
             @RequestBody RequestFilterBlacklistMemberVO vo,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size
-    ){
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         log.info(vo.toString());
         BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
         dto.setMemberType(MemberType.STUDENT);
 
-        BlacklistPageResponse<ResponseFindBlacklistVO> response = blacklistService.filterBlacklistMember(dto, page, size);
+        BlacklistPageResponse<ResponseFindBlacklistVO> response = blacklistService.filterBlacklistMember(dto, page, size, sortField, sortDirection);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -212,13 +216,14 @@ public class BlacklistController {
     public ResponseEntity<?> filterBlackTutor(
             @RequestBody RequestFilterBlacklistMemberVO vo,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size
-    ){
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         log.info(vo.toString());
         BlacklistFilterRequestDTO dto = blacklistMapper.fromFilterMemberVOtoFilterMemberDTO(vo);
         dto.setMemberType(MemberType.TUTOR);
 
-        BlacklistPageResponse<ResponseFindBlacklistVO> response = blacklistService.filterBlacklistMember(dto, page, size);
+        BlacklistPageResponse<ResponseFindBlacklistVO> response = blacklistService.filterBlacklistMember(dto, page, size, sortField, sortDirection);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

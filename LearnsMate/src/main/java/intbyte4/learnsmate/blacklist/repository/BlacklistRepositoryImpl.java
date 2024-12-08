@@ -30,6 +30,9 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
     @Override
     public Page<Blacklist> searchBy(BlacklistFilterRequestDTO request, Pageable pageable) {
         QBlacklist blacklist = QBlacklist.blacklist;
+        QMember member = QMember.member;
+        QAdmin admin = QAdmin.admin;
+
         BooleanBuilder builder = new BooleanBuilder();
         if (eqBlackCode(request.getBlackCode()) != null) {
             builder.and(eqBlackCode(request.getBlackCode()));
@@ -50,8 +53,13 @@ public class BlacklistRepositoryImpl implements BlacklistRepositoryCustom {
         // Query 생성
         JPAQuery<Blacklist> query = queryFactory
                 .selectFrom(blacklist)
-                .where(builder)
-                .orderBy(blacklist.blackCode.desc());
+                .join(blacklist.member, member)
+                .leftJoin(blacklist.admin, admin)
+                .where(builder);
+
+        // 정렬 조건 적용
+        OrderSpecifier<?> orderSpecifier = createOrderSpecifier(blacklist, member, admin, pageable.getSort());
+        query.orderBy(orderSpecifier);
 
         long total = query.fetchCount();
 
