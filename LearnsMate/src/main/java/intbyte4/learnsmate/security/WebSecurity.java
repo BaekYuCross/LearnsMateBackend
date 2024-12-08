@@ -71,7 +71,8 @@ public class WebSecurity {
                                 .requestMatchers(new AntPathRequestMatcher("/admin/**", "GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/auth/**","GET")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/auth/**","POST")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/admin/status")).authenticated()                                .requestMatchers(new AntPathRequestMatcher("/admin/**","POST")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/admin/status")).authenticated()
+                                .requestMatchers(new AntPathRequestMatcher("/users/login", "POST")).permitAll().requestMatchers(new AntPathRequestMatcher("/admin/**","POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "OPTIONS")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/users/**", "GET")).permitAll()
@@ -125,13 +126,12 @@ public class WebSecurity {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("https://learnsmate.site"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(Arrays.asList("https://learnsmate.site"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "LOGIN"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-Requested-With"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
         configuration.setMaxAge(3600L);
-        configuration.addAllowedOrigin("https://learnsmate.site");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
