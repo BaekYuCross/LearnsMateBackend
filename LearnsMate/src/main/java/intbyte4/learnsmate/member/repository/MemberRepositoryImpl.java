@@ -1,7 +1,10 @@
 package intbyte4.learnsmate.member.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.member.domain.MemberType;
@@ -12,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +29,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     public Page<Member> searchBy(MemberFilterRequestDTO request, Pageable pageable) {
         QMember member = QMember.member;
 
-        // BooleanBuilder를 사용해 필터 조건 생성
         BooleanBuilder builder = new BooleanBuilder()
                 .and(eqMemberCode(request.getMemberCode()))
                 .and(eqMemberType(request.getMemberType()))
@@ -39,24 +42,29 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .and(betweenBirth(request.getBirthStartDate(), request.getBirthEndDate()))
                 .and(betweenCreatedAt(request.getCreatedStartDate(), request.getCreatedEndDate()));
 
-        // Query 생성
+        // 동적 정렬 조건 생성
+        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(member, pageable.getSort());
+
+        // Query 생성 및 정렬 조건 적용
         JPAQuery<Member> query = queryFactory
                 .selectFrom(member)
-                .where(builder)
-                .orderBy(member.memberCode.desc());
+                .where(builder);
 
-        // 전체 데이터 수 조회
+        // 정렬 조건이 있으면 적용
+        if (orderSpecifier != null) {
+            query.orderBy(orderSpecifier);
+        }
+
         long total = query.fetchCount();
 
-        // 페이징 적용
         List<Member> members = query
-                .offset(pageable.getOffset()) // 시작 위치
-                .limit(pageable.getPageSize()) // 페이지 크기
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        // PageImpl 객체 생성
         return new PageImpl<>(members, pageable, total);
     }
+
 
     @Override
     public List<Member> searchByWithoutPaging(MemberFilterRequestDTO request) {
@@ -82,6 +90,22 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .where(builder)
                 .orderBy(member.createdAt.desc())
                 .fetch();
+    }
+
+    // 정렬 조건 생성 메서드
+    private OrderSpecifier<?> getOrderSpecifier(QMember member, Pageable pageable) {
+        if (!pageable.getSort().isEmpty()) {
+            Sort.Order order = pageable.getSort().iterator().next();
+            PathBuilder<Member> pathBuilder = new PathBuilder<>(Member.class, "member");
+
+            return new OrderSpecifier(
+                    order.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(order.getProperty())
+            );
+        }
+
+        // 기본 정렬 (memberCode DESC)
+        return member.memberCode.desc();
     }
 
     // memberCode 검색 조건
@@ -148,5 +172,42 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return QMember.member.createdAt.between(startDate, endDate);
     }
 
+    private OrderSpecifier<?> getOrderSpecifier(QMember member, Sort sort) {
+        if (sort.isEmpty()) {
+            return member.memberCode.desc(); // 기본 정렬
+        }
 
+        Sort.Order order = sort.iterator().next();
+
+        switch (order.getProperty()) {
+            case "memberCode":
+                return order.isAscending() ? member.memberCode.asc() : member.memberCode.desc();
+            case "memberName":
+                return order.isAscending() ? member.memberName.asc() : member.memberName.desc();
+            case "memberEmail":
+                return order.isAscending() ? member.memberEmail.asc() : member.memberEmail.desc();
+            case "memberPhone":
+                return order.isAscending() ? member.memberPhone.asc() : member.memberPhone.desc();
+            case "memberAddress":
+                return order.isAscending() ? member.memberAddress.asc() : member.memberAddress.desc();
+            case "memberAge":
+                return order.isAscending() ? member.memberAge.asc() : member.memberAge.desc();
+            case "memberBirth":
+                return order.isAscending() ? member.memberBirth.asc() : member.memberBirth.desc();
+            case "memberFlag":
+                return order.isAscending() ? member.memberFlag.asc() : member.memberFlag.desc();
+            case "createdAt":
+                return order.isAscending() ? member.createdAt.asc() : member.createdAt.desc();
+            case "updatedAt":
+                return order.isAscending() ? member.updatedAt.asc() : member.updatedAt.desc();
+            case "memberType":
+                return order.isAscending() ? member.memberType.asc() : member.memberType.desc();
+            case "memberDormantStatus":
+                return order.isAscending() ? member.memberDormantStatus.asc() : member.memberDormantStatus.desc();
+            case "memberPassword":
+                return order.isAscending() ? member.memberPassword.asc() : member.memberPassword.desc();
+            default:
+                return member.memberCode.desc();
+        }
+    }
 }

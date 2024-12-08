@@ -42,7 +42,7 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
                 .and(likeCouponContents(request))
                 .and(eqCouponCategoryName(request))
                 .and(eqStudentCode(request))
-                .and(eqStudentName(request))
+                .and(likeStudentName(request))
                 .and(eqCouponUseStatus(request))
                 .and(betweenDiscountRate(request))
                 .and(betweenCouponStartDate(request))
@@ -72,7 +72,7 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
                 .and(likeCouponContents(request))
                 .and(eqCouponCategoryName(request))
                 .and(eqStudentCode(request))
-                .and(eqStudentName(request))
+                .and(likeStudentName(request))
                 .and(eqCouponUseStatus(request))
                 .and(betweenDiscountRate(request))
                 .and(betweenCouponStartDate(request))
@@ -135,13 +135,14 @@ public class CustomIssueCouponRepositoryImpl implements CustomIssueCouponReposit
         return member.memberCode.eq(request.getStudentCode());
     }
 
-    private BooleanExpression eqStudentName(IssueCouponFilterRequestVO request) {
+    private BooleanExpression likeStudentName(IssueCouponFilterRequestVO request) {
         if (request.getStudentName() == null || request.getStudentName().isEmpty()) {
             return null;
         }
-
-        return member.memberName.eq(request.getStudentName());
+        // 학생 이름을 포함하는 검색을 위해 likeIgnoreCase 사용
+        return member.memberName.likeIgnoreCase("%" + request.getStudentName() + "%");
     }
+
 
     private BooleanExpression eqCouponUseStatus(IssueCouponFilterRequestVO request) {
         if (request.getCouponUseStatus() == null) {

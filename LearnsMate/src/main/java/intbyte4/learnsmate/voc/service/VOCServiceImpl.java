@@ -78,7 +78,7 @@ public class VOCServiceImpl implements VOCService {
 
     @Override
     public List<VOCDTO> findUnansweredVOC() {
-        List<VOC> vocList = vocRepository.findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
+        List<VOC> vocList = vocRepository.findTop5ByVocAnswerStatusFalseOrderByCreatedAtDesc();
         return vocList.stream()
                 .map(vocMapper::fromEntityToDTO)
                 .collect(Collectors.toList());

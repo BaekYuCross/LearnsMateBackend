@@ -22,13 +22,12 @@ import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.report.domain.dto.ReportDTO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
+import intbyte4.learnsmate.report.repository.ReportRepository;
 import intbyte4.learnsmate.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -50,6 +49,7 @@ public class BlacklistService {
     private final MemberMapper memberMapper;
     private final AdminMapper adminMapper;
     private final AdminService adminService;
+    private final ReportRepository reportRepository;
 
     // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
     public BlacklistPageResponse<ResponseFindBlacklistVO> findAllBlacklistByMemberType(int page, int size, MemberType memberType) {
@@ -59,6 +59,35 @@ public class BlacklistService {
 
         // 페이징 처리된 데이터 조회
         Page<BlacklistDTO> blacklistPage = blacklistRepository.findAllBlacklistByMemberType(memberType, pageable);
+
+        // DTO -> VO 변환
+        List<ResponseFindBlacklistVO> responseList = blacklistPage.getContent().stream()
+                .map(blacklistMapper::fromBlacklistDTOtoResponseFindBlacklistVO)
+                .collect(Collectors.toList());
+
+        // 페이지 응답 생성
+        return new BlacklistPageResponse<>(
+                responseList,
+                blacklistPage.getTotalElements(),
+                blacklistPage.getTotalPages(),
+                blacklistPage.getNumber(),
+                blacklistPage.getSize()
+        );
+    }
+
+    // 1. flag는 볼필요 없음. -> 학생, 강사만 구분해야함.
+    public BlacklistPageResponse<ResponseFindBlacklistVO> findAllBlacklistByMemberTypeBySort(
+            int page, int size, MemberType memberType, String sortField, String sortDirection) {
+
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+
+        // Pageable 객체 생성
+        PageRequest pageable = PageRequest.of(page, size, sort);
+        Page<BlacklistDTO> blacklistPage = blacklistRepository.findAllBlacklistByMemberTypeBySort(memberType, pageable);
 
         // DTO -> VO 변환
         List<ResponseFindBlacklistVO> responseList = blacklistPage.getContent().stream()
@@ -85,7 +114,7 @@ public class BlacklistService {
         Pageable pageable = PageRequest.of(page, size);
 
         // 모든 멤버 가져옴 (페이지네이션 포함)
-        Page<ReportedMemberDTO> reportedMemberPage = reportService.findReportCountByMemberCode(pageable);
+        Page<ReportedMemberDTO> reportedMemberPage = reportService.findReportCountByMemberCode(memberType, pageable);
 
         // 멤버 타입이 동일하고 flag가 true인 사람만 필터링
         List<ReportedMemberDTO> filteredList = reportedMemberPage.stream()
@@ -108,6 +137,39 @@ public class BlacklistService {
                 page,
                 size
         );
+    }
+
+    // 컬럼 정렬 적용
+    public ReservedBlacklistPageResponse<?> findAllReservedBlacklistByMemberTypeWithSort(
+            int page, int size, MemberType memberType, String sortField, String sortDirection
+    ) {
+        Sort sort = createSort(sortField, sortDirection);
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ReportedMemberDTO> reportedMemberPage = reportService.findReportCountByMemberCode(memberType, pageable);
+
+        List<ResponseFindReservedStudentBlacklistVO> content = reportedMemberPage.getContent().stream()
+                .map(blacklistMapper::fromReportedMemberDTOToResponseFindReservedStudentBlacklistVO)
+                .toList();
+
+        return new ReservedBlacklistPageResponse<>(
+                content,
+                reportedMemberPage.getTotalElements(),
+                reportedMemberPage.getTotalPages(),
+                page,
+                size
+        );
+    }
+    private Sort createSort(String sortField, String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        return switch (sortField) {
+            case "memberName" -> Sort.by(direction, "reportedMember.memberName");
+            case "memberCode" -> Sort.by(direction, "reportedMember.memberCode");
+            case "reportCount" -> JpaSort.unsafe(direction, "COUNT(r)");
+            default -> JpaSort.unsafe(Sort.Direction.DESC, "COUNT(r)");  // 기본 정렬
+        };
     }
 
     // 블랙리스트에서 신고당한 댓글 내역까지 모두 볼수 있는 서비스 메서드
@@ -163,9 +225,13 @@ public class BlacklistService {
     }
 
     // 블랙리스트 필터링 메서드
-    public BlacklistPageResponse<ResponseFindBlacklistVO> filterBlacklistMember(BlacklistFilterRequestDTO dto, int page, int size){
-
-        Pageable pageable = PageRequest.of(page, size);
+    public BlacklistPageResponse<ResponseFindBlacklistVO> filterBlacklistMember(BlacklistFilterRequestDTO dto, int page, int size, String sortField, String sortDirection){
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<Blacklist> blacklistPage = blacklistRepository.searchBy(dto, pageable);
 
