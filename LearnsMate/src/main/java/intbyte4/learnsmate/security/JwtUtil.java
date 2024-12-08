@@ -45,13 +45,13 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
-            log.warn("Expired Token: {}", token);
+            log.warn("Token has expired: {}", token, e);
+            throw e;
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("Invalid Token: {}", token, e);
+            log.error("Invalid token: {}", token, e);
+            throw e;
         }
-        return false;
     }
-
 
     public Authentication getAuthentication(String token) {
         if (!validateToken(token)) {
@@ -178,11 +178,15 @@ public class JwtUtil {
     public String getUserCodeFromToken(String token) {
         try {
             return getClaimFromToken(token, Claims::getSubject);
+        } catch (ExpiredJwtException e) {
+            log.warn("Expired JWT token: {}", token, e);
+            throw new IllegalArgumentException("Expired token");
         } catch (JwtException | IllegalArgumentException e) {
             log.error("Invalid JWT token: {}", token, e);
-            return null;
+            throw new IllegalArgumentException("Invalid token");
         }
     }
+
 
     public String extractUserCode(String expiredToken) {
         try {
