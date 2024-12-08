@@ -124,6 +124,13 @@ public class VOCServiceImpl implements VOCService {
         return vocPage.map(vocMapper::fromEntityToDTO);
     }
 
+    // 필터링x 정렬o
+    @Override
+    public Page<VOCDTO> findAllByVOCWithPagingWithSort(Pageable pageable) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        Page<VOC> vocPage = vocRepository.findAllBeforeNowWithSort(now, pageable);
+        return vocPage.map(vocMapper::fromEntityToDTO);
+    }
 
     @Override
     public Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable) {

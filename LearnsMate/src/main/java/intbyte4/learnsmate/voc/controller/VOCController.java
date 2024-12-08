@@ -41,6 +41,20 @@ public class VOCController {
         return ResponseEntity.ok(response);
     }
 
+    // 필터링x 정렬o
+    @Operation(summary = "직원 - VOC 페이지 조회")
+    @GetMapping("/list/sort")
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOCWithSort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        log.info("{}{}{}{}", page, size, sortField, sortDirection);
+        VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPageWithSort(page, size, sortField, sortDirection);
+        log.info(response.toString());
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "직원 - VOC 단 건 조회")
     @GetMapping("/{vocCode}")
     public ResponseEntity<?> getVOC(@PathVariable("vocCode") String vocCode) {

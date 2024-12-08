@@ -29,6 +29,9 @@ public interface VOCService {
 
     Page<VOCDTO> findAllByVOCWithPaging(Pageable of);
 
+    // 필터링x 정렬o
+    Page<VOCDTO> findAllByVOCWithPagingWithSort(Pageable pageable);
+
     Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable);
 
     List<VOCCategoryCountDTO> getCategoryCounts();

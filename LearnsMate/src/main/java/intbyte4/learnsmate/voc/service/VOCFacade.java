@@ -17,6 +17,7 @@ import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -67,6 +68,42 @@ public class VOCFacade {
                 vocPage.getSize()
         );
     }
+
+    // 필터링x 정렬o
+    public VOCPageResponse<ResponseFindVOCVO> findVOCsByPageWithSort(int page, int size, String sortField, String sortDirection) {
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+
+        Sort sort = Sort.by(direction, sortField);
+
+        // PageRequest 객체에 정렬 정보 추가
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        // 정렬이 적용된 페이지 데이터 조회
+        Page<VOCDTO> vocPage = vocService.findAllByVOCWithPagingWithSort(pageRequest);
+        List<ResponseFindVOCVO> responseList = new ArrayList<>();
+
+        // 연관 데이터 조회 및 응답 객체 생성
+        for (VOCDTO vocDTO : vocPage.getContent()) {
+            MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
+            VOCCategoryDTO categoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
+            VOCAnswerDTO vocAnswerDTO = vocAnswerService.findByVOCCode(vocDTO.getVocCode());
+            AdminDTO adminDTO = vocAnswerDTO != null ? adminService.findByAdminCode(vocAnswerDTO.getAdminCode()) : null;
+
+            ResponseFindVOCVO responseVO = vocMapper.fromDTOToResponseVOAll(vocDTO, memberDTO, categoryDTO, adminDTO);
+            responseList.add(responseVO);
+        }
+
+        // VOCPageResponse 객체 생성 및 반환
+        return new VOCPageResponse<>(
+                responseList,
+                vocPage.getTotalElements(),
+                vocPage.getTotalPages(),
+                vocPage.getNumber(),
+                vocPage.getSize()
+        );
+    }
+
+
 
     public VOCPageResponse<ResponseFindVOCVO> filterVOCsByPage(VOCFilterRequestDTO dto, int page, int size) {
         Page<VOCDTO> vocPage = vocService.filterVOCWithPaging(dto, PageRequest.of(page, size));
