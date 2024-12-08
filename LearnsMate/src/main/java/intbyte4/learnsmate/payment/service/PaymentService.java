@@ -17,6 +17,9 @@ public interface PaymentService {
 
     Page<PaymentFilterDTO> getPaymentsByFilters(PaymentFilterRequestVO request, Pageable pageable);
 
+    // 필터링 + 정렬
+    Page<PaymentFilterDTO> getPaymentsByFiltersWithSort(PaymentFilterRequestVO request, int page, int size, String sortField, String sortDirection);
+
     PaymentDTO getPaymentDetails(Long paymentCode);
 
     PaymentDTO lectureAdaptedPayment(MemberDTO memberDTO, LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO);
