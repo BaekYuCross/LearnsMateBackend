@@ -428,7 +428,7 @@ public class LectureFacade {
                 .build();
     }
 
-    private double calculateConversionRate(int clickCount, int purchaseCount, String lectureCode) {
+    private double calculateConversionRate(Integer  clickCount, Integer  purchaseCount, String lectureCode) {
         if (clickCount == 0) {
             log.warn("Click count is 0 for lectureCode: {}", lectureCode);
             return 0.0;
