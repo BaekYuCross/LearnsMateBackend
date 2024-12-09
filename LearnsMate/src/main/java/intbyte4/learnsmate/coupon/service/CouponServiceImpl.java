@@ -25,10 +25,10 @@ import intbyte4.learnsmate.lecture.service.LectureService;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
@@ -251,6 +251,35 @@ public class CouponServiceImpl implements CouponService {
                 couponPage.getSize()           // 페이지 크기
         );
     }
+
+    // 필터링o, 정렬o
+    @Override
+    public CouponPageResponse<CouponFindResponseVO> filterCouponsWithSort(
+            CouponFilterDTO dto, int page, int size, String sortField, String sortDirection) {
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+        Sort sort = Sort.by(direction, sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // 필터 조건과 페이징, 정렬 처리된 데이터 조회
+        Page<CouponEntity> couponPage = couponRepository.searchByWithSort(
+                couponMapper.fromFilterDTOToFilterVO(dto), pageable);
+
+        // DTO 리스트로 변환
+        List<CouponFindResponseVO> couponVOList = couponPage.getContent().stream()
+                .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
+                .collect(Collectors.toList());
+
+        return new CouponPageResponse<>(
+                couponVOList,
+                couponPage.getTotalElements(),
+                couponPage.getTotalPages(),
+                couponPage.getNumber() + 1,
+                couponPage.getSize()
+        );
+    }
+
+
     @Override
     public List<ClientFindCouponDTO> findAllClientCoupon(Long tutorCode) {
         List<ClientFindCouponDTO> dtoList = couponRepository.findAllClientCoupon(tutorCode);

@@ -41,21 +41,29 @@ public class CouponController {
     @GetMapping("/coupons2")
     public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findAllCoupon(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false) String type) {
+            @RequestParam(defaultValue = "50") int size){
 
         CouponPageResponse<CouponFindResponseVO> response;
 
-        if (type == null) {
-            response = couponFacade.findAllCoupons(page, size);
-        } else switch (type) {
-            case "admin" -> response = couponFacade.findAdminCoupons(page, size);
-            case "tutor" -> response = couponFacade.findTutorCoupons(page, size);
-            default -> response = couponFacade.findAllCoupons(page, size);
-        }
+        response = couponFacade.findAllCoupons(page, size);
 
         return ResponseEntity.ok(response);
     }
+
+    // 필터링x 정렬o
+    @Operation(summary = "쿠폰 전체 조회 - offset")
+    @GetMapping("/coupons2/sort")
+    public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findAllCouponWithSort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        CouponPageResponse<CouponFindResponseVO> response;
+        response = couponFacade.findAllCouponsWithSort(page, size, sortField, sortDirection);
+        return ResponseEntity.ok(response);
+    }
+
+
 
     @Operation(summary = "직원 등록 쿠폰 전체 조회")
     @GetMapping("/admin-coupons")
@@ -102,6 +110,28 @@ public class CouponController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 필터링o 정렬o
+    @Operation(summary = "쿠폰 필터링 조회 - offset")
+    @PostMapping("/filters2/sort")
+    public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findCouponByFilterWithSort(
+            @RequestBody CouponFilterRequestVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+
+        log.info("{}", request);
+        CouponFilterDTO dto = couponMapper.fromFilterVOtoFilterDTO(request);
+        log.info("{}", dto.toString());
+        log.info("{}{}", sortField, sortDirection);
+        CouponPageResponse<CouponFindResponseVO> response = couponService.filterCouponsWithSort(dto, page, size, sortField, sortDirection);
+        log.info("{}", response.toString());
+        return ResponseEntity.ok(response);
+    }
+
+
+
 
     @Operation(summary = "직원 - 쿠폰 등록")
     @PostMapping("/admin/register")
