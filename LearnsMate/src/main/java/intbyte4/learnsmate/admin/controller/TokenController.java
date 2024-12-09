@@ -93,18 +93,18 @@ public class TokenController {
             redisTemplate.delete("accessToken:" + userCode);
 
             ZonedDateTime kstExpiration = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(4);
-            int[] expArray = new int[] {
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("accessToken", newAccessToken);
+            responseBody.put("exp", new int[]{
                     kstExpiration.getYear(),
                     kstExpiration.getMonthValue(),
                     kstExpiration.getDayOfMonth(),
                     kstExpiration.getHour(),
                     kstExpiration.getMinute(),
                     kstExpiration.getSecond()
-            };
+            });
 
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("accessToken", newAccessToken);
-            responseBody.put("exp", expArray);
 
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {

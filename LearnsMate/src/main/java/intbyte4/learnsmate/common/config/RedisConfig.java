@@ -1,15 +1,19 @@
 package intbyte4.learnsmate.common.config;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.OFF)
 @Slf4j
 public class RedisConfig {
 
@@ -21,32 +25,28 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        String redisHost = environment.getProperty("spring.data.redis.host");
-        int redisPort = environment.getProperty("spring.data.redis.port", Integer.class, 6379);
+        String redisClusterNodes = environment.getProperty("spring.data.redis.cluster.nodes");
 
-        log.info("Creating Redis connection to {}:{}", redisHost, redisPort);
+        if (redisClusterNodes == null || redisClusterNodes.isEmpty()) {
+            throw new IllegalArgumentException("Redis cluster nodes must not be null or empty");
+        }
 
-        LettuceConnectionFactory factory = new LettuceConnectionFactory();
-        factory.setHostName(redisHost);
-        factory.setPort(redisPort);
-        return factory;
+        log.info("Connecting to Redis cluster at: {}", redisClusterNodes);
+
+        RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration();
+        String[] parts = redisClusterNodes.split(":");
+        clusterConfig.clusterNode(parts[0], Integer.parseInt(parts[1]));
+        clusterConfig.setMaxRedirects(3);
+
+        return new LettuceConnectionFactory(clusterConfig);
     }
-
-    /*
-     * RedisConnection 에서 넘겨준 byte 값을 직렬화 RedisTemplate 은
-     * Redis 데이터를 저장하고 조회하는 기능을 하는 클래스 REdis cli 를 사용해 Redis 데이터를 직접 조회할때,
-     * Redis 데이터를 문자열로 반환하기 위한 설정
-     */
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
-        return template;
-    }
-
-    @PostConstruct
-    public void init() {
-        log.info("Redis Host: {}", environment.getProperty("spring.data.redis.host"));
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        return redisTemplate;
     }
 }

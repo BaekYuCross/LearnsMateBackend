@@ -36,7 +36,7 @@ public class MemberController {
     @GetMapping("/students")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size) {
+            @RequestParam(defaultValue = "50") int size) {
         MemberPageResponse<ResponseFindMemberVO> response = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
 
         return ResponseEntity.ok(response);
@@ -59,7 +59,7 @@ public class MemberController {
     @GetMapping("/tutors")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutor(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size) {
+            @RequestParam(defaultValue = "50") int size) {
         MemberPageResponse<ResponseFindMemberVO> response = memberFacade.findAllMemberByMemberType(page, size, MemberType.TUTOR);
 
         return ResponseEntity.ok(response);
@@ -69,7 +69,7 @@ public class MemberController {
     @GetMapping("/tutors/sort")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutorBySort(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false, defaultValue = "memberCode") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         MemberPageResponse<ResponseFindMemberVO> response
@@ -168,7 +168,7 @@ public class MemberController {
     public ResponseEntity<?> findTutorByFilterAndSort(
             @RequestBody RequestFilterMemberVO request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false, defaultValue = "memberCode") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
 
