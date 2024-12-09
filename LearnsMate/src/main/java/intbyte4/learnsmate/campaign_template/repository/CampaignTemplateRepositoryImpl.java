@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign_template.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.campaign_template.domain.CampaignTemplate;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -67,5 +69,52 @@ public class CampaignTemplateRepositoryImpl implements CampaignTemplateRepositor
         }
 
         return booleanBuilder;
+    }
+
+    // 필터링o 정렬o
+    @Override
+    public Page<CampaignTemplate> searchByWithSort(CampaignTemplateFilterDTO campaignTemplateFilterDTO, Pageable pageable) {
+        JPAQuery<CampaignTemplate> query = queryFactory.selectFrom(qCampaignTemplate)
+                .where(searchByTitle(campaignTemplateFilterDTO)
+                        .and(searchByPeriod(campaignTemplateFilterDTO)));
+
+        // 정렬 필드에 따른 처리
+        if (pageable.getSort().isSorted()) {
+            Sort.Order order = pageable.getSort().iterator().next();
+            OrderSpecifier<?> orderSpecifier = getOrderSpecifier(order);
+            if (orderSpecifier != null) {
+                query.orderBy(orderSpecifier);
+            }
+        }
+
+        long total = query.fetchCount();
+        List<CampaignTemplate> campaigns = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(campaigns, pageable, total);
+    }
+
+    private OrderSpecifier<?> getOrderSpecifier(Sort.Order order) {
+        String property = order.getProperty();
+        boolean isAsc = order.isAscending();
+
+        switch (property) {
+            case "campaignTemplateCode":
+                return isAsc ? qCampaignTemplate.campaignTemplateCode.asc() : qCampaignTemplate.campaignTemplateCode.desc();
+            case "campaignTemplateTitle":
+                return isAsc ? qCampaignTemplate.campaignTemplateTitle.asc() : qCampaignTemplate.campaignTemplateTitle.desc();
+            case "campaignTemplateContents":
+                return isAsc ? qCampaignTemplate.campaignTemplateContents.asc() : qCampaignTemplate.campaignTemplateContents.desc();
+            case "createdAt":
+                return isAsc ? qCampaignTemplate.createdAt.asc() : qCampaignTemplate.createdAt.desc();
+            case "updatedAt":
+                return isAsc ? qCampaignTemplate.updatedAt.asc() : qCampaignTemplate.updatedAt.desc();
+            case "adminName":
+                return isAsc ? qCampaignTemplate.admin.adminName.asc() : qCampaignTemplate.admin.adminName.desc();
+            default:
+                return null;
+        }
     }
 }

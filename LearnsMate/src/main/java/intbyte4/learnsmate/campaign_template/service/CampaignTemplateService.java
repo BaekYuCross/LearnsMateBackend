@@ -13,11 +13,16 @@ public interface CampaignTemplateService {
     void deleteTemplate(CampaignTemplateDTO campaignTemplateDTO);
 
     List<FindAllCampaignTemplatesDTO> findAllByTemplate();
+    // 필터링x 정렬o
+    List<FindAllCampaignTemplatesDTO> findAllByTemplateWithSort(String sortField, String sortDirection);
 
     FindCampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode);
 
     CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> findCampaignTemplateListByFilter
             (CampaignTemplateFilterDTO request, int page, int size);
+    // 필터링o 정렬o
+    CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> findCampaignTemplateListByFilterWithSort
+            (CampaignTemplateFilterDTO dto, int page, int size, String sortField, String sortDirection);
 
     List<FindAllCampaignTemplatesDTO> findTemplateListByFilterWithExcel(CampaignTemplateFilterDTO filterDTO);
 
