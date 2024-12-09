@@ -22,6 +22,13 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long>, Cus
     @Query("SELECT c FROM Coupon c ORDER BY c.createdAt DESC")
     Page<CouponEntity> findAllByCoupon(Pageable pageable);
 
+    // 필터링x 정렬o
+     @Query("SELECT c FROM Coupon c " +
+           "LEFT JOIN FETCH c.couponCategory " +
+           "LEFT JOIN FETCH c.admin " +
+           "LEFT JOIN FETCH c.tutor")
+    Page<CouponEntity> findAllByCouponWithSort(Pageable pageable);
+
     @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true AND c.admin IS NOT NULL")
     Page<CouponEntity> findAllAdminCoupons(Pageable pageable);
 
