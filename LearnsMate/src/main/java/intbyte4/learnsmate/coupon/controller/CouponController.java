@@ -111,6 +111,28 @@ public class CouponController {
         return ResponseEntity.ok(response);
     }
 
+    // 필터링o 정렬o
+    @Operation(summary = "쿠폰 필터링 조회 - offset")
+    @PostMapping("/filters2/sort")
+    public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findCouponByFilterWithSort(
+            @RequestBody CouponFilterRequestVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+
+        log.info("{}", request);
+        CouponFilterDTO dto = couponMapper.fromFilterVOtoFilterDTO(request);
+        log.info("{}", dto.toString());
+        log.info("{}{}", sortField, sortDirection);
+        CouponPageResponse<CouponFindResponseVO> response = couponService.filterCouponsWithSort(dto, page, size, sortField, sortDirection);
+        log.info("{}", response.toString());
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
     @Operation(summary = "직원 - 쿠폰 등록")
     @PostMapping("/admin/register")
     public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody AdminCouponRegisterRequestVO request) {
