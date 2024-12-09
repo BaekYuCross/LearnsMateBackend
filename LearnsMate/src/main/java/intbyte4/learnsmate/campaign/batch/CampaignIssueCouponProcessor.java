@@ -38,6 +38,9 @@ public class CampaignIssueCouponProcessor implements ItemProcessor<Pair<MemberDT
 
     @Override
     public IssueCoupon process(Pair<MemberDTO, CouponDTO> pair) throws Exception {
+        log.info("Processing pair - Student: {}, Coupon: {}",
+                pair.getLeft().getMemberCode(),
+                pair.getRight().getCouponCode());
         MemberDTO studentDTO = pair.getLeft();
         CouponDTO couponDTO = pair.getRight();
 
@@ -64,6 +67,10 @@ public class CampaignIssueCouponProcessor implements ItemProcessor<Pair<MemberDT
         issueCoupon.setCoupon(coupon);
         issueCoupon.setCouponIssueDate(LocalDateTime.now());
         issueCoupon.setCouponUseStatus(false);
+
+        log.info("Processed IssueCoupon - Student: {}, Coupon: {}",
+                issueCoupon.getStudent().getMemberCode(),
+                issueCoupon.getCoupon().getCouponCode());
 
         return issueCoupon;
     }
