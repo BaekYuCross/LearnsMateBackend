@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -138,7 +139,7 @@ public class IssueCouponFacade {
                     .lecturePrice(lecturePrices)
                     .build();
 
-            log.info(filteredIssuedCoupons.toString());
+//            log.info(filteredIssuedCoupons.toString());
             return responseVO;
 
         }).collect(Collectors.toList());
@@ -187,6 +188,56 @@ public class IssueCouponFacade {
                 issueCouponPage.getNumber(),
                 issueCouponPage.getSize(),
                 issueCouponPage.getTotalPages()
+        );
+    }
+
+    // 필터링x 정렬o
+    public IssueCouponPageResponse<AllIssuedCouponResponseVO> findAllIssuedCouponsWithSort(
+            int page, int size, String sortField, String sortDirection) {
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        Page<IssueCoupon> issueCouponPage = issueCouponRepository.findAllByOrderByCouponIssueDateDescWithSort(pageable);
+
+        List<AllIssuedCouponResponseVO> responseList = issueCouponPage.getContent().stream()
+                .map(issueCoupon -> {
+                    CouponEntity coupon = couponService.findByCouponCode(issueCoupon.getCoupon().getCouponCode());
+                    List<String> lectureCodes = couponByLectureService.getLectureCodesByCouponCode(coupon.getCouponCode());
+                    List<String> lectureNames = couponByLectureService.getLectureNamesByCouponCode(coupon.getCouponCode());
+                    List<String> tutorNames = couponByLectureService.getTutorNamesByCouponCode(coupon.getCouponCode());
+                    List<Integer> lecturePrices = couponByLectureService.getLecturePricesByCouponCode(coupon.getCouponCode());
+
+                    MemberDTO student = memberService.findByStudentCode(issueCoupon.getStudent().getMemberCode());
+
+                    return AllIssuedCouponResponseVO.builder()
+                            .couponIssuanceCode(issueCoupon.getCouponIssuanceCode())
+                            .couponName(coupon.getCouponName())
+                            .couponContents(coupon.getCouponContents())
+                            .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
+                            .studentCode(issueCoupon.getStudent().getMemberCode())
+                            .studentName(student.getMemberName())
+                            .couponDiscountRate(coupon.getCouponDiscountRate())
+                            .couponUseStatus(issueCoupon.getCouponUseStatus())
+                            .couponUseDate(issueCoupon.getCouponUseDate())
+                            .couponIssueDate(issueCoupon.getCouponIssueDate())
+                            .couponStartDate(coupon.getCouponStartDate())
+                            .couponExpireDate(coupon.getCouponExpireDate())
+                            .couponCode(issueCoupon.getCoupon().getCouponCode())
+                            .lectureCode(lectureCodes)
+                            .lectureName(lectureNames)
+                            .tutorName(tutorNames)
+                            .lecturePrice(lecturePrices)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return new IssueCouponPageResponse<>(
+                responseList,
+                issueCouponPage.getTotalElements(),
+                issueCouponPage.getTotalPages(),
+                issueCouponPage.getNumber(),
+                issueCouponPage.getSize()
         );
     }
 
@@ -239,6 +290,57 @@ public class IssueCouponFacade {
                 issueCouponPage.getTotalPages(),    // 전체 페이지 수
                 issueCouponPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
                 issueCouponPage.getSize()           // 페이지 크기
+        );
+    }
+
+    // 필터링o 정렬o
+    public IssueCouponPageResponse<AllIssuedCouponResponseVO> filterIssuedCouponWithSort(
+            int page, int size, IssuedCouponFilterDTO dto, String sortField, String sortDirection) {
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        PageRequest pageable = PageRequest.of(page, size, sort);
+
+        Page<IssueCoupon> issueCouponPage = issueCouponRepository.getFilteredIssuedCouponsWithSort(
+                issueCouponMapper.fromDTOToFilterVO(dto),
+                pageable
+        );
+
+        List<AllIssuedCouponResponseVO> responseList = issueCouponPage.getContent().stream()
+                .map(issueCoupon -> {
+                    CouponEntity coupon = issueCoupon.getCoupon();
+                    List<String> lectureCodes = couponByLectureService.getLectureCodesByCouponCode(coupon.getCouponCode());
+                    List<String> lectureNames = couponByLectureService.getLectureNamesByCouponCode(coupon.getCouponCode());
+                    List<String> tutorNames = couponByLectureService.getTutorNamesByCouponCode(coupon.getCouponCode());
+                    List<Integer> lecturePrices = couponByLectureService.getLecturePricesByCouponCode(coupon.getCouponCode());
+
+                    return AllIssuedCouponResponseVO.builder()
+                            .couponIssuanceCode(issueCoupon.getCouponIssuanceCode())
+                            .couponName(coupon.getCouponName())
+                            .couponContents(coupon.getCouponContents())
+                            .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
+                            .studentCode(issueCoupon.getStudent().getMemberCode())
+                            .studentName(issueCoupon.getStudent().getMemberName())
+                            .couponDiscountRate(coupon.getCouponDiscountRate())
+                            .couponUseStatus(issueCoupon.getCouponUseStatus())
+                            .couponUseDate(issueCoupon.getCouponUseDate())
+                            .couponIssueDate(issueCoupon.getCouponIssueDate())
+                            .couponStartDate(coupon.getCouponStartDate())
+                            .couponExpireDate(coupon.getCouponExpireDate())
+                            .couponCode(coupon.getCouponCode())
+                            .lectureCode(lectureCodes)
+                            .lectureName(lectureNames)
+                            .tutorName(tutorNames)
+                            .lecturePrice(lecturePrices)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return new IssueCouponPageResponse<>(
+                responseList,
+                issueCouponPage.getTotalElements(),
+                issueCouponPage.getTotalPages(),
+                issueCouponPage.getNumber() + 1,
+                issueCouponPage.getSize()
         );
     }
 }

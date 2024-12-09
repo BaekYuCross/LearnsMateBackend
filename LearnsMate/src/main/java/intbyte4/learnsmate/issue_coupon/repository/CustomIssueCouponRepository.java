@@ -13,4 +13,9 @@ public interface CustomIssueCouponRepository {
 
     // 발급 쿠폰 offset 페이지네이션 필터링
     Page<IssueCoupon> getFilteredIssuedCoupons(IssueCouponFilterRequestVO request, PageRequest pageable);
+
+    // 필터링x 정렬o
+    Page<IssueCoupon> findAllByOrderByCouponIssueDateDescWithSort(PageRequest pageable);
+    // 필터링o 정렬o
+    Page<IssueCoupon> getFilteredIssuedCouponsWithSort(IssueCouponFilterRequestVO request, PageRequest pageable);
 }
