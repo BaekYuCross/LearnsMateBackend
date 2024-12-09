@@ -5,11 +5,9 @@ import intbyte4.learnsmate.voc.service.VOCAiService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -44,5 +42,18 @@ public class VOCAiController {
         }
 
         return ResponseEntity.ok(analysisData);
+    }
+
+    @Operation(summary = "특정 날짜의 VOC 분석 수동 실행")
+    @PostMapping("/analyze")
+    public ResponseEntity<?> analyzeVocForDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            vocAiService.analyzeVocForSpecificDate(date);
+            return ResponseEntity.ok("특정 날짜(" + date + ")의 VOC 분석이 성공적으로 실행되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("VOC 분석 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 }

@@ -41,7 +41,7 @@ public class CouponController {
     @GetMapping("/coupons2")
     public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findAllCoupon(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size){
+            @RequestParam(defaultValue = "50") int size){
 
         CouponPageResponse<CouponFindResponseVO> response;
 
@@ -55,7 +55,7 @@ public class CouponController {
     @GetMapping("/coupons2/sort")
     public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findAllCouponWithSort(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         CouponPageResponse<CouponFindResponseVO> response;
@@ -101,7 +101,7 @@ public class CouponController {
     public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findCouponByFilter(
             @RequestBody CouponFilterRequestVO request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size){
+            @RequestParam(defaultValue = "50") int size){
 
         log.info("{}", request);
         CouponFilterDTO dto = couponMapper.fromFilterVOtoFilterDTO(request);
@@ -117,7 +117,7 @@ public class CouponController {
     public ResponseEntity<CouponPageResponse<CouponFindResponseVO>> findCouponByFilterWithSort(
             @RequestBody CouponFilterRequestVO request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
 

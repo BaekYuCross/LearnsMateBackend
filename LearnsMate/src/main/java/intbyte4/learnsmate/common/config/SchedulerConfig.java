@@ -23,7 +23,7 @@ public class SchedulerConfig {
     private final CampaignService campaignService;
     private final CampaignRepository campaignRepository;
 
-    @Scheduled(cron = "0 0 9 * * MON")
+    @Scheduled(cron = "0 0 0 * * MON", zone = "Asia/Seoul")
     public void scheduleVocAnalysis() {
         vocAiService.analyzeVocForLastWeek();
     }
