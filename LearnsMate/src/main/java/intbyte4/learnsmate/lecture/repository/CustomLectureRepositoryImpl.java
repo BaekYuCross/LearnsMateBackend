@@ -265,11 +265,15 @@ public class CustomLectureRepositoryImpl implements CustomLectureRepository {
         return status != null ? lecture.lectureStatus.eq(status) : null;
     }
 
-    private BooleanExpression betweenLecturePrice(Integer minLecturePrice, Integer maxLecturePrice) {
-        if (minLecturePrice == null && maxLecturePrice == null) return null;
-        if (minLecturePrice == null) return lecture.lecturePrice.loe(maxLecturePrice);
-        if (maxLecturePrice == null) return lecture.lecturePrice.goe(minLecturePrice);
-        return lecture.lecturePrice.between(minLecturePrice, maxLecturePrice);
+    private BooleanBuilder betweenLecturePrice(Integer minLecturePrice, Integer maxLecturePrice) {
+        BooleanBuilder priceCondition = new BooleanBuilder();
+        if (minLecturePrice != null) {
+            priceCondition.and(lecture.lecturePrice.goe(minLecturePrice));
+        }
+        if (maxLecturePrice != null) {
+            priceCondition.and(lecture.lecturePrice.loe(maxLecturePrice));
+        }
+        return priceCondition;
     }
 
     private BooleanExpression betweenCreatedAt(LocalDate startCreatedAt, LocalDate endCreatedAt) {
