@@ -144,6 +144,25 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body("삭제 성공");
     }
 
+    @Operation(summary = "직원 - 학생 필터링 검색")
+    @PostMapping("/filter/student")
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findStudentByFilter(
+            @RequestBody RequestFilterMemberVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+
+        log.info("request: {}", request.toString());
+        MemberFilterRequestDTO dto =
+                memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
+
+        dto.setMemberType(MemberType.STUDENT);
+
+        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterStudent(dto, page, size);
+
+        log.info("response: {}", response.toString());
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "직원 - 학생 필터링 정렬 검색")
     @PostMapping("/filter/student/sort")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findStudentByFilterAndSort(
