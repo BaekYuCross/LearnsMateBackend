@@ -30,7 +30,7 @@ public class SchedulerConfig {
     }
 
 //    @Scheduled(cron = "0 0 */3 * * *")
-    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
     public void scheduleCampaigns() {
         LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         List<Campaign> readyCampaigns = campaignRepository
