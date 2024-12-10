@@ -19,6 +19,9 @@ public class CouponFilterRequestVO {
     @JsonProperty("coupon_contents")
     private String couponContents;
 
+    @JsonProperty("coupon_flag")
+    private Boolean couponFlag;
+
     @JsonProperty("active_state")
     private Boolean activeState;
 

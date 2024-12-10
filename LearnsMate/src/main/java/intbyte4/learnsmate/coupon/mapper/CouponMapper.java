@@ -49,23 +49,6 @@ public class CouponMapper {
                 .build();
     }
 
-    public RegisterCouponDTO entityToRegisterDTO (CouponEntity entity) {
-        return RegisterCouponDTO.builder()
-                .couponCode(entity.getCouponCode())
-                .couponName(entity.getCouponName())
-                .couponContents(entity.getCouponContents())
-                .couponDiscountRate(entity.getCouponDiscountRate())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .couponStartDate(entity.getCouponStartDate())
-                .couponExpireDate(entity.getCouponExpireDate())
-                .activeState(entity.getActiveState())
-                .couponCategoryName(entity.getCouponCategory().getCouponCategoryName())
-                .adminCode(entity.getAdmin() != null ? entity.getAdmin().getAdminCode() : null)
-                .tutorCode(entity.getTutor() != null ? entity.getTutor().getMemberCode() : null)
-                .build();
-    }
-
     public CouponEntity toAdminCouponEntity (CouponDTO dto, CouponCategory category, Admin admin) {
         return CouponEntity.builder()
                 .couponCode(dto.getCouponCode())
@@ -221,7 +204,7 @@ public class CouponMapper {
         return CouponFilterDTO.builder()
                 .couponName(request.getCouponName())
                 .couponContents(request.getCouponContents())
-                .activeState(request.getActiveState())
+                .couponFlag(request.getCouponFlag())
                 .startExpireDate(request.getStartExpireDate())
                 .endExpireDate(request.getEndExpireDate())
                 .startCouponStartDate(request.getStartCouponStartDate())
@@ -243,7 +226,7 @@ public class CouponMapper {
         return CouponFilterRequestVO.builder()
                 .couponName(dto.getCouponName())
                 .couponContents(dto.getCouponContents())
-                .activeState(dto.getActiveState())
+                .couponFlag(dto.getCouponFlag())
                 .startExpireDate(dto.getStartExpireDate())
                 .endExpireDate(dto.getEndExpireDate())
                 .startCouponStartDate(dto.getStartCouponStartDate())
@@ -313,6 +296,7 @@ public class CouponMapper {
                 .couponStartDate(coupon.getCouponStartDate())
                 .couponExpireDate(coupon.getCouponExpireDate())
                 .activeState(coupon.getActiveState())
+                .couponFlag(coupon.getCouponFlag())
                 .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
                 .adminName(coupon.getAdmin() != null ? coupon.getAdmin().getAdminName() : null)
                 .tutorName(coupon.getTutor() != null ? coupon.getTutor().getMemberName() : null)

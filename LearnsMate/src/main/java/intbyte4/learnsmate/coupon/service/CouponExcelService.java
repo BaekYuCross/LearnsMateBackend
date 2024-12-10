@@ -31,7 +31,7 @@ public class CouponExcelService {
         put("couponContents", "쿠폰 내용");
         put("couponDiscountRate", "쿠폰 할인율");
         put("couponCategoryName", "쿠폰 종류");
-        put("activeState", "상태");
+        put("couponFlag", "상태");
         put("couponStartDate", "시작일");
         put("couponExpireDate", "만료일");
         put("createdAt", "생성일");
@@ -114,7 +114,7 @@ public class CouponExcelService {
             case "couponContents" -> cell.setCellValue(coupon.getCouponContents());
             case "couponDiscountRate" -> cell.setCellValue(coupon.getCouponDiscountRate() + "%");
             case "couponCategoryName" -> cell.setCellValue(coupon.getCouponCategoryName());
-            case "activeState" -> cell.setCellValue(coupon.getActiveState() ? "활성" : "비활성");
+            case "couponFlag" -> cell.setCellValue(coupon.getCouponFlag() ? "활성" : "비활성");
             case "couponStartDate" -> {
                 if (coupon.getCouponStartDate() != null) {
                     cell.setCellValue(coupon.getCouponStartDate());
@@ -201,7 +201,7 @@ public class CouponExcelService {
                         .updatedAt(existingCoupon.getUpdatedAt())
                         .couponStartDate(existingCoupon.getCouponStartDate())
                         .couponExpireDate(existingCoupon.getCouponExpireDate())
-                        .activeState(existingCoupon.getActiveState())
+                        .couponFlag(existingCoupon.getCouponFlag())
                         .couponCategoryName(existingCoupon.getCouponCategory().getCouponCategoryName())
                         .build();
 
@@ -258,8 +258,8 @@ public class CouponExcelService {
         }
 
         // 활성 상태 검증
-        if (!existingCoupon.getActiveState().equals(getActiveStateFromString(getStringValue(row.getCell(5))))) {
-            log.info("활성상태 불일치: DB={}, Excel={}", existingCoupon.getActiveState(), getActiveStateFromString(getStringValue(row.getCell(5))));
+        if (!existingCoupon.getCouponFlag().equals(getActiveStateFromString(getStringValue(row.getCell(5))))) {
+            log.info("활성상태 불일치: DB={}, Excel={}", existingCoupon.getCouponFlag(), getActiveStateFromString(getStringValue(row.getCell(5))));
             return false;
         }
 
