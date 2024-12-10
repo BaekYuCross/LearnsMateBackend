@@ -312,7 +312,7 @@ public class CouponMapper {
                 .updatedAt(coupon.getUpdatedAt())
                 .couponStartDate(coupon.getCouponStartDate())
                 .couponExpireDate(coupon.getCouponExpireDate())
-                .activeState(coupon.getActiveState())
+                .couponFlag(coupon.getCouponFlag())
                 .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
                 .adminName(coupon.getAdmin() != null ? coupon.getAdmin().getAdminName() : null)
                 .tutorName(coupon.getTutor() != null ? coupon.getTutor().getMemberName() : null)
