@@ -32,6 +32,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -160,7 +161,9 @@ public class MemberFacade {
         );
 
         PageRequest pageable = PageRequest.of(page, size, sort);
-        Page<Member> memberPage = memberRepository.findByMemberTypeBySort(memberType, pageable);
+
+        LocalDateTime currentKoreanTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        Page<Member> memberPage = memberRepository.findByMemberTypeBySort(memberType, currentKoreanTime, pageable);
 
         List<ResponseFindMemberVO> responseVOList = memberPage.getContent().stream()
                 .map(memberMapper::fromMemberToResponseFindMemberVO)
