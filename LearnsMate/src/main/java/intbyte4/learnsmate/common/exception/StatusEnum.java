@@ -16,6 +16,7 @@ public enum StatusEnum {
     ENUM_NOT_MATCH(400, HttpStatus.BAD_REQUEST, "타입이 옳지 않습니다."),
     INVALID_FILE_FORMAT(400, HttpStatus.BAD_REQUEST, "파일 형식이 올바르지 않습니다."),
     INVALID_COUPON_DATA(400, HttpStatus.BAD_REQUEST, "쿠폰 데이터가 올바르지 않습니다."),
+    BLACKLIST_MEMBER(400, HttpStatus.BAD_REQUEST, "블랙리스트에 등록된 회원입니다."),
 
     RESTRICTED(403, HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     DELETE_NOT_ALLOWED(403, HttpStatus.FORBIDDEN, "삭제할 수 없습니다."),

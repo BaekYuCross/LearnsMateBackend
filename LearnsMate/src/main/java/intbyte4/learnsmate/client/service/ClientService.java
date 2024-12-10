@@ -59,6 +59,10 @@ public class ClientService {
             throw new CommonException(StatusEnum.INVALID_PASSWORD);
         }
 
+        if(!member.getMemberFlag()){
+            throw new CommonException(StatusEnum.BLACKLIST_MEMBER);
+        }
+
         LoginHistoryDTO loginHistoryDTO = LoginHistoryDTO.builder()
                 .lastLoginDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .memberCode(member.getMemberCode())
