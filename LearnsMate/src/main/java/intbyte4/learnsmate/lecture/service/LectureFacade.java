@@ -284,6 +284,11 @@ public class LectureFacade {
     }
 
     public LectureStatsVO getLectureStatsWithFilterAndRates(String lectureCode, LectureStatsFilterDTO filter) {
+        log.info(filter.getEndMonth().toString());
+        log.info(filter.getEndYear().toString());
+        log.info(filter.getStartMonth().toString());
+        log.info(filter.getStartYear().toString());
+
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
         if (lectureDTO == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
 
