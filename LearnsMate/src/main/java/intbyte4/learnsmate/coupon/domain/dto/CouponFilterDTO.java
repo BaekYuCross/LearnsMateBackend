@@ -14,7 +14,7 @@ import java.util.List;
 public class CouponFilterDTO {
     private String couponName;
     private String couponContents;
-    private Boolean activeState;
+    private Boolean couponFlag;
     private LocalDateTime startExpireDate;
     private LocalDateTime endExpireDate;
     private LocalDateTime startCreatedAt;

@@ -130,9 +130,6 @@ public class CouponController {
         return ResponseEntity.ok(response);
     }
 
-
-
-
     @Operation(summary = "직원 - 쿠폰 등록")
     @PostMapping("/admin/register")
     public ResponseEntity<CouponRegisterResponseVO> createCoupon(@RequestBody AdminCouponRegisterRequestVO request) {
