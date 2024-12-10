@@ -36,8 +36,11 @@ public class CampaignTemplateRepositoryImpl implements CampaignTemplateRepositor
 
     @Override
     public List<CampaignTemplate> searchByWithoutPaging(CampaignTemplateFilterDTO request) {
-        return queryFactory.selectFrom(qCampaignTemplate).where(searchByTitle(request)
-                .and(searchByPeriod(request))).fetch();
+        return queryFactory.selectFrom(qCampaignTemplate)
+                .where(searchByTitle(request)
+                        .and(searchByPeriod(request))
+                        .and(qCampaignTemplate.campaignTemplateFlag.eq(true)))
+                .fetch();
     }
 
     public BooleanBuilder searchByTitle(CampaignTemplateFilterDTO campaignTemplateFilterDTO) {

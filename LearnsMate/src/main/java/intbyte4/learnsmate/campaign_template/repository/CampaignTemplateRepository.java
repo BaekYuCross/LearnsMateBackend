@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface CampaignTemplateRepository extends JpaRepository<CampaignTemplate, Long>, CampaignTemplateRepositoryCustom {
     List<CampaignTemplate> findAllByCampaignTemplateFlag(Sort createdAt, Boolean campaignTemplateFlag);
+    List<CampaignTemplate> findByCampaignTemplateFlagTrue();
 }

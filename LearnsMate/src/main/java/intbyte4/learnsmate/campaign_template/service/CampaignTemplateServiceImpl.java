@@ -227,7 +227,7 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
 
     @Override
     public List<FindAllCampaignTemplatesDTO> findAllTemplateListWithExcel() {
-        List<CampaignTemplate> campaignTemplates = campaignTemplateRepository.findAll();
+        List<CampaignTemplate> campaignTemplates = campaignTemplateRepository.findByCampaignTemplateFlagTrue();
 
         List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
         for(CampaignTemplate campaignTemplate : campaignTemplates) {

@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign.mapper;
 
 
+import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
@@ -229,13 +230,15 @@ public class CampaignMapper {
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
+                .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
                 .members(dto.getMembers())
                 .coupons(dto.getCoupons())
                 .build();
     }
 
 
-    public FindCampaignDetailDTO toFindCampaignDetailDTO(CampaignDTO campaignDTO, Page<CouponDTO> couponPage, Page<MemberDTO> memberPage) {
+    public FindCampaignDetailDTO toFindCampaignDetailDTO(CampaignDTO campaignDTO, Page<CouponDTO> couponPage, Page<MemberDTO> memberPage, AdminDTO adminDTO) {
         return FindCampaignDetailDTO.builder()
                 .campaignCode(campaignDTO.getCampaignCode())
                 .campaignTitle(campaignDTO.getCampaignTitle())
@@ -246,6 +249,8 @@ public class CampaignMapper {
                 .campaignSendDate(campaignDTO.getCampaignSendDate())
                 .createdAt(campaignDTO.getCreatedAt())
                 .createdAt(campaignDTO.getUpdatedAt())
+                .adminCode(campaignDTO.getAdminCode())
+                .adminName(adminDTO.getAdminName())
                 .members(memberPage)
                 .coupons(couponPage)
                 .build();

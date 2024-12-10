@@ -19,7 +19,6 @@ import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.couponbycampaign.domain.dto.CouponByCampaignDTO;
 import intbyte4.learnsmate.couponbycampaign.service.CouponByCampaignService;
-import intbyte4.learnsmate.issue_coupon.service.IssueCouponService;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.service.MemberService;
@@ -365,11 +364,11 @@ public class CampaignServiceImpl implements CampaignService {
         Campaign campaign = campaignRepository.findById(request.getCampaignCode())
                 .orElseThrow(() -> new CommonException(StatusEnum.CAMPAIGN_NOT_FOUND));
         CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
-
+        AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
         Page<MemberDTO> membersPage = memberService.findMembersByCampaignCode(request, pageable);
         Page<CouponDTO> couponsPage = couponService.findCouponsByCampaignCode(request, pageable);
 
-        return campaignMapper.toFindCampaignDetailDTO(campaignDTO,couponsPage,membersPage);
+        return campaignMapper.toFindCampaignDetailDTO(campaignDTO,couponsPage,membersPage, adminDTO);
     }
 
     @Override
