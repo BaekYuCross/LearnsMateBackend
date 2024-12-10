@@ -28,8 +28,8 @@ public class SchedulerConfig {
         vocAiService.analyzeVocForLastWeek();
     }
 
-    @Scheduled(cron = "0 0 */3 * * *")
-//    @Scheduled(cron = "0 * * * * *")
+//    @Scheduled(cron = "0 0 */3 * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void scheduleCampaigns() {
         LocalDateTime currentTime = LocalDateTime.now();
         List<Campaign> readyCampaigns = campaignRepository

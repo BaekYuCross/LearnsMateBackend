@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,6 +93,50 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
     }
 
     @Override
+    public List<FindAllCampaignTemplatesDTO> findAllByTemplateWithSort(String sortField, String sortDirection) {
+        log.info("템플릿 전체 정렬 조회 중 - 필드: {}, 방향: {}", sortField, sortDirection);
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+        validateSortField(sortField);
+
+        List<FindAllCampaignTemplatesDTO> findAllCampaignTemplatesDTOList = new ArrayList<>();
+
+        List<CampaignTemplate> campaignTemplateList;
+        if (sortField.equals("adminName")) {
+            campaignTemplateList = campaignTemplateRepository
+                    .findAllByCampaignTemplateFlag(Sort.by(direction, "admin.adminName"), true);
+        } else {
+            campaignTemplateList = campaignTemplateRepository
+                    .findAllByCampaignTemplateFlag(Sort.by(direction, sortField), true);
+        }
+
+        for (CampaignTemplate campaignTemplate : campaignTemplateList) {
+            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateMapper.fromEntityToDTO(campaignTemplate);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignTemplateDTO.getAdminCode());
+            findAllCampaignTemplatesDTOList.add(
+                    campaignTemplateMapper.fromEntityToFindAllDTO(campaignTemplate, adminDTO.getAdminName())
+            );
+        }
+
+        return findAllCampaignTemplatesDTOList;
+    }
+
+    private void validateSortField(String sortField) {
+        List<String> validFields = Arrays.asList(
+                "campaignTemplateCode",
+                "campaignTemplateTitle",
+                "campaignTemplateContents",
+                "adminName",
+                "createdAt",
+                "updatedAt"
+        );
+
+        if (!validFields.contains(sortField)) {
+            throw new IllegalArgumentException("Invalid sort field: " + sortField);
+        }
+    }
+
+    @Override
     public FindCampaignTemplateDTO findByTemplateCode(Long campaignTemplateCode) {
         log.info("템플릿 단 건 조회 중: {}", campaignTemplateCode);
         CampaignTemplate campaignTemplate = campaignTemplateRepository.findById(campaignTemplateCode)
@@ -147,6 +192,28 @@ public class CampaignTemplateServiceImpl implements CampaignTemplateService {
                 CampaignTemplatePage.getTotalPages(),    // 전체 페이지 수
                 CampaignTemplatePage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
                 CampaignTemplatePage.getSize()           // 페이지 크기
+        );
+    }
+
+    // 필터링o 정렬o
+    @Override
+    public CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> findCampaignTemplateListByFilterWithSort(
+            CampaignTemplateFilterDTO dto, int page, int size, String sortField, String sortDirection) {
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+        Page<CampaignTemplate> CampaignTemplatePage = campaignTemplateRepository.searchByWithSort(dto, pageable);
+
+        List<ResponseFindCampaignTemplateByFilterVO> campaignTemplateDTOList = CampaignTemplatePage.getContent().stream()
+                .map(campaignTemplateMapper::fromCampaignTemplateToResponseFindCampaignTemplateByFilterVO)
+                .collect(Collectors.toList());
+
+        return new CampaignTemplatePageResponse<>(
+                campaignTemplateDTOList,
+                CampaignTemplatePage.getTotalElements(),
+                CampaignTemplatePage.getTotalPages(),
+                CampaignTemplatePage.getNumber() + 1,
+                CampaignTemplatePage.getSize()
         );
     }
 

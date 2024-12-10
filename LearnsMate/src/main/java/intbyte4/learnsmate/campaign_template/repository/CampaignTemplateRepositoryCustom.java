@@ -10,4 +10,7 @@ import java.util.List;
 public interface CampaignTemplateRepositoryCustom {
     Page<CampaignTemplate> searchBy(CampaignTemplateFilterDTO campaignTemplateFilterDTO, Pageable pageable);
     List<CampaignTemplate> searchByWithoutPaging(CampaignTemplateFilterDTO request);
+
+    // 필터링o 정렬o
+    Page<CampaignTemplate> searchByWithSort(CampaignTemplateFilterDTO dto, Pageable pageable);
 }

@@ -132,11 +132,24 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public void executeCampaign(Campaign campaign) {
         try {
+            List<UserPerCampaignDTO> userList = userPerCampaignService.findUserByCampaignCode(campaign.getCampaignCode());
+            List<MemberDTO> students = userList.stream()
+                    .map(user -> memberService.findMemberByMemberCode(user.getStudentCode(), MemberType.STUDENT))
+                    .toList();
+
+            List<CouponByCampaignDTO> couponList = couponByCampaignService.findByCampaignCode(campaign);
+            List<CouponDTO> coupons = couponList.stream()
+                    .map(campaignCoupon -> couponService.findCouponDTOByCouponCode(campaignCoupon.getCouponCode()))
+                    .toList();
+
+            // 2. Reader에 데이터 설정
+            log.info("Setting up reader with students: {}, coupons: {}", students.size(), coupons.size());
+            couponMemberReader.setStudentCouponPairs(students, coupons);
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("campaignCode", campaign.getCampaignCode())
                     .addDate("startTime", new Date())
                     .toJobParameters();
-
+            log.info("Executing campaign {}", campaign.getCampaignTitle());
             JobExecution jobExecution = jobLauncher.run(campaignJob, jobParameters);
 
             if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
