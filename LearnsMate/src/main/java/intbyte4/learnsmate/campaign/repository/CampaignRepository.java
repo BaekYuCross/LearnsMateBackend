@@ -16,4 +16,5 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long>, Campa
 
     // campaign_type이 RESERVATION 이고 lessthan이고 flag가 false인 것들에 한해서
     List<Campaign> findByCampaignSendDateLessThanEqualAndCampaignSendFlagFalseAndCampaignType(LocalDateTime currentTime, CampaignTypeEnum campaignTypeEnum);
+
 }
