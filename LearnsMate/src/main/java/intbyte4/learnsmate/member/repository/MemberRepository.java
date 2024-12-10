@@ -20,8 +20,9 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @Query("SELECT m from member m WHERE m.memberType = :memberType ORDER BY m.memberCode DESC ")
     Page<Member> findByMemberType(MemberType memberType, Pageable pageable);
 
-    @Query("SELECT m from member m WHERE m.memberType = :memberType")
-    Page<Member> findByMemberTypeBySort(MemberType memberType, Pageable pageable);
+    @Query("SELECT m FROM member m WHERE m.memberType = :memberType " +
+            "AND m.createdAt <= :currentTime")
+    Page<Member> findByMemberTypeBySort(MemberType memberType, LocalDateTime currentTime, Pageable pageable);
 
     Member findByMemberCodeAndMemberType(Long memberCode, MemberType memberType);
 
