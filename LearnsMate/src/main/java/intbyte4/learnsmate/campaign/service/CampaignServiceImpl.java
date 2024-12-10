@@ -54,7 +54,6 @@ public class CampaignServiceImpl implements CampaignService {
     private final CouponByCampaignService couponByCampaignService;
     private final MemberService memberService;
     private final CouponService couponService;
-    private final IssueCouponService issueCouponService;
     private final EmailService emailService;
     private final CampaignMapper campaignMapper;
     private final AdminMapper adminMapper;
@@ -329,6 +328,37 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
+    public CampaignPageResponse<FindAllCampaignsDTO> findAllCampaignListBySort(
+            int page, int size, String sortField, String sortDirection){
+
+        if (sortField.equals("adminName")) {
+            sortField = "admin.adminName";
+        }
+
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+        PageRequest pageable = PageRequest.of(page, size, sort);
+        Page<Campaign> campaignPage = campaignRepository.findAll(pageable);
+        List<FindAllCampaignsDTO> findAllCampaignsDTOList = new ArrayList<>();
+        for (Campaign campaign : campaignPage) {
+            CampaignDTO campaignDTO = campaignMapper.toDTO(campaign);
+            AdminDTO adminDTO = adminService.findByAdminCode(campaignDTO.getAdminCode());
+            findAllCampaignsDTOList.add(campaignMapper.toFindAllCampaignDTO(campaignDTO, adminDTO.getAdminName()));
+        }
+
+        return new CampaignPageResponse<>(
+                findAllCampaignsDTOList,
+                campaignPage.getTotalElements(),
+                campaignPage.getTotalPages(),
+                campaignPage.getNumber(),
+                campaignPage.getSize()
+        );
+    }
+
+    @Override
     public FindCampaignDetailDTO findCampaign(FindCampaignDetailDTO request, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
 
@@ -350,6 +380,30 @@ public class CampaignServiceImpl implements CampaignService {
 
         // 필터 조건과 페이징 처리된 데이터 조회
         Page<Campaign> campaignPage = campaignRepository.searchBy(request, pageable);
+
+        List<ResponseFindCampaignByFilterVO> campaignDTOList = campaignPage.getContent().stream()
+                .map(campaignMapper::fromCampaignToResponseFindCampaignByConditionVO)
+                .collect(Collectors.toList());
+
+        return new CampaignPageResponse<>(
+                campaignDTOList,               // 데이터 리스트
+                campaignPage.getTotalElements(), // 전체 데이터 수
+                campaignPage.getTotalPages(),    // 전체 페이지 수
+                campaignPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
+                campaignPage.getSize()           // 페이지 크기
+        );
+    }
+
+    @Override
+    public CampaignPageResponse<ResponseFindCampaignByFilterVO> findCampaignListByFilterAndSort(CampaignFilterDTO dto, int page, int size, String sortField, String sortDirection) {
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Campaign> campaignPage = campaignRepository.searchBy(dto, pageable);
 
         List<ResponseFindCampaignByFilterVO> campaignDTOList = campaignPage.getContent().stream()
                 .map(campaignMapper::fromCampaignToResponseFindCampaignByConditionVO)
