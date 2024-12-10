@@ -4,6 +4,7 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.coupon.domain.dto.ClientFindCouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.dto.CouponFilterDTO;
+import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.domain.pagination.CouponPageResponse;
 import intbyte4.learnsmate.coupon.domain.vo.request.*;
 import intbyte4.learnsmate.coupon.domain.vo.response.*;
@@ -139,6 +140,8 @@ public class CouponController {
         log.info("직원 쿠폰 수정 요청 : {}", request);
         try {
             if (!couponService.findAdminCouponByCouponCode(couponCode)) {
+                CouponEntity couponEntity = couponService.findByCouponCode(couponCode);
+                if (!couponEntity.getCouponFlag()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 삭제된 직원 쿠폰입니다.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("직원 쿠폰이 아닙니다.");
             }
 
@@ -165,6 +168,8 @@ public class CouponController {
     public ResponseEntity<?> deleteCoupon(@PathVariable("couponCode") Long couponCode) {
         try {
             if (!couponService.findAdminCouponByCouponCode(couponCode)) {
+                CouponEntity couponEntity = couponService.findByCouponCode(couponCode);
+                if (!couponEntity.getCouponFlag()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 삭제된 직원 쿠폰입니다.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("직원 쿠폰이 아닙니다.");
             }
 
