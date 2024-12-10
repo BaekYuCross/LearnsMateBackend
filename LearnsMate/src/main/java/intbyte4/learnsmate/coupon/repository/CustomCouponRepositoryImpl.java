@@ -40,6 +40,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         builder.and(likeCouponName(request.getCouponName()));
         builder.and(likeCouponContents(request.getCouponContents()));
         builder.and(eqCouponFlag(request.getCouponFlag()));
+        builder.and(eqActiveState(request.getActiveState()));
         builder.and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()));
         builder.and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()));
         builder.and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()));
@@ -75,6 +76,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         builder.and(likeCouponName(request.getCouponName()));
         builder.and(likeCouponContents(request.getCouponContents()));
         builder.and(eqCouponFlag(request.getCouponFlag()));
+        builder.and(eqActiveState(request.getActiveState()));
         builder.and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()));
         builder.and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()));
         builder.and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()));
@@ -94,8 +96,6 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
             registrationTypeFilter.and(coupon.admin.isNull());   // admin은 null이어야 함
         }
         builder.and(registrationTypeFilter);
-
-        log.info("Query Filters: {}", builder.toString()); // 로그 추가
 
         List<CouponEntity> content = queryFactory
                 .selectFrom(coupon)
@@ -119,6 +119,10 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
 
     private BooleanExpression likeCouponContents(String couponContents) {
         return couponContents == null || couponContents.isBlank() ? null : QCouponEntity.couponEntity.couponContents.likeIgnoreCase("%" + couponContents + "%");
+    }
+
+    private BooleanExpression eqActiveState(Boolean activeState) {
+        return activeState == null ? null : QCouponEntity.couponEntity.activeState.eq(activeState);
     }
 
     private BooleanExpression eqCouponFlag(Boolean couponFlag) {
@@ -204,15 +208,6 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
                 QCouponEntity.couponEntity.tutor.memberName.equalsIgnoreCase(tutorName);
     }
 
-    private String adminOrTutorFilter(String adminName, String tutorName) {
-        if (adminName != null) {
-            return "admin";
-        } else if (tutorName != null) {
-            return "tutor";
-        }
-        return null;
-    }
-
     @Override
     public Page<CouponEntity> searchByWithSort(CouponFilterRequestVO request, Pageable pageable) {
         QCouponEntity coupon = QCouponEntity.couponEntity;
@@ -224,6 +219,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         builder.and(likeCouponName(request.getCouponName()));
         builder.and(likeCouponContents(request.getCouponContents()));
         builder.and(eqCouponFlag(request.getCouponFlag()));
+        builder.and(eqActiveState(request.getActiveState()));
         builder.and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()));
         builder.and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()));
         builder.and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()));
@@ -253,7 +249,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         // 정렬 조건 적용
         if (pageable.getSort().isSorted()) {
             Sort.Order sortOrder = pageable.getSort().iterator().next();
-            OrderSpecifier<?> orderSpecifier = getOrderSpecifier(coupon, admin, tutor, sortOrder);
+            OrderSpecifier<?> orderSpecifier = getOrderSpecifier(coupon, sortOrder);
             query.orderBy(orderSpecifier);
         }
 
@@ -269,7 +265,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         return new PageImpl<>(content, pageable, total);
     }
 
-    private OrderSpecifier<?> getOrderSpecifier(QCouponEntity coupon, QAdmin admin, QMember tutor, Sort.Order order) {
+    private OrderSpecifier<?> getOrderSpecifier(QCouponEntity coupon, Sort.Order order) {
         String property = order.getProperty();
         boolean isAsc = order.getDirection().isAscending();
 
@@ -280,6 +276,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
             case "couponDiscountRate" -> isAsc ? coupon.couponDiscountRate.asc() : coupon.couponDiscountRate.desc();
             case "couponCategoryName" -> isAsc ? coupon.couponCategory.couponCategoryName.asc() : coupon.couponCategory.couponCategoryName.desc();
             case "couponFlag" -> isAsc ? coupon.couponFlag.asc() : coupon.couponFlag.desc();
+            case "activeState" -> isAsc ? coupon.activeState.asc() : coupon.activeState.desc();
             case "couponStartDate" -> isAsc ? coupon.couponStartDate.asc() : coupon.couponStartDate.desc();
             case "couponExpireDate" -> isAsc ? coupon.couponExpireDate.asc() : coupon.couponExpireDate.desc();
             case "createdAt" -> isAsc ? coupon.createdAt.asc() : coupon.createdAt.desc();

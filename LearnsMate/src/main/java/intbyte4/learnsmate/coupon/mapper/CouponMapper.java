@@ -49,23 +49,6 @@ public class CouponMapper {
                 .build();
     }
 
-    public RegisterCouponDTO entityToRegisterDTO (CouponEntity entity) {
-        return RegisterCouponDTO.builder()
-                .couponCode(entity.getCouponCode())
-                .couponName(entity.getCouponName())
-                .couponContents(entity.getCouponContents())
-                .couponDiscountRate(entity.getCouponDiscountRate())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .couponStartDate(entity.getCouponStartDate())
-                .couponExpireDate(entity.getCouponExpireDate())
-                .activeState(entity.getActiveState())
-                .couponCategoryName(entity.getCouponCategory().getCouponCategoryName())
-                .adminCode(entity.getAdmin() != null ? entity.getAdmin().getAdminCode() : null)
-                .tutorCode(entity.getTutor() != null ? entity.getTutor().getMemberCode() : null)
-                .build();
-    }
-
     public CouponEntity toAdminCouponEntity (CouponDTO dto, CouponCategory category, Admin admin) {
         return CouponEntity.builder()
                 .couponCode(dto.getCouponCode())
@@ -312,6 +295,7 @@ public class CouponMapper {
                 .updatedAt(coupon.getUpdatedAt())
                 .couponStartDate(coupon.getCouponStartDate())
                 .couponExpireDate(coupon.getCouponExpireDate())
+                .activeState(coupon.getActiveState())
                 .couponFlag(coupon.getCouponFlag())
                 .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
                 .adminName(coupon.getAdmin() != null ? coupon.getAdmin().getAdminName() : null)

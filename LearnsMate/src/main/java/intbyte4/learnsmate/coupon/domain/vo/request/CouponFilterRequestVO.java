@@ -22,6 +22,9 @@ public class CouponFilterRequestVO {
     @JsonProperty("coupon_flag")
     private Boolean couponFlag;
 
+    @JsonProperty("active_state")
+    private Boolean activeState;
+
     @JsonProperty("start_expire_date")
     private LocalDateTime startExpireDate;
 

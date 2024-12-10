@@ -63,8 +63,6 @@ public class CouponController {
         return ResponseEntity.ok(response);
     }
 
-
-
     @Operation(summary = "직원 등록 쿠폰 전체 조회")
     @GetMapping("/admin-coupons")
     public ResponseEntity<List<CouponFindResponseVO>> getAdminCoupons() {
@@ -121,12 +119,9 @@ public class CouponController {
             @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
 
-        log.info("{}", request);
         CouponFilterDTO dto = couponMapper.fromFilterVOtoFilterDTO(request);
-        log.info("{}", dto.toString());
-        log.info("{}{}", sortField, sortDirection);
         CouponPageResponse<CouponFindResponseVO> response = couponService.filterCouponsWithSort(dto, page, size, sortField, sortDirection);
-        log.info("{}", response.toString());
+
         return ResponseEntity.ok(response);
     }
 

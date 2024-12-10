@@ -120,7 +120,7 @@ public class CouponFacade {
             case "adminName" -> "admin.adminName";
             case "tutorName" -> "tutor.memberName";
             // 나머지 필드들은 그대로 사용
-            case "couponCode", "couponName", "couponContents", "couponDiscountRate",
+            case "couponCode", "couponName", "couponContents", "couponDiscountRate", "activeState",
                  "couponFlag", "couponStartDate", "couponExpireDate", "createdAt", "updatedAt" -> sortField;
             default -> "createdAt";  // 기본 정렬 필드
         };
@@ -178,6 +178,7 @@ public class CouponFacade {
                         .couponCategoryName(couponCategory.getCouponCategoryName())
                         .couponCategoryCode(couponCategory.getCouponCategoryCode())
                         .couponFlag(couponDTO.getCouponFlag())
+                        .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
                         .createdAt(couponDTO.getCreatedAt())
@@ -198,6 +199,7 @@ public class CouponFacade {
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
                         .couponFlag(couponDTO.getCouponFlag())
+                        .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
                         .createdAt(couponDTO.getCreatedAt())
@@ -228,6 +230,7 @@ public class CouponFacade {
                         .couponCategoryCode(couponDTO.getCouponCategoryCode())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
                         .couponFlag(couponDTO.getCouponFlag())
+                        .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
                         .createdAt(couponDTO.getCreatedAt())
@@ -258,6 +261,7 @@ public class CouponFacade {
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
                         .couponFlag(couponDTO.getCouponFlag())
+                        .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
                         .createdAt(couponDTO.getCreatedAt())
@@ -286,6 +290,7 @@ public class CouponFacade {
                     .couponDiscountRate(coupon.getCouponDiscountRate())
                     .couponCategoryName(couponCategory.getCouponCategoryName())
                     .couponFlag(coupon.getCouponFlag())
+                    .activeState(coupon.getActiveState())
                     .couponStartDate(coupon.getCouponStartDate())
                     .couponExpireDate(coupon.getCouponExpireDate())
                     .createdAt(coupon.getCreatedAt())
@@ -304,6 +309,7 @@ public class CouponFacade {
                     .couponDiscountRate(coupon.getCouponDiscountRate())
                     .couponCategoryName(couponCategory.getCouponCategoryName())
                     .couponFlag(coupon.getCouponFlag())
+                    .activeState(coupon.getActiveState())
                     .couponStartDate(coupon.getCouponStartDate())
                     .couponExpireDate(coupon.getCouponExpireDate())
                     .createdAt(coupon.getCreatedAt())
@@ -335,6 +341,7 @@ public class CouponFacade {
                     .couponDiscountRate(coupon.getCouponDiscountRate())
                     .couponCategoryName(couponCategoryName)
                     .couponFlag(coupon.getCouponFlag())
+                    .activeState(coupon.getActiveState())
                     .couponStartDate(coupon.getCouponStartDate())
                     .couponExpireDate(coupon.getCouponExpireDate())
                     .createdAt(coupon.getCreatedAt())

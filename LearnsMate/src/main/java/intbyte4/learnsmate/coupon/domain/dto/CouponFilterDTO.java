@@ -15,6 +15,7 @@ public class CouponFilterDTO {
     private String couponName;
     private String couponContents;
     private Boolean couponFlag;
+    private Boolean activeState;
     private LocalDateTime startExpireDate;
     private LocalDateTime endExpireDate;
     private LocalDateTime startCreatedAt;
