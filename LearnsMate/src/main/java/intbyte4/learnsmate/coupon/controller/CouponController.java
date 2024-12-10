@@ -243,7 +243,6 @@ public class CouponController {
     @PatchMapping("/tutor/activate/{couponCode}")
     public ResponseEntity<?> tutorActiveCoupon(@PathVariable("couponCode") Long couponCode) {
         try {
-            log.info("강사 쿠폰 활성화 요청: {}", couponCode);
             CouponDTO updatedCoupon = couponService.tutorActivateCoupon(couponCode);
             return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
         } catch (CommonException e) {
@@ -259,7 +258,6 @@ public class CouponController {
     @PatchMapping("/tutor/inactivate/{couponCode}")
     public ResponseEntity<?> tutorInactiveCoupon(@PathVariable("couponCode") Long couponCode) {
         try {
-            log.info("강사 쿠폰 비활성화 요청: {}", couponCode);
             CouponDTO updatedCoupon = couponService.tutorInactiveCoupon(couponCode);
             return ResponseEntity.status(HttpStatus.OK).body(updatedCoupon);
         } catch (CommonException e) {
@@ -274,11 +272,8 @@ public class CouponController {
     @Operation(summary = "강사 - 강사가 등록한 전체 쿠폰 조회")
     @GetMapping("/client/{tutorCode}/allcoupon")
     public ResponseEntity<?> findAllClientCoupon(@PathVariable("tutorCode")Long tutorCode) {
-
         List<ClientFindCouponDTO> dtoList = couponService.findAllClientCoupon(tutorCode);
-
-        List<ResponseClientFindCouponVO> voList
-                = couponMapper.fromClientFindCouponDTOtoResponseClientFindCouponVO(dtoList);
+        List<ResponseClientFindCouponVO> voList = couponMapper.fromClientFindCouponDTOtoResponseClientFindCouponVO(dtoList);
 
         return ResponseEntity.ok(voList);
     }
