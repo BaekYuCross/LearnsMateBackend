@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -144,9 +145,14 @@ public class CampaignServiceImpl implements CampaignService {
             // 2. Reader에 데이터 설정
             log.info("Setting up reader with students: {}, coupons: {}", students.size(), coupons.size());
             couponMemberReader.setStudentCouponPairs(students, coupons);
+
+            ZoneId seoulZone = ZoneId.of("Asia/Seoul");
+            ZonedDateTime zonedNow = ZonedDateTime.now(seoulZone);
+            Date seoulTime = Date.from(zonedNow.toInstant());
+
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("campaignCode", campaign.getCampaignCode())
-                    .addDate("startTime", new Date())
+                    .addDate("startTime", seoulTime)
                     .toJobParameters();
             log.info("Executing campaign {}", campaign.getCampaignTitle());
             JobExecution jobExecution = jobLauncher.run(campaignJob, jobParameters);
