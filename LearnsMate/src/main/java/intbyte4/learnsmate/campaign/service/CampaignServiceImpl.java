@@ -142,17 +142,16 @@ public class CampaignServiceImpl implements CampaignService {
                     .map(campaignCoupon -> couponService.findCouponDTOByCouponCode(campaignCoupon.getCouponCode()))
                     .toList();
 
-            // 2. Reader에 데이터 설정
             log.info("Setting up reader with students: {}, coupons: {}", students.size(), coupons.size());
             couponMemberReader.setStudentCouponPairs(students, coupons);
 
-            ZoneId seoulZone = ZoneId.of("Asia/Seoul");
-            ZonedDateTime zonedNow = ZonedDateTime.now(seoulZone);
-            Date seoulTime = Date.from(zonedNow.toInstant());
+            if (students.isEmpty() || coupons.isEmpty()) {
+                throw new IllegalArgumentException("No students or coupons found for campaign: " + campaign.getCampaignCode());
+            }
 
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("campaignCode", campaign.getCampaignCode())
-                    .addDate("startTime", seoulTime)
+                    .addDate("scheduledTime", Date.from(campaign.getCampaignSendDate().atZone(ZoneId.of("Asia/Seoul")).toInstant()))
                     .toJobParameters();
             log.info("Executing campaign {}", campaign.getCampaignTitle());
             JobExecution jobExecution = jobLauncher.run(campaignJob, jobParameters);
@@ -160,6 +159,10 @@ public class CampaignServiceImpl implements CampaignService {
             if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
                 sendNotifications(campaign);
                 updateCampaignSendFlag(campaign.getCampaignCode());
+            } else {
+                log.error("Campaign job failed with status: {} for campaign: {}",
+                        jobExecution.getStatus(), campaign.getCampaignCode());
+                throw new IllegalArgumentException("Campaign job failed with status: " + jobExecution.getStatus());
             }
         } catch (Exception e) {
             log.error("Campaign execution failed for campaign: {}", campaign.getCampaignCode(), e);
