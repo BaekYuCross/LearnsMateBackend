@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Configuration
@@ -29,9 +30,9 @@ public class SchedulerConfig {
     }
 
 //    @Scheduled(cron = "0 0 */3 * * *")
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
     public void scheduleCampaigns() {
-        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         List<Campaign> readyCampaigns = campaignRepository
                 .findByCampaignSendDateLessThanEqualAndCampaignSendFlagFalseAndCampaignType(
                         currentTime,
