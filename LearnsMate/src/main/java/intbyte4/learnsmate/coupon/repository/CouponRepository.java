@@ -19,14 +19,16 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long>, Cus
     List<CouponEntity> findAllByCouponFlagTrue();
 
     // couponFlag가 true인 쿠폰 전체 조회 + offset 페이징
-    @Query("SELECT c FROM Coupon c ORDER BY c.createdAt DESC")
+    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true ORDER BY c.createdAt DESC")
     Page<CouponEntity> findAllByCoupon(Pageable pageable);
 
     // 필터링x 정렬o
-     @Query("SELECT c FROM Coupon c " +
-           "LEFT JOIN FETCH c.couponCategory " +
-           "LEFT JOIN FETCH c.admin " +
-           "LEFT JOIN FETCH c.tutor")
+    @Query(value = "SELECT DISTINCT c FROM Coupon c " +
+            "LEFT JOIN FETCH c.couponCategory " +
+            "LEFT JOIN FETCH c.admin " +
+            "LEFT JOIN FETCH c.tutor " +
+            "WHERE c.couponFlag = true",
+            countQuery = "SELECT COUNT(c) FROM Coupon c WHERE c.couponFlag = true")
     Page<CouponEntity> findAllByCouponWithSort(Pageable pageable);
 
     @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true AND c.admin IS NOT NULL")
