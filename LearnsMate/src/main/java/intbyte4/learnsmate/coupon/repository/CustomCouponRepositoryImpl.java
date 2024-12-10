@@ -59,6 +59,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
             registrationTypeFilter.and(coupon.admin.isNull());   // admin은 null이어야 함
         }
         builder.and(registrationTypeFilter);
+        builder.and(coupon.couponFlag.eq(true));
 
         return queryFactory
                 .selectFrom(coupon)
@@ -96,6 +97,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
             registrationTypeFilter.and(coupon.admin.isNull());   // admin은 null이어야 함
         }
         builder.and(registrationTypeFilter);
+        builder.and(coupon.couponFlag.eq(true));
 
         List<CouponEntity> content = queryFactory
                 .selectFrom(coupon)
