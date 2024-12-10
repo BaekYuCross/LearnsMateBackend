@@ -132,31 +132,31 @@ public class MemberService {
                 .map(memberMapper::fromMembertoMemberDTO);
     }
 
-//    // 학생 필터링하는 서비스 코드
-//    public MemberPageResponse<ResponseFindMemberVO> filterStudent(MemberFilterRequestDTO dto, int page, int size){
-//        // Pageable 객체 생성
-//        Pageable pageable = PageRequest.of(page, size);
-//
-//        // 필터 조건과 페이징 처리된 데이터 조회
-//        Page<Member> memberPage = memberRepository.searchBy(dto, pageable);
-//
-//        // DTO 리스트로 변환
-//        List<ResponseFindMemberVO> memberVOList = memberPage.getContent().stream()
-//                .map(memberMapper::fromMemberToResponseFindMemberVO)
-//                .collect(Collectors.toList());
-//
-//        // MemberPageResponse 생성 후 반환
-//        return new MemberPageResponse<>(
-//                memberVOList,               // 데이터 리스트
-//                memberPage.getTotalElements(), // 전체 데이터 수
-//                memberPage.getTotalPages(),    // 전체 페이지 수
-//                memberPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
-//                memberPage.getSize()           // 페이지 크기
-//        );
-//    }
-
-
     // 학생 필터링하는 서비스 코드
+    public MemberPageResponse<ResponseFindMemberVO> filterStudent(MemberFilterRequestDTO dto, int page, int size){
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 필터 조건과 페이징 처리된 데이터 조회
+        Page<Member> memberPage = memberRepository.searchBy(dto, pageable);
+
+        // DTO 리스트로 변환
+        List<ResponseFindMemberVO> memberVOList = memberPage.getContent().stream()
+                .map(memberMapper::fromMemberToResponseFindMemberVO)
+                .collect(Collectors.toList());
+
+        // MemberPageResponse 생성 후 반환
+        return new MemberPageResponse<>(
+                memberVOList,               // 데이터 리스트
+                memberPage.getTotalElements(), // 전체 데이터 수
+                memberPage.getTotalPages(),    // 전체 페이지 수
+                memberPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
+                memberPage.getSize()           // 페이지 크기
+        );
+    }
+
+
+    // 학생 필터링하는 서비스 코드 + 컬럼정렬
     public MemberPageResponse<ResponseFindMemberVO> filterStudentBySort(MemberFilterRequestDTO dto, int page, int size, String sortField, String sortDirection){
         // Sort 객체 생성
         Sort sort = Sort.by(
