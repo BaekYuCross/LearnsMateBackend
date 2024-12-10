@@ -39,7 +39,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
 
         builder.and(likeCouponName(request.getCouponName()));
         builder.and(likeCouponContents(request.getCouponContents()));
-        builder.and(eqActiveState(request.getActiveState()));
+        builder.and(eqCouponFlag(request.getCouponFlag()));
         builder.and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()));
         builder.and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()));
         builder.and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()));
@@ -74,7 +74,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
 
         builder.and(likeCouponName(request.getCouponName()));
         builder.and(likeCouponContents(request.getCouponContents()));
-        builder.and(eqActiveState(request.getActiveState()));
+        builder.and(eqCouponFlag(request.getCouponFlag()));
         builder.and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()));
         builder.and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()));
         builder.and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()));
@@ -121,8 +121,8 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         return couponContents == null || couponContents.isBlank() ? null : QCouponEntity.couponEntity.couponContents.likeIgnoreCase("%" + couponContents + "%");
     }
 
-    private BooleanExpression eqActiveState(Boolean activeState) {
-        return activeState == null ? null : QCouponEntity.couponEntity.activeState.eq(activeState);
+    private BooleanExpression eqCouponFlag(Boolean couponFlag) {
+        return couponFlag == null ? null : QCouponEntity.couponEntity.couponFlag.eq(couponFlag);
     }
 
     private BooleanExpression betweenDiscountRate(Integer minDiscountRate, Integer maxDiscountRate) {
@@ -223,7 +223,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
 
         builder.and(likeCouponName(request.getCouponName()));
         builder.and(likeCouponContents(request.getCouponContents()));
-        builder.and(eqActiveState(request.getActiveState()));
+        builder.and(eqCouponFlag(request.getCouponFlag()));
         builder.and(betweenDiscountRate(request.getMinDiscountRate(), request.getMaxDiscountRate()));
         builder.and(betweenExpireDate(request.getStartExpireDate(), request.getEndExpireDate()));
         builder.and(betweenCreatedAt(request.getStartCreatedAt(), request.getEndCreatedAt()));
@@ -279,7 +279,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
             case "couponContents" -> isAsc ? coupon.couponContents.asc() : coupon.couponContents.desc();
             case "couponDiscountRate" -> isAsc ? coupon.couponDiscountRate.asc() : coupon.couponDiscountRate.desc();
             case "couponCategoryName" -> isAsc ? coupon.couponCategory.couponCategoryName.asc() : coupon.couponCategory.couponCategoryName.desc();
-            case "activeState" -> isAsc ? coupon.activeState.asc() : coupon.activeState.desc();
+            case "couponFlag" -> isAsc ? coupon.couponFlag.asc() : coupon.couponFlag.desc();
             case "couponStartDate" -> isAsc ? coupon.couponStartDate.asc() : coupon.couponStartDate.desc();
             case "couponExpireDate" -> isAsc ? coupon.couponExpireDate.asc() : coupon.couponExpireDate.desc();
             case "createdAt" -> isAsc ? coupon.createdAt.asc() : coupon.createdAt.desc();
