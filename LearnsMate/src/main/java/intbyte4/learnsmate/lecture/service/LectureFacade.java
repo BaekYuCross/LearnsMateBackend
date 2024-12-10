@@ -276,14 +276,19 @@ public class LectureFacade {
                 .build();
     }
 
-    private double calculateConversionRate(int clickCount, int purchaseCount) {
-        if (clickCount == 0) {
+    private double calculateConversionRate(Integer clickCount, Integer purchaseCount) {
+        if (clickCount == null || clickCount == 0 || purchaseCount == null) {
             return 0.0;
         }
         return (double) purchaseCount / clickCount * 100;
     }
 
     public LectureStatsVO getLectureStatsWithFilterAndRates(String lectureCode, LectureStatsFilterDTO filter) {
+        log.info(filter.getEndMonth().toString());
+        log.info(filter.getEndYear().toString());
+        log.info(filter.getStartMonth().toString());
+        log.info(filter.getStartYear().toString());
+
         LectureDTO lectureDTO = lectureService.getLectureById(lectureCode);
         if (lectureDTO == null) throw new CommonException(StatusEnum.LECTURE_NOT_FOUND);
 
