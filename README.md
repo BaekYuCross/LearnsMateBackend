@@ -113,7 +113,7 @@
 
 <br><br>
 
-# 🚩 API 명세서 (수정해야함)
+# 🚩 API 명세서
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/6.-API-%EB%AA%85%EC%84%B8%EC%84%9C)
 
 <br><br>
