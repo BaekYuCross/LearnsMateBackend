@@ -6,7 +6,7 @@
 
 <br>
 
-# Group 5 Team Member - 'Dev5Oops'
+# Group 5 Team Member - " Dev5Oops "
 
 
 | <div align="center" ><img src="learnsmate_readmeimages/00.조원/조제훈.png" height="160" width="170" /></div> | <div align="center"><img src="learnsmate_readmeimages/00.조원/백경석.jpg" height="160" width="170"/></div> | <div align="center"><img src="learnsmate_readmeimages/00.조원/유제은.jpg" height="160" width="170"/></div> | <div align="center"><img src="learnsmate_readmeimages/00.조원/이나현.jpg" height="160" width="170"/></div> | <div align="center"><img src="learnsmate_readmeimages/00.조원/이서현.jpg" height="160" width="170"/></div> |
