@@ -116,11 +116,11 @@
 <br><br>
 
 # 🚩 API Test (수정해야함)
-### [🔗 위키 바로가기](https://github.com/Dev5Oops/Healthtart/wiki/6.-API-%EB%AA%85%EC%84%B8%EC%84%9C)
+### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/6.-API-%EB%AA%85%EC%84%B8%EC%84%9C)
 
 <br><br>
 
-# 🚩 기능 테스트
+# 🚩 기능 시연
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/7.-%EA%B8%B0%EB%8A%A5-%EC%8B%9C%EC%97%B0)
 
 <br><br>
