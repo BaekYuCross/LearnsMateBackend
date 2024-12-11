@@ -119,12 +119,6 @@
 
 <br><br>
 
-# 🚩 Jenkins
-
-### [🔗 위키 바로가기](https://github.com/Dev5Oops/Healthtart/wiki/8.-CICD)
-
-<br><br>
-
 
 # 🚩UI 디자인 (Figma)
 <details>
