@@ -97,7 +97,7 @@ jobs:
             secret-key: \${SECRET_KEY}
 
           token:
-            expiration_time: 14400000
+            expiration_time: 6000
             secret: \${TOKEN_SECRET}
           EOL
 
