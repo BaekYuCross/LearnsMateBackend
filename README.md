@@ -92,7 +92,7 @@
 <br><br>
 
 # 🚩 기획 문서
-### [🔗 위키 바로가기](https://github.com/Dev5Oops/Healthtart/wiki/2.-%EA%B8%B0%ED%9A%8D-%EB%AC%B8%EC%84%9C)
+### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/2.-%EA%B8%B0%ED%9A%8D-%EB%AC%B8%EC%84%9C)
 
 <br><br>
 
