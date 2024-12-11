@@ -4,8 +4,6 @@
 
 ##  [➡️  Dev5Oops - LearnsMate PPT 자료 바로가기 ](https://drive.google.com/file/d/1uhkju48AMsp_QFIqk1KVPPqWoqpMuqw1/view?usp=sharing)
 
----
-
 
 # Group 5 Team Member - 'Dev5Oops'
 
