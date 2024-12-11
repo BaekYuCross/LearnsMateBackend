@@ -1,9 +1,11 @@
 package intbyte4.learnsmate.campaign_template.controller;
 
-import intbyte4.learnsmate.campaign_template.domain.dto.CampaignTemplateDTO;
+import intbyte4.learnsmate.campaign_template.domain.dto.*;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.request.RequestRegisterTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseEditTemplateVO;
+import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindCampaignTemplateByFilterVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseFindTemplateVO;
 import intbyte4.learnsmate.campaign_template.domain.vo.response.ResponseRegisterTemplateVO;
 import intbyte4.learnsmate.campaign_template.mapper.CampaignTemplateMapper;
@@ -96,22 +98,38 @@ public class CampaignTemplateController {
     @Operation(summary = "직원 - 캠페인 템플릿 전체 조회")
     @GetMapping("/list")
     public ResponseEntity<List<ResponseFindTemplateVO>> listTemplates() {
-        List<CampaignTemplateDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
+        List<FindAllCampaignTemplatesDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplate();
         List<ResponseFindTemplateVO> response = new ArrayList<>();
-        for (CampaignTemplateDTO campaignTemplateDTO : campaignTemplateDTOList) {
-            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
+        for (FindAllCampaignTemplatesDTO findAllCampaignTemplateDTO : campaignTemplateDTOList) {
+            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromFindAllDtoToFindResponseVO(findAllCampaignTemplateDTO);
             response.add(vocVO);
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    // 필터링x 정렬o
+    @Operation(summary = "직원 - 캠페인 템플릿 전체 조회 + 컬럼 정렬")
+    @GetMapping("/list/sort")
+    public ResponseEntity<List<ResponseFindTemplateVO>> listTemplatesWithSort(
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        List<FindAllCampaignTemplatesDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplateWithSort(sortField, sortDirection);
+        List<ResponseFindTemplateVO> response = new ArrayList<>();
+        for (FindAllCampaignTemplatesDTO findAllCampaignTemplateDTO : campaignTemplateDTOList) {
+            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromFindAllDtoToFindResponseVO(findAllCampaignTemplateDTO);
+            response.add(vocVO);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     @Operation(summary = "직원 - 캠페인 템플릿 단 건 조회")
     @GetMapping("/{campaignTemplateCode}")
     public ResponseEntity<?> getTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
         log.info("템플릿 조회 요청된 템플릿 코드 : {}", campaignTemplateCode);
         try {
-            CampaignTemplateDTO campaignTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
-            ResponseFindTemplateVO response = campaignTemplateMapper.fromDtoToFindResponseVO(campaignTemplateDTO);
+            FindCampaignTemplateDTO findCampaignTemplateDTO = campaignTemplateService.findByTemplateCode(campaignTemplateCode);
+            ResponseFindTemplateVO response = campaignTemplateMapper.fromFindCampaignTemplateDtoToFindResponseVO(findCampaignTemplateDTO);
             log.info("캠페인 템플릿 조회 성공: {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CommonException e) {
@@ -122,4 +140,38 @@ public class CampaignTemplateController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다");
         }
     }
+
+    @Operation(summary = "직원 - 조건 별 캠페인 템플릿 조회")
+    @PostMapping("/filter")
+    public ResponseEntity<CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO>> filterCampaignTemplates
+            (@RequestBody RequestFindCampaignTemplateByFilterVO request,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "15") int size){
+        CampaignTemplateFilterDTO dto =
+                campaignTemplateMapper.fromFindCampaignTemplateByFilterVOtoFilterDTO(request);
+        log.info("반환된 조건 별 캠페인 : {}", dto);
+        CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> response = campaignTemplateService
+                .findCampaignTemplateListByFilter(dto, page, size);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 필터링o 정렬o
+    @Operation(summary = "직원 - 조건 별 캠페인 템플릿 조회")
+    @PostMapping("/filter/sort")
+    public ResponseEntity<CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO>> filterCampaignTemplatesWithSort
+            (@RequestBody RequestFindCampaignTemplateByFilterVO request,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "50") int size,
+             @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        CampaignTemplateFilterDTO dto =
+                campaignTemplateMapper.fromFindCampaignTemplateByFilterVOtoFilterDTO(request);
+        log.info("반환된 조건 별 캠페인 : {}", dto);
+        CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> response = campaignTemplateService
+                .findCampaignTemplateListByFilterWithSort(dto, page, size, sortField, sortDirection);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

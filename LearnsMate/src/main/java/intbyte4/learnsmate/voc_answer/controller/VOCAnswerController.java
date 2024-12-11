@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.voc_answer.controller;
 
+import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.domain.vo.request.RequestEditVOCAnswerVO;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("vocAnswerController")
@@ -27,10 +29,14 @@ public class VOCAnswerController {
 
     @Operation(summary = "직원 - VOC 답변 등록")
     @PostMapping("/register")
-    public ResponseEntity<?> registerTemplate(@RequestBody final RequestRegisterVOCAnswerVO request) {
+    public ResponseEntity<?> registerTemplate(@RequestBody RequestRegisterVOCAnswerVO request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("VOC 답변 등록 요청 : {}", request);
         try {
+            String adminCode = userDetails.getUsername();
+
             VOCAnswerDTO vocAnswerDTO = vocAnswerMapper.fromRegisterRequestVOToDTO(request);
+            vocAnswerDTO.setAdminCode(Long.valueOf(adminCode));
+
             VOCAnswerDTO registerVocAnswer = vocAnswerService.registerVOCAnswer(vocAnswerDTO);
             ResponseRegisterVOCAnswerVO response = vocAnswerMapper.fromDTOToRegisterResponseVO(registerVocAnswer);
 

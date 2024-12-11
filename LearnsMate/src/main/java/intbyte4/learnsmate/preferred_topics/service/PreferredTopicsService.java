@@ -4,11 +4,14 @@ import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
 import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
 import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
+import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategoryEnum;
 import intbyte4.learnsmate.lecture_category.service.LectureCategoryService;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
+import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicStatsConvertDTO;
+import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicStatsDTO;
 import intbyte4.learnsmate.preferred_topics.domain.dto.PreferredTopicsDTO;
 import intbyte4.learnsmate.preferred_topics.domain.entity.PreferredTopics;
 import intbyte4.learnsmate.preferred_topics.mapper.PreferredTopicsMapper;
@@ -16,6 +19,7 @@ import intbyte4.learnsmate.preferred_topics.repository.PreferredTopicsRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,7 +77,7 @@ public class PreferredTopicsService {
         List<LectureCategory> categoryList = categoryDTOList.stream()
                         .map(dto -> LectureCategory.builder()
                                 .lectureCategoryCode(dto.getLectureCategoryCode())
-                                .lectureCategoryName(dto.getLectureCategoryName())
+                                .lectureCategoryName(LectureCategoryEnum.valueOf(dto.getLectureCategoryName()))
                                 .build())
                                 .collect(Collectors.toList());
 
@@ -81,5 +85,21 @@ public class PreferredTopicsService {
                 = preferredTopicsMapper.fromPreferredTopicsDTOListtoEntityList(member, categoryList);
 
         preferredTopicsRepository.saveAll(preferredTopicList);
+    }
+
+    public List<PreferredTopicStatsConvertDTO> getMonthlyCategoryStats(LocalDateTime startDate, LocalDateTime endDate) {
+        List<PreferredTopicStatsDTO> dtoList = preferredTopicsRepository.findCategoryStatsByMonth(startDate, endDate);
+
+        return dtoList.stream()
+                .map(dto -> PreferredTopicStatsConvertDTO.builder()
+                        .yearMonth(String.format("%04d-%02d", dto.getYear(), dto.getMonth()))
+                        .lectureCategoryName(dto.getLectureCategoryName().toString())
+                        .topicCount(dto.getTopicCount())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<Long> findStudentsWithSimilarPreferredTopics(Long studentCode) {
+        return preferredTopicsRepository.findStudentsWithSimilarPreferredTopics(studentCode);
     }
 }

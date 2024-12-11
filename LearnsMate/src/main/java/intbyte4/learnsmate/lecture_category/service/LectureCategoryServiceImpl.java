@@ -15,7 +15,6 @@ public class LectureCategoryServiceImpl implements LectureCategoryService {
     private final LectureCategoryRepository lectureCategoryRepository;
     private final LectureCategoryMapper lectureCategoryMapper;
 
-    // 강의 카테고리 단건 조회
     @Override
     public LectureCategoryDTO findByLectureCategoryCode(Integer lectureCategoryCode) {
 
@@ -24,5 +23,4 @@ public class LectureCategoryServiceImpl implements LectureCategoryService {
 
         return lectureCategoryMapper.toDTO(lectureCategory);
     }
-
 }

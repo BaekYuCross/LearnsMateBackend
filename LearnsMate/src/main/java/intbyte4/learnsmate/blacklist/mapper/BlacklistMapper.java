@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.blacklist.mapper;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistDTO;
 import intbyte4.learnsmate.blacklist.domain.dto.BlacklistFilterRequestDTO;
@@ -15,6 +16,7 @@ import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +52,7 @@ public class BlacklistMapper {
 
     public Blacklist fromBlacklistDTOtoBlacklist(BlacklistDTO dto, Member member, Admin admin) {
         return Blacklist.builder()
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .blackReason(dto.getBlackReason())
                 .admin(admin)
                 .member(member)
@@ -84,10 +86,36 @@ public class BlacklistMapper {
 
     public BlacklistFilterRequestDTO fromFilterMemberVOtoFilterMemberDTO(RequestFilterBlacklistMemberVO vo) {
         return BlacklistFilterRequestDTO.builder()
+                .blackCode(vo.getBlackCode())
                 .memberCode(vo.getMemberCode())
                 .memberName(vo.getMemberName())
                 .memberEmail(vo.getMemberEmail())
                 .build();
     }
 
+    public ResponseFindBlacklistVO fromBlacklistDTOtoResponseFindBlacklistVO(BlacklistDTO dto) {
+        return ResponseFindBlacklistVO.builder()
+                .blackCode(dto.getBlackCode())
+                .memberCode(dto.getMemberCode())
+                .memberName(dto.getMemberName())
+                .memberEmail(dto.getMemberEmail())
+                .blackReason(dto.getBlackReason())
+                .createdAt(dto.getCreatedAt())
+                .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
+                .build();
+    }
+
+    public ResponseFindBlacklistVO fromBlacklistToResponseFindBlacklistVO(Blacklist blacklist) {
+        return ResponseFindBlacklistVO.builder()
+                .blackCode(blacklist.getBlackCode())
+                .memberCode(blacklist.getMember().getMemberCode())
+                .memberName(blacklist.getMember().getMemberName())
+                .memberEmail(blacklist.getMember().getMemberEmail())
+                .blackReason(blacklist.getBlackReason())
+                .createdAt(blacklist.getCreatedAt())
+                .adminCode(blacklist.getAdmin().getAdminCode())
+                .adminName(blacklist.getAdmin().getAdminName())
+                .build();
+    }
 }

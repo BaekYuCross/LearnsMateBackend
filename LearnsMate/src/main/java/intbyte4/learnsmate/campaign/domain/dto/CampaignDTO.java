@@ -15,7 +15,9 @@ public class CampaignDTO {
     private String campaignTitle;
     private String campaignContents;
     private String campaignType;
+    private String campaignMethod;
     private LocalDateTime campaignSendDate;
+    private Boolean campaignSendFlag;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long adminCode;

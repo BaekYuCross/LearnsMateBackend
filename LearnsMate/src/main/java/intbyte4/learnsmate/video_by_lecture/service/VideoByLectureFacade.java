@@ -14,6 +14,7 @@ import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.video_by_lecture.domain.dto.CountVideoByLectureDTO;
 import intbyte4.learnsmate.video_by_lecture.repository.VideoByLectureRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VideoByLectureFacade {
 
     private final VideoByLectureRepository videoByLectureRepository;
@@ -44,14 +46,13 @@ public class VideoByLectureFacade {
 
         // 강의마다 처리
         for (LectureDTO lectureDTO : lectureDTOList) {
-            Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
-            long videoCount = videoByLectureRepository.countByLectureCode(lecture);
+            long videoCount = videoByLectureRepository.countByLectureCode(lectureDTO.getLectureCode());
 
-            long totalStudents = lectureByStudentService.countStudentsByLectureAndOwnStatus(lecture.getLectureCode());
+            long totalStudents = lectureByStudentService.countStudentsByLectureAndOwnStatus(lectureDTO.getLectureCode());
 
             result.add(CountVideoByLectureDTO.builder()
-                    .lectureCode(lecture.getLectureCode())
+                    .lectureCode(lectureDTO.getLectureCode())
                     .totalStudents(totalStudents)
                     .lectureTitle(lectureDTO.getLectureTitle())
                     .videoCount(videoCount)

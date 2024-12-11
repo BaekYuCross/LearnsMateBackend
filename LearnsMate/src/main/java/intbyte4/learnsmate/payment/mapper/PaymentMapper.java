@@ -13,13 +13,22 @@ import org.springframework.stereotype.Component;
 public class PaymentMapper {
 
     // PaymentDTO -> Payment
-    public Payment toEntity(PaymentDTO paymentDTO, LectureByStudent lectureByStudent, IssueCoupon issueCoupon) {
+    public Payment toAdaptEntity(PaymentDTO paymentDTO, LectureByStudent lectureByStudent, IssueCoupon issueCoupon) {
         return Payment.builder()
                 .paymentCode(paymentDTO.getPaymentCode())
                 .paymentPrice(paymentDTO.getPaymentPrice())
                 .createdAt(paymentDTO.getCreatedAt())
                 .lectureByStudent(lectureByStudent)
                 .couponIssuance(issueCoupon)
+                .build();
+    }
+
+    public Payment toEntity(PaymentDTO paymentDTO, LectureByStudent lectureByStudent) {
+        return Payment.builder()
+                .paymentCode(paymentDTO.getPaymentCode())
+                .paymentPrice(paymentDTO.getPaymentPrice())
+                .createdAt(paymentDTO.getCreatedAt())
+                .lectureByStudent(lectureByStudent)
                 .build();
     }
 

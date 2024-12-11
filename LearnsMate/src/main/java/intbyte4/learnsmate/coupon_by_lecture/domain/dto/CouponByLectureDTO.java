@@ -11,5 +11,5 @@ import lombok.*;
 public class CouponByLectureDTO {
     private Long couponByLectureCode;
     private Long couponCode;
-    private Long lectureCode;
+    private String lectureCode;
 }

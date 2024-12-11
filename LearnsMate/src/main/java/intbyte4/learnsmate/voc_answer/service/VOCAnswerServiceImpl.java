@@ -6,7 +6,8 @@ import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
-import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCDTO;
@@ -16,8 +17,9 @@ import intbyte4.learnsmate.voc_answer.domain.VOCAnswer;
 import intbyte4.learnsmate.voc_answer.domain.dto.VOCAnswerDTO;
 import intbyte4.learnsmate.voc_answer.mapper.VOCAnswerMapper;
 import intbyte4.learnsmate.voc_answer.repository.VOCAnswerRepository;
-import intbyte4.learnsmate.voc_category.domain.VocCategory;
-import intbyte4.learnsmate.voc_category.service.VocCategoryService;
+import intbyte4.learnsmate.voc_category.domain.dto.VOCCategoryDTO;
+import intbyte4.learnsmate.voc_category.mapper.VOCCategoryMapper;
+import intbyte4.learnsmate.voc_category.service.VOCCategoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,8 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Optional;
 
 @Slf4j
 @Service("vocAnswerService")
@@ -36,9 +40,11 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
     private final AdminService adminService;
     private final VOCService vocService;
     private final VOCMapper vocMapper;
-    private final VocCategoryService vocCategoryService;
+    private final VOCCategoryService vocCategoryService;
     private final MemberService memberService;
     private final AdminMapper adminMapper;
+    private final VOCCategoryMapper vocCategoryMapper;
+    private final MemberMapper memberMapper;
 
     @Override
     @Transactional
@@ -48,8 +54,8 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         VOC voc = getVOC(vocAnswerDTO);
 
         VOCAnswer vocAnswer = vocAnswerMapper.toEntity(vocAnswerDTO, user, voc);
-        vocAnswer.setCreatedAt(LocalDateTime.now());
-        vocAnswer.setUpdatedAt(LocalDateTime.now());
+        vocAnswer.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        vocAnswer.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 
         log.info("데이터베이스에 VOC 답변 저장 중: {}", vocAnswer);
         VOCAnswer savedVOCAnswer = vocAnswerRepository.save(vocAnswer);
@@ -67,7 +73,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
 
         VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerDTO.getVocAnswerCode()).orElseThrow(() -> new CommonException(StatusEnum.VOC_ANSWER_NOT_FOUND));
         vocAnswer.setVocAnswerContent(vocAnswerDTO.getVocAnswerContent());
-        vocAnswer.setUpdatedAt(LocalDateTime.now());
+        vocAnswer.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 
         log.info("데이터베이스에 수정된 VOC 답변 저장 중: {}", vocAnswer);
         VOCAnswer updatedCampaignTemplate = vocAnswerRepository.save(vocAnswer);
@@ -82,6 +88,15 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         return vocAnswerMapper.fromEntityToDTO(vocAnswer);
     }
 
+    @Override
+    public VOCAnswerDTO findByVOCCode(String vocCode) {
+        Optional<VOCAnswer> optionalVocAnswer = vocAnswerRepository.findByVoc_VocCode(vocCode);
+
+        return optionalVocAnswer
+                .map(vocAnswerMapper::fromEntityToDTO)
+                .orElse(null);
+    }
+
     private VOC getVOC(VOCAnswerDTO vocAnswerDTO) {
         VOCDTO vocDTO = vocService.findByVOCCode(vocAnswerDTO.getVocCode());
         if (vocDTO == null) {
@@ -90,21 +105,22 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         }
         log.info(vocDTO.toString());
 
-        VocCategory vocCategory = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
-        Member member = memberService.findByStudentCode(vocDTO.getMemberCode());
-        return vocMapper.toEntity(vocDTO, vocCategory, member);
+        VOCCategoryDTO vocCategoryDTO = vocCategoryService.findByVocCategoryCode(vocDTO.getVocCategoryCode());
+        MemberDTO memberDTO = memberService.findById(vocDTO.getMemberCode());
+        return vocMapper.toEntity(vocDTO, vocCategoryMapper.toEntity(vocCategoryDTO), memberMapper.fromMemberDTOtoMember(memberDTO));
     }
 
     public Admin validAdmin(AdminService adminService, Long adminCode, Logger log) {
+        log.info("Checking admin with adminCode: {}", adminCode); // adminCode 값 확인
         AdminDTO adminDTO = adminService.findByAdminCode(adminCode);
         if (adminDTO == null) {
-            log.warn("존재하지 않는 직원 : {}", adminCode);
+            log.warn("Admin not found for code: {}", adminCode);
             throw new CommonException(StatusEnum.ADMIN_NOT_FOUND);
         }
-        log.info(adminDTO.toString());
+        log.info("Found admin: {}", adminDTO); // 반환된 adminDTO 확인
 
-        return adminMapper.toEntity(adminDTO);
+        Admin admin = adminMapper.toEntity(adminDTO);
+        log.info("Mapped admin entity: {}", admin); // Admin Entity 매핑 확인
+        return admin;
     }
-
-
 }

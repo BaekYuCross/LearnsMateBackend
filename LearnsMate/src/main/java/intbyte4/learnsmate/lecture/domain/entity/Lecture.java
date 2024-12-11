@@ -1,7 +1,7 @@
 package intbyte4.learnsmate.lecture.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.enums.LectureLevelEnum;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +20,7 @@ public class Lecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lecture_code", nullable = false)
-    private Long lectureCode;
+    private String lectureCode;
 
     @Column(name = "lecture_title", nullable = false)
     private String lectureTitle;
@@ -28,6 +28,7 @@ public class Lecture {
     @Column(name = "lecture_confirm_status", nullable = false)
     private Boolean lectureConfirmStatus;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -55,7 +56,6 @@ public class Lecture {
     @Column(name = "lecture_level", nullable = false)
     private LectureLevelEnum lectureLevel;
 
-
     public void toUpdate(LectureDTO lectureDTO) {
         this.lectureTitle = lectureDTO.getLectureTitle();
         this.lectureConfirmStatus = lectureDTO.getLectureConfirmStatus();
@@ -64,7 +64,7 @@ public class Lecture {
         this.lecturePrice = lectureDTO.getLecturePrice();
         this.lectureStatus = lectureDTO.getLectureStatus();
         this.lectureClickCount = lectureDTO.getLectureClickCount();
-        this.lectureLevel = lectureDTO.getLectureLevel();
+        this.lectureLevel = LectureLevelEnum.valueOf(lectureDTO.getLectureLevel());
     }
 
     public void toDelete(){
@@ -77,8 +77,7 @@ public class Lecture {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void incrementClickCount() {
-        this.lectureClickCount++;
+    public void setLectureCode(String lectureCode) {
+        this.lectureCode = lectureCode;
     }
-
 }

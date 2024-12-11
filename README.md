@@ -1,10 +1,11 @@
-# LearnsMate
+# 👨‍🏫 LearnsMate 
 
-<img src="">
+<img src="learnsmate_readmeimages/01.프로젝트개요/LearnsBuddy-logo.png">
+
+[➡️  Dev5Oops - LearnsMate PPT 자료 바로가기 ](learnsmate_readmeimages/01.프로젝트개요/Dev5Oops-LearnsMate-제출용.pdf)
 
 
-
-# Group 5 Team Member - 'LearnsBuddy'
+# Group 5 Team Member - 'Dev5Oops'
 
 
 | <img src="learnsmate_readmeimages/00.조원/조제훈.png" height=130/> | <img src="learnsmate_readmeimages/00.조원/백경석.jpg" height=130/> | <img src="learnsmate_readmeimages/00.조원/유제은.jpg" height=130/> | <img src="learnsmate_readmeimages/00.조원/이나현.jpg" height=130/> | <img src="learnsmate_readmeimages/00.조원/이서현.jpg" height=130/> | 
@@ -85,8 +86,25 @@
 
 
 #  🚩 프로젝트 개요
-### [🔗 위키 바로가기](https://github.com/Dev5Oops/Healthtart/wiki/1.-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B0%9C%EC%9A%94)
 
+## 1. 프로젝트 소개
+CRM 소개
+LearnsBuddy 소개
+LearnsMate 소개
+
+## 1. 프로젝트 기획 의도
+
+## 2. 프로젝트 필요성
+
+## 3. 차별화 전략
+
+## 4. 프로젝트 핵심 기능
+
+결론
+“모객 중심의 전략적 CRM 도구” 로   
+데이터 기반 의사결정과 맞춤형 기능을 제공   
+학생과 강사 정보를 통합 관리, 캠페인을 통해 잠재 고객을 확보
+기존 고객 만족도를 높여 지속적인 성장과 교육 서비스 발전을 지원
 <br><br>
 
 # 🚩 기획 문서

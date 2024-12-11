@@ -1,9 +1,6 @@
 package intbyte4.learnsmate.lecture_category_by_lecture.mapper;
 
-import intbyte4.learnsmate.lecture.domain.entity.Lecture;
-import intbyte4.learnsmate.lecture_category.domain.entity.LectureCategory;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.LectureCategoryByLectureDTO;
-import intbyte4.learnsmate.lecture_category_by_lecture.domain.dto.OneLectureCategoryListDTO;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.LectureCategoryByLecture;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.vo.response.ResponseFindLectureCategoryByLectureVO;
 import org.springframework.stereotype.Component;
@@ -14,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 public class LectureCategoryByLectureMapper {
 
-    public List<LectureCategoryByLectureDTO> fromEntitytoDTO(List<LectureCategoryByLecture> entityList) {
+    public List<LectureCategoryByLectureDTO> fromEntityToDTO(List<LectureCategoryByLecture> entityList) {
         return entityList.stream()
                 .map(entity -> LectureCategoryByLectureDTO.builder()
                         .lectureCategoryByLectureCode(entity.getLectureCategoryByLectureCode())
@@ -34,13 +31,11 @@ public class LectureCategoryByLectureMapper {
                 .collect(Collectors.toList());
     }
 
-    public List<LectureCategoryByLecture> fromLectureAndLectureCategoryListtoEntity(Lecture lecture, List<LectureCategory> categoryList) {
-        return categoryList.stream()
-                .map(lectureCategory -> LectureCategoryByLecture.builder()
-                        .lecture(lecture)
-                        .lectureCategory(lectureCategory)
-                        .build()
-                )
-                .collect(Collectors.toList());
+    public LectureCategoryByLectureDTO toDTO(LectureCategoryByLecture lectureCategoryByLecture) {
+        return LectureCategoryByLectureDTO.builder()
+                .lectureCategoryByLectureCode(lectureCategoryByLecture.getLectureCategoryByLectureCode())
+                .lectureCategoryCode(lectureCategoryByLecture.getLectureCategory().getLectureCategoryCode())
+                .lectureCode(lectureCategoryByLecture.getLecture().getLectureCode())
+                .build();
     }
 }

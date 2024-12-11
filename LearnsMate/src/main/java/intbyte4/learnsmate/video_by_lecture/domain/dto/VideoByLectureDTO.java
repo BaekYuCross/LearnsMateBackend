@@ -14,6 +14,6 @@ public class VideoByLectureDTO {
     private Long videoCode;
     private String videoLink;
     private String videoTitle;
-    private Long lectureCode;
+    private String lectureCode;
 
 }
