@@ -4,6 +4,8 @@
 
 ##  [➡️  Dev5Oops - LearnsMate PPT 자료 바로가기 ](https://drive.google.com/file/d/1uhkju48AMsp_QFIqk1KVPPqWoqpMuqw1/view?usp=sharing)
 
+---
+
 
 # Group 5 Team Member - 'Dev5Oops'
 
@@ -17,6 +19,7 @@
 <br><br>
 
 
+---
 
 
 # 🛠️ Technical Stack
@@ -81,6 +84,7 @@
 
 <br><br>
 
+---
 
 
 
@@ -120,6 +124,8 @@
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/7.-%EA%B8%B0%EB%8A%A5-%EC%8B%9C%EC%97%B0)
 
 <br><br>
+
+---
 
 
 # 📜 동료평가
