@@ -121,10 +121,10 @@
 # 🚩 기능 시연
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/7.-%EA%B8%B0%EB%8A%A5-%EC%8B%9C%EC%97%B0)
 
-<br><br>
+<br>
 
 ---
-
+<br>
 
 # 📜 동료평가
 
