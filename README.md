@@ -2,7 +2,7 @@
 
 <img src="learnsmate_readmeimages/01.프로젝트개요/LearnsBuddy-logo.png">
 
-[➡️  Dev5Oops - LearnsMate PPT 자료 바로가기 ]([learnsmate_readmeimages/01.프로젝트개요/Dev5Oops-LearnsMate-제출용.pdf](https://drive.google.com/file/d/1uhkju48AMsp_QFIqk1KVPPqWoqpMuqw1/view?usp=sharing))
+[➡️  Dev5Oops - LearnsMate PPT 자료 바로가기 ](https://drive.google.com/file/d/1uhkju48AMsp_QFIqk1KVPPqWoqpMuqw1/view?usp=sharing)
 
 
 # Group 5 Team Member - 'Dev5Oops'
