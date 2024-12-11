@@ -87,38 +87,38 @@
 
 <br>
 
-#  🚩 프로젝트 개요
+#  🎞️ 프로젝트 개요
 
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/1.-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B0%9C%EC%9A%94)
 
 <br><br>
 
-# 🚩 기획 문서
+# 📜 기획 문서
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/2.-%EA%B8%B0%ED%9A%8D-%EB%AC%B8%EC%84%9C)
 
 <br><br>
 
-# 🚩 DDD (Domain Driven Design) 설계
+# 📊 DDD (Domain Driven Design) 설계
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/3.-DDD-(Domain-Driven-Design))
 
 <br><br>
 
-# 🚩 DB모델링
+# 💽 DB모델링
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/4.-DB-%EB%AA%A8%EB%8D%B8%EB%A7%81)
 
 <br><br>
 
-# 🚩UI 디자인 (Figma)
+# 🪄 UI 디자인 (Figma)
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/5.-UI-%EB%94%94%EC%9E%90%EC%9D%B8-(Figma))
 
 <br><br>
 
-# 🚩 API 명세서
+# ⛓️‍💥 API 명세서 
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/6.-API-%EB%AA%85%EC%84%B8%EC%84%9C)
 
 <br><br>
 
-# 🚩 기능 시연
+# 💻 기능 시연
 ### [🔗 위키 바로가기](https://github.com/LearnsMate/LearnsMateBackend/wiki/7.-%EA%B8%B0%EB%8A%A5-%EC%8B%9C%EC%97%B0)
 
 <br>
