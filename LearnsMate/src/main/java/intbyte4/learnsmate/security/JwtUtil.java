@@ -111,7 +111,7 @@ public class JwtUtil {
 
         ZoneId kst = ZoneId.of("Asia/Seoul");
         ZonedDateTime now = ZonedDateTime.now(kst);
-        ZonedDateTime expirationDateTime = now.plusHours(expirationTime / (1000 * 60 * 60));
+        ZonedDateTime expirationDateTime = now.plusHours(expirationTime / (1000 * 60 * 60 * 60 * 4));
 
         userDetails.setExpiration(expirationDateTime.toLocalDateTime());
 
