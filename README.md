@@ -4,6 +4,7 @@
 
 ##  [➡️  Dev5Oops - LearnsMate PPT 자료 바로가기 ](https://drive.google.com/file/d/1uhkju48AMsp_QFIqk1KVPPqWoqpMuqw1/view?usp=sharing)
 
+<br>
 
 # Group 5 Team Member - 'Dev5Oops'
 
@@ -14,11 +15,11 @@
 | <div align="center" style="background-color: #005950;">[<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/JoJeHuni) <br>`ESFJ`</div> | <div align="center">[<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/Hellin22) <br>`ENTP`</div> | <div align="center">[<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/YuJeeun) <br>`INFP`</div> | <div align="center">[<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/sksmsdlskgus) <br>`ENTJ`</div> | <div align="center">[<img src="https://img.shields.io/badge/Github-Link-181717?logo=Github">](https://github.com/sh694090) <br>`INFJ`</div> |
 
 
-<br><br>
+<br>
 
 
 ---
-
+<br>
 
 # 🛠️ Technical Stack
 
@@ -80,12 +81,11 @@
 
 
 
-<br><br>
+<br>
 
 ---
 
-
-
+<br>
 
 #  🚩 프로젝트 개요
 
