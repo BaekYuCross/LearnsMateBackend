@@ -19,5 +19,5 @@ public class ResponseFindCommentVO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long memberCode;
-    private Long lectureCode;
+    private String lectureCode;
 }

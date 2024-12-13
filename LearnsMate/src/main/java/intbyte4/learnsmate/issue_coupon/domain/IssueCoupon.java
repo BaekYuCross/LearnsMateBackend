@@ -6,7 +6,6 @@ import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,8 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 @Builder
-@Where(clause = "member_type = 'STUDENT'")
 public class IssueCoupon {
 
     @Id

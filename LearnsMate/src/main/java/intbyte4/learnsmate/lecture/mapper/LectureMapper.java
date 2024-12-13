@@ -1,24 +1,38 @@
 package intbyte4.learnsmate.lecture.mapper;
 
+import intbyte4.learnsmate.coupon.domain.vo.request.LectureRequestVO;
 import intbyte4.learnsmate.lecture.domain.dto.LectureDTO;
-import intbyte4.learnsmate.lecture.domain.dto.LectureDetailDTO;
+import intbyte4.learnsmate.lecture.domain.dto.LectureFilterDTO;
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
+import intbyte4.learnsmate.lecture.domain.entity.LectureLevelEnum;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestEditLectureInfoVO;
+import intbyte4.learnsmate.lecture.domain.vo.request.RequestLectureFilterVO;
 import intbyte4.learnsmate.lecture.domain.vo.request.RequestRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseEditLectureInfoVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseFindLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRegisterLectureVO;
-import intbyte4.learnsmate.lecture.domain.vo.response.ResponseRemoveLectureVO;
+import intbyte4.learnsmate.lecture.domain.vo.response.*;
+import intbyte4.learnsmate.lecture_category.domain.dto.LectureCategoryDTO;
+import intbyte4.learnsmate.member.domain.MemberType;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
+import intbyte4.learnsmate.member.mapper.MemberMapper;
+import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.payment.domain.vo.RequestRegisterLecturePaymentVO;
-import intbyte4.learnsmate.payment.domain.vo.RequestRegisterPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class LectureMapper {
+
+    private final MemberService memberService;
+    private final MemberMapper memberMapper;
+
+    public LectureMapper(MemberService memberService, MemberMapper memberMapper) {
+        this.memberService = memberService;
+        this.memberMapper = memberMapper;
+    }
 
     public LectureDTO toDTO(Lecture entity) {
         return LectureDTO.builder()
@@ -31,7 +45,7 @@ public class LectureMapper {
                 .lecturePrice(entity.getLecturePrice())
                 .lectureStatus(entity.getLectureStatus())
                 .lectureClickCount(entity.getLectureClickCount())
-                .lectureLevel(entity.getLectureLevel())
+                .lectureLevel(String.valueOf(entity.getLectureLevel()))
                 .tutorCode(entity.getTutor().getMemberCode())
                 .build();
     }
@@ -42,69 +56,40 @@ public class LectureMapper {
                 .lectureTitle(dto.getLectureTitle())
                 .lectureConfirmStatus(dto.getLectureConfirmStatus())
                 .createdAt(dto.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(dto.getLectureImage())
                 .lecturePrice(dto.getLecturePrice())
                 .lectureStatus(dto.getLectureStatus())
                 .lectureClickCount(dto.getLectureClickCount())
-                .lectureLevel(dto.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(dto.getLectureLevel()))
                 .tutor(tutor)
                 .build();
     }
 
-
-    // DTO -> VO 변환
-    // DTO -> VO 변환
-    public ResponseFindLectureVO fromDtoToResponseVO(LectureDetailDTO dto) {
-        return ResponseFindLectureVO.builder()
-                .lectureCode(dto.getLectureCode())
-                .lectureTitle(dto.getLectureTitle())
-                .lectureConfirmStatus(dto.getLectureConfirmStatus())
-                .createdAt(dto.getCreatedAt())
-                .lectureImage(dto.getLectureImage())
-                .lecturePrice(dto.getLecturePrice())
-                .tutorCode(dto.getTutorCode())
-                .tutorName(dto.getTutorName())
-                .lectureStatus(dto.getLectureStatus())
-                .lectureCategory(dto.getLectureCategory())
-                .lectureClickCount(dto.getLectureClickCount())
-                .lectureLevel(dto.getLectureLevel())
-                .totalStudents(dto.getTotalStudents())
-                .totalRevenue(dto.getTotalRevenue())
-                .lectureVideos(dto.getLectureVideos())
-                .build();
-    }
-
-    // VO -> DTO 변환
     public LectureDTO fromRequestVOtoDto(RequestEditLectureInfoVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
-                .lectureConfirmStatus(vo.getLectureConfirmStatus())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(vo.getLectureImage())
                 .lecturePrice(vo.getLecturePrice())
-                .lectureStatus(vo.getLectureStatus())
-                .lectureClickCount(vo.getLectureClickCount())
-                .lectureLevel(vo.getLectureLevel())
+                .lectureLevel(String.valueOf(vo.getLectureLevel()))
                 .build();
     }
 
-    // VO -> DTO 변환
     public LectureDTO fromRegisterRequestVOtoDto(RequestRegisterLectureVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
                 .lectureConfirmStatus(vo.getLectureConfirmStatus())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(vo.getLectureImage())
                 .lecturePrice(vo.getLecturePrice())
                 .lectureStatus(vo.getLectureStatus())
                 .lectureClickCount(0)
-                .lectureLevel(vo.getLectureLevel())
+                .lectureLevel(String.valueOf(vo.getLectureLevel()))
                 .tutorCode(vo.getTutorCode())
                 .build();
     }
-
 
     public ResponseEditLectureInfoVO fromDtoToEditResponseVO(LectureDTO updatedLecture) {
         return ResponseEditLectureInfoVO.builder()
@@ -115,7 +100,7 @@ public class LectureMapper {
                 .lecturePrice(updatedLecture.getLecturePrice())
                 .lectureStatus(updatedLecture.getLectureStatus())
                 .lectureClickCount(updatedLecture.getLectureClickCount())
-                .lectureLevel(updatedLecture.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(updatedLecture.getLectureLevel()))
                 .build();
     }
 
@@ -123,13 +108,13 @@ public class LectureMapper {
         return ResponseRegisterLectureVO.builder()
                 .lectureTitle(Lecture.getLectureTitle())
                 .lectureConfirmStatus(Lecture.getLectureConfirmStatus())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(Lecture.getLectureImage())
                 .lecturePrice(Lecture.getLecturePrice())
                 .lectureStatus(Lecture.getLectureStatus())
                 .lectureClickCount(0)
-                .lectureLevel(Lecture.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(Lecture.getLectureLevel()))
                 .tutorCode(Lecture.getTutorCode())
                 .build();
     }
@@ -146,21 +131,119 @@ public class LectureMapper {
                 .tutorCode(removedLecture.getTutorCode())
                 .lectureStatus(removedLecture.getLectureStatus())
                 .lectureClickCount(removedLecture.getLectureClickCount())
-                .lectureLevel(removedLecture.getLectureLevel())
+                .lectureLevel(LectureLevelEnum.valueOf(removedLecture.getLectureLevel()))
                 .build();
     }
+
     public LectureDTO fromRequestRegisterLecturePaymentVOToDTO(RequestRegisterLecturePaymentVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
                 .lectureConfirmStatus(vo.getLectureConfirmStatus())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(vo.getLectureImage())
                 .lecturePrice(vo.getLecturePrice())
+                .lectureStatus(vo.getLectureStatus())
+                .lectureClickCount(0)
+                .lectureLevel(String.valueOf(vo.getLectureLevel()))
+                .build();
+    }
+
+    public LectureFilterDTO toFilterDTO(RequestLectureFilterVO request) {
+        return LectureFilterDTO.builder()
+                .lectureCode(request.getLectureCode())
+                .lectureTitle(request.getLectureTitle())
+                .tutorCode(request.getTutorCode())
+                .tutorName(request.getTutorName())
+                .lectureCategoryName(request.getLectureCategoryName())
+                .lectureLevel(request.getLectureLevel())
+                .lectureConfirmStatus(request.getLectureConfirmStatus())
+                .lectureStatus(request.getLectureStatus())
+                .minLecturePrice(request.getMinLecturePrice())
+                .maxLecturePrice(request.getMaxLecturePrice())
+                .startCreatedAt(request.getStartCreatedAt())
+                .endCreatedAt(request.getEndCreatedAt())
+                .build();
+    }
+
+    public ResponseFindLectureVO fromDTOToResponseVOAll(LectureDTO lectureDTO, MemberDTO tutorDTO, LectureCategoryDTO lectureCategoryDTO) {
+        return ResponseFindLectureVO.builder()
+                .lectureCode(lectureDTO.getLectureCode())
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .tutorCode(lectureDTO.getTutorCode())
+                .tutorName(tutorDTO.getMemberName())
+                .lectureCategoryName(lectureCategoryDTO.getLectureCategoryName())
+                .lectureLevel(lectureDTO.getLectureLevel())
+                .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
+                .lectureStatus(lectureDTO.getLectureStatus())
+                .createdAt(lectureDTO.getCreatedAt())
+                .lecturePrice(lectureDTO.getLecturePrice())
+                .build();
+    }
+
+    public LectureDTO convertToLectureDTO(ResponseFindLectureVO vo) {
+        return LectureDTO.builder()
+                .lectureCode(vo.getLectureCode())
+                .lectureTitle(vo.getLectureTitle())
+                .lectureConfirmStatus(vo.getLectureConfirmStatus())
+                .createdAt(vo.getCreatedAt())
+                .updatedAt(null)
+                .lectureImage(null)
+                .lecturePrice(vo.getLecturePrice())
+                .tutorCode(vo.getTutorCode())
                 .lectureStatus(vo.getLectureStatus())
                 .lectureClickCount(0)
                 .lectureLevel(vo.getLectureLevel())
                 .build();
     }
 
+    public Lecture fromDTOToEntity(LectureDTO lectureDTO) {
+        return Lecture.builder()
+                .lectureCode(lectureDTO.getLectureCode())
+                .lectureTitle(lectureDTO.getLectureTitle())
+                .lectureConfirmStatus(lectureDTO.getLectureConfirmStatus())
+                .createdAt(lectureDTO.getCreatedAt())
+                .updatedAt(null)
+                .lectureImage(null)
+                .lecturePrice(lectureDTO.getLecturePrice())
+                .tutor(memberMapper.fromMemberDTOtoMember(memberService.findMemberByMemberCode(lectureDTO.getTutorCode(), MemberType.TUTOR)))
+                .lectureStatus(lectureDTO.getLectureStatus())
+                .lectureClickCount(lectureDTO.getLectureClickCount())
+                .lectureLevel(LectureLevelEnum.valueOf(lectureDTO.getLectureLevel()))
+                .build();
+    }
+
+    public LectureDTO requestVOToDTO(LectureRequestVO request) {
+        return LectureDTO.builder()
+                .lectureCode(request.getLectureCode())
+                .lectureTitle(request.getLectureTitle())
+                .lectureConfirmStatus(request.getLectureConfirmStatus())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
+                .lectureImage(request.getLectureImage())
+                .lecturePrice(request.getLecturePrice())
+                .tutorCode(request.getTutorCode())
+                .lectureStatus(request.getLectureStatus())
+                .lectureClickCount(request.getLectureClickCount())
+                .lectureLevel(request.getLectureLevel())
+                .build();
+    }
+
+    public List<ResponseClientFindLectureVO> fromDTOtoResponseClinetFindLectureVO(List<LectureDTO> dtoList) {
+        return dtoList.stream()
+                .map(dto -> ResponseClientFindLectureVO.builder()
+                        .lectureCode(dto.getLectureCode())
+                        .lectureTitle(dto.getLectureTitle())
+                        .lectureConfirmStatus(dto.getLectureConfirmStatus())
+                        .createdAt(dto.getCreatedAt())
+                        .updatedAt(dto.getUpdatedAt())
+                        .lectureImage(dto.getLectureImage())
+                        .lecturePrice(dto.getLecturePrice())
+                        .tutorCode(dto.getTutorCode())
+                        .lectureStatus(dto.getLectureStatus())
+                        .lectureClickCount(dto.getLectureClickCount())
+                        .lectureLevel(dto.getLectureLevel())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }

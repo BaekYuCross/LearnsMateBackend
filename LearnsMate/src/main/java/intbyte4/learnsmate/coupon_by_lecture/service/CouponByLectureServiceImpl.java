@@ -53,4 +53,24 @@ public class CouponByLectureServiceImpl implements CouponByLectureService {
         CouponByLecture couponByLecture = couponByLectureRepository.findByLectureAndCoupon(lecture, coupon);
         return couponByLectureMapper.toDTO(couponByLecture);
     }
+
+    @Override
+    public List<String> getLectureCodesByCouponCode(Long couponCode) {
+        return couponByLectureRepository.findLectureCodesByCouponCode(couponCode);
+    }
+
+    @Override
+    public List<String> getLectureNamesByCouponCode(Long couponCode) {
+        return couponByLectureRepository.findLectureNamesByCouponCode(couponCode);
+    }
+
+    @Override
+    public List<String> getTutorNamesByCouponCode(Long couponCode) {
+        return couponByLectureRepository.findTutorNamesByCouponCode(couponCode);
+    }
+
+    @Override
+    public List<Integer> getLecturePricesByCouponCode(Long couponCode) {
+        return couponByLectureRepository.findLecturePricesByCouponCode(couponCode);
+    }
 }

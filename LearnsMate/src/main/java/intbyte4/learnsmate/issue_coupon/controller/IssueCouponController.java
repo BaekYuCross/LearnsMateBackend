@@ -1,5 +1,9 @@
 package intbyte4.learnsmate.issue_coupon.controller;
 
+import intbyte4.learnsmate.issue_coupon.domain.dto.IssuedCouponFilterDTO;
+import intbyte4.learnsmate.issue_coupon.domain.pagination.IssueCouponPageResponse;
+import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponFilterRequestVO;
+import intbyte4.learnsmate.issue_coupon.domain.vo.response.AllIssuedCouponResponseVO;
 import intbyte4.learnsmate.issue_coupon.service.IssueCouponFacade;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
 import intbyte4.learnsmate.issue_coupon.domain.vo.request.IssueCouponRegisterRequestVO;
@@ -61,4 +65,98 @@ public class IssueCouponController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "발급된 쿠폰 전체 조회")
+    @GetMapping("/all-issued-coupons")
+    public ResponseEntity<List<AllIssuedCouponResponseVO>> getAllIssuedCoupons() {
+        List<AllIssuedCouponResponseVO> allIssuedCoupons = issueCouponFacade.findAllIssuedCoupons();
+        return new ResponseEntity<>(allIssuedCoupons, HttpStatus.OK);
+    }
+
+    @Operation(summary = "발급된 쿠폰 필터링 조회")
+    @PostMapping("/filters")
+    public ResponseEntity<List<AllIssuedCouponResponseVO>> findIssuedCouponsByFilters(@RequestBody IssueCouponFilterRequestVO request) {
+        log.info("발급 쿠폰 필터링 요청 수신");
+        try {
+            IssuedCouponFilterDTO dto = issueCouponMapper.fromVOToFilterResponseDTO(request);
+            log.info(dto.toString());
+            List<AllIssuedCouponResponseVO> response = issueCouponFacade.filterIssuedCoupon(dto);
+            log.info(response.toString());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "발급된 쿠폰 전체 조회 - offset pagination")
+    @GetMapping("/all-issued-coupons2")
+    public ResponseEntity<IssueCouponPageResponse<AllIssuedCouponResponseVO>> getAllIssuedCoupons(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+
+        IssueCouponPageResponse<AllIssuedCouponResponseVO> response =  issueCouponFacade.findAllIssuedCoupons(page, size);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "발급된 쿠폰 전체 조회 - offset pagination + 컬럼 정렬")
+    @GetMapping("/all-issued-coupons2/sort")
+    public ResponseEntity<IssueCouponPageResponse<AllIssuedCouponResponseVO>> getAllIssuedCouponsWithSort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+
+        IssueCouponPageResponse<AllIssuedCouponResponseVO> response = issueCouponFacade.findAllIssuedCouponsWithSort(page, size, sortField, sortDirection);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "발급된 쿠폰 필터링 조회 - offset pagination")
+    @PostMapping("/filters2")
+    public ResponseEntity<IssueCouponPageResponse<AllIssuedCouponResponseVO>> findIssuedCouponsByFilters(
+            @RequestBody IssueCouponFilterRequestVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        log.info("발급 쿠폰 필터링 요청 수신");
+        try {
+            IssuedCouponFilterDTO dto = issueCouponMapper.fromVOToFilterResponseDTO(request);
+            log.info(dto.toString());
+
+            IssueCouponPageResponse<AllIssuedCouponResponseVO> response
+                    = issueCouponFacade.filterIssuedCoupon(page, size, dto);
+
+            log.info(response.toString());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "발급된 쿠폰 필터링 조회 - offset pagination + 컬럼 정렬, 컬럼 필터링")
+    @PostMapping("/filters2/sort")
+    public ResponseEntity<IssueCouponPageResponse<AllIssuedCouponResponseVO>> findIssuedCouponsByFilters(
+            @RequestBody IssueCouponFilterRequestVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        log.info("발급 쿠폰 필터링 요청 수신");
+        try {
+            IssuedCouponFilterDTO dto = issueCouponMapper.fromVOToFilterResponseDTO(request);
+            log.info(dto.toString());
+
+            IssueCouponPageResponse<AllIssuedCouponResponseVO> response
+                    = issueCouponFacade.filterIssuedCouponWithSort(page, size, dto, sortField, sortDirection);
+
+            log.info(response.toString());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

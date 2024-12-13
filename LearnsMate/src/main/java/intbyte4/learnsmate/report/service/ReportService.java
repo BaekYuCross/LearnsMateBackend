@@ -1,11 +1,14 @@
 package intbyte4.learnsmate.report.service;
 
+import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.report.domain.dto.ReportDTO;
 import intbyte4.learnsmate.report.domain.dto.ReportedMemberDTO;
 import intbyte4.learnsmate.report.domain.entity.Report;
 import intbyte4.learnsmate.report.mapper.ReportMapper;
 import intbyte4.learnsmate.report.repository.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -46,12 +49,8 @@ public class ReportService {
     }
 
     // repository를 돌면서 5회이상 신고된 사람 모두 구해오기
-    public List<ReportedMemberDTO> findReportCountByMemberCode() {
-
-        List<ReportedMemberDTO> reportedMoreThanFiveMemberList
-                = reportRepository.findMembersWithReportsCountGreaterThanEqualFive();
-
-        return reportedMoreThanFiveMemberList;
+    public Page<ReportedMemberDTO> findReportCountByMemberCode(MemberType memberType, Pageable pageable) {
+        return reportRepository.findMembersWithReportsCountGreaterThanEqualFive(memberType, pageable);
     }
 
     // memberCode로 신고당한 모든 신고내역 조회

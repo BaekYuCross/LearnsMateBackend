@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,11 +17,6 @@ import java.util.List;
 public class RequestRegisterPaymentVO {
     private RequestRegisterIssueCouponPaymentVO issueCouponVO;
     private RequestRegisterMemberPaymentVO memberVO;
-    private List<RequestRegisterLecturePaymentVO> LectureVOList;
-
-    private Long paymentCode;
+    private RequestRegisterLecturePaymentVO LectureVO;
     private Integer paymentPrice;
-    private LocalDateTime createdAt;
-    private Long lectureByStudentCode;
-    private String couponIssuanceCode;
 }

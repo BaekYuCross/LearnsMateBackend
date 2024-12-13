@@ -24,9 +24,7 @@ public class VideoByLectureController {
 
     @Operation(summary = "강의코드별 모든 강의별 동영상 조회")
     @GetMapping("/lectures/{lectureCode}/videos")
-    public ResponseEntity<List<ResponseFindVideoByLectureVO>> findVideoByLectureByLectureCode(
-            @PathVariable("lectureCode") Long lectureCode) {
-
+    public ResponseEntity<List<ResponseFindVideoByLectureVO>> findVideoByLectureByLectureCode(@PathVariable("lectureCode") String lectureCode) {
         List<VideoByLectureDTO> videoByLectureDTOs = videoByLectureService.findVideoByLectureByLectureCode(lectureCode);
         List<ResponseFindVideoByLectureVO> response = videoByLectureDTOs.stream()
                 .map(videoByLectureMapper::toResponseVO)

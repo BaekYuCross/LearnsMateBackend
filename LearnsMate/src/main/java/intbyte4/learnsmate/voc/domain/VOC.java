@@ -1,11 +1,13 @@
 package intbyte4.learnsmate.voc.domain;
 
 import intbyte4.learnsmate.member.domain.entity.Member;
-import intbyte4.learnsmate.voc_category.domain.VocCategory;
+import intbyte4.learnsmate.voc_category.domain.VOCCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 @Entity(name = "Voc")
 @Table(name = "voc")
@@ -18,9 +20,8 @@ import java.time.LocalDateTime;
 public class VOC {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "voc_code", nullable = false, unique = true)
-    private Long vocCode;
+    private String vocCode;
 
     @Column(name = "voc_content", nullable = false)
     private String vocContent;
@@ -31,17 +32,36 @@ public class VOC {
     @Column(name = "voc_answer_satisfaction")
     private String vocAnswerSatisfaction;
 
-    @Column(name = "voc_analysis", nullable = false)
-    private String vocAnalysis;
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "voc_category_code", nullable = false)
-    private VocCategory vocCategory;
+    private VOCCategory vocCategory;
 
     @ManyToOne
     @JoinColumn(name = "member_code", nullable = false)
     private Member member;
+
+    @PrePersist
+    public void generateVocCode() {
+        int categoryCode = this.vocCategory.getVocCategoryCode();
+        String formattedCategoryCode = String.format("%03d", categoryCode);
+
+        String formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        String uniqueCode = UUID.randomUUID().toString().substring(0, 8);
+
+        this.vocCode = String.format("V%s-%s%s", formattedCategoryCode, formattedDate, uniqueCode);
+    }
+
+    public void updateSatisfaction(Long satisfaction){
+        if(satisfaction == 0){
+            this.vocAnswerSatisfaction = "불만족";
+        }else if(satisfaction == 1){
+            this.vocAnswerSatisfaction = "보통";
+        }else{
+            this.vocAnswerSatisfaction = "만족";
+        }
+    }
 }

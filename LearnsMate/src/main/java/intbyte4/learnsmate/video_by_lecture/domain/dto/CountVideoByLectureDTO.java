@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CountVideoByLectureDTO {
-    private Long lectureCode;
+    private String lectureCode;
     private String lectureTitle;
     private long videoCount;
     private long totalStudents;

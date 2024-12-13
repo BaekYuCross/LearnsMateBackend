@@ -27,11 +27,11 @@ public class CouponEntity {
     @Column(name = "coupon_name", nullable = false)
     private String couponName;
 
-    @Column(name = "coupon_contents", nullable = false)
+    @Column(name = "coupon_contents")
     private String couponContents;
 
     @Column(name = "coupon_discount_rate", nullable = false)
-    private int couponDiscountRate;
+    private Integer couponDiscountRate;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -52,11 +52,11 @@ public class CouponEntity {
     private Boolean activeState;
 
     @ManyToOne
-    @JoinColumn (name = "coupon_category_code", nullable = false)
+    @JoinColumn(name = "coupon_category_code", nullable = false)
     private CouponCategory couponCategory;
 
     @ManyToOne
-    @JoinColumn (name = "admin_code")
+    @JoinColumn(name = "admin_code")
     private Admin admin;
 
     @ManyToOne

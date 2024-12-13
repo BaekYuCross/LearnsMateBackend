@@ -14,7 +14,7 @@ public interface VideoByLectureRepository extends JpaRepository<VideoByLecture, 
 
     // Lecture의 lectureCode로 VideoByLecture의 개수를 카운트하는 쿼리
     @Query("SELECT COUNT(v) FROM video_by_lecture v WHERE v.lecture.lectureCode = :lectureCode")
-    long countByLectureCode(@Param("lectureCode") Lecture lecture);
+    long countByLectureCode(@Param("lectureCode") String lectureCode);
 
     List<VideoByLecture> findByLecture(Lecture lecture);
 }

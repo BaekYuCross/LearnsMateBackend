@@ -8,16 +8,17 @@ import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberFilterRequestDTO;
 import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.domain.vo.request.RequestEditMemberVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterStudentVO;
-import intbyte4.learnsmate.member.domain.vo.request.RequestFilterTutorVO;
+import intbyte4.learnsmate.member.domain.vo.request.RequestFilterMemberVO;
 import intbyte4.learnsmate.member.domain.vo.request.RequestSaveMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindStudentDetailVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindMemberVO;
 import intbyte4.learnsmate.member.domain.vo.response.ResponseFindTutorDetailVO;
+import intbyte4.learnsmate.member.domain.vo.response.ResponseLoginVO;
 import intbyte4.learnsmate.payment.domain.vo.RequestRegisterMemberPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class MemberMapper{
@@ -53,8 +54,8 @@ public class MemberMapper{
                 .memberBirth(request.getMemberBirth())
                 .memberFlag(true) // 기본 값 설정
                 .memberDormantStatus(false) // 기본 값 설정
-                .createdAt(LocalDateTime.now()) // 생성 시점
-                .updatedAt(LocalDateTime.now()) // 생성 시점
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul"))) // 생성 시점
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul"))) // 생성 시점
                 .build();
     }
 
@@ -109,7 +110,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt()) // 보통 생성 시점은 VO에서 넘어오지 않을 수 있으므로 확인 필요
-                .updatedAt(LocalDateTime.now()) // 업데이트 시간은 현재 시간으로 설정
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul"))) // 업데이트 시간은 현재 시간으로 설정
                 .build();
     }
 
@@ -127,7 +128,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 
@@ -145,7 +146,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 
@@ -157,6 +158,7 @@ public class MemberMapper{
                 .usedCouponsList(dto.getUsedCouponsList())
                 .unansweredVOCByMemberList(dto.getUnansweredVOCByMemberList())
                 .answeredVOCByMemberList(dto.getAnsweredVOCByMemberList())
+                .recommendedLectureList(dto.getRecommendedLectureList())
                 .build();
     }
 
@@ -174,7 +176,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 
@@ -185,38 +187,48 @@ public class MemberMapper{
                 .build();
     }
 
-    public MemberFilterRequestDTO fromRequestFilterStudentVOtoMemberFilterRequestDTO(RequestFilterStudentVO request) {
+    public MemberFilterRequestDTO fromRequestFilterVOtoMemberFilterRequestDTO(RequestFilterMemberVO request) {
         return MemberFilterRequestDTO.builder()
                 .memberCode(request.getMemberCode())
+                .memberName(request.getMemberName())
                 .memberType(request.getMemberType())
                 .memberEmail(request.getMemberEmail())
-                .memberName(request.getMemberName())
-                .memberAge(request.getMemberAge())
                 .memberPhone(request.getMemberPhone())
                 .memberAddress(request.getMemberAddress())
+                .memberStartAge(request.getMemberStartAge())
+                .memberEndAge(request.getMemberEndAge())
                 .birthStartDate(request.getBirthStartDate())
                 .birthEndDate(request.getBirthEndDate())
+                .memberFlag(request.getMemberFlag())
+                .memberDormantFlag(request.getMemberDormantFlag())
                 .createdStartDate(request.getCreatedStartDate())
                 .createdEndDate(request.getCreatedEndDate())
-                .updatedStartDate(request.getUpdatedStartDate())
-                .updatedEndDate(request.getUpdatedEndDate())
                 .build();
     }
-    public MemberFilterRequestDTO fromRequestFiltertutorVOtoMemberFilterRequestDTO(RequestFilterTutorVO request) {
-        return MemberFilterRequestDTO.builder()
-                .memberCode(request.getMemberCode())
-//                .memberType(request.getMemberType())
-                .memberEmail(request.getMemberEmail())
-                .memberName(request.getMemberName())
-                .memberAge(request.getMemberAge())
-                .memberPhone(request.getMemberPhone())
-                .memberAddress(request.getMemberAddress())
-                .birthStartDate(request.getBirthStartDate())
-                .birthEndDate(request.getBirthEndDate())
-//                .createdStartDate(request.getCreatedStartDate())
-//                .createdEndDate(request.getCreatedEndDate())
-//                .updatedStartDate(request.getUpdatedStartDate())
-//                .updatedEndDate(request.getUpdatedEndDate())
+
+    public ResponseFindMemberVO fromMemberToResponseFindMemberVO(Member member) {
+        return ResponseFindMemberVO.builder()
+                .memberCode(member.getMemberCode())
+                .memberType(member.getMemberType())
+                .memberEmail(member.getMemberEmail())
+                .memberPassword(member.getMemberPassword())
+                .memberName(member.getMemberName())
+                .memberAge(member.getMemberAge())
+                .memberPhone(member.getMemberPhone())
+                .memberAddress(member.getMemberAddress())
+                .memberBirth(member.getMemberBirth())
+                .memberFlag(member.getMemberFlag())
+                .memberDormantStatus(member.getMemberDormantStatus())
+                .createdAt(member.getCreatedAt())
+                .updatedAt(member.getUpdatedAt())
+                .build();
+    }
+
+    public ResponseLoginVO fromMemberDTOtoResponseLoginVO(MemberDTO findMemberDTO) {
+        return ResponseLoginVO.builder()
+                .memberCode(findMemberDTO.getMemberCode())
+                .memberName(findMemberDTO.getMemberName())
+                .memberEmail(findMemberDTO.getMemberEmail())
                 .build();
     }
 }
