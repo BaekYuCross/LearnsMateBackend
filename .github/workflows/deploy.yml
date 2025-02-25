@@ -77,19 +77,14 @@ jobs:
                     auth: true
                     starttls:
                       enable: true
+                      required: true
           
             data:
               redis:
-                host: \${REDIS_HOST}
-                port: 6379
-                repositories:
-                  enabled: false
-                lettuce:
-                  pool:
-                    max-active: 50
-                    max-idle: 25
-                    min-idle: 5
-                    time-between-eviction-runs: 2000ms
+                cluster: 
+                  nodes: \${REDIS_HOST}:6379
+                  max-redirects: 3
+                
           
           coolsms:
             api:
@@ -102,7 +97,7 @@ jobs:
             secret-key: \${SECRET_KEY}
 
           token:
-            expiration_time: 43200000
+            expiration_time: 14400000
             secret: \${TOKEN_SECRET}
           EOL
 

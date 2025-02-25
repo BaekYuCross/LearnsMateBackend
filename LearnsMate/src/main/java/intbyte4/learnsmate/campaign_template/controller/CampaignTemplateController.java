@@ -107,6 +107,22 @@ public class CampaignTemplateController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // 필터링x 정렬o
+    @Operation(summary = "직원 - 캠페인 템플릿 전체 조회 + 컬럼 정렬")
+    @GetMapping("/list/sort")
+    public ResponseEntity<List<ResponseFindTemplateVO>> listTemplatesWithSort(
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        List<FindAllCampaignTemplatesDTO> campaignTemplateDTOList = campaignTemplateService.findAllByTemplateWithSort(sortField, sortDirection);
+        List<ResponseFindTemplateVO> response = new ArrayList<>();
+        for (FindAllCampaignTemplatesDTO findAllCampaignTemplateDTO : campaignTemplateDTOList) {
+            ResponseFindTemplateVO vocVO = campaignTemplateMapper.fromFindAllDtoToFindResponseVO(findAllCampaignTemplateDTO);
+            response.add(vocVO);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
     @Operation(summary = "직원 - 캠페인 템플릿 단 건 조회")
     @GetMapping("/{campaignTemplateCode}")
     public ResponseEntity<?> getTemplate(@PathVariable("campaignTemplateCode") Long campaignTemplateCode) {
@@ -140,5 +156,22 @@ public class CampaignTemplateController {
         return ResponseEntity.ok(response);
     }
 
+    // 필터링o 정렬o
+    @Operation(summary = "직원 - 조건 별 캠페인 템플릿 조회")
+    @PostMapping("/filter/sort")
+    public ResponseEntity<CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO>> filterCampaignTemplatesWithSort
+            (@RequestBody RequestFindCampaignTemplateByFilterVO request,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "50") int size,
+             @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        CampaignTemplateFilterDTO dto =
+                campaignTemplateMapper.fromFindCampaignTemplateByFilterVOtoFilterDTO(request);
+        log.info("반환된 조건 별 캠페인 : {}", dto);
+        CampaignTemplatePageResponse<ResponseFindCampaignTemplateByFilterVO> response = campaignTemplateService
+                .findCampaignTemplateListByFilterWithSort(dto, page, size, sortField, sortDirection);
+
+        return ResponseEntity.ok(response);
+    }
 
 }

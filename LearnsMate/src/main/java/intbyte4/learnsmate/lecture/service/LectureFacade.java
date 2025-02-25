@@ -49,6 +49,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,7 +165,28 @@ public class LectureFacade {
         );
     }
 
-    public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPage(LectureFilterDTO filterDTO, int page, int size) {
+    public LecturePaginationResponse<ResponseFindLectureVO> getLecturesWithPaginationByOffsetWithSort(
+            int page, int size, String sortField, String sortDirection) {
+
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ResponseFindLectureVO> lectures = lectureRepository.findLecturesWithSorting(pageable);
+
+        return new LecturePaginationResponse<>(
+                lectures.getContent(),
+                lectures.getTotalElements(),
+                lectures.getTotalPages(),
+                lectures.getNumber(),
+                lectures.getSize()
+        );
+    }
+
+    public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPage(
+            LectureFilterDTO filterDTO, int page, int size, String sortField, String sortDirection) {
         Page<LectureDTO> lectures = lectureService.filterLectureWithPaging(filterDTO, PageRequest.of(page, size));
         log.info("{}", lectures.toString());
         List<ResponseFindLectureVO> responseList = new ArrayList<>();
@@ -187,6 +209,26 @@ public class LectureFacade {
                 lectures.getTotalElements(),
                 lectures.getTotalPages(),
                 lectures.getNumber() + 1,
+                lectures.getSize()
+        );
+    }
+
+    public LecturePaginationResponse<ResponseFindLectureVO> filterLecturesByPageWithSort(
+            LectureFilterDTO filterDTO, int page, int size, String sortField, String sortDirection) {
+
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ResponseFindLectureVO> lectures = lectureRepository.searchByWithPaging(filterDTO, pageable);
+
+        return new LecturePaginationResponse<>(
+                lectures.getContent(),
+                lectures.getTotalElements(),
+                lectures.getTotalPages(),
+                lectures.getNumber(),
                 lectures.getSize()
         );
     }
@@ -234,8 +276,8 @@ public class LectureFacade {
                 .build();
     }
 
-    private double calculateConversionRate(int clickCount, int purchaseCount) {
-        if (clickCount == 0) {
+    private double calculateConversionRate(Integer clickCount, Integer purchaseCount) {
+        if (clickCount == null || clickCount == 0 || purchaseCount == null) {
             return 0.0;
         }
         return (double) purchaseCount / clickCount * 100;
@@ -317,8 +359,8 @@ public class LectureFacade {
         Lecture lecture = Lecture.builder()
                 .lectureTitle(lectureDTO.getLectureTitle())
                 .lectureConfirmStatus(false)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(lectureDTO.getLectureImage())
                 .lecturePrice(lectureDTO.getLecturePrice())
                 .tutor(tutor)
@@ -341,7 +383,7 @@ public class LectureFacade {
 
     private void setLectureCode(Lecture lecture, List<Integer> lectureCategoryCodeList) {
         String lectureCodePrefix;
-        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String date = LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String randomUUID = UUID.randomUUID().toString().substring(0, 8);
 
         if (lectureCategoryCodeList.contains(7)) lectureCodePrefix = "L007";
@@ -386,7 +428,7 @@ public class LectureFacade {
                 .build();
     }
 
-    private double calculateConversionRate(int clickCount, int purchaseCount, String lectureCode) {
+    private double calculateConversionRate(Integer  clickCount, Integer  purchaseCount, String lectureCode) {
         if (clickCount == 0) {
             log.warn("Click count is 0 for lectureCode: {}", lectureCode);
             return 0.0;

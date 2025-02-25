@@ -19,6 +19,7 @@ import intbyte4.learnsmate.payment.domain.vo.RequestRegisterLecturePaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class LectureMapper {
                 .lectureTitle(dto.getLectureTitle())
                 .lectureConfirmStatus(dto.getLectureConfirmStatus())
                 .createdAt(dto.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(dto.getLectureImage())
                 .lecturePrice(dto.getLecturePrice())
                 .lectureStatus(dto.getLectureStatus())
@@ -68,7 +69,7 @@ public class LectureMapper {
     public LectureDTO fromRequestVOtoDto(RequestEditLectureInfoVO vo) {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(vo.getLectureImage())
                 .lecturePrice(vo.getLecturePrice())
                 .lectureLevel(String.valueOf(vo.getLectureLevel()))
@@ -79,8 +80,8 @@ public class LectureMapper {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
                 .lectureConfirmStatus(vo.getLectureConfirmStatus())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(vo.getLectureImage())
                 .lecturePrice(vo.getLecturePrice())
                 .lectureStatus(vo.getLectureStatus())
@@ -107,8 +108,8 @@ public class LectureMapper {
         return ResponseRegisterLectureVO.builder()
                 .lectureTitle(Lecture.getLectureTitle())
                 .lectureConfirmStatus(Lecture.getLectureConfirmStatus())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(Lecture.getLectureImage())
                 .lecturePrice(Lecture.getLecturePrice())
                 .lectureStatus(Lecture.getLectureStatus())
@@ -138,8 +139,8 @@ public class LectureMapper {
         return LectureDTO.builder()
                 .lectureTitle(vo.getLectureTitle())
                 .lectureConfirmStatus(vo.getLectureConfirmStatus())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .lectureImage(vo.getLectureImage())
                 .lecturePrice(vo.getLecturePrice())
                 .lectureStatus(vo.getLectureStatus())
@@ -158,8 +159,8 @@ public class LectureMapper {
                 .lectureLevel(request.getLectureLevel())
                 .lectureConfirmStatus(request.getLectureConfirmStatus())
                 .lectureStatus(request.getLectureStatus())
-                .minPrice(request.getMinPrice())
-                .maxPrice(request.getMaxPrice())
+                .minLecturePrice(request.getMinLecturePrice())
+                .maxLecturePrice(request.getMaxLecturePrice())
                 .startCreatedAt(request.getStartCreatedAt())
                 .endCreatedAt(request.getEndCreatedAt())
                 .build();

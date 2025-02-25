@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign.mapper;
 
 
+import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +50,7 @@ public class CampaignMapper {
                 .campaignSendFlag(dto.getCampaignSendFlag())
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .admin(admin)
                 .build();
     }
@@ -228,13 +230,15 @@ public class CampaignMapper {
                 .campaignSendDate(dto.getCampaignSendDate())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
+                .adminCode(dto.getAdminCode())
+                .adminName(dto.getAdminName())
                 .members(dto.getMembers())
                 .coupons(dto.getCoupons())
                 .build();
     }
 
 
-    public FindCampaignDetailDTO toFindCampaignDetailDTO(CampaignDTO campaignDTO, Page<CouponDTO> couponPage, Page<MemberDTO> memberPage) {
+    public FindCampaignDetailDTO toFindCampaignDetailDTO(CampaignDTO campaignDTO, Page<CouponDTO> couponPage, Page<MemberDTO> memberPage, AdminDTO adminDTO) {
         return FindCampaignDetailDTO.builder()
                 .campaignCode(campaignDTO.getCampaignCode())
                 .campaignTitle(campaignDTO.getCampaignTitle())
@@ -245,6 +249,8 @@ public class CampaignMapper {
                 .campaignSendDate(campaignDTO.getCampaignSendDate())
                 .createdAt(campaignDTO.getCreatedAt())
                 .createdAt(campaignDTO.getUpdatedAt())
+                .adminCode(campaignDTO.getAdminCode())
+                .adminName(adminDTO.getAdminName())
                 .members(memberPage)
                 .coupons(couponPage)
                 .build();

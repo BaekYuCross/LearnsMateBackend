@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -154,10 +155,48 @@ public class MemberService {
         );
     }
 
+
+    // 학생 필터링하는 서비스 코드 + 컬럼정렬
+    public MemberPageResponse<ResponseFindMemberVO> filterStudentBySort(MemberFilterRequestDTO dto, int page, int size, String sortField, String sortDirection){
+        // Sort 객체 생성
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+
+        // Pageable 객체 생성 (정렬 조건 포함)
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // 필터 조건과 페이징 처리된 데이터 조회
+        Page<Member> memberPage = memberRepository.searchBy(dto, pageable);
+
+        // DTO 리스트로 변환
+        List<ResponseFindMemberVO> memberVOList = memberPage.getContent().stream()
+                .map(memberMapper::fromMemberToResponseFindMemberVO)
+                .collect(Collectors.toList());
+
+        // MemberPageResponse 생성 후 반환
+        return new MemberPageResponse<>(
+                memberVOList,               // 데이터 리스트
+                memberPage.getTotalElements(), // 전체 데이터 수
+                memberPage.getTotalPages(),    // 전체 페이지 수
+                memberPage.getNumber() + 1,    // 현재 페이지 (0-based → 1-based)
+                memberPage.getSize()           // 페이지 크기
+        );
+    }
+
     // 강사 필터링하는 코드 -> 강사 필터링은 조건이 더 적음(멤버에 다 포함됨)
-    public MemberPageResponse<ResponseFindMemberVO> filterTutor(MemberFilterRequestDTO dto, int page, int size){
+    public MemberPageResponse<ResponseFindMemberVO> filterTutortBySort(MemberFilterRequestDTO dto, int page, int size, String sortField, String sortDirection){
+        // Sort 객체 생성
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+
         // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         // 필터 조건과 페이징 처리된 데이터 조회
         Page<Member> memberPage = memberRepository.searchBy(dto, pageable);

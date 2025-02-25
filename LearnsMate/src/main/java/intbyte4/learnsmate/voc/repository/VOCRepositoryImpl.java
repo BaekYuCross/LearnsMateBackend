@@ -1,11 +1,15 @@
 package intbyte4.learnsmate.voc.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.voc.domain.QVOC;
 import intbyte4.learnsmate.voc.domain.VOC;
 import intbyte4.learnsmate.voc.domain.dto.VOCFilterRequestDTO;
+import intbyte4.learnsmate.voc_answer.domain.QVOCAnswer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +26,7 @@ import java.util.List;
 public class VOCRepositoryImpl implements VOCRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     private final QVOC qVOC = QVOC.vOC;
+    private final QVOCAnswer qVOCAnswer = QVOCAnswer.vOCAnswer;
 
     @Override
     public List<VOC> findAllByFilter(VOCFilterRequestDTO dto) {
@@ -196,4 +201,141 @@ public class VOCRepositoryImpl implements VOCRepositoryCustom {
         return qVOC.createdAt.between(startDate, endDate);
     }
 
+    // 동적 정렬 관련
+    private OrderSpecifier<?>[] getSortedColumn(Pageable pageable) {
+        if (!pageable.getSort().isEmpty()) {
+            List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+
+            pageable.getSort().stream().forEach(order -> {
+                Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+
+                switch (order.getProperty()) {
+                    case "vocCode":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.vocCode));
+                        break;
+                    case "vocContent":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.vocContent));
+                        break;
+                    case "vocCategoryName":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.vocCategory.vocCategoryName));
+                        break;
+                    case "memberType":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.member.memberType));
+                        break;
+                    case "memberName":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.member.memberName));
+                        break;
+                    case "memberCode":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.member.memberCode));
+                        break;
+                    case "adminName":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOCAnswer.admin.adminName));
+                        break;
+                    case "createdAt":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.createdAt));
+                        break;
+                    case "vocAnswerStatus":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.vocAnswerStatus));
+                        break;
+                    case "vocAnswerSatisfaction":
+                        orderSpecifiers.add(new OrderSpecifier<>(direction, qVOC.vocAnswerSatisfaction));
+                        break;
+                    default:
+                        log.warn("Unsupported sort property: {}, falling back to default sort", order.getProperty());
+                        orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, qVOC.createdAt));
+                        break;
+                }
+            });
+
+            return orderSpecifiers.toArray(new OrderSpecifier[0]);
+        }
+
+        return new OrderSpecifier[]{ new OrderSpecifier<>(Order.DESC, qVOC.createdAt) };
+    }
+
+    @Override
+    public Page<VOC> findAllBeforeNowWithSort(LocalDateTime now, Pageable pageable) {
+        log.info("Finding all VOCs before: {} with sorting", now);
+
+        // adminName 정렬인 경우 추가 join 필요
+        boolean needsAdminJoin = pageable.getSort().stream()
+                .anyMatch(order -> order.getProperty().equals("adminName"));
+
+        JPAQuery<VOC> query = queryFactory
+                .selectFrom(qVOC)
+                .leftJoin(qVOC.vocCategory).fetchJoin()
+                .leftJoin(qVOC.member).fetchJoin();
+
+        // adminName 정렬을 위한 join
+        if (needsAdminJoin) {
+            query.leftJoin(qVOCAnswer).on(qVOCAnswer.voc.eq(qVOC))
+                    .leftJoin(qVOCAnswer.admin);
+        }
+
+        List<VOC> content = query
+                .where(qVOC.createdAt.loe(now))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getSortedColumn(pageable))
+                .fetch();
+
+        // 전체 카운트 조회
+        Long total = queryFactory
+                .select(qVOC.count())
+                .from(qVOC)
+                .where(qVOC.createdAt.loe(now))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    @Override
+    public Page<VOC> searchByWithPagingWithSort(VOCFilterRequestDTO dto, Pageable pageable) {
+        log.info("Searching VOCs with criteria: {} and page: {} with sorting", dto, pageable);
+
+        // 기본 쿼리 생성
+        JPAQuery<VOC> query = queryFactory
+                .selectFrom(qVOC)
+                .leftJoin(qVOC.vocCategory).fetchJoin()
+                .leftJoin(qVOC.member).fetchJoin();
+
+        // adminName 정렬이 필요한 경우 추가 조인
+        if (pageable.getSort().stream().anyMatch(order -> order.getProperty().equals("adminName"))) {
+            query.leftJoin(qVOCAnswer).on(qVOCAnswer.voc.eq(qVOC))
+                    .leftJoin(qVOCAnswer.admin);
+        }
+
+        // 조건절 적용
+        List<VOC> content = query
+                .where(
+                        eqVOCCode(dto.getVocCode()),
+                        searchByContents(dto.getVocContent()),
+                        searchByType(dto.getVocCategoryCode()),
+                        searchByMemberType(dto.getMemberType()),
+                        searchByAnswerStatus(dto.getVocAnswerStatus()),
+                        searchByAnswerSatisfaction(dto.getVocAnswerSatisfaction()),
+                        searchByCreatedAt(dto.getStartCreateDate(), dto.getStartEndDate())
+                )
+                .orderBy(getSortedColumn(pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 카운트 조회
+        Long total = queryFactory
+                .select(qVOC.count())
+                .from(qVOC)
+                .where(
+                        eqVOCCode(dto.getVocCode()),
+                        searchByContents(dto.getVocContent()),
+                        searchByType(dto.getVocCategoryCode()),
+                        searchByMemberType(dto.getMemberType()),
+                        searchByAnswerStatus(dto.getVocAnswerStatus()),
+                        searchByAnswerSatisfaction(dto.getVocAnswerSatisfaction()),
+                        searchByCreatedAt(dto.getStartCreateDate(), dto.getStartEndDate())
+                )
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
 }

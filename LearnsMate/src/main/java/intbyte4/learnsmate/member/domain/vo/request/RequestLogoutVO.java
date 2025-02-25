@@ -1,5 +1,6 @@
 package intbyte4.learnsmate.member.domain.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -9,5 +10,6 @@ import lombok.*;
 @ToString
 public class RequestLogoutVO {
 
+    @JsonProperty("login_history_code")
     private Long loginHistoryCode;
 }

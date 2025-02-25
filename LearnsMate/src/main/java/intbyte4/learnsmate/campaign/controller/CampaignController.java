@@ -33,6 +33,7 @@ public class CampaignController {
     @PostMapping("/register")
     public ResponseEntity<ResponseRegisterCampaignVO> createCampaign
             (@RequestBody RequestRegisterCampaignVO requestCampaign) {
+        log.info("바디 내용은?: {}", requestCampaign.toString());
         List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
                 .map(memberMapper::fromRequestFindCampaignStudentVOToMemberDTO)
                 .toList();
@@ -41,6 +42,7 @@ public class CampaignController {
                 .map(couponMapper::fromRequestFindCampaignCouponVOToCouponDTO)
                 .toList();
 
+        log.info("등록입니다.: {}{}", studentDTOList.toString(), couponDTOList.toString());
         CampaignDTO campaignDTO = campaignService.registerCampaign(campaignMapper
                 .fromRegisterRequestVOtoDTO(requestCampaign)
                 , studentDTOList
@@ -93,6 +95,21 @@ public class CampaignController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "직원 - 캠페인 전체 정렬 조회")
+    @GetMapping("/campaigns/sort")
+    public ResponseEntity<CampaignPageResponse<ResponseFindCampaignVO>> getAllCampaignsBySort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "campaignCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection){
+        log.info("sortField: {}",sortField);
+        CampaignPageResponse<FindAllCampaignsDTO> findAllCampaignsDTOList = campaignService
+                .findAllCampaignListBySort(page, size, sortField, sortDirection);
+        CampaignPageResponse<ResponseFindCampaignVO> response = campaignMapper
+                .fromDtoListToFindCampaignVO(findAllCampaignsDTOList);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "직원 - 캠페인 단건 조회")
     @GetMapping("/{campaignCode}")
     public ResponseEntity<ResponseFindCampaignDetailVO> getCampaignDetails
@@ -114,9 +131,26 @@ public class CampaignController {
              @RequestParam(defaultValue = "15") int size){
         CampaignFilterDTO dto =
                 campaignMapper.fromFindCampaignByConditionVOtoFilterDTO(request);
-        log.info("반환된 조건 별 캠페인 : {}", dto);
         CampaignPageResponse<ResponseFindCampaignByFilterVO> response = campaignService
                 .findCampaignListByFilter(dto, page, size);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "직원 - 조건 별 캠페인 정렬 조회")
+    @PostMapping("/filter/sort")
+        public ResponseEntity<CampaignPageResponse<ResponseFindCampaignByFilterVO>> filterCampaignsBySort
+            (@RequestBody RequestFindCampaignByFilterVO request,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "15") int size,
+             @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+             @RequestParam(required = false, defaultValue = "DESC") String sortDirection){
+
+        CampaignFilterDTO dto =
+                campaignMapper.fromFindCampaignByConditionVOtoFilterDTO(request);
+
+        CampaignPageResponse<ResponseFindCampaignByFilterVO> response = campaignService
+                .findCampaignListByFilterAndSort(dto, page, size, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }

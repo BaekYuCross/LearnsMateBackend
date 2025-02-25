@@ -41,6 +41,9 @@ public class CouponFindResponseVO {
     @JsonProperty("coupon_expire_date")
     private LocalDateTime couponExpireDate;
 
+    @JsonProperty("coupon_flag")
+    private Boolean couponFlag;
+
     @JsonProperty("active_state")
     private Boolean activeState;
 

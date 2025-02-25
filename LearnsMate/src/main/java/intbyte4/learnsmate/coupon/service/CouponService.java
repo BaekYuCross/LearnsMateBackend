@@ -48,6 +48,10 @@ public interface CouponService {
     List<CouponEntity> filterCoupons(CouponFilterDTO dto);
 
     CouponPageResponse<CouponFindResponseVO> filterCoupons(CouponFilterDTO dto, int page, int size);
+    // 필터링o 정렬o
+    CouponPageResponse<CouponFindResponseVO> filterCouponsWithSort(CouponFilterDTO dto, int page, int size, String sortField, String sortDirection);
 
     List<ClientFindCouponDTO> findAllClientCoupon(Long tutorCode);
+
+    boolean findAdminCouponByCouponCode(Long couponCode);
 }

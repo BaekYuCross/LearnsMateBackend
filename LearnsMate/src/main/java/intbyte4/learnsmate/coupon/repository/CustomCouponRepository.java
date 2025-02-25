@@ -12,4 +12,7 @@ public interface CustomCouponRepository {
     List<CouponEntity> findCouponsByFilters(CouponFilterRequestVO request);
 
     Page<CouponEntity> searchBy(CouponFilterRequestVO request, Pageable pageable);
+
+    // 필터링o 정렬o
+    Page<CouponEntity> searchByWithSort(CouponFilterRequestVO request, Pageable pageable);
 }

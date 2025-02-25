@@ -40,10 +40,23 @@ public class LectureController {
         }
     }
 
-    @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 조회")
+    @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 정렬 조회")
     @GetMapping("/list")
-    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size
+    ){
         LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffset(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "강의 정보 페이지네이션 방식으로 전체 정렬 조회")
+    @GetMapping("/list/sort")
+    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> getLecturesWithPagination(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection
+    ){
+        LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffsetWithSort(page, size, sortField, sortDirection);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -92,13 +105,33 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.OK).body(lectureMapper.fromDtoToRemoveResponseVO(removedLecture));
     }
 
-    @Operation(summary = "전체 조회 화면에서의 필터링 기능")
-    @PostMapping("/filter")
-    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> filterLectures(@RequestBody RequestLectureFilterVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+//    @Operation(summary = "전체 조회 화면에서의 필터링 기능")
+//    @PostMapping("/filter")
+//    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> filterLectures(@RequestBody RequestLectureFilterVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+//        try {
+//            LectureFilterDTO filterDTO = lectureMapper.toFilterDTO(request);
+//            log.info("filterDTO: " + filterDTO.toString());
+//            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size);
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            log.error("강의 필터링 중 오류 발생", e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+
+    @Operation(summary = "전체 조회 화면에서의 필터링 정렬 기능")
+    @PostMapping("/filter/sort")
+    public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> filterLectures(
+            @RequestBody RequestLectureFilterVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection
+    ) {
         try {
             LectureFilterDTO filterDTO = lectureMapper.toFilterDTO(request);
             log.info("filterDTO: " + filterDTO.toString());
-            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size);
+            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPageWithSort(filterDTO, page, size, sortField, sortDirection);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("강의 필터링 중 오류 발생", e);
@@ -132,11 +165,13 @@ public class LectureController {
     @PostMapping("/coupon-register/filter")
     public ResponseEntity<LecturePaginationResponse<ResponseFindLectureVO>> filterLecturesInCouponReg(@RequestBody RequestLectureFilterVO request,
                                                                                                       @RequestParam(defaultValue = "0") int page,
-                                                                                                      @RequestParam(defaultValue = "15") int size) {
+                                                                                                      @RequestParam(defaultValue = "15") int size,
+                                                                                                      @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+                                                                                                      @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
         try {
             LectureFilterDTO filterDTO = lectureMapper.toFilterDTO(request);
             log.info("filterDTO: " + filterDTO.toString());
-            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size);
+            LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.filterLecturesByPage(filterDTO, page, size, sortField, sortDirection);
             log.info("{}, {}", page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {

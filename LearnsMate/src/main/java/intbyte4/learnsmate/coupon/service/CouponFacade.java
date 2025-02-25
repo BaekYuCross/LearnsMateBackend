@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ public class CouponFacade {
     @Transactional
     public CouponPageResponse<CouponFindResponseVO> findAllCoupons(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
-        Page<CouponEntity> couponPage = couponRepository.findAllByCouponFlagTrue(pageable);
+        Page<CouponEntity> couponPage = couponRepository.findAllByCoupon(pageable);
 
         List<CouponFindResponseVO> responseVOList = couponPage.getContent().stream()
                 .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
@@ -87,6 +88,42 @@ public class CouponFacade {
                 couponPage.getNumber(),
                 couponPage.getSize()
         );
+    }
+
+    // 필터링x 정렬o 쿠폰 조회 메서드
+    @Transactional
+    public CouponPageResponse<CouponFindResponseVO> findAllCouponsWithSort(int page, int size, String sortField, String sortDirection) {
+        // 프론트에서 전달된 필드명을 엔티티 필드명으로 매핑
+        String entitySortField = convertToEntityField(sortField);
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+        Sort sort = Sort.by(direction, entitySortField);
+
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<CouponEntity> couponPage = couponRepository.findAllByCouponWithSort(pageRequest);
+
+        List<CouponFindResponseVO> responseVOList = couponPage.getContent().stream()
+                .map(couponMapper::fromCouponEntityToCouponFindResponseVO)
+                .collect(Collectors.toList());
+
+        return new CouponPageResponse<>(
+                responseVOList,
+                couponPage.getTotalElements(),
+                couponPage.getTotalPages(),
+                couponPage.getNumber(),
+                couponPage.getSize()
+        );
+    }
+
+    private String convertToEntityField(String sortField) {
+        return switch (sortField) {
+            case "couponCategoryName" -> "couponCategory.couponCategoryName";
+            case "adminName" -> "admin.adminName";
+            case "tutorName" -> "tutor.memberName";
+            // 나머지 필드들은 그대로 사용
+            case "couponCode", "couponName", "couponContents", "couponDiscountRate", "activeState",
+                 "couponFlag", "couponStartDate", "couponExpireDate", "createdAt", "updatedAt" -> sortField;
+            default -> "createdAt";  // 기본 정렬 필드
+        };
     }
 
     // offset 페이지네이션을 위한 전체 admin 쿠폰 조회
@@ -140,6 +177,7 @@ public class CouponFacade {
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
                         .couponCategoryCode(couponCategory.getCouponCategoryCode())
+                        .couponFlag(couponDTO.getCouponFlag())
                         .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
@@ -160,6 +198,7 @@ public class CouponFacade {
                         .couponContents(couponDTO.getCouponContents())
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
+                        .couponFlag(couponDTO.getCouponFlag())
                         .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
@@ -190,6 +229,7 @@ public class CouponFacade {
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
                         .couponCategoryCode(couponDTO.getCouponCategoryCode())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
+                        .couponFlag(couponDTO.getCouponFlag())
                         .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
@@ -220,6 +260,7 @@ public class CouponFacade {
                         .couponContents(couponDTO.getCouponContents())
                         .couponDiscountRate(couponDTO.getCouponDiscountRate())
                         .couponCategoryName(couponCategory.getCouponCategoryName())
+                        .couponFlag(couponDTO.getCouponFlag())
                         .activeState(couponDTO.getActiveState())
                         .couponStartDate(couponDTO.getCouponStartDate())
                         .couponExpireDate(couponDTO.getCouponExpireDate())
@@ -248,6 +289,7 @@ public class CouponFacade {
                     .couponContents(coupon.getCouponContents())
                     .couponDiscountRate(coupon.getCouponDiscountRate())
                     .couponCategoryName(couponCategory.getCouponCategoryName())
+                    .couponFlag(coupon.getCouponFlag())
                     .activeState(coupon.getActiveState())
                     .couponStartDate(coupon.getCouponStartDate())
                     .couponExpireDate(coupon.getCouponExpireDate())
@@ -266,6 +308,7 @@ public class CouponFacade {
                     .couponContents(coupon.getCouponContents())
                     .couponDiscountRate(coupon.getCouponDiscountRate())
                     .couponCategoryName(couponCategory.getCouponCategoryName())
+                    .couponFlag(coupon.getCouponFlag())
                     .activeState(coupon.getActiveState())
                     .couponStartDate(coupon.getCouponStartDate())
                     .couponExpireDate(coupon.getCouponExpireDate())
@@ -297,6 +340,7 @@ public class CouponFacade {
                     .couponContents(coupon.getCouponContents())
                     .couponDiscountRate(coupon.getCouponDiscountRate())
                     .couponCategoryName(couponCategoryName)
+                    .couponFlag(coupon.getCouponFlag())
                     .activeState(coupon.getActiveState())
                     .couponStartDate(coupon.getCouponStartDate())
                     .couponExpireDate(coupon.getCouponExpireDate())
@@ -307,7 +351,6 @@ public class CouponFacade {
                     .build();
         }).collect(Collectors.toList());
     }
-
 }
 
 

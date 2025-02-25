@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.payment.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -9,6 +10,7 @@ import intbyte4.learnsmate.lecture.domain.entity.QLecture;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.QLectureByStudent;
 import intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.QLectureCategoryByLecture;
+import intbyte4.learnsmate.member.domain.entity.QMember;
 import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.entity.QPayment;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -165,5 +168,127 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
 
     private BooleanExpression likeCouponIssuanceName(String couponIssuanceName) {
         return StringUtils.hasText(couponIssuanceName) ? payment.couponIssuance.coupon.couponName.likeIgnoreCase("%" + couponIssuanceName + "%") : null;
+    }
+
+    @Override // 필터링x 정렬o
+    public Page<Payment> findAllWithSort(Pageable pageable) {
+        QPayment payment = QPayment.payment;
+        QLectureByStudent lectureByStudent = QLectureByStudent.lectureByStudent;
+        QLecture lecture = QLecture.lecture;
+        QLectureCategoryByLecture lectureCategoryByLecture = QLectureCategoryByLecture.lectureCategoryByLecture;
+        QLectureCategory lectureCategory = QLectureCategory.lectureCategory;
+        QMember student = QMember.member;
+        QMember tutor = new QMember("tutor");
+
+        JPAQuery<Payment> query = queryFactory
+                .selectFrom(payment)
+                .innerJoin(payment.lectureByStudent, lectureByStudent)
+                .innerJoin(lectureByStudent.student, student)
+                .innerJoin(lectureByStudent.lecture, lecture)
+                .innerJoin(lecture.tutor, tutor)
+                .innerJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
+                .innerJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
+                .leftJoin(payment.couponIssuance);
+
+        if (pageable.getSort().isSorted()) {
+            OrderSpecifier<?> orderSpecifier = getOrderSpecifier(payment, lecture, lectureCategory, student, tutor, pageable.getSort().iterator().next());
+            query.orderBy(orderSpecifier);
+        }
+
+        long total = query.fetchCount();
+
+        List<Payment> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override // 필터링o 정렬o
+    public Page<PaymentFilterDTO> findPaymentByFiltersWithSort(PaymentFilterRequestVO request, Pageable pageable) {
+        QPayment payment = QPayment.payment;
+        QLectureByStudent lectureByStudent = QLectureByStudent.lectureByStudent;
+        QLecture lecture = QLecture.lecture;
+        QLectureCategoryByLecture lectureCategoryByLecture = QLectureCategoryByLecture.lectureCategoryByLecture;
+        QLectureCategory lectureCategory = QLectureCategory.lectureCategory;
+        QMember student = QMember.member;
+        QMember tutor = new QMember("tutor");
+
+        BooleanBuilder builder = createFilterConditions(request);
+
+        if (request != null && request.getStudentCode() != null) {
+            builder.and(lectureByStudent.student.memberCode.eq(request.getStudentCode()));
+        }
+
+        JPAQuery<Payment> baseQuery = queryFactory
+                .selectFrom(payment)
+                .innerJoin(payment.lectureByStudent, lectureByStudent)
+                .innerJoin(lectureByStudent.student, student)
+                .innerJoin(lectureByStudent.lecture, lecture)
+                .innerJoin(lecture.tutor, tutor)
+                .innerJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
+                .innerJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
+                .leftJoin(payment.couponIssuance)
+                .leftJoin(payment.couponIssuance.coupon)
+                .where(builder);
+
+        // 정렬 조건 적용
+        if (pageable.getSort().isSorted()) {
+            OrderSpecifier<?> orderSpecifier = getOrderSpecifier(payment, lecture, lectureCategory, student, tutor, pageable.getSort().iterator().next());
+            baseQuery.orderBy(orderSpecifier);
+        }
+
+        Long total = baseQuery.clone()
+                .select(payment.count())
+                .fetch().get(0);
+
+        List<PaymentFilterDTO> content = baseQuery
+                .select(Projections.constructor(PaymentFilterDTO.class,
+                        payment.paymentCode,
+                        payment.createdAt,
+                        lecture.lectureCode,
+                        lecture.lectureTitle,
+                        lectureCategory.lectureCategoryName.stringValue(),
+                        lecture.tutor.memberCode,
+                        lecture.tutor.memberName,
+                        lectureByStudent.student.memberCode,
+                        lectureByStudent.student.memberName,
+                        payment.paymentPrice,
+                        payment.couponIssuance.couponIssuanceCode,
+                        payment.couponIssuance.coupon.couponName,
+                        lecture.lecturePrice
+                ))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    private OrderSpecifier<?> getOrderSpecifier(QPayment payment, QLecture lecture, QLectureCategory lectureCategory, QMember student, QMember tutor, Sort.Order order) {
+        String property = order.getProperty();
+        boolean isAsc = order.getDirection().isAscending();
+
+        return switch (property) {
+            case "memberCode" -> isAsc ? student.memberCode.asc() : student.memberCode.desc();
+            case "paymentCode" -> isAsc ? payment.paymentCode.asc() : payment.paymentCode.desc();
+            case "paymentPrice" -> isAsc ? payment.paymentPrice.asc() : payment.paymentPrice.desc();
+            case "createdAt" -> isAsc ? payment.createdAt.asc() : payment.createdAt.desc();
+            case "lectureCode" -> isAsc ? lecture.lectureCode.asc() : lecture.lectureCode.desc();
+            case "lectureTitle" -> isAsc ? lecture.lectureTitle.asc() : lecture.lectureTitle.desc();
+            case "lecturePrice" -> isAsc ? lecture.lecturePrice.asc() : lecture.lecturePrice.desc();
+            case "lectureCategory", "lectureCategoryName" -> isAsc ?
+                    lectureCategory.lectureCategoryName.stringValue().asc() :
+                    lectureCategory.lectureCategoryName.stringValue().desc();
+            case "tutorCode" -> isAsc ? tutor.memberCode.asc() : tutor.memberCode.desc();
+            case "tutorName" -> isAsc ? tutor.memberName.asc() : tutor.memberName.desc();
+            case "studentCode" -> isAsc ? student.memberCode.asc() : student.memberCode.desc();
+            case "studentName" -> isAsc ? student.memberName.asc() : student.memberName.desc();
+            case "studentEmail" -> isAsc ? student.memberEmail.asc() : student.memberEmail.desc();
+            case "couponIssuanceCode" -> isAsc ? payment.couponIssuance.couponIssuanceCode.asc() : payment.couponIssuance.couponIssuanceCode.desc();
+            case "couponIssuanceName" -> isAsc ? payment.couponIssuance.coupon.couponName.asc() : payment.couponIssuance.coupon.couponName.desc();
+            default -> payment.createdAt.desc();
+        };
     }
 }

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @Slf4j
@@ -53,8 +54,8 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
         VOC voc = getVOC(vocAnswerDTO);
 
         VOCAnswer vocAnswer = vocAnswerMapper.toEntity(vocAnswerDTO, user, voc);
-        vocAnswer.setCreatedAt(LocalDateTime.now());
-        vocAnswer.setUpdatedAt(LocalDateTime.now());
+        vocAnswer.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        vocAnswer.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 
         log.info("데이터베이스에 VOC 답변 저장 중: {}", vocAnswer);
         VOCAnswer savedVOCAnswer = vocAnswerRepository.save(vocAnswer);
@@ -72,7 +73,7 @@ public class VOCAnswerServiceImpl implements VOCAnswerService {
 
         VOCAnswer vocAnswer = vocAnswerRepository.findById(vocAnswerDTO.getVocAnswerCode()).orElseThrow(() -> new CommonException(StatusEnum.VOC_ANSWER_NOT_FOUND));
         vocAnswer.setVocAnswerContent(vocAnswerDTO.getVocAnswerContent());
-        vocAnswer.setUpdatedAt(LocalDateTime.now());
+        vocAnswer.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 
         log.info("데이터베이스에 수정된 VOC 답변 저장 중: {}", vocAnswer);
         VOCAnswer updatedCampaignTemplate = vocAnswerRepository.save(vocAnswer);

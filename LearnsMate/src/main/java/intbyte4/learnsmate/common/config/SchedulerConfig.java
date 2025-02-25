@@ -1,89 +1,49 @@
 package intbyte4.learnsmate.common.config;
 
-import intbyte4.learnsmate.admin.service.EmailService;
-import intbyte4.learnsmate.campaign.domain.dto.CampaignDTO;
+import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;
+import intbyte4.learnsmate.campaign.repository.CampaignRepository;
 import intbyte4.learnsmate.campaign.service.CampaignService;
-import intbyte4.learnsmate.campaign.service.CoolSmsService;
-import intbyte4.learnsmate.member.domain.MemberType;
-import intbyte4.learnsmate.member.domain.dto.MemberDTO;
-import intbyte4.learnsmate.member.service.MemberService;
-import intbyte4.learnsmate.userpercampaign.domain.dto.UserPerCampaignDTO;
-import intbyte4.learnsmate.userpercampaign.service.UserPerCampaignService;
 import intbyte4.learnsmate.voc.service.VOCAiService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.ZoneId;
 import java.util.List;
 
 @Configuration
 @EnableScheduling
 @Slf4j
+@RequiredArgsConstructor
 public class SchedulerConfig {
-
     private final VOCAiService vocAiService;
     private final CampaignService campaignService;
-    private final JobLauncher jobLauncher;
-    private final Job campaignJob;
-    private final MemberService memberService;
-    private final EmailService emailService;
-    private final UserPerCampaignService userPerCampaignService;
-    private final CoolSmsService coolSmsService;
+    private final CampaignRepository campaignRepository;
 
-    public SchedulerConfig(VOCAiService vocAiService, CampaignService campaignService, JobLauncher jobLauncher, Job campaignJob, MemberService memberService, EmailService emailService , UserPerCampaignService userPerCampaignService, CoolSmsService coolSmsService) {
-        this.vocAiService = vocAiService;
-        this.campaignService = campaignService;
-        this.jobLauncher = jobLauncher;
-        this.campaignJob = campaignJob;
-        this.memberService = memberService;
-        this.emailService = emailService;
-        this.userPerCampaignService = userPerCampaignService;
-        this.coolSmsService = coolSmsService;
-    }
-
-    @Scheduled(cron = "0 0 9 * * MON")
+    @Scheduled(cron = "0 0 0 * * MON", zone = "Asia/Seoul")
     public void scheduleVocAnalysis() {
         vocAiService.analyzeVocForLastWeek();
     }
 
-    @Scheduled(cron = "0 0 */3 * * *")
-//    @Scheduled(cron = "0 * * * * *") // 테스트 용
+//    @Scheduled(cron = "0 0 */3 * * *")
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
     public void scheduleCampaigns() {
-        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        List<Campaign> readyCampaigns = campaignRepository
+                .findByCampaignSendDateLessThanEqualAndCampaignSendFlagFalseAndCampaignType(
+                        currentTime,
+                        CampaignTypeEnum.RESERVATION
+                );
 
-        List<CampaignDTO> readyCampaigns = campaignService.getReadyCampaigns(currentTime);
-
-        for (CampaignDTO campaign : readyCampaigns) {
+        for (Campaign campaign : readyCampaigns) {
             try {
-                if (CampaignTypeEnum.RESERVATION.name().equals(campaign.getCampaignType())) {
-                    JobParameters jobParameters = new JobParametersBuilder()
-                            .addLong("campaignCode", campaign.getCampaignCode())
-                            .addDate("startTime", new Date())
-                            .toJobParameters();
-                    jobLauncher.run(campaignJob, jobParameters);
-
-                    List<UserPerCampaignDTO> userPerCampaignDTOList = userPerCampaignService.findUserByCampaignCode(campaign.getCampaignCode());
-                    for (UserPerCampaignDTO userPerCampaignDTO : userPerCampaignDTOList) {
-                        MemberDTO member = memberService.findMemberByMemberCode(userPerCampaignDTO.getStudentCode(), MemberType.STUDENT);
-                        if (member != null && campaign.getCampaignMethod().equals("Email")) {
-                            emailService.sendCampaignEmail(member.getMemberEmail(), campaign.getCampaignTitle(), campaign.getCampaignContents());
-                        }
-                        else if (member != null && campaign.getCampaignMethod().equals("SMS")) {
-                            coolSmsService.sendSms(member.getMemberPhone(), campaign.getCampaignContents());
-                        }
-                    }
-                    campaignService.updateCampaignSendFlag(campaign.getCampaignCode());
-                }
+                campaignService.executeCampaign(campaign);
             } catch (Exception e) {
-                System.err.println("Failed to launch campaign job: " + e.getMessage());
+                log.error("Failed to execute scheduled campaign: {}", campaign.getCampaignCode(), e);
             }
         }
     }

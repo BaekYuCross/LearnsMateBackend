@@ -18,6 +18,7 @@ import intbyte4.learnsmate.payment.domain.vo.RequestRegisterMemberPaymentVO;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class MemberMapper{
@@ -53,8 +54,8 @@ public class MemberMapper{
                 .memberBirth(request.getMemberBirth())
                 .memberFlag(true) // 기본 값 설정
                 .memberDormantStatus(false) // 기본 값 설정
-                .createdAt(LocalDateTime.now()) // 생성 시점
-                .updatedAt(LocalDateTime.now()) // 생성 시점
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul"))) // 생성 시점
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul"))) // 생성 시점
                 .build();
     }
 
@@ -109,7 +110,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt()) // 보통 생성 시점은 VO에서 넘어오지 않을 수 있으므로 확인 필요
-                .updatedAt(LocalDateTime.now()) // 업데이트 시간은 현재 시간으로 설정
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul"))) // 업데이트 시간은 현재 시간으로 설정
                 .build();
     }
 
@@ -127,7 +128,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 
@@ -145,7 +146,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 
@@ -175,7 +176,7 @@ public class MemberMapper{
                 .memberFlag(request.getMemberFlag())
                 .memberDormantStatus(request.getMemberDormantStatus())
                 .createdAt(request.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.campaign.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import intbyte4.learnsmate.campaign.domain.dto.CampaignFilterDTO;
@@ -11,14 +12,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static intbyte4.learnsmate.campaign.domain.entity.QCampaign.campaign;
+
 @RequiredArgsConstructor
 public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    private final QCampaign qCampaign = QCampaign.campaign;
+    private final QCampaign qCampaign = campaign;
 
     @Override
     public Page<Campaign> searchBy(CampaignFilterDTO campaignFilterDTO, Pageable pageable) {
@@ -28,9 +32,14 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
                         .and(searchByPeriod(campaignFilterDTO))
                         .and(searchBySendDateStatus(campaignFilterDTO)));
 
+        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(campaign, pageable.getSort());
+
+        if (orderSpecifier != null) {
+            query.orderBy(orderSpecifier);
+        }
+
         long total = query.fetchCount();
 
-        // 페이징 적용
         List<Campaign> campaigns = query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
 
         return new PageImpl<>(campaigns, pageable, total);
@@ -113,6 +122,34 @@ public class CampaignRepositoryImpl implements CampaignRepositoryCustom {
         }
 
         return booleanBuilder;
+    }
+
+    private OrderSpecifier<?> getOrderSpecifier(QCampaign campaign, Sort sort){
+        if (sort.isEmpty()) {
+            return campaign.campaignCode.desc();
+        }
+
+        Sort.Order order = sort.iterator().next();
+        switch (order.getProperty()){
+            case "campaignCode":
+                return order.isAscending() ? campaign.campaignCode.asc() : campaign.campaignCode.desc();
+            case "campaignTitle":
+                return order.isAscending() ? campaign.campaignTitle.asc() : campaign.campaignTitle.desc();
+            case "campaignContents":
+                return order.isAscending() ? campaign.campaignContents.asc() : campaign.campaignContents.desc();
+            case "campaignType":
+                return order.isAscending() ? campaign.campaignType.asc() : campaign.campaignType.desc();
+            case "campaignSendDate":
+                return order.isAscending() ? campaign.campaignSendDate.asc() : campaign.campaignSendDate.desc();
+            case "createdAt":
+                return order.isAscending() ? campaign.createdAt.asc() : campaign.createdAt.desc();
+            case "updatedAt":
+                return order.isAscending() ? campaign.updatedAt.asc() : campaign.updatedAt.desc();
+            case "adminName":
+                return order.isAscending() ? campaign.admin.adminName.asc() : campaign.admin.adminName.desc();
+            default:
+                return campaign.campaignCode.desc();
+        }
     }
 
 }

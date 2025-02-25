@@ -28,11 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -149,6 +149,35 @@ public class MemberFacade {
                 memberPage.getSize()
         );
     }
+
+    // sort 처리하기
+    public MemberPageResponse<ResponseFindMemberVO> findAllMemberByMemberTypeBySort(
+            int page, int size, MemberType memberType, String sortField, String sortDirection) {
+
+        Sort sort = Sort.by(
+                sortDirection.equalsIgnoreCase("DESC") ?
+                        Sort.Direction.DESC : Sort.Direction.ASC,
+                sortField
+        );
+
+        PageRequest pageable = PageRequest.of(page, size, sort);
+
+        LocalDateTime currentKoreanTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        Page<Member> memberPage = memberRepository.findByMemberTypeBySort(memberType, currentKoreanTime, pageable);
+
+        List<ResponseFindMemberVO> responseVOList = memberPage.getContent().stream()
+                .map(memberMapper::fromMemberToResponseFindMemberVO)
+                .collect(Collectors.toList());
+
+        return new MemberPageResponse<>(
+                responseVOList,
+                memberPage.getTotalElements(),
+                memberPage.getTotalPages(),
+                memberPage.getNumber(),
+                memberPage.getSize()
+        );
+    }
+
 
     public List<CategoryCountDTO> getCategoryCounts() {
         return lectureCategoryByLectureService.countLecturesByCategory();

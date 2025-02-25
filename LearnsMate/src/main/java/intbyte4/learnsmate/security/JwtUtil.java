@@ -18,9 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
+import java.time.Clock;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,22 +41,16 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            if (token == null || token.isBlank()) {
-                log.warn("토큰이 null이거나 빈 문자열입니다.");
-                return false;
-            }
+            log.info("Validating token: {}", token);
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.warn("유효하지 않은 JWT 서명입니다: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.warn("지원하지 않는 JWT 토큰입니다: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.warn("JWT 클레임이 비어있거나 잘못되었습니다: {}", e.getMessage());
+            log.warn("Token has expired: {}", token, e);
+            throw e;
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid token: {}", token, e);
+            throw e;
         }
-        return false;
     }
 
     public Authentication getAuthentication(String token) {
@@ -116,30 +109,34 @@ public class JwtUtil {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        LocalDateTime expirationDateTime = LocalDateTime.now().plusHours(expirationTime / (1000 * 60 * 60));
-        userDetails.setExpiration(expirationDateTime);
+        ZoneId kst = ZoneId.of("Asia/Seoul");
+        ZonedDateTime now = ZonedDateTime.now(kst);
+        ZonedDateTime expirationDateTime = now.plusHours(expirationTime / (1000 * 60 * 60));
+
+        userDetails.setExpiration(expirationDateTime.toLocalDateTime());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setIssuedAt(Date.from(now.toInstant()))
+                .setExpiration(Date.from(expirationDateTime.toInstant()))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 
-    // 리프레시 토큰은 단순히 새로운 액세스 토큰 발급을 요청하기 위한 용도
     public String generateRefreshToken(JwtTokenDTO tokenDTO) {
-        Claims claims = Jwts.claims().setSubject(tokenDTO.getUserCode()); // 최소한의 정보
+        Claims claims = Jwts.claims().setSubject(tokenDTO.getUserCode());
         log.info("RefreshToken Claims 생성: {}", claims);
 
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime expirationDateTime = now.plusDays(7);
+
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일 만료
+                .setIssuedAt(Date.from(now.toInstant()))
+                .setExpiration(Date.from(expirationDateTime.toInstant()))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
-
 
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, claims -> claims.get("email", String.class));
@@ -154,7 +151,10 @@ public class JwtUtil {
     }
 
     public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
+        Date expiration = getClaimFromToken(token, Claims::getExpiration);
+        ZonedDateTime utcExpiration = expiration.toInstant().atZone(ZoneId.of("UTC"));
+        ZonedDateTime kstExpiration = utcExpiration.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return Date.from(kstExpiration.toInstant());
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
@@ -176,8 +176,17 @@ public class JwtUtil {
     }
 
     public String getUserCodeFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
+        try {
+            return getClaimFromToken(token, Claims::getSubject);
+        } catch (ExpiredJwtException e) {
+            log.warn("Expired JWT token: {}", token, e);
+            throw new IllegalArgumentException("Expired token");
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid JWT token: {}", token, e);
+            throw new IllegalArgumentException("Invalid token");
+        }
     }
+
 
     public String extractUserCode(String expiredToken) {
         try {

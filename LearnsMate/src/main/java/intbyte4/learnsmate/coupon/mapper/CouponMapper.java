@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,23 +44,6 @@ public class CouponMapper {
                 .couponFlag(entity.getCouponFlag())
                 .activeState(entity.getActiveState())
                 .couponCategoryCode(entity.getCouponCategory().getCouponCategoryCode())
-                .adminCode(entity.getAdmin() != null ? entity.getAdmin().getAdminCode() : null)
-                .tutorCode(entity.getTutor() != null ? entity.getTutor().getMemberCode() : null)
-                .build();
-    }
-
-    public RegisterCouponDTO entityToRegisterDTO (CouponEntity entity) {
-        return RegisterCouponDTO.builder()
-                .couponCode(entity.getCouponCode())
-                .couponName(entity.getCouponName())
-                .couponContents(entity.getCouponContents())
-                .couponDiscountRate(entity.getCouponDiscountRate())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .couponStartDate(entity.getCouponStartDate())
-                .couponExpireDate(entity.getCouponExpireDate())
-                .activeState(entity.getActiveState())
-                .couponCategoryName(entity.getCouponCategory().getCouponCategoryName())
                 .adminCode(entity.getAdmin() != null ? entity.getAdmin().getAdminCode() : null)
                 .tutorCode(entity.getTutor() != null ? entity.getTutor().getMemberCode() : null)
                 .build();
@@ -151,9 +135,9 @@ public class CouponMapper {
         return CouponEntity.builder()
                 .couponName(request.getCouponName())
                 .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .couponStartDate(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .couponStartDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)
                 .activeState(true)
@@ -220,7 +204,7 @@ public class CouponMapper {
         return CouponFilterDTO.builder()
                 .couponName(request.getCouponName())
                 .couponContents(request.getCouponContents())
-                .activeState(request.getActiveState())
+                .couponFlag(request.getCouponFlag())
                 .startExpireDate(request.getStartExpireDate())
                 .endExpireDate(request.getEndExpireDate())
                 .startCouponStartDate(request.getStartCouponStartDate())
@@ -242,7 +226,7 @@ public class CouponMapper {
         return CouponFilterRequestVO.builder()
                 .couponName(dto.getCouponName())
                 .couponContents(dto.getCouponContents())
-                .activeState(dto.getActiveState())
+                .couponFlag(dto.getCouponFlag())
                 .startExpireDate(dto.getStartExpireDate())
                 .endExpireDate(dto.getEndExpireDate())
                 .startCouponStartDate(dto.getStartCouponStartDate())
@@ -263,8 +247,8 @@ public class CouponMapper {
                 .couponName(request.getCouponName())
                 .couponContents(request.getCouponContents())
                 .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .couponStartDate(request.getCouponStartDate())
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)
@@ -279,8 +263,8 @@ public class CouponMapper {
                 .couponName(request.getCouponName())
                 .couponContents(request.getCouponContents())
                 .couponDiscountRate(request.getCouponDiscountRate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .couponStartDate(request.getCouponStartDate())
                 .couponExpireDate(request.getCouponExpireDate())
                 .couponFlag(true)
@@ -312,6 +296,7 @@ public class CouponMapper {
                 .couponStartDate(coupon.getCouponStartDate())
                 .couponExpireDate(coupon.getCouponExpireDate())
                 .activeState(coupon.getActiveState())
+                .couponFlag(coupon.getCouponFlag())
                 .couponCategoryName(coupon.getCouponCategory().getCouponCategoryName())
                 .adminName(coupon.getAdmin() != null ? coupon.getAdmin().getAdminName() : null)
                 .tutorName(coupon.getTutor() != null ? coupon.getTutor().getMemberName() : null)

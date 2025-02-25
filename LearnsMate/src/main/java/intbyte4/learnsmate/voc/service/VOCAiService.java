@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -171,12 +173,134 @@ public class VOCAiService {
                             .keyword(keyword)
                             .keywordCount(count)
                             .recommendation(recommendation)
-                            .createdAt(LocalDateTime.now())
+                            .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                             .build();
 
                     vocAiAnswerRepository.save(vocAiAnswer);
                     log.info("키워드 '{}' 저장 완료: {}건", keyword, count);
                     processedKeywords.add(keyword);
+                }
+            }
+        } catch (JsonProcessingException e) {
+            log.error("GPT 응답을 JSON으로 처리 중 오류 발생: {}", e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("GPT 응답 처리 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public void analyzeVocForSpecificDate(LocalDate targetDate) {
+        LocalDateTime startOfAnalysisWeek = targetDate.minusWeeks(1).with(DayOfWeek.MONDAY).atTime(9, 0);
+        LocalDateTime endOfAnalysisWeek = targetDate.with(DayOfWeek.MONDAY).atTime(8, 59, 59);
+
+        log.info("특정 날짜 기준 VOC 분석 시작: {} ~ {}", startOfAnalysisWeek, endOfAnalysisWeek);
+
+        List<Object[]> keywordFrequencyData = vocRepository.findKeywordFrequencyBetweenDates(startOfAnalysisWeek, endOfAnalysisWeek);
+
+        if (keywordFrequencyData.isEmpty()) {
+            log.info("해당 기간({} ~ {}) 동안 발견된 주요 키워드가 없습니다.", startOfAnalysisWeek, endOfAnalysisWeek);
+            return;
+        }
+
+        log.info("해당 기간({} ~ {}) 동안 발견된 키워드 개수: {}", startOfAnalysisWeek, endOfAnalysisWeek, keywordFrequencyData.size());
+
+        Map<String, Integer> keywordFrequency = keywordFrequencyData.stream()
+                .collect(Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> ((Number) row[1]).intValue()
+                ));
+
+        List<Map.Entry<String, Integer>> topKeywords = keywordFrequency.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(5)
+                .toList();
+
+        if (topKeywords.isEmpty()) {
+            log.info("해당 기간({} ~ {}) 동안 상위 키워드가 없습니다.", startOfAnalysisWeek, endOfAnalysisWeek);
+            return;
+        }
+
+        log.info("해당 기간 상위 키워드: {}", topKeywords);
+
+        StringBuilder vocContents = new StringBuilder("VOC 분석 데이터:\n");
+        StringBuilder recommendations = new StringBuilder("추천 답안:\n");
+
+        for (Map.Entry<String, Integer> entry : topKeywords) {
+            String keyword = entry.getKey();
+            int count = entry.getValue();
+            log.info("키워드 '{}'에 대한 VOC {}건 분석 중...", keyword, count);
+
+            vocContents.append(keyword).append(": ").append(count).append("건\n");
+
+            List<VOC> relatedVocs = vocRepository.findVocByKeywordAndSatisfaction(startOfAnalysisWeek, endOfAnalysisWeek, keyword);
+            for (VOC voc : relatedVocs) {
+                Optional<VOCAnswer> vocAnswerOptional = vocAnswerRepository.findByVoc_VocCode(voc.getVocCode());
+                vocAnswerOptional.ifPresent(vocAnswer -> {
+                    recommendations.append("- ").append(vocAnswer.getVocAnswerContent()).append("\n");
+                });
+            }
+        }
+
+        try {
+            String response = gptService.analyzeVocContents(vocContents.toString());
+            processGptResponseWithDate(response, targetDate);
+        } catch (Exception e) {
+            log.error("GPT로 VOC 분석 중 오류 발생: {}", e.getMessage(), e);
+        }
+    }
+
+    private void processGptResponseWithDate(String response, LocalDate analysisDate) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode fullResponseJson = objectMapper.readTree(response);
+
+            JsonNode choices = fullResponseJson.get("choices");
+            if (choices == null || !choices.isArray() || choices.isEmpty()) {
+                log.error("GPT 응답 형식 오류: 'choices' 배열이 없습니다.");
+                return;
+            }
+
+            String content = choices.get(0).get("message").get("content").asText();
+            log.info("GPT 응답에서 추출된 내용: {}", content);
+
+            JsonNode contentJson = objectMapper.readTree(content);
+
+            JsonNode insights = contentJson.get("insights");
+            JsonNode recommendations = contentJson.get("recommendations");
+
+            if (insights == null || recommendations == null) {
+                log.error("GPT 응답 형식 오류: 'insights' 또는 'recommendations' 항목이 없습니다.");
+                return;
+            }
+
+            if (!insights.isArray() || !recommendations.isArray()) {
+                log.error("GPT 응답 형식 오류: 'insights' 또는 'recommendations'가 배열이 아닙니다.");
+                return;
+            }
+
+            Set<String> processedKeywords = new HashSet<>();
+
+            for (JsonNode insight : insights) {
+                String keyword = insight.get("keyword").asText();
+                int count = insight.get("count").asInt();
+
+                if (processedKeywords.contains(keyword)) continue;
+
+                String recommendation = recommendations.findValuesAsText("recommendation").stream()
+                        .filter(r -> recommendations.findValue("keyword").asText().equals(keyword))
+                        .findFirst()
+                        .orElse("추천 답안 없음");
+
+                if (!vocAiAnswerRepository.existsByAnalysisDateAndKeyword(analysisDate, keyword)) {
+                    VOCAiAnswer vocAiAnswer = VOCAiAnswer.builder()
+                            .analysisDate(analysisDate)
+                            .keyword(keyword)
+                            .keywordCount(count)
+                            .recommendation(recommendation)
+                            .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                            .build();
+
+                    vocAiAnswerRepository.save(vocAiAnswer);
                 }
             }
         } catch (JsonProcessingException e) {

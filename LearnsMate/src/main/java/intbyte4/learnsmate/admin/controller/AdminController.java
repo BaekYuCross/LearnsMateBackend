@@ -24,6 +24,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,22 +56,30 @@ public class AdminController {
 
     // @AuthenticationPrincipal을 활용 -> CustomUserDetails에서 사용자 정보를 추출
     // 인증 성공 시 사용자 이름과 권한을 상태에 저장 -> Pinia 로 이름과 권한 정보 넘어감 (loginState.js 롹인 바람)
-    @Operation(summary = "직원 정보 조회")
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> checkAuthStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("GET /admin/status 요청 도착");
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("name", userDetails.getUserDTO().getAdminName()); // 관리자 이름
-        response.put("code", userDetails.getUserDTO().getAdminCode()); // 관리자 사번
-        response.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment()); // 관리자 부서
-        response.put("roles", userDetails.getAuthorities()); // 권한 정보
-        response.put("exp", userDetails.getExpiration()); // 시간
+        LocalDateTime expiration = userDetails.getExpiration();
+        ZonedDateTime kstExpiration = expiration.atZone(ZoneId.of("Asia/Seoul"));
 
-        log.info("만료시간은!!!: {}", userDetails.getExpiration());
+        int[] expArray = new int[] {
+                kstExpiration.getYear(),
+                kstExpiration.getMonthValue(),
+                kstExpiration.getDayOfMonth(),
+                kstExpiration.getHour(),
+                kstExpiration.getMinute(),
+                kstExpiration.getSecond()
+        };
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("name", userDetails.getUserDTO().getAdminName());
+        response.put("code", userDetails.getUserDTO().getAdminCode());
+        response.put("adminDepartment", userDetails.getUserDTO().getAdminDepartment());
+        response.put("roles", userDetails.getAuthorities());
+        response.put("exp", expArray);
 
         return ResponseEntity.ok(response);
     }
@@ -78,9 +89,6 @@ public class AdminController {
     @Operation(summary = "직원 비밀번호 재설정시 이메일 전송")
     @PostMapping("/verification-email/password")
     public ResponseEmailDTO<?> sendVerificationEmailPassword(@RequestBody @Validated AdminEmailVerificationVO requestVO) {
-
-        log.info("POST /admin/verification-email/password 요청 도착: request={}", requestVO);
-
         AdminDTO request = adminMapper.fromAdminEmailVoToDto(requestVO);
 
         // 입력한 사번 코드와 이메일의 정보 검증
@@ -111,8 +119,6 @@ public class AdminController {
     @Operation(summary = "비번 재설정 전 이메일 인증번호 검증")
     @PostMapping("/verification-email/confirmation")
     public ResponseEmailDTO<?> verifyEmail(@RequestBody @Validated EmailVerificationVO request) {
-        log.info("POST /admin/verification-email/confirmation 요청 도착: request={}", request);
-
         boolean isVerified = emailService.verifyCode(request.getEmail(), request.getCode());
 
         ResponseEmailMessageVO responseEmailMessageVO =new ResponseEmailMessageVO();
@@ -133,7 +139,6 @@ public class AdminController {
         AdminDTO request = adminMapper.fromResetPasswordVoToDto(requestVO);
         adminService.resetPassword(request);
 
-        log.info("비밀번호가 성공적으로 재설정되었습니다.");
         return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다.");
     }
 }

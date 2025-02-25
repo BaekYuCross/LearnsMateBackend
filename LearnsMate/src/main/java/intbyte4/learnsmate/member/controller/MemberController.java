@@ -36,8 +36,21 @@ public class MemberController {
     @GetMapping("/students")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size) {
+            @RequestParam(defaultValue = "50") int size) {
         MemberPageResponse<ResponseFindMemberVO> response = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "직원 - 학생 전체 정렬 조회")
+    @GetMapping("/students/sort")
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudentBySort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        MemberPageResponse<ResponseFindMemberVO> response
+                = memberFacade.findAllMemberByMemberTypeBySort(page, size, MemberType.STUDENT, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }
@@ -46,8 +59,21 @@ public class MemberController {
     @GetMapping("/tutors")
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutor(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size) {
-        MemberPageResponse<ResponseFindMemberVO> response = memberService.findAllMemberByMemberType(page, size, MemberType.TUTOR);
+            @RequestParam(defaultValue = "50") int size) {
+        MemberPageResponse<ResponseFindMemberVO> response = memberFacade.findAllMemberByMemberType(page, size, MemberType.TUTOR);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "직원 - 강사 전체 정렬 조회")
+    @GetMapping("/tutors/sort")
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllTutorBySort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        MemberPageResponse<ResponseFindMemberVO> response
+                = memberFacade.findAllMemberByMemberTypeBySort(page, size, MemberType.TUTOR, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }
@@ -125,6 +151,7 @@ public class MemberController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
+        log.info("request: {}", request.toString());
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
@@ -132,22 +159,44 @@ public class MemberController {
 
         MemberPageResponse<ResponseFindMemberVO> response = memberService.filterStudent(dto, page, size);
 
+        log.info("response: {}", response.toString());
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "직원 - 강사 필터링 검색")
-    @PostMapping("/filter/tutor")
-    public ResponseEntity<?> findTutorByFilter(
+    @Operation(summary = "직원 - 학생 필터링 정렬 검색")
+    @PostMapping("/filter/student/sort")
+    public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findStudentByFilterAndSort(
             @RequestBody RequestFilterMemberVO request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size) {
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+
+        MemberFilterRequestDTO dto =
+                memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
+
+        dto.setMemberType(MemberType.STUDENT);
+
+        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterStudentBySort(dto, page, size, sortField, sortDirection);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "직원 - 강사 필터링 정렬 검색")
+    @PostMapping("/filter/tutor/sort")
+    public ResponseEntity<?> findTutorByFilterAndSort(
+            @RequestBody RequestFilterMemberVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false, defaultValue = "memberCode") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
 
         MemberFilterRequestDTO dto =
                 memberMapper.fromRequestFilterVOtoMemberFilterRequestDTO(request);
 
         dto.setMemberType(MemberType.TUTOR);
 
-        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterTutor(dto, page, size);
+        MemberPageResponse<ResponseFindMemberVO> response = memberService.filterTutortBySort(dto, page, size, sortField, sortDirection);
 
         return ResponseEntity.ok(response);
     }

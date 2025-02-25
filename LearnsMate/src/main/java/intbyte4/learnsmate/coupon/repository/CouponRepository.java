@@ -15,10 +15,21 @@ import java.util.List;
 public interface CouponRepository extends JpaRepository<CouponEntity, Long>, CustomCouponRepository {
 
     // couponFlag가 true인 쿠폰 전체 조회
+    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true ORDER BY c.createdAt DESC")
     List<CouponEntity> findAllByCouponFlagTrue();
 
     // couponFlag가 true인 쿠폰 전체 조회 + offset 페이징
-    Page<CouponEntity> findAllByCouponFlagTrue(Pageable pageable);
+    @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true ORDER BY c.createdAt DESC")
+    Page<CouponEntity> findAllByCoupon(Pageable pageable);
+
+    // 필터링x 정렬o
+    @Query(value = "SELECT DISTINCT c FROM Coupon c " +
+            "LEFT JOIN FETCH c.couponCategory " +
+            "LEFT JOIN FETCH c.admin " +
+            "LEFT JOIN FETCH c.tutor " +
+            "WHERE c.couponFlag = true",
+            countQuery = "SELECT COUNT(c) FROM Coupon c WHERE c.couponFlag = true")
+    Page<CouponEntity> findAllByCouponWithSort(Pageable pageable);
 
     @Query("SELECT c FROM Coupon c WHERE c.couponFlag = true AND c.admin IS NOT NULL")
     Page<CouponEntity> findAllAdminCoupons(Pageable pageable);
@@ -37,4 +48,8 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long>, Cus
             "JOIN cbl.lecture l " +
             "WHERE c.couponFlag = true AND c.tutor.memberCode = :tutorCode")
     List<ClientFindCouponDTO> findAllClientCoupon(@Param("tutorCode") Long tutorCode);
+
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
+            "FROM Coupon c WHERE c.couponCode = :couponCode AND c.admin IS NOT NULL")
+    boolean findByAdminCouponByCouponCode(@Param("couponCode") Long couponCode);
 }

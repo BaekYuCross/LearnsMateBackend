@@ -36,8 +36,22 @@ public class VOCController {
 
     @Operation(summary = "직원 - VOC 페이지 조회")
     @GetMapping("/list")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOC(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
         VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPage(page, size);
+        return ResponseEntity.ok(response);
+    }
+
+    // 필터링x 정렬o
+    @Operation(summary = "직원 - VOC 페이지 조회")
+    @GetMapping("/list/sort")
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> listVOCWithSort(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        log.info("{}{}{}{}", page, size, sortField, sortDirection);
+        VOCPageResponse<ResponseFindVOCVO> response = vocFacade.findVOCsByPageWithSort(page, size, sortField, sortDirection);
+        log.info(response.toString());
         return ResponseEntity.ok(response);
     }
 
@@ -109,10 +123,31 @@ public class VOCController {
 
     @Operation(summary = "VOC 필터링")
     @PostMapping("/filter")
-    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "50") int size) {
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOC(@RequestBody RequestFilterVOCVO request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "30") int size) {
         try {
             VOCFilterRequestDTO dto = vocMapper.fromFilterVOtoFilterDTO(request);
             VOCPageResponse<ResponseFindVOCVO> response = vocFacade.filterVOCsByPage(dto, page, size);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // 필터링o 정렬o
+    @Operation(summary = "VOC 필터링")
+    @PostMapping("/filter/sort")
+    public ResponseEntity<VOCPageResponse<ResponseFindVOCVO>> filterVOCWithSort(
+            @RequestBody RequestFilterVOCVO request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortField,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        log.info("VOC 컬럼 필터링 요청 수신");
+        log.info("{}{}{}{}", page, size, sortField, sortDirection);
+        try {
+            VOCFilterRequestDTO dto = vocMapper.fromFilterVOtoFilterDTO(request);
+            VOCPageResponse<ResponseFindVOCVO> response = vocFacade.filterVOCsByPageWithSort(dto, page, size, sortField, sortDirection);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("예상치 못한 오류 발생", e);

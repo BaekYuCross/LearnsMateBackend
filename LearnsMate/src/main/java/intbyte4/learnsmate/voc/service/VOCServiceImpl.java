@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class VOCServiceImpl implements VOCService {
 
     @Override
     public List<VOCDTO> findUnansweredVOC() {
-        List<VOC> vocList = vocRepository.findTop3ByVocAnswerStatusFalseOrderByCreatedAtDesc();
+        List<VOC> vocList = vocRepository.findTop5ByVocAnswerStatusFalseOrderByCreatedAtDesc();
         return vocList.stream()
                 .map(vocMapper::fromEntityToDTO)
                 .collect(Collectors.toList());
@@ -110,7 +111,7 @@ public class VOCServiceImpl implements VOCService {
     // 현재 시간보다 이전의 데이터를 가져오기 위해 해둔 것 실제라면 위의 서비스 로직으로 구현해야 함
     @Override
     public Page<VOCDTO> findAllByVOCWithPaging(Pageable pageable) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         Pageable sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
@@ -120,10 +121,24 @@ public class VOCServiceImpl implements VOCService {
         return vocPage.map(vocMapper::fromEntityToDTO);
     }
 
+    // 필터링x 정렬o
+    @Override
+    public Page<VOCDTO> findAllByVOCWithPagingWithSort(Pageable pageable) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        Page<VOC> vocPage = vocRepository.findAllBeforeNowWithSort(now, pageable);
+        return vocPage.map(vocMapper::fromEntityToDTO);
+    }
 
     @Override
     public Page<VOCDTO> filterVOCWithPaging(VOCFilterRequestDTO dto, Pageable pageable) {
         Page<VOC> vocPage = vocRepository.searchByWithPaging(dto, pageable);
+        return vocPage.map(vocMapper::fromEntityToDTO);
+    }
+
+    // 필터링o 정렬o
+    @Override
+    public Page<VOCDTO> filterVOCWithPagingWithSort(VOCFilterRequestDTO dto, Pageable pageable) {
+        Page<VOC> vocPage = vocRepository.searchByWithPagingWithSort(dto, pageable);
         return vocPage.map(vocMapper::fromEntityToDTO);
     }
 
@@ -153,7 +168,6 @@ public class VOCServiceImpl implements VOCService {
                 .collect(Collectors.toList());
     }
 
-    // 강의 등록
     @Override
     public VOCDTO saveVOC(VOCDTO dto, MemberDTO memberDTO, VOCCategoryDTO vocCategoryDTO) {
 
@@ -166,7 +180,7 @@ public class VOCServiceImpl implements VOCService {
                 .vocContent(dto.getVocContent())
                 .vocAnswerStatus(false)
                 .vocAnswerSatisfaction(null)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .vocCategory(vocCategory)
                 .member(member)
                 .build();
