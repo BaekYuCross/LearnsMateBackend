@@ -130,7 +130,7 @@ public class VOCRepositoryImpl implements VOCRepositoryCustom {
             return null;
         }
         log.info("Filtering by VOC code: {}", vocCode);
-        return qVOC.vocCode.eq(vocCode);
+        return qVOC.vocCode.likeIgnoreCase("%" + vocCode + "%");
     }
 
     private BooleanExpression searchByContents(String vocContents) {
@@ -192,14 +192,13 @@ public class VOCRepositoryImpl implements VOCRepositoryCustom {
         if (startDate == null && endDate == null) {
             return null;
         }
-        log.info("Filtering by date range: {} to {}", startDate, endDate);
-        if (startDate != null && endDate != null) {
-            return qVOC.createdAt.between(startDate, endDate);
-        } else if (startDate != null) {
-            return qVOC.createdAt.goe(startDate);
-        } else {
+        if (startDate == null) {
             return qVOC.createdAt.loe(endDate);
         }
+        if (endDate == null) {
+            return qVOC.createdAt.goe(startDate);
+        }
+        return qVOC.createdAt.between(startDate, endDate);
     }
 
     // 동적 정렬 관련

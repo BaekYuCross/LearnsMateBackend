@@ -42,12 +42,10 @@ public class VOCServiceImpl implements VOCService {
 
     @Override
     public VOCDTO findByVOCCode(String vocCode) {
-        log.info("VOC 단 건 조회 중: {}", vocCode);
         VOC voc = vocRepository.findById(vocCode)
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
 
         VOCDTO vocDTO = vocMapper.fromEntityToDTO(voc);
-        log.info("매핑된 VOCDTO: {}", vocDTO);
         return vocDTO;
     }
 
@@ -57,7 +55,6 @@ public class VOCServiceImpl implements VOCService {
                 .orElseThrow(() -> new CommonException(StatusEnum.VOC_NOT_FOUND));
         voc.setVocAnswerStatus(vocAnswerStatus);
         vocRepository.save(voc);
-        log.info("VOC 답변 상태가 {}로 업데이트됐습니다.: {}", vocAnswerStatus, voc);
     }
 
     @Override
@@ -196,8 +193,6 @@ public class VOCServiceImpl implements VOCService {
     // 회원의 전체 voc 조회
     @Override
     public List<VOCClientDTO> findAllClientVOC(Long memberCode) {
-
-        log.info("memberCode: {}", memberCode);
         List<VOCClientDTO> dtoList = vocRepository.findAllClientVOC(memberCode);
 
         return dtoList;

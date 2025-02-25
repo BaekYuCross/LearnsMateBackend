@@ -119,14 +119,20 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
     }
 
     private BooleanExpression betweenCreatedAt(LocalDateTime startCreatedAt, LocalDateTime endCreatedAt) {
-        if (startCreatedAt == null && endCreatedAt == null) return null;
-        if (startCreatedAt == null) return payment.createdAt.loe(endCreatedAt);
-        if (endCreatedAt == null) return payment.createdAt.goe(startCreatedAt);
+        if (startCreatedAt == null && endCreatedAt == null) {
+            return null; // 시작일과 종료일 모두 없으면 필터링 조건 없음
+        }
+        if (startCreatedAt == null) {
+            return payment.createdAt.loe(endCreatedAt);
+        }
+        if (endCreatedAt == null) {
+            return payment.createdAt.goe(startCreatedAt);
+        }
         return payment.createdAt.between(startCreatedAt, endCreatedAt);
     }
 
     private BooleanExpression eqLectureCode(String lectureCode) {
-        return StringUtils.hasText(lectureCode) ? lecture.lectureCode.eq(lectureCode) : null;
+        return StringUtils.hasText(lectureCode) ? lecture.lectureCode.likeIgnoreCase("%" + lectureCode + "%") : null;
     }
 
     private BooleanExpression likeLectureTitle(String lectureTitle) {
