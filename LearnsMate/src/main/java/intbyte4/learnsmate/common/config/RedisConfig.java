@@ -4,16 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.OFF)
+@EnableRedisRepositories
 @Slf4j
 public class RedisConfig {
 
@@ -25,20 +25,19 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        String redisClusterNodes = environment.getProperty("spring.data.redis.cluster.nodes");
+        String redisHost = environment.getProperty("spring.data.redis.host", "localhost");
+        int redisPort = environment.getProperty("spring.data.redis.port", Integer.class, 6379);
+        String redisPassword = environment.getProperty("spring.data.redis.password", "");
 
-        if (redisClusterNodes == null || redisClusterNodes.isEmpty()) {
-            throw new IllegalArgumentException("Redis cluster nodes must not be null or empty");
+        log.info("Connecting to Redis at {}:{}", redisHost, redisPort);
+
+        RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration(redisHost, redisPort);
+
+        if (!redisPassword.isEmpty()) {
+            standaloneConfig.setPassword(RedisPassword.of(redisPassword));
         }
 
-        log.info("Connecting to Redis cluster at: {}", redisClusterNodes);
-
-        RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration();
-        String[] parts = redisClusterNodes.split(":");
-        clusterConfig.clusterNode(parts[0], Integer.parseInt(parts[1]));
-        clusterConfig.setMaxRedirects(3);
-
-        return new LettuceConnectionFactory(clusterConfig);
+        return new LettuceConnectionFactory(standaloneConfig);
     }
 
     @Bean
