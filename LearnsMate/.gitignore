@@ -21,6 +21,7 @@ bin/
 
 # IntelliJ IDEA
 application-test.yml
+application.yml
 
 # VS Code
 .vscode/
