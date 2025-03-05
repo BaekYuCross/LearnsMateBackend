@@ -5,6 +5,7 @@ import intbyte4.learnsmate.admin.domain.dto.JwtTokenDTO;
 import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.admin.domain.vo.request.RequestLoginVO;
 import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.refresh_token.service.RefreshTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,14 +38,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private Environment env;
     private JwtUtil jwtUtil;
     private RedisTemplate<String, String> redisTemplate;
+    private RefreshTokenService refreshTokenService;
 
     public AuthenticationFilter(AuthenticationManager authenticationManager, AdminService userService, Environment env, JwtUtil jwtUtil,
-                                RedisTemplate<String, String> redisTemplate) {
+                                RedisTemplate<String, String> redisTemplate, RefreshTokenService refreshTokenService) {
         super(authenticationManager);
         this.userService = userService;
         this.env = env;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
+        this.refreshTokenService = refreshTokenService;
 
         // 커스텀 로그인 경로 설정
         setFilterProcessesUrl("/users/login");
@@ -125,8 +128,9 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         log.info("토큰 생성 완료");
 
         try {
-            saveRefreshTokenToRedis(userCode, refreshToken);
-            log.info("Redis에 Refresh Token 저장 완료");
+//            saveRefreshTokenToRedis(userCode, refreshToken);
+            saveRefreshToken(userCode, refreshToken);
+            log.info("Redis 및 DB에 Refresh Token 저장 완료");
         } catch (Exception e) {
             log.error("Redis 저장 실패: {}", e.getMessage(), e);
         }
@@ -147,22 +151,51 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.getWriter().write(new ObjectMapper().writeValueAsString(responseData));
     }
 
-    // Redis에 refreshToken 저장
-    public void saveRefreshTokenToRedis(String userCode, String refreshToken) {
-        try {
-            log.info("Saved Refresh Token to Redis: Key=refreshToken:{}, Value={}", userCode, refreshToken);
+//    // Redis에 refreshToken 저장
+//    public void saveRefreshTokenToRedis(String userCode, String refreshToken) {
+//        try {
+//            log.info("Saved Refresh Token to Redis: Key=refreshToken:{}, Value={}", userCode, refreshToken);
+//
+//            // Redis에 refreshToken 저장
+//            redisTemplate.opsForValue().set(
+//                    "refreshToken:" + userCode,
+//                    refreshToken,
+//                    7, // 7일
+//                    TimeUnit.DAYS
+//            );
+//        } catch (Exception e) {
+//            log.error("Redis save fail - saveRefreshTokenToRedis : ", e);
+//        }
+//    }
 
-            // Redis에 refreshToken 저장
+    // Refresh Token 저장 (Redis & DB 동시 저장)
+    public void saveRefreshToken(String userCode, String refreshToken) {
+        try {
+            // Redis에 저장
+            long redisStartTime = System.nanoTime();
             redisTemplate.opsForValue().set(
                     "refreshToken:" + userCode,
                     refreshToken,
                     7, // 7일
                     TimeUnit.DAYS
             );
+            long redisEndTime = System.nanoTime();
+            log.info("⏱️ Redis 저장 시간: {} ns - userCode: {}", (redisEndTime - redisStartTime), userCode);
+            log.info("✅ Redis에 Refresh Token 저장 완료 - userCode: {}", userCode);
+
+            // DBMS에 저장
+            long dbStartTime = System.nanoTime();
+            refreshTokenService.saveRefreshTokenToDB(userCode, refreshToken);
+            long dbEndTime = System.nanoTime();
+            log.info("⏱️ DB 저장 시간: {} ns - userCode: {}", (dbEndTime - dbStartTime), userCode);
+
+            log.info("✅ DBMS에 Refresh Token 저장 완료 - userCode: {}", userCode);
+
         } catch (Exception e) {
-            log.error("Redis save fail - saveRefreshTokenToRedis : ", e);
+            log.error("❌ Refresh Token 저장 실패 (Redis 또는 DBMS) - userCode: {}", userCode, e);
         }
     }
+
 
     //로그인 실패시 실행하는 메소드
     @Override

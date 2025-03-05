@@ -1,6 +1,7 @@
 package intbyte4.learnsmate.security;
 
 import intbyte4.learnsmate.admin.service.AdminService;
+import intbyte4.learnsmate.refresh_token.service.RefreshTokenService;
 import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,7 @@ import java.util.Collections;
 @EnableWebSecurity
 public class WebSecurity {
 
+    private final RefreshTokenService refreshTokenService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
     private AdminService userService;
@@ -35,12 +37,13 @@ public class WebSecurity {
     private JwtUtil jwtUtil;
 
     @Autowired
-    public WebSecurity(BCryptPasswordEncoder bCryptPasswordEncoder, AdminService userService, Environment env, JwtUtil jwtUtil, RedisTemplate<String, String> redisTemplate) {
+    public WebSecurity(BCryptPasswordEncoder bCryptPasswordEncoder, AdminService userService, Environment env, JwtUtil jwtUtil, RedisTemplate<String, String> redisTemplate, RefreshTokenService refreshTokenService) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userService = userService;
         this.env = env;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
+        this.refreshTokenService = refreshTokenService;
     }
 
 
@@ -140,6 +143,6 @@ public class WebSecurity {
 
     // Authentication 용 메소드(인증 필터 반환)
     private Filter getAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new AuthenticationFilter(authenticationManager, userService, env, jwtUtil, redisTemplate);
+        return new AuthenticationFilter(authenticationManager, userService, env, jwtUtil, redisTemplate, refreshTokenService);
     }
 }

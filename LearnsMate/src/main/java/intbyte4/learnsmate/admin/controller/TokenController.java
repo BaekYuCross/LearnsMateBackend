@@ -4,6 +4,7 @@ import intbyte4.learnsmate.admin.domain.dto.JwtTokenDTO;
 import intbyte4.learnsmate.admin.domain.entity.CustomUserDetails;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.admin.service.RedisService;
+import intbyte4.learnsmate.refresh_token.service.RefreshTokenService;
 import intbyte4.learnsmate.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -32,6 +34,7 @@ public class TokenController {
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisService redisService;
     private final AdminService adminService;
+    private final RefreshTokenService refreshTokenService;
 
     @Operation(summary = "직원 로그아웃")
     @PostMapping("/logout")
@@ -49,6 +52,9 @@ public class TokenController {
             String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
             redisService.deleteToken(userCode);
 
+            // DBMS에서 토큰 삭제
+            refreshTokenService.deleteRefreshTokenFromDB(userCode);
+
             // 응답에서 쿠키 제거
             clearCookie(response, "token");
             clearCookie(response, "refreshToken");
@@ -64,6 +70,8 @@ public class TokenController {
     @Operation(summary = "토큰 리프레시 요청")
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
+        long startTime = Instant.now().toEpochMilli();  // 시작 시간 기록
+
         try {
             String refreshToken = requestBody.get("refreshToken");
             log.info("Received refresh token: {}", refreshToken);
@@ -75,14 +83,34 @@ public class TokenController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
             }
 
+            long redisStartTime = System.nanoTime();
+            // Redis에서 refreshToken 조회
             String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
-            log.info("Redis token found: {}", redisToken != null);
+            long redisEndTime = System.nanoTime();
+            long redisElapsedTime = redisEndTime - redisStartTime;  // Redis 조회 소요 시간 계산
 
-            if (redisToken == null || !refreshToken.equals(redisToken) || !jwtUtil.validateToken(redisToken)) {
-                log.error("Token validation failed. Redis token: {}, Refresh token valid: {}",
-                        redisToken != null,
-                        refreshToken != null && jwtUtil.validateToken(refreshToken)
-                );
+            log.info("Redis token found: {}", redisToken != null);
+            log.info("Redis 조회 시간: {}ms", redisElapsedTime);
+
+            // DBMS에서 refreshToken 조회 (시간 측정 포함)
+            long dbStartTime = System.nanoTime();
+            String dbmsToken = refreshTokenService.getRefreshTokenFromDB(userCode);
+            long dbEndTime = System.nanoTime();
+
+            long dbmsElapsedTime = dbEndTime - dbStartTime;  // DBMS 조회 소요 시간 계산
+            log.info("DBMS token found: {}", dbmsToken != null);
+            log.info("DBMS 조회 시간: {}ms", dbmsElapsedTime);
+
+            // 성능 비교 로그
+            log.info("Redis 조회 시간: {}ms, DBMS 조회 시간: {}ms", redisElapsedTime, dbmsElapsedTime);
+
+            // 성능 비교 후 적절한 토큰 검증
+            if (redisToken == null && dbmsToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
+            }
+
+            String validToken = redisToken != null ? redisToken : dbmsToken;
+            if (!jwtUtil.validateToken(validToken)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
             }
 
@@ -105,6 +133,9 @@ public class TokenController {
                     kstExpiration.getSecond()
             });
 
+            long endTime = Instant.now().toEpochMilli();  // 전체 소요 시간 기록
+            long totalElapsedTime = endTime - startTime;  // 전체 소요 시간 계산
+            log.info("전체 소요 시간: {}ms", totalElapsedTime);
 
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
