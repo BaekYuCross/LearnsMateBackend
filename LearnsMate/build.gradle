@@ -79,6 +79,11 @@ dependencies {
     implementation 'net.nurigo:sdk:4.3.0'
 
     implementation 'org.springframework.session:spring-session-core:3.0.0'
+
+    // p6spy를 사용하면 Hibernate의 SQL 로그를 더 가독성 좋고 컬러로 출력
+    dependencies {
+        implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+    }
 }
 
 tasks.named('test') {
