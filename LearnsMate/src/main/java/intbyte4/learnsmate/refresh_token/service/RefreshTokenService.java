@@ -40,7 +40,6 @@ public class RefreshTokenService {
 
         long endTime = Instant.now().toEpochMilli();  // 조회 끝 시간 기록
         long duration = endTime - startTime;  // 걸린 시간 계산
-        System.out.println("DBMS 조회 시간: " + duration + "ms");
 
         return refreshToken;
     }
