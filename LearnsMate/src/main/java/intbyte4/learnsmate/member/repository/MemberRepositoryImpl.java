@@ -55,7 +55,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
             query.orderBy(orderSpecifier);
         }
 
-        long total = query.fetchCount();
+        long total = query.fetch().size();
 
         List<Member> members = query
                 .offset(pageable.getOffset())

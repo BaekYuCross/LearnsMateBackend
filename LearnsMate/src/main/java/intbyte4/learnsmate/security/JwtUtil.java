@@ -119,7 +119,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(Date.from(now.toInstant()))
                 .setExpiration(Date.from(expirationDateTime.toInstant()))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -134,7 +134,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(Date.from(now.toInstant()))
                 .setExpiration(Date.from(expirationDateTime.toInstant()))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
