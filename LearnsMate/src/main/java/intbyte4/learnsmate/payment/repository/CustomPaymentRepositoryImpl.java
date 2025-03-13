@@ -6,11 +6,14 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import intbyte4.learnsmate.coupon.domain.entity.QCouponEntity;
+import intbyte4.learnsmate.issue_coupon.domain.QIssueCoupon;
 import intbyte4.learnsmate.lecture.domain.entity.QLecture;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.QLectureByStudent;
 import intbyte4.learnsmate.lecture_category.domain.entity.QLectureCategory;
 import intbyte4.learnsmate.lecture_category_by_lecture.domain.entity.QLectureCategoryByLecture;
 import intbyte4.learnsmate.member.domain.entity.QMember;
+import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.entity.QPayment;
@@ -26,6 +29,8 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -195,12 +200,90 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
             query.orderBy(orderSpecifier);
         }
 
-        long total = query.fetchCount();
+        long total = query.fetch().size();
 
         List<Payment> results = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public Page<PaymentDetailDTO> findAllWithSort2(Pageable pageable) {
+        QPayment payment = QPayment.payment;
+        QLectureByStudent lectureByStudent = QLectureByStudent.lectureByStudent;
+        QLecture lecture = QLecture.lecture;
+        QLectureCategoryByLecture lectureCategoryByLecture = QLectureCategoryByLecture.lectureCategoryByLecture;
+        QLectureCategory lectureCategory = QLectureCategory.lectureCategory;
+        QMember student = QMember.member;
+        QMember tutor = new QMember("tutor");
+        QIssueCoupon issueCoupon = QIssueCoupon.issueCoupon;
+        QCouponEntity coupon = QCouponEntity.couponEntity;
+
+        // **1️⃣ 전체 개수 조회 (COUNT 쿼리)**
+        long total = Optional.ofNullable(queryFactory
+                        .select(payment.count())
+                        .from(payment)
+                        .innerJoin(payment.lectureByStudent, lectureByStudent)
+                        .innerJoin(lectureByStudent.lecture, lecture)
+                        .fetchOne())
+                .orElse(0L); // 🔥 NULL 방지 (데이터가 없으면 0 반환)
+
+        // **2️⃣ 페이징 처리된 데이터 조회**
+        List<PaymentDetailDTO> results = queryFactory
+                .select(
+                        payment.paymentCode,
+                        payment.paymentPrice,
+                        payment.createdAt,
+                        lecture.lectureCode,
+                        lecture.lectureTitle,
+                        lecture.lecturePrice,
+                        tutor.memberCode,
+                        tutor.memberName,
+                        student.memberCode,
+                        student.memberName,
+                        lecture.lectureStatus,
+                        lectureCategory.lectureCategoryName,
+                        lecture.lectureClickCount,
+                        lecture.lectureLevel,
+                        issueCoupon.couponIssuanceCode,
+                        coupon.couponName
+                )
+                .from(payment)
+                .innerJoin(payment.lectureByStudent, lectureByStudent)
+                .innerJoin(lectureByStudent.student, student)
+                .innerJoin(lectureByStudent.lecture, lecture)
+                .innerJoin(lecture.tutor, tutor)
+                .innerJoin(lectureCategoryByLecture).on(lectureCategoryByLecture.lecture.eq(lecture))
+                .innerJoin(lectureCategoryByLecture.lectureCategory, lectureCategory)
+                .leftJoin(payment.couponIssuance, issueCoupon)
+                .leftJoin(issueCoupon.coupon, coupon)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getOrderSpecifier(payment, lecture, lectureCategory, student, tutor, pageable.getSort().iterator().next()))
+                .fetch()
+                .stream()
+                .map(tuple -> new PaymentDetailDTO(
+                        tuple.get(payment.paymentCode),
+                        tuple.get(payment.paymentPrice),
+                        tuple.get(payment.createdAt),
+                        tuple.get(lecture.lectureCode),
+                        tuple.get(lecture.lectureTitle),
+                        tuple.get(lecture.lecturePrice),
+                        tuple.get(tutor.memberCode),
+                        tuple.get(tutor.memberName),
+                        tuple.get(student.memberCode),
+                        tuple.get(student.memberName),
+                        tuple.get(lecture.lectureStatus),
+                        Objects.toString(tuple.get(lectureCategory.lectureCategoryName), null),  // ✅ NPE 방지!
+                        tuple.get(lecture.lectureClickCount),
+                        tuple.get(lecture.lectureLevel),
+                        tuple.get(issueCoupon.couponIssuanceCode),
+                        tuple.get(coupon.couponName)
+                ))
+                .toList();
 
         return new PageImpl<>(results, pageable, total);
     }

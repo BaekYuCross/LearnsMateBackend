@@ -64,16 +64,33 @@ public class PaymentFacade {
     // Facade
     public PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> getPaymentsWithGraphAndSort(
             int page, int size, String sortField, String sortDirection) {
-        Page<Payment> payments = getPaymentsWithPaginationAndSort(page, size, sortField, sortDirection);
-        Map<Integer, List<PaymentMonthlyRevenueDTO>> graphData = (page == 0) ? getMonthlyRevenueComparisonWithSort() : null;
+        log.info("getPaymentsWithPaginationAndSort 시작");
+        long startTime = System.currentTimeMillis(); // 시작 시간
+//        Page<Payment> payments = getPaymentsWithPaginationAndSort(page, size, sortField, sortDirection);
+        long endTime = System.currentTimeMillis(); // 종료 시간
+        log.info("getPaymentsWithPaginationAndSort 종료 | 실행 시간: {} ms", (endTime - startTime));
 
-        List<ResponseFindPaymentVO> paymentVOs = payments.stream()
-                .map(this::getPaymentDetailDTO)
+        log.info("getPaymentsWithPaginationAndSort2 시작");
+        startTime = System.currentTimeMillis();
+        Page<PaymentDetailDTO> paymentDetailDTOs = getPaymentsWithPaginationAndSort2(page, size, sortField, sortDirection);
+        endTime = System.currentTimeMillis();
+        log.info("getPaymentsWithPaginationAndSort2 종료 | 실행 시간: {} ms", (endTime - startTime));
+        log.info("paymentDetailDTOs: {}", paymentDetailDTOs.getContent());
+
+        log.info("getMonthlyRevenueComparisonWithSort 시작");
+        Map<Integer, List<PaymentMonthlyRevenueDTO>> graphData = (page == 0) ? getMonthlyRevenueComparisonWithSort() : null;
+        log.info("getMonthlyRevenueComparisonWithSort 종료");
+
+        List<ResponseFindPaymentVO> paymentVOs = paymentDetailDTOs.stream()
                 .map(paymentMapper::fromDtoToResponseVO)
                 .collect(Collectors.toList());
+//        List<ResponseFindPaymentVO> paymentVOs = payments.stream()
+//                .map(this::getPaymentDetailDTO)
+//                .map(paymentMapper::fromDtoToResponseVO)
+//                .collect(Collectors.toList());
 
-        boolean hasNext = payments.hasNext();
-        long totalElements = payments.getTotalElements();
+        boolean hasNext = paymentDetailDTOs.hasNext();
+        long totalElements = paymentDetailDTOs.getTotalElements();
 
         return new PaymentPageResponse<>(paymentVOs, graphData, hasNext, totalElements);
     }
@@ -84,6 +101,14 @@ public class PaymentFacade {
         Pageable pageable = PageRequest.of(page, size, sort);
         return paymentRepository.findAllWithSort(pageable);
     }
+
+    // 정렬
+    private Page<PaymentDetailDTO> getPaymentsWithPaginationAndSort2(int page, int size, String sortField, String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.valueOf(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return paymentRepository.findAllWithSort2(pageable);
+    }
+
 
     // 정렬
     private String getSortFieldName(String sortField) {
