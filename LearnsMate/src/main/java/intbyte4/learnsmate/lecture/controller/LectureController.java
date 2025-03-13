@@ -56,7 +56,12 @@ public class LectureController {
             @RequestParam(required = false, defaultValue = "createdAt") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection
     ){
+        long startTime = System.nanoTime();
         LecturePaginationResponse<ResponseFindLectureVO> response = lectureFacade.getLecturesWithPaginationByOffsetWithSort(page, size, sortField, sortDirection);
+
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime; // 실행 시간 계산 (나노초 단위)
+        log.info("퍼사드 실행 시간: {}ns ({}ms)", elapsedTime, elapsedTime / 1_000_000.0);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
