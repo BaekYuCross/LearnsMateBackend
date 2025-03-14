@@ -26,8 +26,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -45,6 +47,7 @@ public class PaymentFacade {
     private final PaymentRepository paymentRepository;
     private final IssueCouponService issueCouponService;
     private final PaymentMapper paymentMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> getPaymentsWithGraph(int page, int size) {
         Page<Payment> payments = getPaymentsWithPagination(page, size);
@@ -64,19 +67,53 @@ public class PaymentFacade {
     // Facade
     public PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> getPaymentsWithGraphAndSort(
             int page, int size, String sortField, String sortDirection) {
-        Page<Payment> payments = getPaymentsWithPaginationAndSort(page, size, sortField, sortDirection);
-        Map<Integer, List<PaymentMonthlyRevenueDTO>> graphData = (page == 0) ? getMonthlyRevenueComparisonWithSort() : null;
 
-        List<ResponseFindPaymentVO> paymentVOs = payments.stream()
-                .map(this::getPaymentDetailDTO)
+        String redisKey = "payments:page=" + page + ":size=" + size + ":sort=" + sortField + "_" + sortDirection;
+
+        log.info("🔍 Redis에서 캐시 확인: {}", redisKey);
+        long startTime = System.currentTimeMillis();
+
+        // *️⃣ Redis에서 데이터 조회 (캐시 확인)
+        PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> cachedData =
+                (PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>) redisTemplate.opsForValue().get(redisKey);
+
+        if (cachedData != null) {
+            log.info("✅ Redis 캐시 HIT! 캐싱된 데이터 반환");
+            long endTime = System.currentTimeMillis();
+            log.info("🕒 캐시 데이터 조회 시간: {} ms", (endTime - startTime));
+            return cachedData;
+        }
+
+        log.info("🚨 Redis 캐시 MISS! DB에서 조회 시작");
+
+        // 2️⃣ 기존 데이터 조회 로직
+        log.info("getPaymentsWithPaginationAndSort2 시작");
+        startTime = System.currentTimeMillis();
+        Page<PaymentDetailDTO> paymentDetailDTOs = getPaymentsWithPaginationAndSort2(page, size, sortField, sortDirection);
+        long endTime = System.currentTimeMillis();
+        log.info("getPaymentsWithPaginationAndSort2 종료 | 실행 시간: {} ms", (endTime - startTime));
+
+        log.info("getMonthlyRevenueComparisonWithSort 시작");
+        Map<Integer, List<PaymentMonthlyRevenueDTO>> graphData = (page == 0) ? getMonthlyRevenueComparisonWithSort() : null;
+        log.info("getMonthlyRevenueComparisonWithSort 종료");
+
+        List<ResponseFindPaymentVO> paymentVOs = paymentDetailDTOs.stream()
                 .map(paymentMapper::fromDtoToResponseVO)
                 .collect(Collectors.toList());
 
-        boolean hasNext = payments.hasNext();
-        long totalElements = payments.getTotalElements();
+        boolean hasNext = paymentDetailDTOs.hasNext();
+        long totalElements = paymentDetailDTOs.getTotalElements();
 
-        return new PaymentPageResponse<>(paymentVOs, graphData, hasNext, totalElements);
+        // 3️⃣ Redis에 저장 (TTL 30분)
+        PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> response =
+                new PaymentPageResponse<>(paymentVOs, graphData, hasNext, totalElements);
+
+        redisTemplate.opsForValue().set(redisKey, response, Duration.ofMinutes(30));
+        log.info("📌 Redis에 데이터 저장 완료 (TTL: 30분)");
+
+        return response;
     }
+
 
     // 정렬
     private Page<Payment> getPaymentsWithPaginationAndSort(int page, int size, String sortField, String sortDirection) {
@@ -84,6 +121,14 @@ public class PaymentFacade {
         Pageable pageable = PageRequest.of(page, size, sort);
         return paymentRepository.findAllWithSort(pageable);
     }
+
+    // 정렬
+    private Page<PaymentDetailDTO> getPaymentsWithPaginationAndSort2(int page, int size, String sortField, String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.valueOf(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return paymentRepository.findAllWithSort2(pageable);
+    }
+
 
     // 정렬
     private String getSortFieldName(String sortField) {

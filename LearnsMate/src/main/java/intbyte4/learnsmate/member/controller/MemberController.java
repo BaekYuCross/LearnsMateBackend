@@ -37,8 +37,12 @@ public class MemberController {
     public ResponseEntity<MemberPageResponse<ResponseFindMemberVO>> findAllStudent(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
+        log.info("findAllStudent 시작");
+        long startTime = System.currentTimeMillis(); // 시작 시간
         MemberPageResponse<ResponseFindMemberVO> response = memberFacade.findAllMemberByMemberType(page, size, MemberType.STUDENT);
-
+        long endTime = System.currentTimeMillis(); // 종료 시간
+        log.info("findAllStudent 끝");
+        log.info("findAllStudent 종료 | 실행 시간: {} ms", (endTime - startTime));
         return ResponseEntity.ok(response);
     }
 
@@ -49,8 +53,13 @@ public class MemberController {
             @RequestParam(defaultValue = "15") int size,
             @RequestParam(required = false, defaultValue = "memberCode") String sortField,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection) {
+        long startTime = System.currentTimeMillis(); // 시작 시간
+        log.info("findAllStudentBySort 시작");
         MemberPageResponse<ResponseFindMemberVO> response
                 = memberFacade.findAllMemberByMemberTypeBySort(page, size, MemberType.STUDENT, sortField, sortDirection);
+        long endTime = System.currentTimeMillis(); // 종료 시간
+        log.info("findAllStudentBySort 끝");
+        log.info("findAllStudentBySort 종료 | 실행 시간: {} ms", (endTime - startTime));
 
         return ResponseEntity.ok(response);
     }

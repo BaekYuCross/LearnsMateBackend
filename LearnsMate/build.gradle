@@ -84,6 +84,10 @@ dependencies {
     dependencies {
         implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
     }
+    // Redis에 데이터를 저장할 때, LocalDateTime 타입을 제대로 직렬화(serialize) 도움 라이브러리
+    dependencies {
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    }
 }
 
 tasks.named('test') {
