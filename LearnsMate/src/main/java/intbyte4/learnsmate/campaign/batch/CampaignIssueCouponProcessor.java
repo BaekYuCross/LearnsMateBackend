@@ -20,7 +20,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 @Component
@@ -33,14 +33,11 @@ public class CampaignIssueCouponProcessor implements ItemProcessor<Pair<MemberDT
     private final CouponCategoryService couponCategoryService;
     private final AdminService adminService;
     private final AdminMapper adminMapper;
-    private final Map<Integer, CouponCategory> couponCategoryCache = new HashMap<>();
-    private final Map<Long, Admin> adminCache = new HashMap<>();
+    private final Map<Integer, CouponCategory> couponCategoryCache = new ConcurrentHashMap<>();
+    private final Map<Long, Admin> adminCache = new ConcurrentHashMap<>();
 
     @Override
     public IssueCoupon process(Pair<MemberDTO, CouponDTO> pair) throws Exception {
-        log.info("Processing pair - Student: {}, Coupon: {}",
-                pair.getLeft().getMemberCode(),
-                pair.getRight().getCouponCode());
         MemberDTO studentDTO = pair.getLeft();
         CouponDTO couponDTO = pair.getRight();
 
@@ -61,16 +58,11 @@ public class CampaignIssueCouponProcessor implements ItemProcessor<Pair<MemberDT
         Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
         CouponEntity coupon = couponMapper.toAdminCouponEntity(couponDTO, couponCategory, admin);
 
-
         IssueCoupon issueCoupon = new IssueCoupon();
         issueCoupon.setStudent(student);
         issueCoupon.setCoupon(coupon);
         issueCoupon.setCouponIssueDate(LocalDateTime.now());
         issueCoupon.setCouponUseStatus(false);
-
-        log.info("Processed IssueCoupon - Student: {}, Coupon: {}",
-                issueCoupon.getStudent().getMemberCode(),
-                issueCoupon.getCoupon().getCouponCode());
 
         return issueCoupon;
     }

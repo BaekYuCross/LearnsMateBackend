@@ -13,3 +13,4 @@ public interface CouponByCampaignService {
     void removeCouponByCampaign(Long couponByCampaignCode);
     void removeByCampaignCode(Long campaignCode);
 }
+    
