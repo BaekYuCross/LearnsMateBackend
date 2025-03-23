@@ -24,7 +24,6 @@ public class CampaignIssueCouponReader implements ItemReader<Pair<MemberDTO, Cou
         for (MemberDTO student : students) {
             for (CouponDTO coupon : coupons) {
                 studentCouponPairs.add(Pair.of(student, coupon));
-                log.info("student {} coupon {}", student, coupon);
             }
         }
         this.iterator = studentCouponPairs.iterator();
@@ -32,7 +31,6 @@ public class CampaignIssueCouponReader implements ItemReader<Pair<MemberDTO, Cou
 
     @Override
     public Pair<MemberDTO, CouponDTO> read() {
-        log.info("IssueCoupon Pair: {}", studentCouponPairs);
         if (iterator != null && iterator.hasNext()) {
             return iterator.next();
         } else {

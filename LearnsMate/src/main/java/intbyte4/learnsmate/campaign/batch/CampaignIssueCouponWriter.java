@@ -20,12 +20,16 @@ public class CampaignIssueCouponWriter implements ItemWriter<IssueCoupon> {
 
     @Override
     public void write(Chunk<? extends IssueCoupon> chunk) throws Exception {
+        long startTime = System.currentTimeMillis(); // 시작 시간 기록
+
         List<IssueCoupon> issueCoupons = new ArrayList<>();
         for (IssueCoupon issueCoupon : chunk) {
             IssueCoupon newIssueCoupon = IssueCoupon.createIssueCoupon(issueCoupon.getCoupon(), issueCoupon.getStudent());
             issueCoupons.add(newIssueCoupon);
         }
-        log.info("IssueCoupon Writer: {}", issueCoupons);
         issueCouponRepository.saveAll(issueCoupons);
+
+        long endTime = System.currentTimeMillis(); // 종료 시간 기록
+        log.info("Writer 데이터 쓰기 완료: {}ms, 처리된 데이터 수: {}", endTime - startTime, issueCoupons.size());
     }
 }

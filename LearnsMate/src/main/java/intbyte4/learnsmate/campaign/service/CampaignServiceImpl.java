@@ -142,7 +142,6 @@ public class CampaignServiceImpl implements CampaignService {
                     .map(campaignCoupon -> couponService.findCouponDTOByCouponCode(campaignCoupon.getCouponCode()))
                     .toList();
 
-            log.info("Setting up reader with students: {}, coupons: {}", students.size(), coupons.size());
             couponMemberReader.setStudentCouponPairs(students, coupons);
 
             if (students.isEmpty() || coupons.isEmpty()) {
