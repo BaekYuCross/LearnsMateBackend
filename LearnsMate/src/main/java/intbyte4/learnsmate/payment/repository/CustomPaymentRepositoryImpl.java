@@ -222,16 +222,16 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
         QIssueCoupon issueCoupon = QIssueCoupon.issueCoupon;
         QCouponEntity coupon = QCouponEntity.couponEntity;
 
-        // **1️⃣ 전체 개수 조회 (COUNT 쿼리)**
+        // 1.️ 전체 개수 조회 (COUNT 쿼리)
         long total = Optional.ofNullable(queryFactory
                         .select(payment.count())
                         .from(payment)
                         .innerJoin(payment.lectureByStudent, lectureByStudent)
                         .innerJoin(lectureByStudent.lecture, lecture)
                         .fetchOne())
-                .orElse(0L); // 🔥 NULL 방지 (데이터가 없으면 0 반환)
+                .orElse(0L); // NULL 방지 (데이터가 없으면 0 반환)
 
-        // **2️⃣ 페이징 처리된 데이터 조회**
+        // 2. 페이징 처리된 데이터 조회
         List<PaymentDetailDTO> results = queryFactory
                 .select(
                         payment.paymentCode,
@@ -277,7 +277,7 @@ public class CustomPaymentRepositoryImpl implements CustomPaymentRepository {
                         tuple.get(student.memberCode),
                         tuple.get(student.memberName),
                         tuple.get(lecture.lectureStatus),
-                        Objects.toString(tuple.get(lectureCategory.lectureCategoryName), null),  // ✅ NPE 방지!
+                        Objects.toString(tuple.get(lectureCategory.lectureCategoryName), null),  // NPE 방지!
                         tuple.get(lecture.lectureClickCount),
                         tuple.get(lecture.lectureLevel),
                         tuple.get(issueCoupon.couponIssuanceCode),

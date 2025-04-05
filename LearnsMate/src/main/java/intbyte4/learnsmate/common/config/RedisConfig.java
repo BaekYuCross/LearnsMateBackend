@@ -43,9 +43,9 @@ public class RedisConfig {
         }
 
         LettuceConnectionFactory factory = new LettuceConnectionFactory(standaloneConfig);
-        factory.afterPropertiesSet(); // 🔥 설정 적용
+        factory.afterPropertiesSet(); // 설정 적용
 
-        // ✅ Redis 연결 테스트 로깅
+        // Redis 연결 테스트 로깅
         try {
             factory.getConnection().ping();
             log.info("✅ Redis 연결 성공!");
@@ -61,7 +61,7 @@ public class RedisConfig {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
 
-        // ✅ ObjectMapper 설정 (타입 정보를 포함하도록 설정)
+        // ObjectMapper 설정 (타입 정보를 포함하도록 설정)
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
