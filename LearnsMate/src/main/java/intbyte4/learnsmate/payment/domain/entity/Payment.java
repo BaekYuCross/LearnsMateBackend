@@ -32,7 +32,7 @@ public class Payment {
     private LectureByStudent lectureByStudent;
 
     @ManyToOne
-    @JoinColumn(name = "coupon_issuance_code", nullable = false)
+    @JoinColumn(name = "coupon_issuance_code")
     private IssueCoupon couponIssuance;
 
 
