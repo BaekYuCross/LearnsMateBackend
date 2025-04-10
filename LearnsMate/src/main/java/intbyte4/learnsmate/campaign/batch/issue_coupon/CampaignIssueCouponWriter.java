@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.campaign.batch;
+package intbyte4.learnsmate.campaign.batch.issue_coupon;
 
 import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import lombok.RequiredArgsConstructor;

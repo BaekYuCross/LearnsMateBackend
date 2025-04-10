@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.campaign.batch;
+package intbyte4.learnsmate.campaign.batch.issue_coupon;
 
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
@@ -8,8 +8,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Component
