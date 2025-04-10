@@ -53,6 +53,8 @@ dependencies {
     // EC2 인스턴스 헬스 체크를 위한 actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
     // Redis 통합
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     // Redis 연결 풀 관리

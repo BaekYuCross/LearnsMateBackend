@@ -33,7 +33,6 @@ public class CampaignController {
     @PostMapping("/register")
     public ResponseEntity<ResponseRegisterCampaignVO> createCampaign
             (@RequestBody RequestRegisterCampaignVO requestCampaign) {
-        log.info("바디 내용은?: {}", requestCampaign.toString());
         List<MemberDTO> studentDTOList = requestCampaign.getStudentList().stream()
                 .map(memberMapper::fromRequestFindCampaignStudentVOToMemberDTO)
                 .toList();
@@ -42,7 +41,6 @@ public class CampaignController {
                 .map(couponMapper::fromRequestFindCampaignCouponVOToCouponDTO)
                 .toList();
 
-        log.info("등록입니다.: {}{}", studentDTOList.toString(), couponDTOList.toString());
         CampaignDTO campaignDTO = campaignService.registerCampaign(campaignMapper
                 .fromRegisterRequestVOtoDTO(requestCampaign)
                 , studentDTOList
