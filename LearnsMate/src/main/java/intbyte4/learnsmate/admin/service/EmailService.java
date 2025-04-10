@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -47,6 +48,7 @@ public class EmailService {
     }
 
     // 캠페인 이메일 발송 메소드 추가
+    @Async
     public void sendCampaignEmail(String email, String campaignTitle, String campaignContents) {
         log.info("Start sending campaign email to: " + email);
 

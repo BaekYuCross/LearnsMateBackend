@@ -16,28 +16,41 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class CampaignIssueCouponReader implements ItemReader<Pair<MemberDTO, CouponDTO>> {
-    private List<Pair<MemberDTO, CouponDTO>> studentCouponPairs;
-    private Iterator<Pair<MemberDTO, CouponDTO>> iterator;
+
+    private List<MemberDTO> students;
+    private List<CouponDTO> coupons;
+    private int studentIndex = 0;
+    private int couponIndex = 0;
 
     public void setStudentCouponPairs(List<MemberDTO> students, List<CouponDTO> coupons) {
-        this.studentCouponPairs = new ArrayList<>();
-        for (MemberDTO student : students) {
-            for (CouponDTO coupon : coupons) {
-                studentCouponPairs.add(Pair.of(student, coupon));
-                log.info("student {} coupon {}", student, coupon);
-            }
-        }
-        this.iterator = studentCouponPairs.iterator();
+        this.students = students;
+        this.coupons = coupons;
+        this.studentIndex = 0;
+        this.couponIndex = 0;
     }
 
     @Override
     public Pair<MemberDTO, CouponDTO> read() {
-        log.info("IssueCoupon Pair: {}", studentCouponPairs);
-        if (iterator != null && iterator.hasNext()) {
-            return iterator.next();
-        } else {
+        if (students == null || coupons == null || students.isEmpty() || coupons.isEmpty()) {
             return null;
         }
+
+        if (studentIndex >= students.size()) {
+            return null;
+        }
+
+        Pair<MemberDTO, CouponDTO> pair = Pair.of(
+                students.get(studentIndex),
+                coupons.get(couponIndex)
+        );
+
+        couponIndex++;
+
+        if (couponIndex >= coupons.size()) {
+            couponIndex = 0;
+            studentIndex++;
+        }
+
+        return pair;
     }
 }
-

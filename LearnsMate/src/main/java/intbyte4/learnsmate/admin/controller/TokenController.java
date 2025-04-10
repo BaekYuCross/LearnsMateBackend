@@ -53,7 +53,7 @@ public class TokenController {
             redisService.deleteToken(userCode);
 
             // DBMS에서 토큰 삭제
-            refreshTokenService.deleteRefreshTokenFromDB(userCode);
+//            refreshTokenService.deleteRefreshTokenFromDB(userCode);
 
             // 응답에서 쿠키 제거
             clearCookie(response, "token");

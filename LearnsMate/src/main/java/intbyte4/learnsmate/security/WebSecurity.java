@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,7 +24,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -46,7 +46,10 @@ public class WebSecurity {
         this.refreshTokenService = refreshTokenService;
     }
 
-
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/actuator/**");
+    }
     /* 인가(Authorization)용 메소드 */
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -66,6 +69,7 @@ public class WebSecurity {
         // HttpSecurity 설정
         http.authorizeHttpRequests((authz) ->
                         authz
+                                .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/actuator/health")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/index.html", "GET")).permitAll()

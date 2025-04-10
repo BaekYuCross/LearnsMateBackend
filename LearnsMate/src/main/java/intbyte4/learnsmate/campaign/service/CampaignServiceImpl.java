@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +67,9 @@ public class CampaignServiceImpl implements CampaignService {
                                         List<CouponDTO> requestCouponList) {
         // 캠페인 기본 정보 설정
         Campaign campaign = createCampaign(requestCampaign);
-        Campaign savedCampaign = campaignRepository.save(campaign);
+        // 캠페인 Repo에 save
+        Campaign savedCampaign = campaignRepository.saveAndFlush(campaign);
+        // DTO로 변환
         CampaignDTO savedCampaignDTO = campaignMapper.toDTO(savedCampaign);
 
         // 학생과 쿠폰 정보 등록
@@ -142,20 +143,26 @@ public class CampaignServiceImpl implements CampaignService {
                     .map(campaignCoupon -> couponService.findCouponDTOByCouponCode(campaignCoupon.getCouponCode()))
                     .toList();
 
-            log.info("Setting up reader with students: {}, coupons: {}", students.size(), coupons.size());
+            // ItemReader에 학생, 쿠폰 pairs 전달
             couponMemberReader.setStudentCouponPairs(students, coupons);
 
             if (students.isEmpty() || coupons.isEmpty()) {
                 throw new IllegalArgumentException("No students or coupons found for campaign: " + campaign.getCampaignCode());
             }
-
+            // JobInstance 생성
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("campaignCode", campaign.getCampaignCode())
                     .addDate("scheduledTime", Date.from(campaign.getCampaignSendDate().atZone(ZoneId.of("Asia/Seoul")).toInstant()))
+                    .addString("case", "bulk-insert")  // 실험 케이스명: sequencial-save-all, parallel-save-all, bulk-insert
                     .toJobParameters();
+
             log.info("Executing campaign {}", campaign.getCampaignTitle());
+
+            // JobInstance 한번의 시행 시도를 나타냄
+            // JobLauncher Job, JobParameters를 받아 실행하는 역할
             JobExecution jobExecution = jobLauncher.run(campaignJob, jobParameters);
 
+            // BatchStatus가 COMPLETED면 캠페인 발송 후 발송 상태 변경
             if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
                 sendNotifications(campaign);
                 updateCampaignSendFlag(campaign.getCampaignCode());
