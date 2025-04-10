@@ -19,9 +19,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
@@ -46,7 +45,6 @@ public class CampaignIssueCouponProcessor implements ItemProcessor<Pair<MemberDT
                 couponCategoryService::findByCouponCategoryCode
         );
 
-        // 관리자 캐싱
         Admin admin = adminCache.computeIfAbsent(
                 couponDTO.getAdminCode(),
                 code -> {
@@ -57,13 +55,9 @@ public class CampaignIssueCouponProcessor implements ItemProcessor<Pair<MemberDT
 
         Member student = memberMapper.fromMemberDTOtoMember(studentDTO);
         CouponEntity coupon = couponMapper.toAdminCouponEntity(couponDTO, couponCategory, admin);
-
-        IssueCoupon issueCoupon = new IssueCoupon();
-        issueCoupon.setStudent(student);
-        issueCoupon.setCoupon(coupon);
-        issueCoupon.setCouponIssueDate(LocalDateTime.now());
-        issueCoupon.setCouponUseStatus(false);
+        IssueCoupon issueCoupon = IssueCoupon.createIssueCoupon(coupon, student);
 
         return issueCoupon;
     }
+
 }

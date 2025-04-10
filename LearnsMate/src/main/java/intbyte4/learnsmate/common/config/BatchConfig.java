@@ -58,7 +58,6 @@ public class BatchConfig {
                 .processor(processor)
                 .writer(writer)
                 .taskExecutor(taskExecutor) // TaskExecutor 적용
-                .listener(stepPerformanceListener)
                 .build();
     }
 
@@ -66,7 +65,7 @@ public class BatchConfig {
     public Job campaignJob(Step couponProcessingStep, JobPerformanceListener jobPerformanceListener) {
         return new JobBuilder("campaignJob", jobRepository)
                 .start(couponProcessingStep)
-                .listener(jobPerformanceListener) // 리스너 적용
+                .listener(jobPerformanceListener)
                 .build();
     }
 
