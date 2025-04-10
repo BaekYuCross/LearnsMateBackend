@@ -1,4 +1,4 @@
-package intbyte4.learnsmate.campaign.batch;
+package intbyte4.learnsmate.campaign.batch.issue_coupon;
 
 import intbyte4.learnsmate.admin.domain.dto.AdminDTO;
 import intbyte4.learnsmate.admin.domain.entity.Admin;

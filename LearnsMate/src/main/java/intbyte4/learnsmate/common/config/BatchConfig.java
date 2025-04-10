@@ -1,8 +1,8 @@
 package intbyte4.learnsmate.common.config;
 
-import intbyte4.learnsmate.campaign.batch.CampaignIssueCouponProcessor;
-import intbyte4.learnsmate.campaign.batch.CampaignIssueCouponReader;
-import intbyte4.learnsmate.campaign.batch.CampaignIssueCouponWriter;
+import intbyte4.learnsmate.campaign.batch.issue_coupon.CampaignIssueCouponProcessor;
+import intbyte4.learnsmate.campaign.batch.issue_coupon.CampaignIssueCouponReader;
+import intbyte4.learnsmate.campaign.batch.issue_coupon.CampaignIssueCouponWriter;
 import intbyte4.learnsmate.campaign.batch.listener.JobPerformanceListener;
 import intbyte4.learnsmate.campaign.batch.listener.StepPerformanceListener;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;

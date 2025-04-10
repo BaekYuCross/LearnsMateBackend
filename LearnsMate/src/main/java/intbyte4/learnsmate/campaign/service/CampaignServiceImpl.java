@@ -5,7 +5,7 @@ import intbyte4.learnsmate.admin.domain.entity.Admin;
 import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.admin.service.EmailService;
-import intbyte4.learnsmate.campaign.batch.CampaignIssueCouponReader;
+import intbyte4.learnsmate.campaign.batch.issue_coupon.CampaignIssueCouponReader;
 import intbyte4.learnsmate.campaign.domain.dto.*;
 import intbyte4.learnsmate.campaign.domain.entity.Campaign;
 import intbyte4.learnsmate.campaign.domain.entity.CampaignTypeEnum;

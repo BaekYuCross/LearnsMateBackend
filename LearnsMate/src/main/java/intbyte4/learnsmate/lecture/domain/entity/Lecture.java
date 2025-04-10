@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Builder
 public class Lecture {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lecture_code", nullable = false)
     private String lectureCode;
 

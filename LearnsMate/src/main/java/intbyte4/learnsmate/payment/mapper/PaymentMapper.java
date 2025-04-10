@@ -39,7 +39,9 @@ public class PaymentMapper {
                 .paymentPrice(payment.getPaymentPrice())
                 .createdAt(payment.getCreatedAt())
                 .lectureByStudentCode(payment.getLectureByStudent().getLectureByStudentCode())
-                .couponIssuanceCode(payment.getCouponIssuance().getCouponIssuanceCode())
+                .couponIssuanceCode(
+                        payment.getCouponIssuance() != null ? payment.getCouponIssuance().getCouponIssuanceCode() : null
+                )
                 .build();
     }
 
