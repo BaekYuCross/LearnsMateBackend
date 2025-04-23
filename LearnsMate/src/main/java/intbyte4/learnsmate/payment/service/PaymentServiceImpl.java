@@ -6,6 +6,7 @@ import intbyte4.learnsmate.admin.mapper.AdminMapper;
 import intbyte4.learnsmate.admin.service.AdminService;
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.common.util.RedisKeyHelper;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.domain.entity.CouponEntity;
 import intbyte4.learnsmate.coupon.mapper.CouponMapper;
@@ -31,16 +32,16 @@ import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.vo.PaymentFilterRequestVO;
+import intbyte4.learnsmate.payment.domain.vo.PaymentPageResponse;
 import intbyte4.learnsmate.payment.mapper.PaymentMapper;
 import intbyte4.learnsmate.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -63,6 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final AdminService adminService;
     private final CouponMapper couponMapper;
     private final AdminMapper adminMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // payment facade에 있는 조회반환 값이랑 달라서 통계에 사용할 수 있으므로 남겨둠 지우지 마셈.
     // 직원이 전체 결제 내역을 조회
@@ -83,11 +85,47 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     // 필터링 + 정렬
+//    @Override
+//    public Page<PaymentFilterDTO> getPaymentsByFiltersWithSort(PaymentFilterRequestVO request, int page, int size, String sortField, String sortDirection) {
+//        Sort sort = Sort.by(Sort.Direction.valueOf(sortDirection), sortField);
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//        return paymentRepository.findPaymentByFiltersWithSort(request, pageable);
+//    }
+
     @Override
-    public Page<PaymentFilterDTO> getPaymentsByFiltersWithSort(PaymentFilterRequestVO request, int page, int size, String sortField, String sortDirection) {
+    public Page<PaymentFilterDTO> getPaymentsByFiltersWithSort(
+            PaymentFilterRequestVO request, int page, int size, String sortField, String sortDirection) {
+
+        // Redis 키 생성 (SHA-256 기반)
+        String redisKey = RedisKeyHelper.buildPaymentCacheKey(request, page, size, sortField, sortDirection);
+
+        // 캐시 조회
+        PaymentPageResponse<PaymentFilterDTO, Void> cached =
+                (PaymentPageResponse<PaymentFilterDTO, Void>) redisTemplate.opsForValue().get(redisKey);
+
+        if (cached != null) {
+            log.info("Redis HIT: 필터 캐싱된 데이터 반환 [{}]", redisKey);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(sortDirection), sortField));
+            return new PageImpl<>(cached.getPaymentData(), pageable, cached.getTotalElements());
+        }
+
+        // 캐시 없으면 DB 조회
         Sort sort = Sort.by(Sort.Direction.valueOf(sortDirection), sortField);
         Pageable pageable = PageRequest.of(page, size, sort);
-        return paymentRepository.findPaymentByFiltersWithSort(request, pageable);
+        Page<PaymentFilterDTO> result = paymentRepository.findPaymentByFiltersWithSort(request, pageable);
+        List<PaymentFilterDTO> content = result.getContent();
+        boolean hasNext = result.hasNext();
+        long totalElements = result.getTotalElements();
+        PaymentPageResponse<PaymentFilterDTO, Void> response = new PaymentPageResponse<>(
+                content, null, hasNext, totalElements
+        );
+
+        // Redis 저장
+        redisTemplate.opsForValue().set(redisKey, response, Duration.ofMinutes(30));
+        redisTemplate.opsForSet().add("payment-cache-keys", redisKey);
+
+        log.info("Redis MISS: 데이터 캐싱 완료 [{}]", redisKey);
+        return result;
     }
 
     // 직원이 특정 결제 내역을 단건 상세 조회
@@ -121,6 +159,10 @@ public class PaymentServiceImpl implements PaymentService {
 
             paymentDTO = getPaymentDTO(lectureDTO, issueCouponDTO, result.lecture(), result.lectureByStudentDTO(), lectureByStudent, result.student(), coupon);
         }
+
+        // 캐시 무효화 트리거
+        redisTemplate.convertAndSend("payment-cache-invalidate", "clear");
+
         return paymentDTO;
     }
 
@@ -132,14 +174,15 @@ public class PaymentServiceImpl implements PaymentService {
         Lecture lecture = lectureMapper.toEntity(lectureDTO, tutor);
 
         LectureByStudentDTO lectureByStudentDTO = new LectureByStudentDTO();
-        lectureByStudentService.registerLectureByStudent(lectureByStudentDTO, lecture, student);
-        LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(lectureByStudentDTO, lecture, student);
-
-        PaymentDTO paymentDTO = getPaymentDTO(lectureDTO, lecture);
+        lectureByStudentDTO.setOwnStatus(true);
+        LectureByStudent lectureByStudent = lectureByStudentService.registerLectureByStudent(lectureByStudentDTO, lecture, student);
+        PaymentDTO paymentDTO = getPaymentDTO(lectureDTO, lecture, memberDTO);
         Payment payment = paymentMapper.toEntity(paymentDTO, lectureByStudent);
 
         paymentRepository.save(payment);
 
+        // 캐시 무효화 트리거
+        redisTemplate.convertAndSend("payment-cache-invalidate", "clear");
         return paymentDTO;
     }
 
@@ -204,7 +247,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private PaymentDTO getPaymentDTO(LectureDTO lectureDTO, IssueCouponDTO issueCouponDTO, Lecture lecture, LectureByStudentDTO lectureByStudentDTO, LectureByStudent lectureByStudent, Member student, CouponEntity coupon) {
-        PaymentDTO paymentDTO = getPaymentDTO(lectureDTO, lecture);
+        PaymentDTO paymentDTO = getPaymentDTO(lectureDTO, lecture, null);
         if (issueCouponDTO.getStudentCode().equals(lectureByStudentDTO.getStudent().getMemberCode())) {
             paymentDTO.setCouponIssuanceCode(issueCouponDTO.getCouponIssuanceCode());
         }
@@ -223,12 +266,12 @@ public class PaymentServiceImpl implements PaymentService {
         lectureVideoByStudentDTO.setLectureStatus(false);
     }
 
-    private PaymentDTO getPaymentDTO(LectureDTO lectureDTO, Lecture lecture) {
+    private PaymentDTO getPaymentDTO(LectureDTO lectureDTO, Lecture lecture, MemberDTO memberDTO) {
         PaymentDTO paymentInfo = new PaymentDTO();
         paymentInfo.setPaymentCode(null);
         paymentInfo.setPaymentPrice(lectureDTO.getLecturePrice());
         paymentInfo.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-        paymentInfo.setLectureByStudentCode(lectureByStudentService.findStudentCodeByLectureCode(lecture));
+        paymentInfo.setLectureByStudentCode(lectureByStudentService.findStudentCodeByLectureCode(lecture, memberDTO));
         return paymentInfo;
     }
 }

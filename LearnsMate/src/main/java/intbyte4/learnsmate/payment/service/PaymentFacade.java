@@ -2,6 +2,7 @@ package intbyte4.learnsmate.payment.service;
 
 import intbyte4.learnsmate.common.exception.CommonException;
 import intbyte4.learnsmate.common.exception.StatusEnum;
+import intbyte4.learnsmate.common.util.RedisKeyHelper;
 import intbyte4.learnsmate.coupon.domain.dto.CouponDTO;
 import intbyte4.learnsmate.coupon.service.CouponService;
 import intbyte4.learnsmate.issue_coupon.domain.dto.IssueCouponDTO;
@@ -67,18 +68,16 @@ public class PaymentFacade {
     // Facade
     public PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> getPaymentsWithGraphAndSort(
             int page, int size, String sortField, String sortDirection) {
-        String redisKey = "payments:page=" + page + ":size=" + size + ":sort=" + sortField + "_" + sortDirection;
 
-        long startTime = System.currentTimeMillis();
+        String redisKey = RedisKeyHelper.buildPaymentCacheKey(null, page, size, sortField, sortDirection);
 
-        // Redis에서 데이터 조회 (캐시 확인)
+        // Redis 캐시 조회
         PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> cachedData =
-                (PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>) redisTemplate.opsForValue().get(redisKey);
+                (PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>>)
+                        redisTemplate.opsForValue().get(redisKey);
 
         if (cachedData != null) {
             log.info("Redis 캐시 HIT! 캐싱된 데이터 반환");
-            long endTime = System.currentTimeMillis();
-            log.info("캐시 데이터 조회 시간: {} ms", (endTime - startTime));
             return cachedData;
         }
 
@@ -101,6 +100,9 @@ public class PaymentFacade {
 
         // Redis에 저장 (TTL 30분)
         redisTemplate.opsForValue().set(redisKey, response, Duration.ofMinutes(30));
+        // 캐시 무효화를 위해 결제 캐시 키를 Set에 저장
+        redisTemplate.opsForSet().add("payment-cache-keys", redisKey);
+
         log.info("Redis에 데이터 저장 완료 (TTL: 30분)");
 
         return response;

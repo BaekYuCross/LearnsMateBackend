@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -17,6 +15,6 @@ import java.time.LocalDateTime;
 public class RequestRegisterPaymentVO {
     private RequestRegisterIssueCouponPaymentVO issueCouponVO;
     private RequestRegisterMemberPaymentVO memberVO;
-    private RequestRegisterLecturePaymentVO LectureVO;
+    private RequestRegisterLecturePaymentVO lectureVO;
     private Integer paymentPrice;
 }
