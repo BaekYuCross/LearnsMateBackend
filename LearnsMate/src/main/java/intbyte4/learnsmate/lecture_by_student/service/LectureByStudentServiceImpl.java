@@ -13,6 +13,7 @@ import intbyte4.learnsmate.member.domain.entity.Member;
 import intbyte4.learnsmate.member.mapper.MemberMapper;
 import intbyte4.learnsmate.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LectureByStudentServiceImpl implements LectureByStudentService {
 
     private final LectureByStudentRepository lectureByStudentRepository;
@@ -55,15 +57,16 @@ public class LectureByStudentServiceImpl implements LectureByStudentService {
     }
 
     @Override
-    public void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member) {
+    public LectureByStudent registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member) {
         LectureByStudent lectureByStudent = lectureByStudentMapper.toEntity(lectureByStudentDTO, lecture, member);
-
-        lectureByStudentRepository.save(lectureByStudent);
+        log.info("{}", lectureByStudent.toString());
+        return lectureByStudentRepository.save(lectureByStudent);
     }
 
     @Override
-    public Long findStudentCodeByLectureCode(Lecture lecture) {
-        LectureByStudent lectureByStudent = lectureByStudentRepository.findByLecture(lecture);
+    public Long findStudentCodeByLectureCode(Lecture lecture, MemberDTO memberDTO) {
+        LectureByStudent lectureByStudent = lectureByStudentRepository.findByLecture(lecture.getLectureCode(), memberDTO.getMemberCode());
+
         return lectureByStudent.getLectureByStudentCode();
     }
 

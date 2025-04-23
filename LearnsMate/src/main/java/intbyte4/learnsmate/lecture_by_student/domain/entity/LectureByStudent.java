@@ -18,7 +18,7 @@ public class LectureByStudent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lecture_by_student_code", nullable = false)
+    @Column(name = "lecture_by_student_code")
     private Long lectureByStudentCode;
 
     @Column(name = "own_status", nullable = false)

@@ -29,7 +29,8 @@ public interface LectureByStudentRepository extends JpaRepository<LectureByStude
             "WHERE ls.lecture.lectureCode = :lectureCode AND ls.ownStatus = true")
     int calculateTotalRevenueByLecture(@Param("lectureCode") String lectureCode);
 
-    LectureByStudent findByLecture(Lecture lecture);
+    @Query("SELECT l FROM lecture_by_student l WHERE l.lecture.lectureCode = :lectureCode AND l.student.memberCode = :memberCode")
+    LectureByStudent findByLecture(@Param("lectureCode") String lectureCode, @Param("memberCode") Long memberCode);
 
     LectureByStudent findByLectureAndStudent(Lecture lecture, Member member);
 }

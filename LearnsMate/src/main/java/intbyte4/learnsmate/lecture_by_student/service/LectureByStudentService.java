@@ -2,6 +2,8 @@ package intbyte4.learnsmate.lecture_by_student.service;
 
 import intbyte4.learnsmate.lecture.domain.entity.Lecture;
 import intbyte4.learnsmate.lecture_by_student.domain.dto.LectureByStudentDTO;
+import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
+import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import jakarta.transaction.Transactional;
 import intbyte4.learnsmate.member.domain.entity.Member;
 
@@ -16,9 +18,9 @@ public interface LectureByStudentService {
 
     int calculateTotalRevenue(String lectureCode);
 
-    void registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member);
+    LectureByStudent registerLectureByStudent(LectureByStudentDTO lectureByStudentDTO, Lecture lecture, Member member);
 
-    Long findStudentCodeByLectureCode(Lecture lecture);
+    Long findStudentCodeByLectureCode(Lecture lecture, MemberDTO memberDTO);
 
     LectureByStudentDTO findByLectureAndStudent(Lecture lecture, Member member);
 }

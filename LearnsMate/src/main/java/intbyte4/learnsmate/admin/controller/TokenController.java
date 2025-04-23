@@ -19,9 +19,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -34,126 +34,145 @@ public class TokenController {
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisService redisService;
     private final AdminService adminService;
-    private final RefreshTokenService refreshTokenService;
 
     @Operation(summary = "직원 로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
-        try {
-            // 요청 본문에서 refreshToken 추출
-            String refreshToken = requestBody.get("refreshToken");
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        log.info("POST /admin/logout 요청 도착");
 
-            if (refreshToken == null || refreshToken.isEmpty()) {
-                log.warn("RefreshToken is missing in the request body");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("RefreshToken이 필요합니다.");
+        // 쿠키에서 refreshToken 추출
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                }
             }
-
-            // refreshToken으로 사용자 정보 확인 및 Redis에서 토큰 삭제
-            String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
-            redisService.deleteToken(userCode);
-
-            // DBMS에서 토큰 삭제
-//            refreshTokenService.deleteRefreshTokenFromDB(userCode);
-
-            // 응답에서 쿠키 제거
-            clearCookie(response, "token");
-            clearCookie(response, "refreshToken");
-
-            log.info("User logged out successfully: {}", userCode);
-            return ResponseEntity.ok().body("로그아웃 성공");
-        } catch (Exception e) {
-            log.error("Logout failed: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 처리 중 오류가 발생했습니다.");
         }
+
+        // 쿠키 삭제
+        clearCookie(response, "token", "/", "localhost");
+        clearCookie(response, "refreshToken", "/", "localhost");
+
+        // Redis에서 refreshToken 삭제
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            // 토큰에서 userCode 추출
+            String userCode = jwtUtil.getUserCodeFromToken(refreshToken); // 토큰에서 사용자 식별자 추출
+            if (userCode != null) {
+                redisService.deleteToken(userCode); // userCode 기반으로 Redis에서 삭제
+            } else {
+                log.warn("RefreshToken에서 userCode를 추출하지 못했습니다.");
+            }
+        }
+
+        log.info("로그아웃 성공");
+        return ResponseEntity.ok().body("로그아웃 성공");
     }
 
     @Operation(summary = "토큰 리프레시 요청")
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
-        long startTime = Instant.now().toEpochMilli();  // 시작 시간 기록
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+        // 1. 쿠키에서 refreshToken 추출
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    log.info("받은 refreshToken: {}", refreshToken);
+                    break;
+                }
+            }
+        }
+
+        // 2. refreshToken 없으면 400
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("refreshToken이 필요합니다.");
+        }
 
         try {
-            String refreshToken = requestBody.get("refreshToken");
-            log.info("Received refresh token: {}", refreshToken);
-
-            String userCode = jwtUtil.getUserCodeFromToken(refreshToken);
-            log.info("Extracted userCode: {}", userCode);
-
-            if (userCode == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+            // 3. JWT 형식 확인
+            if (!refreshToken.contains(".")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 refreshToken 형식입니다.");
             }
 
-            long redisStartTime = System.nanoTime();
-            // Redis에서 refreshToken 조회
+            // 4. 토큰에서 userCode 추출
+            String userCode = jwtUtil.extractUserCode(refreshToken);
+
+            // 5. Redis에서 refreshToken 확인
             String redisToken = redisTemplate.opsForValue().get("refreshToken:" + userCode);
-            long redisEndTime = System.nanoTime();
-            long redisElapsedTime = redisEndTime - redisStartTime;  // Redis 조회 소요 시간 계산
-
-            log.info("Redis token found: {}", redisToken != null);
-            log.info("Redis 조회 시간: {}ms", redisElapsedTime);
-
-            // DBMS에서 refreshToken 조회 (시간 측정 포함)
-            long dbStartTime = System.nanoTime();
-            String dbmsToken = refreshTokenService.getRefreshTokenFromDB(userCode);
-            long dbEndTime = System.nanoTime();
-
-            long dbmsElapsedTime = dbEndTime - dbStartTime;  // DBMS 조회 소요 시간 계산
-            log.info("DBMS token found: {}", dbmsToken != null);
-            log.info("DBMS 조회 시간: {}ms", dbmsElapsedTime);
-
-            // 성능 비교 로그
-            log.info("Redis 조회 시간: {}ms, DBMS 조회 시간: {}ms", redisElapsedTime, dbmsElapsedTime);
-
-            // 성능 비교 후 적절한 토큰 검증
-            if (redisToken == null && dbmsToken == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
+            if (redisToken == null || !jwtUtil.validateToken(redisToken)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 Refresh Token입니다.");
             }
 
-            String validToken = redisToken != null ? redisToken : dbmsToken;
-            if (!jwtUtil.validateToken(validToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
-            }
-
+            // 6. 사용자 정보 로드 및 인증 객체 생성
             CustomUserDetails userDetails = (CustomUserDetails) adminService.loadUserByUsername(userCode);
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            String newAccessToken = jwtUtil.generateToken(new JwtTokenDTO(userCode, null, null), List.of("ROLE_USER"), null, authentication);
 
-            redisTemplate.delete("accessToken:" + userCode);
+            // 7. 새로운 Access Token 발급
+            String newAccessToken = jwtUtil.generateToken(
+                    new JwtTokenDTO(userCode, null, null),
+                    List.of("ROLE_USER"), null, authentication
+            );
 
-            ZonedDateTime kstExpiration = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(4);
+            // 8. 만료 시간 계산
+            Date expirationDate = jwtUtil.getExpirationDateFromToken(newAccessToken);
 
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("accessToken", newAccessToken);
-            responseBody.put("exp", new int[]{
-                    kstExpiration.getYear(),
-                    kstExpiration.getMonthValue(),
-                    kstExpiration.getDayOfMonth(),
-                    kstExpiration.getHour(),
-                    kstExpiration.getMinute(),
-                    kstExpiration.getSecond()
-            });
+            ZonedDateTime kstExpiration = expirationDate.toInstant()
+                    .atZone(ZoneId.of("Asia/Seoul"));
 
-            long endTime = Instant.now().toEpochMilli();  // 전체 소요 시간 기록
-            long totalElapsedTime = endTime - startTime;  // 전체 소요 시간 계산
-            log.info("전체 소요 시간: {}ms", totalElapsedTime);
+            String expirationTime = kstExpiration.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            log.info("새로운 토큰 만료 시간: {}", expirationTime);
 
-            return ResponseEntity.ok(responseBody);
+            // 9. 쿠키에 Access Token 설정 (로컬 개발용)
+//            Cookie accessTokenCookie = new Cookie("token", newAccessToken);
+//            accessTokenCookie.setHttpOnly(true);
+//            accessTokenCookie.setSecure(false); // 로컬에서는 HTTPS 안 쓰니까 false
+//            accessTokenCookie.setPath("/");
+//            accessTokenCookie.setMaxAge(15 * 60); // 15분
+//
+//            response.addCookie(accessTokenCookie);
+
+            // Set-Cookie 수동 작성 (SameSite=Strict 포함)
+            String accessTokenCookie = "token=" + newAccessToken +
+                    "; Path=/" +
+                    "; Max-Age=" + (15 * 60) +
+                    "; HttpOnly" +
+                    "; SameSite=Strict";
+
+            response.setHeader("Set-Cookie", accessTokenCookie);
+
+            // 10. 응답 바디에 만료 정보 포함
+            return ResponseEntity.ok(Map.of(
+                    "message", "새로운 Access Token 발급 완료!",
+                    "exp", expirationTime
+            ));
+
         } catch (Exception e) {
-            log.error("Token refresh failed: {}", e.getMessage());
-            log.error("Stack trace:", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Token refresh failed: " + e.getMessage());
+            log.error("토큰 재발급 실패", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("재발급 실패: " + e.getMessage());
         }
     }
 
-    private void clearCookie(HttpServletResponse response, String cookieName) {
+
+    private void clearCookie(HttpServletResponse response, String cookieName, String path, String domain) {
         Cookie cookie = new Cookie(cookieName, null);
-        cookie.setPath("/");
+        cookie.setPath(path);
+        cookie.setDomain(domain);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(0);
+        cookie.setMaxAge(0); // 즉시 만료
         response.addCookie(cookie);
     }
+
+//    private void clearCookie(HttpServletResponse response, String cookieName) {
+//        Cookie cookie = new Cookie(cookieName, null);
+//        cookie.setPath("/");
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+//        cookie.setMaxAge(0);
+//        response.addCookie(cookie);
+//    }
 
     //Postman으로 refreshToken값 조회
     @Operation(summary = "Redis에 담긴 refreshToken값 조회")
