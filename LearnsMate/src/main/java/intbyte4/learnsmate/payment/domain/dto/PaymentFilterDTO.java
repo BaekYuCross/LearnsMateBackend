@@ -6,8 +6,10 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class PaymentFilterDTO {
     @JsonProperty("payment_code")
     private Long paymentCode;
@@ -47,24 +49,4 @@ public class PaymentFilterDTO {
 
     @JsonProperty("lecture_price")
     private Integer lecturePrice;
-
-    public PaymentFilterDTO(Long paymentCode, LocalDateTime createdAt, String lectureCode,
-                            String lectureTitle, String lectureCategoryName, Long tutorCode,
-                            String tutorName, Long studentCode, String studentName,
-                            Integer paymentPrice, String couponIssuanceCode, String couponIssuanceName,
-                            Integer lecturePrice) {
-        this.paymentCode = paymentCode;
-        this.createdAt = createdAt;
-        this.lectureCode = lectureCode;
-        this.lectureTitle = lectureTitle;
-        this.lectureCategoryName = lectureCategoryName;
-        this.tutorCode = tutorCode;
-        this.tutorName = tutorName;
-        this.studentCode = studentCode;
-        this.studentName = studentName;
-        this.paymentPrice = paymentPrice;
-        this.couponIssuanceCode = couponIssuanceCode;
-        this.couponIssuanceName = couponIssuanceName;
-        this.lecturePrice = lecturePrice;
-    }
 }

@@ -4,6 +4,7 @@ import intbyte4.learnsmate.issue_coupon.domain.IssueCoupon;
 import intbyte4.learnsmate.lecture_by_student.domain.entity.LectureByStudent;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.vo.ResponseFindPaymentVO;
 import intbyte4.learnsmate.payment.domain.vo.ResponseRegisterPaymentVO;
@@ -66,6 +67,27 @@ public class PaymentMapper {
                 .couponIssuanceName(paymentDTO.getCouponIssuanceName())
                 .build();
     }
+
+
+    // PaymentDTO -> PaymentResponseVO
+    public ResponseFindPaymentVO fromFilterDtoToResponseVO(PaymentFilterDTO paymentDTO) {
+        return ResponseFindPaymentVO.builder()
+                .paymentCode(paymentDTO.getPaymentCode())
+                .paymentPrice(paymentDTO.getPaymentPrice())
+                .createdAt(paymentDTO.getCreatedAt())
+                .lectureCode(paymentDTO.getLectureCode())
+                .lectureTitle(paymentDTO.getLectureTitle())
+                .lecturePrice(paymentDTO.getLecturePrice())
+                .tutorCode(paymentDTO.getTutorCode())
+                .tutorName(paymentDTO.getTutorName())
+                .studentCode(paymentDTO.getStudentCode())
+                .studentName(paymentDTO.getStudentName())
+                .lectureCategory(paymentDTO.getLectureCategoryName())
+                .couponIssuanceCode(paymentDTO.getCouponIssuanceCode())
+                .couponIssuanceName(paymentDTO.getCouponIssuanceName())
+                .build();
+    }
+
 
     public ResponseRegisterPaymentVO fromPaymentDTOtoResponseRegisterPaymentVO(PaymentDTO dto) {
         return ResponseRegisterPaymentVO.builder()

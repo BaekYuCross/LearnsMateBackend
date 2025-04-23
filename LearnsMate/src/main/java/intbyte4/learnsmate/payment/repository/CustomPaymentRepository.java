@@ -14,7 +14,8 @@ public interface CustomPaymentRepository {
     // 필터링x 정렬o
     Page<Payment> findAllWithSort(Pageable pageable);
 
-    Page<PaymentDetailDTO> findAllWithSort2(Pageable pageable);
+    // 필터링x 정렬o 버전2
+    Page<PaymentFilterDTO> findAllWithSort2(Pageable pageable);
 
     // 필터링o 정렬o
     Page<PaymentFilterDTO> findPaymentByFiltersWithSort(PaymentFilterRequestVO request, Pageable pageable);

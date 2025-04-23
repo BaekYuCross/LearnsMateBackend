@@ -15,6 +15,7 @@ import intbyte4.learnsmate.member.domain.MemberType;
 import intbyte4.learnsmate.member.domain.dto.MemberDTO;
 import intbyte4.learnsmate.member.service.MemberService;
 import intbyte4.learnsmate.payment.domain.dto.PaymentDetailDTO;
+import intbyte4.learnsmate.payment.domain.dto.PaymentFilterDTO;
 import intbyte4.learnsmate.payment.domain.dto.PaymentMonthlyRevenueDTO;
 import intbyte4.learnsmate.payment.domain.entity.Payment;
 import intbyte4.learnsmate.payment.domain.vo.PaymentPageResponse;
@@ -83,17 +84,17 @@ public class PaymentFacade {
 
         log.info("Redis 캐시 MISS! DB에서 조회 시작");
 
-        Page<PaymentDetailDTO> paymentDetailDTOs
+        Page<PaymentFilterDTO> paymentFilterDTOs
                 = getPaymentsWithPaginationAndSort2(page, size, sortField, sortDirection);
 
         Map<Integer, List<PaymentMonthlyRevenueDTO>> graphData = (page == 0) ? getMonthlyRevenueComparisonWithSort() : null;
 
-        List<ResponseFindPaymentVO> paymentVOs = paymentDetailDTOs.stream()
-                .map(paymentMapper::fromDtoToResponseVO)
+        List<ResponseFindPaymentVO> paymentVOs = paymentFilterDTOs.stream()
+                .map(paymentMapper::fromFilterDtoToResponseVO)
                 .collect(Collectors.toList());
 
-        boolean hasNext = paymentDetailDTOs.hasNext();
-        long totalElements = paymentDetailDTOs.getTotalElements();
+        boolean hasNext = paymentFilterDTOs.hasNext();
+        long totalElements = paymentFilterDTOs.getTotalElements();
 
         PaymentPageResponse<ResponseFindPaymentVO, Map<Integer, List<PaymentMonthlyRevenueDTO>>> response =
                 new PaymentPageResponse<>(paymentVOs, graphData, hasNext, totalElements);
@@ -132,7 +133,7 @@ public class PaymentFacade {
     }
 
     // 정렬
-    private Page<PaymentDetailDTO> getPaymentsWithPaginationAndSort2(int page, int size, String sortField, String sortDirection) {
+    private Page<PaymentFilterDTO> getPaymentsWithPaginationAndSort2(int page, int size, String sortField, String sortDirection) {
 
         Sort sort = Sort.by(Sort.Direction.valueOf(sortDirection), sortField);
         Pageable pageable = PageRequest.of(page, size, sort);
