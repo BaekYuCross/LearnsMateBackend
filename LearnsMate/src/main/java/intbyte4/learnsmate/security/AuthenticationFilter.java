@@ -86,31 +86,75 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     // 로그인 성공 시 실행되는 메소드 -> 여기서 JWT를 발급
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        log.info("인증 성공 - 시작");
+
+        // 로그인 성공 후 security가 관리하는 principal 객체를 로그로 출력
+        log.info("로그인 성공하고 security가 관리하는 principal 객체(authResult): {}", authResult);
 
         // Principal 객체 확인 및 캐스팅
         if (!(authResult.getPrincipal() instanceof CustomUserDetails)) {
-            log.error("Authentication 객체가 CustomUserDetails 타입이 아닙니다.");
             throw new IllegalArgumentException("Authentication 객체가 CustomUserDetails 타입이 아닙니다.");
         }
 
+        // CustomUserDetails로 캐스팅하여 사용자 정보를 가져옴
         CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
-        log.info("사용자 정보 가져옴: {}", userDetails.getUsername());
 
-        String userCode = userDetails.getUsername();
-        String userEmail = userDetails.getUserDTO().getAdminEmail();
-        String userName = userDetails.getUserDTO().getAdminName();
-        log.info("사용자 상세 정보 추출 완료: code={}, email={}, name={}", userCode, userEmail, userName);
+        // 사용자 정보 가져오기
+        String userCode = userDetails.getUsername(); // username이 userCode로 설정
+        String userEmail = userDetails.getUserDTO().getAdminEmail(); // 이메일
+        String userName = userDetails.getUserDTO().getAdminName(); // 이름
 
+        log.info("인증된 사용자 정보 - userCode: {}, email: {}, userName: {}", userCode, userEmail, userName);
+
+        // 인증된 사용자의 권한을 가져와 List<String>으로 변환
         List<String> roles = authResult.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+        log.info("roles: {}", roles.toString());  // 권한 목록 출력
 
-        // JWT 생성
+        // JWT 생성: JwtTokenDTO에 사용자 정보를 담고, roles와 함께 JWT 토큰을 생성
         JwtTokenDTO tokenDTO = new JwtTokenDTO(userCode, userEmail, userName);
-        String token = jwtUtil.generateToken(tokenDTO, roles, null, authResult);
+        String token = jwtUtil.generateToken(tokenDTO, roles, null, authResult);  // JWT 생성 (roles와 추가적인 데이터를 페이로드에 담음)
+        String refreshToken = jwtUtil.generateRefreshToken(tokenDTO); // 7일
 
-        // 만료 시간 계산 및 추가
+        // Access Token Set-Cookie 수동 구성 (운영 환경)
+//        String accessTokenCookie = "token=" + token +
+//                "; Path=/" +
+//                "; Max-Age=" + (4 * 3600) + // 4시간
+//                "; HttpOnly" +
+//                "; Secure" + // HTTPS 환경에서만 전송
+//                "; SameSite=None"; // 크로스 도메인 허용 시 필요
+//
+//        // Refresh Token Set-Cookie 수동 구성 (운영 환경)
+//        String refreshTokenCookie = "refreshToken=" + refreshToken +
+//                "; Path=/" +
+//                "; Max-Age=" + (7 * 24 * 3600) + // 7일
+//                "; HttpOnly" +
+//                "; Secure" + // HTTPS 필수
+//                "; SameSite=None"; // 프론트와 백 도메인이 다를 경우 필수
+//
+        // Access Token Set-Cookie 수동 구성
+        String accessTokenCookie = "token=" + token +
+                "; Path=/" +
+                "; Max-Age=" + (4 * 3600) +
+                "; HttpOnly" +
+                "; SameSite=Strict"; // ← 핵심 포인트
+
+        // Refresh Token Set-Cookie 수동 구성
+        String refreshTokenCookie = "refreshToken=" + refreshToken +
+                "; Path=/" +
+                "; Max-Age=" + (7 * 24 * 3600) +
+                "; HttpOnly" +
+                "; SameSite=Strict";
+
+        // 쿠키 헤더로 추가
+        response.addHeader("Set-Cookie", accessTokenCookie);
+        response.addHeader("Set-Cookie", refreshTokenCookie);
+
+        // Redis 저장
+        saveRefreshTokenToRedis(userCode, refreshToken);
+
+        log.info("Access Token 및 Refresh Token 생성 완료 !!!!!!!!!!!!!!!!!!!!");
+
         Date expirationDate = jwtUtil.getExpirationDateFromToken(token);
         ZonedDateTime kstExpiration = ZonedDateTime.ofInstant(expirationDate.toInstant(), ZoneId.of("Asia/Seoul"));
 
@@ -124,23 +168,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 kstExpiration.getSecond()
         };
 
-        String refreshToken = jwtUtil.generateRefreshToken(tokenDTO);
-        log.info("토큰 생성 완료");
-
-        try {
-//            saveRefreshTokenToRedis(userCode, refreshToken);
-            saveRefreshToken(userCode, refreshToken);
-            log.info("Redis 및 DB에 Refresh Token 저장 완료");
-        } catch (Exception e) {
-            log.error("Redis 저장 실패: {}", e.getMessage(), e);
-        }
-
-        log.info("Generated exp for frontend: {}", expArray);
-
-        // JSON으로 토큰 반환
+        // JSON으로 사용자 데이터 반환
         Map<String, Object> responseData = new HashMap<>();
-        responseData.put("accessToken", token);
-        responseData.put("refreshToken", refreshToken);
+//        responseData.put("accessToken", token);
+//        responseData.put("refreshToken", refreshToken);
         responseData.put("exp", expArray);
         responseData.put("name", userName);
         responseData.put("code", userCode);
@@ -151,48 +182,21 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.getWriter().write(new ObjectMapper().writeValueAsString(responseData));
     }
 
-//    // Redis에 refreshToken 저장
-//    public void saveRefreshTokenToRedis(String userCode, String refreshToken) {
-//        try {
-//            log.info("Saved Refresh Token to Redis: Key=refreshToken:{}, Value={}", userCode, refreshToken);
-//
-//            // Redis에 refreshToken 저장
-//            redisTemplate.opsForValue().set(
-//                    "refreshToken:" + userCode,
-//                    refreshToken,
-//                    7, // 7일
-//                    TimeUnit.DAYS
-//            );
-//        } catch (Exception e) {
-//            log.error("Redis save fail - saveRefreshTokenToRedis : ", e);
-//        }
-//    }
 
-    // Refresh Token 저장 (Redis & DB 동시 저장)
-    public void saveRefreshToken(String userCode, String refreshToken) {
+    // Redis에 refreshToken 저장
+    public void saveRefreshTokenToRedis(String userCode, String refreshToken) {
         try {
-            // Redis에 저장
-            long redisStartTime = System.nanoTime();
+            log.info("Saved Refresh Token to Redis: Key=refreshToken:{}, Value={}", userCode, refreshToken);
+
+            // Redis에 refreshToken 저장
             redisTemplate.opsForValue().set(
                     "refreshToken:" + userCode,
                     refreshToken,
                     7, // 7일
                     TimeUnit.DAYS
             );
-            long redisEndTime = System.nanoTime();
-            log.info("⏱️ Redis 저장 시간: {} ns - userCode: {}", (redisEndTime - redisStartTime), userCode);
-            log.info("✅ Redis에 Refresh Token 저장 완료 - userCode: {}", userCode);
-
-            // DBMS에 저장
-            long dbStartTime = System.nanoTime();
-            refreshTokenService.saveRefreshTokenToDB(userCode, refreshToken);
-            long dbEndTime = System.nanoTime();
-            log.info("⏱️ DB 저장 시간: {} ns - userCode: {}", (dbEndTime - dbStartTime), userCode);
-
-            log.info("✅ DBMS에 Refresh Token 저장 완료 - userCode: {}", userCode);
-
         } catch (Exception e) {
-            log.error("❌ Refresh Token 저장 실패 (Redis 또는 DBMS) - userCode: {}", userCode, e);
+            log.error("Redis save fail - saveRefreshTokenToRedis : ", e);
         }
     }
 
